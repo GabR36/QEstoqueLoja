@@ -1,5 +1,8 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include <QFile>
+#include <QTextStream>
+#include <QMessageBox>
 
 QString nomeProduto;
 
@@ -18,7 +21,19 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_Btn_Enviar_clicked()
 {
-    nomeProduto += ui->Ledit_Nome->text() + " ";
+    nomeProduto += ui->Ledit_Nome->text() + "\n";
     ui->TxtB_Info->setText(nomeProduto);
+    QFile arquivo("/home/gabriel/source/QEstoqueLoja/QEstoqueLoja/estoque.txt");
+    if (arquivo.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        // Crie um objeto QTextStream para escrever no arquivo
+        QTextStream out(&arquivo);
+        // Escreva os dados no arquivo
+        out << nomeProduto;
+        // Feche o arquivo
+        arquivo.flush();
+        arquivo.close();
+    } else {
+        QMessageBox::warning(this,"ERRO", "Algo deu errado ao escrever no arquivo.");
+    }
 }
 

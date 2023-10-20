@@ -32,7 +32,7 @@ void MainWindow::on_Btn_Enviar_clicked()
 {
     nomeProduto += ui->Ledit_Nome->text() + "\n";
     ui->TxtB_Info->setText(nomeProduto);
-    QFile arquivo("/home/gabriel/source/QEstoqueLoja/QEstoqueLoja/estoque.txt");
+    QFile arquivo("../QEstoqueLoja/estoque.txt");
     if (arquivo.open(QIODevice::WriteOnly | QIODevice::Text)) {
         // Crie um objeto QTextStream para escrever no arquivo
         QTextStream out(&arquivo);

@@ -4,7 +4,7 @@
 #include <QTextStream>
 #include <QMessageBox>
 
-QString nomeProduto, quantidadeProduto, registro;
+QString nomeProduto, quantidadeProduto, registro, descProduto;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -32,7 +32,8 @@ void MainWindow::on_Btn_Enviar_clicked()
 {
     nomeProduto = ui->Ledit_Nome->text();
     quantidadeProduto = ui->Ledit_Quantidade->text();
-    registro += nomeProduto + " " + quantidadeProduto + "\n";
+    descProduto = ui->Ledit_Desc->text();
+    registro += nomeProduto + " " + quantidadeProduto + " " + descProduto + "\n";
     ui->TxtB_Info->setText(registro);
     QFile arquivo("../QEstoqueLoja/estoque.txt");
     if (arquivo.open(QIODevice::WriteOnly | QIODevice::Text)) {

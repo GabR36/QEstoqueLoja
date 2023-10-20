@@ -17,9 +17,9 @@
    <widget class="QPushButton" name="Btn_Enviar">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>80</y>
-      <width>80</width>
+      <x>70</x>
+      <y>180</y>
+      <width>273</width>
       <height>24</height>
      </rect>
     </property>
@@ -52,20 +52,42 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <rect>
       <x>70</x>
       <y>30</y>
-      <width>357</width>
-      <height>26</height>
+      <width>275</width>
+      <height>90</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>nome do produto: </string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="Ledit_Nome"/>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>nome do produto: </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="Ledit_Nome"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QLabel" name="Lbl_Quantidade">
+           <property name="text">
+            <string>quantidade:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="Ledit_Quantidade"/>
+         </item>
+        </layout>
+       </item>
+      </layout>
      </item>
     </layout>
    </widget>

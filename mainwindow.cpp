@@ -4,7 +4,7 @@
 #include <QTextStream>
 #include <QMessageBox>
 
-QString nomeProduto;
+QString nomeProduto, quantidadeProduto, registro;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -14,8 +14,8 @@ MainWindow::MainWindow(QWidget *parent)
     QFile arquivo("../QEstoqueLoja/estoque.txt");
     if (arquivo.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream entrada(&arquivo);
-        nomeProduto = entrada.readAll();
-        ui->TxtB_Info->setPlainText(nomeProduto);
+        registro = entrada.readAll();
+        ui->TxtB_Info->setPlainText(registro);
         arquivo.close();
     } else {
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao abrir o arquivo.");
@@ -30,14 +30,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_Btn_Enviar_clicked()
 {
-    nomeProduto += ui->Ledit_Nome->text() + "\n";
-    ui->TxtB_Info->setText(nomeProduto);
+    nomeProduto = ui->Ledit_Nome->text();
+    quantidadeProduto = ui->Ledit_Quantidade->text();
+    registro += nomeProduto + " " + quantidadeProduto + "\n";
+    ui->TxtB_Info->setText(registro);
     QFile arquivo("../QEstoqueLoja/estoque.txt");
     if (arquivo.open(QIODevice::WriteOnly | QIODevice::Text)) {
         // Crie um objeto QTextStream para escrever no arquivo
         QTextStream out(&arquivo);
         // Escreva os dados no arquivo
-        out << nomeProduto;
+        out << registro;
         // Feche o arquivo
         arquivo.flush();
         arquivo.close();

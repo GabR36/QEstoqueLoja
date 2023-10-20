@@ -11,6 +11,15 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    QFile arquivo("/home/gabriel/source/QEstoqueLoja/QEstoqueLoja/estoque.txt");
+    if (arquivo.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream entrada(&arquivo);
+        nomeProduto = entrada.readAll();
+        ui->TxtB_Info->setPlainText(nomeProduto);
+        arquivo.close();
+    } else {
+        QMessageBox::warning(this,"ERRO", "Algo deu errado ao abrir o arquivo.");
+    }
 }
 
 MainWindow::~MainWindow()

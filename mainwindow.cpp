@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QFile arquivo("/home/gabriel/source/QEstoqueLoja/QEstoqueLoja/estoque.txt");
+    QFile arquivo("../QEstoqueLoja/estoque.txt");
     if (arquivo.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream entrada(&arquivo);
         nomeProduto = entrada.readAll();

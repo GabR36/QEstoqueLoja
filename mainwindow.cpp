@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
         registro = entrada.readAll();
         ui->TxtB_Info->setPlainText(registro);
         arquivo.close();
+        ui->Ledit_Nome->setFocus();
     } else {
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao abrir o arquivo.");
     }
@@ -44,6 +45,10 @@ void MainWindow::on_Btn_Enviar_clicked()
         // Feche o arquivo
         arquivo.flush();
         arquivo.close();
+        ui->Ledit_Desc->clear();
+        ui->Ledit_Nome->clear();
+        ui->Ledit_Quantidade->clear();
+        ui->Ledit_Nome->setFocus();
     } else {
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao escrever no arquivo.");
     }

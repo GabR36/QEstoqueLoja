@@ -28,9 +28,10 @@ MainWindow::MainWindow(QWidget *parent)
     // ui->Tview_Produtos->setHorizontalHeader(cabecalhoTabela);
     QStandardItemModel *model = new QStandardItemModel(this);
     model->setRowCount(3);
-    model->setColumnCount(2);
+    model->setColumnCount(3);
     model->setHorizontalHeaderItem(0, new QStandardItem("Nome"));
-    model->setHorizontalHeaderItem(1, new QStandardItem("Idade"));
+    model->setHorizontalHeaderItem(1, new QStandardItem("Quantidade"));
+    model->setHorizontalHeaderItem(2, new QStandardItem("Descrição"));
 
     QStandardItem *item1 = new QStandardItem("Alice");
     QStandardItem *item2 = new QStandardItem("25");
@@ -38,6 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
     model->setItem(0, 1, item2);
     ui->Tview_Produtos->setModel(model);
     // ui->Tview_Produtos->horizontalHeader();
+    model->setRowCount(3+1);
+    ui->Tview_Produtos->setModel(model);
 }
 
 MainWindow::~MainWindow()

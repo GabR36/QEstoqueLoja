@@ -112,9 +112,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <widget class="QTableView" name="Tview_Produtos">
     <property name="geometry">
      <rect>
-      <x>460</x>
+      <x>375</x>
       <y>260</y>
-      <width>256</width>
+      <width>381</width>
       <height>192</height>
      </rect>
     </property>

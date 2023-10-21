@@ -3,7 +3,8 @@
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
-#include <QHeaderView>
+// #include <QHeaderView>
+#include <QStandardItemModel>
 
 QString nomeProduto, quantidadeProduto, registro, descProduto;
 
@@ -22,9 +23,20 @@ MainWindow::MainWindow(QWidget *parent)
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao abrir o arquivo.");
     }
     ui->Ledit_Nome->setFocus();
-    QHeaderView cabecalhoTabela(Qt::Horizontal, ui->widget);
-    ui->Tview_Produtos->setHorizontalHeader(cabecalhoTabela);
-    ui->Tview_Produtos->horizontalHeader();
+    // QHeaderView cabecalhoTabela(Qt::Horizontal, ui->widget);
+    // ui->Tview_Produtos->setHorizontalHeader(cabecalhoTabela);
+    QStandardItemModel *model = new QStandardItemModel(this);
+    model->setRowCount(3);
+    model->setColumnCount(2);
+    model->setHorizontalHeaderItem(0, new QStandardItem("Nome"));
+    model->setHorizontalHeaderItem(1, new QStandardItem("Idade"));
+
+    QStandardItem *item1 = new QStandardItem("Alice");
+    QStandardItem *item2 = new QStandardItem("25");
+    model->setItem(0, 0, item1);
+    model->setItem(0, 1, item2);
+    ui->Tview_Produtos->setModel(model);
+    // ui->Tview_Produtos->horizontalHeader();
 }
 
 MainWindow::~MainWindow()

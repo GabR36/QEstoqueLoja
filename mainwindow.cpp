@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QHeaderView>
 
 QString nomeProduto, quantidadeProduto, registro, descProduto;
 
@@ -17,10 +18,13 @@ MainWindow::MainWindow(QWidget *parent)
         registro = entrada.readAll();
         ui->TxtB_Info->setPlainText(registro);
         arquivo.close();
-        ui->Ledit_Nome->setFocus();
     } else {
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao abrir o arquivo.");
     }
+    ui->Ledit_Nome->setFocus();
+    QHeaderView cabecalhoTabela(Qt::Horizontal, ui->widget);
+    ui->Tview_Produtos->setHorizontalHeader(cabecalhoTabela);
+    ui->Tview_Produtos->horizontalHeader();
 }
 
 MainWindow::~MainWindow()

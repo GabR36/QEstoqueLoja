@@ -3,7 +3,6 @@
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
-// #include <QHeaderView>
 #include <QStandardItemModel>
 #include "produto.h"
 
@@ -26,22 +25,9 @@ MainWindow::MainWindow(QWidget *parent)
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao abrir o arquivo.");
     }
     ui->Ledit_Nome->setFocus();
-    // QHeaderView cabecalhoTabela(Qt::Horizontal, ui->widget);
-    // ui->Tview_Produtos->setHorizontalHeader(cabecalhoTabela);
-    model->setRowCount(3);
-    model->setColumnCount(3);
     model->setHorizontalHeaderItem(0, new QStandardItem("Nome"));
     model->setHorizontalHeaderItem(1, new QStandardItem("Quantidade"));
     model->setHorizontalHeaderItem(2, new QStandardItem("Descrição"));
-
-    QStandardItem *item1 = new QStandardItem("Alice");
-    QStandardItem *item2 = new QStandardItem("25");
-
-    model->setItem(0, 0, item1);
-    model->setItem(0, 1, item2);
-    ui->Tview_Produtos->setModel(model);
-    // ui->Tview_Produtos->horizontalHeader();
-    model->setRowCount(3+1);
     ui->Tview_Produtos->setModel(model);
 }
 

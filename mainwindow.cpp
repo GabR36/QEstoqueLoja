@@ -8,6 +8,8 @@
 #include "produto.h"
 
 QString nomeProduto, quantidadeProduto, registro, descProduto;
+int rowCount;
+QStandardItemModel *model = new QStandardItemModel();
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -26,7 +28,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Ledit_Nome->setFocus();
     // QHeaderView cabecalhoTabela(Qt::Horizontal, ui->widget);
     // ui->Tview_Produtos->setHorizontalHeader(cabecalhoTabela);
-    QStandardItemModel *model = new QStandardItemModel(this);
     model->setRowCount(3);
     model->setColumnCount(3);
     model->setHorizontalHeaderItem(0, new QStandardItem("Nome"));
@@ -35,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QStandardItem *item1 = new QStandardItem("Alice");
     QStandardItem *item2 = new QStandardItem("25");
+
     model->setItem(0, 0, item1);
     model->setItem(0, 1, item2);
     ui->Tview_Produtos->setModel(model);
@@ -55,6 +57,13 @@ void MainWindow::on_Btn_Enviar_clicked()
     quantidadeProduto = ui->Ledit_Quantidade->text();
     descProduto = ui->Ledit_Desc->text();
     registro += nomeProduto + " " + quantidadeProduto + " " + descProduto + "\n";
+    QStandardItem *newNome = new QStandardItem(nomeProduto);
+    QStandardItem *newQuantidade = new QStandardItem(quantidadeProduto);
+    QStandardItem *newDesc = new QStandardItem(descProduto);
+    rowCount = model->rowCount();
+    model->setItem(rowCount, 0, newNome);
+    model->setItem(rowCount, 1, newQuantidade);
+    model->setItem(rowCount, 2, newDesc);
     ui->TxtB_Info->setText(registro);
     QFile arquivo("../QEstoqueLoja/estoque.txt");
     if (arquivo.open(QIODevice::WriteOnly | QIODevice::Text)) {

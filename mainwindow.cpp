@@ -5,6 +5,7 @@
 #include <QMessageBox>
 // #include <QHeaderView>
 #include <QStandardItemModel>
+#include "produto.h"
 
 QString nomeProduto, quantidadeProduto, registro, descProduto;
 

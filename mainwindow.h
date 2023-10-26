@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include <QStandardItemModel>
+#include <vector>
+#include "produto.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -16,6 +18,7 @@ public:
     QString nomeProduto, quantidadeProduto, registro, descProduto;
     int rowCount;
     QStandardItemModel *model = new QStandardItemModel();
+    std::vector<Produto> produtos;
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 

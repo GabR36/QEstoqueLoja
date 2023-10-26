@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
         QTextStream entrada(&arquivo);
         registro = entrada.readAll();
         ui->TxtB_Info->setPlainText(registro);
+        while(arquivo >> )
         arquivo.close();
     } else {
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao abrir o arquivo.");

@@ -3,12 +3,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
-#include <QStandardItemModel>
 #include "produto.h"
-
-QString nomeProduto, quantidadeProduto, registro, descProduto;
-int rowCount;
-QStandardItemModel *model = new QStandardItemModel();
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

@@ -23,15 +23,16 @@ MainWindow::MainWindow(QWidget *parent)
                 QString nome = elementos[0];
                 int quant = elementos[1].toInt();
                 QString desc = elementos[2];
-                qDebug() << nome;
-                qDebug() << quant;
-                qDebug() << desc;
+                Produto novoProduto(nome, desc, quant);
+                produtos.push_back(novoProduto);
             }
             else{
                 qDebug() << "erro.";
             }
         }
         arquivo.close();
+        qDebug() << produtos[0].nome;
+        // qDebug() << produtos[1].nome;
     } else {
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao abrir o arquivo.");
     }
@@ -51,9 +52,11 @@ MainWindow::~MainWindow()
 void MainWindow::on_Btn_Enviar_clicked()
 {
     nomeProduto = ui->Ledit_Nome->text();
-    quantidadeProduto = ui->Ledit_Quantidade->text();
+    quantidadeProduto = ui->Ledit_Quantidade->text().toInt();
     descProduto = ui->Ledit_Desc->text();
-    registro += nomeProduto + "," + quantidadeProduto + "," + descProduto + "\n";
+    Produto addProduto(nomeProduto, descProduto, quantidadeProduto);
+    produtos.push_back(addProduto);
+    registro = nomeProduto + "," + quantidadeProduto + "," + descProduto + "/n";
     QStandardItem *newNome = new QStandardItem(nomeProduto);
     QStandardItem *newQuantidade = new QStandardItem(quantidadeProduto);
     QStandardItem *newDesc = new QStandardItem(descProduto);
@@ -63,7 +66,7 @@ void MainWindow::on_Btn_Enviar_clicked()
     model->setItem(rowCount, 2, newDesc);
     ui->TxtB_Info->setText(registro);
     QFile arquivo("../QEstoqueLoja/estoque.txt");
-    if (arquivo.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    if (arquivo.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
         // Crie um objeto QTextStream para escrever no arquivo
         QTextStream out(&arquivo);
         // Escreva os dados no arquivo

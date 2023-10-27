@@ -14,8 +14,6 @@ MainWindow::MainWindow(QWidget *parent)
     QFile arquivo("../QEstoqueLoja/estoque.txt");
     if (arquivo.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream entrada(&arquivo);
-        // registro = entrada.readAll();
-        // ui->TxtB_Info->setPlainText(registro);
         while(!entrada.atEnd()){
             QString linha = entrada.readLine();
             QStringList elementos = linha.split(',');
@@ -73,7 +71,6 @@ void MainWindow::on_Btn_Enviar_clicked()
     model->setItem(rowCount, 0, newNome);
     model->setItem(rowCount, 1, newQuantidade);
     model->setItem(rowCount, 2, newDesc);
-    ui->TxtB_Info->setText(registro);
     QFile arquivo("../QEstoqueLoja/estoque.txt");
     if (arquivo.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
         // Crie um objeto QTextStream para escrever no arquivo

@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
         QTextStream entrada(&arquivo);
         registro = entrada.readAll();
         ui->TxtB_Info->setPlainText(registro);
-        while(arquivo >> )
+        // while(arquivo >> )
         arquivo.close();
     } else {
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao abrir o arquivo.");
@@ -38,7 +38,7 @@ void MainWindow::on_Btn_Enviar_clicked()
     nomeProduto = ui->Ledit_Nome->text();
     quantidadeProduto = ui->Ledit_Quantidade->text();
     descProduto = ui->Ledit_Desc->text();
-    registro += nomeProduto + " " + quantidadeProduto + " " + descProduto + "\n";
+    registro += nomeProduto + "," + quantidadeProduto + "," + descProduto + "\n";
     QStandardItem *newNome = new QStandardItem(nomeProduto);
     QStandardItem *newQuantidade = new QStandardItem(quantidadeProduto);
     QStandardItem *newDesc = new QStandardItem(descProduto);

@@ -31,7 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
             }
         }
         arquivo.close();
-    } else {
+    }
+    else {
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao abrir o arquivo.");
     }
     ui->Ledit_Nome->setFocus();
@@ -39,6 +40,16 @@ MainWindow::MainWindow(QWidget *parent)
     model->setHorizontalHeaderItem(1, new QStandardItem("Quantidade"));
     model->setHorizontalHeaderItem(2, new QStandardItem("Descrição"));
     ui->Tview_Produtos->setModel(model);
+
+    for(int i = 0;i < produtos.size(); i++){
+        QStandardItem *newNome = new QStandardItem(produtos[i].nome);
+        QStandardItem *newQuantidade = new QStandardItem(QString::number(produtos[i].quantidade));
+        QStandardItem *newDesc = new QStandardItem(produtos[i].descricao);
+        rowCount = model->rowCount();
+        model->setItem(rowCount, 0, newNome);
+        model->setItem(rowCount, 1, newQuantidade);
+        model->setItem(rowCount, 2, newDesc);
+    }
 }
 
 MainWindow::~MainWindow()

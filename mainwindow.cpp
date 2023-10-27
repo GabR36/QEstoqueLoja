@@ -31,8 +31,6 @@ MainWindow::MainWindow(QWidget *parent)
             }
         }
         arquivo.close();
-        qDebug() << produtos[0].nome;
-        // qDebug() << produtos[1].nome;
     } else {
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao abrir o arquivo.");
     }
@@ -52,11 +50,11 @@ MainWindow::~MainWindow()
 void MainWindow::on_Btn_Enviar_clicked()
 {
     nomeProduto = ui->Ledit_Nome->text();
-    quantidadeProduto = ui->Ledit_Quantidade->text().toInt();
+    quantidadeProduto = ui->Ledit_Quantidade->text();
     descProduto = ui->Ledit_Desc->text();
-    Produto addProduto(nomeProduto, descProduto, quantidadeProduto);
+    Produto addProduto(nomeProduto, descProduto, quantidadeProduto.toInt());
     produtos.push_back(addProduto);
-    registro = nomeProduto + "," + quantidadeProduto + "," + descProduto + "/n";
+    registro = nomeProduto + "," + quantidadeProduto + "," + descProduto + "\n";
     QStandardItem *newNome = new QStandardItem(nomeProduto);
     QStandardItem *newQuantidade = new QStandardItem(quantidadeProduto);
     QStandardItem *newDesc = new QStandardItem(descProduto);

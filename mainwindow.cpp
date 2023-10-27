@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include "produto.h"
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -13,9 +14,23 @@ MainWindow::MainWindow(QWidget *parent)
     QFile arquivo("../QEstoqueLoja/estoque.txt");
     if (arquivo.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream entrada(&arquivo);
-        registro = entrada.readAll();
-        ui->TxtB_Info->setPlainText(registro);
-        // while(arquivo >> )
+        // registro = entrada.readAll();
+        // ui->TxtB_Info->setPlainText(registro);
+        while(!entrada.atEnd()){
+            QString linha = entrada.readLine();
+            QStringList elementos = linha.split(',');
+            if (elementos.size() == 3){
+                QString nome = elementos[0];
+                int quant = elementos[1].toInt();
+                QString desc = elementos[2];
+                qDebug() << nome;
+                qDebug() << quant;
+                qDebug() << desc;
+            }
+            else{
+                qDebug() << "erro.";
+            }
+        }
         arquivo.close();
     } else {
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao abrir o arquivo.");

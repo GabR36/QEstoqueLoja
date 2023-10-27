@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     model->setHorizontalHeaderItem(1, new QStandardItem("Quantidade"));
     model->setHorizontalHeaderItem(2, new QStandardItem("Descrição"));
     ui->Tview_Produtos->setModel(model);
+    ui->Tview_Produtos->setColumnWidth(2, 165);
 
     for(int i = 0;i < produtos.size(); i++){
         QStandardItem *newNome = new QStandardItem(produtos[i].nome);

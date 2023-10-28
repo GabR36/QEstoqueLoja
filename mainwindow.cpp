@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     QFile arquivo("../QEstoqueLoja/estoque.txt");
     if (arquivo.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        idCont = 0;
         QTextStream entrada(&arquivo);
         while(!entrada.atEnd()){
             QString linha = entrada.readLine();
@@ -24,6 +25,9 @@ MainWindow::MainWindow(QWidget *parent)
                 int id = elementos[3].toInt();
                 Produto novoProduto(nome, desc, quant, id);
                 produtos.push_back(novoProduto);
+                if (id > idCont){
+                    idCont = id;
+                }
             }
             else{
                 qDebug() << "erro.";

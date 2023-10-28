@@ -110,6 +110,9 @@ void MainWindow::on_Btn_delet_clicked()
     for (int i = 0; i < produtos.size(); i++){
         if (produtos[i].id == idDelet){
             produtos.erase(produtos.begin() + i);
+            // remover registro da tabela
+            model->removeRow(idDelet);
+
         }
     }
 }

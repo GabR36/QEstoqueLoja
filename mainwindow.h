@@ -25,6 +25,8 @@ public:
 private slots:
     void on_Btn_Enviar_clicked();
 
+    void on_Btn_delet_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

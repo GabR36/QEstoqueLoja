@@ -117,12 +117,12 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEdit"/>
+        <widget class="QLineEdit" name="Ledit_idDelet"/>
        </item>
       </layout>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="Btn_delet">
        <property name="text">
         <string>Deletar</string>
        </property>

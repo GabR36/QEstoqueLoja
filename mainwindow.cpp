@@ -102,3 +102,15 @@ void MainWindow::on_Btn_Enviar_clicked()
     }
 }
 
+
+void MainWindow::on_Btn_delet_clicked()
+{
+    int idDelet = ui->Ledit_idDelet->text().toInt();
+    // excluir do vetor, do arquivo de texto e da tabela.
+    for (int i = 0; i < produtos.size(); i++){
+        if (produtos[i].id == idDelet){
+            produtos.erase(produtos.begin() + i);
+        }
+    }
+}
+

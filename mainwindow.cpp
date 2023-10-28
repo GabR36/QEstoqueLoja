@@ -70,7 +70,7 @@ void MainWindow::on_Btn_Enviar_clicked()
     QString idContTxt = QString::number(idCont);
     Produto addProduto(nomeProduto, descProduto, quantidadeProduto.toInt(), idCont);
     produtos.push_back(addProduto);
-    registro = nomeProduto + "," + quantidadeProduto + "," + descProduto + idContTxt +"\n";
+    registro = nomeProduto + "," + quantidadeProduto + "," + descProduto + "," + idContTxt +"\n";
     QStandardItem *newNome = new QStandardItem(nomeProduto);
     QStandardItem *newQuantidade = new QStandardItem(quantidadeProduto);
     QStandardItem *newDesc = new QStandardItem(descProduto);

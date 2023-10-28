@@ -16,7 +16,7 @@ class MainWindow : public QMainWindow
 
 public:
     QString nomeProduto, quantidadeProduto, registro, descProduto;
-    int rowCount;
+    int rowCount, idCont;
     QStandardItemModel *model = new QStandardItemModel();
     std::vector<Produto> produtos;
     MainWindow(QWidget *parent = nullptr);

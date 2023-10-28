@@ -7,10 +7,11 @@
 class Produto
 {
 public:
+    int id;
     QString nome;
     QString descricao;
     int quantidade;
-    Produto(QString nomeArg, QString descArg, int quantArg);
+    Produto(QString nomeArg, QString descArg, int quantArg, int idArg);
 };
 
 #endif // PRODUTO_H

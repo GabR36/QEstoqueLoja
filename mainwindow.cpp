@@ -17,11 +17,12 @@ MainWindow::MainWindow(QWidget *parent)
         while(!entrada.atEnd()){
             QString linha = entrada.readLine();
             QStringList elementos = linha.split(',');
-            if (elementos.size() == 3){
+            if (elementos.size() == 4){
                 QString nome = elementos[0];
                 int quant = elementos[1].toInt();
                 QString desc = elementos[2];
-                Produto novoProduto(nome, desc, quant);
+                int id = elementos[3].toInt();
+                Produto novoProduto(nome, desc, quant, id);
                 produtos.push_back(novoProduto);
             }
             else{
@@ -37,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent)
     model->setHorizontalHeaderItem(0, new QStandardItem("Nome"));
     model->setHorizontalHeaderItem(1, new QStandardItem("Quantidade"));
     model->setHorizontalHeaderItem(2, new QStandardItem("Descrição"));
+    model->setHorizontalHeaderItem(3, new QStandardItem("ID"));
     ui->Tview_Produtos->setModel(model);
     ui->Tview_Produtos->setColumnWidth(2, 165);
 
@@ -44,10 +46,12 @@ MainWindow::MainWindow(QWidget *parent)
         QStandardItem *newNome = new QStandardItem(produtos[i].nome);
         QStandardItem *newQuantidade = new QStandardItem(QString::number(produtos[i].quantidade));
         QStandardItem *newDesc = new QStandardItem(produtos[i].descricao);
+        QStandardItem *newId = new QStandardItem(QString::number(produtos[i].id));
         rowCount = model->rowCount();
         model->setItem(rowCount, 0, newNome);
         model->setItem(rowCount, 1, newQuantidade);
         model->setItem(rowCount, 2, newDesc);
+        model->setItem(rowCount, 3, newId);
     }
 }
 
@@ -62,16 +66,20 @@ void MainWindow::on_Btn_Enviar_clicked()
     nomeProduto = ui->Ledit_Nome->text();
     quantidadeProduto = ui->Ledit_Quantidade->text();
     descProduto = ui->Ledit_Desc->text();
-    Produto addProduto(nomeProduto, descProduto, quantidadeProduto.toInt());
+    idCont = idCont + 1;
+    QString idContTxt = QString::number(idCont);
+    Produto addProduto(nomeProduto, descProduto, quantidadeProduto.toInt(), idCont);
     produtos.push_back(addProduto);
-    registro = nomeProduto + "," + quantidadeProduto + "," + descProduto + "\n";
+    registro = nomeProduto + "," + quantidadeProduto + "," + descProduto + idContTxt +"\n";
     QStandardItem *newNome = new QStandardItem(nomeProduto);
     QStandardItem *newQuantidade = new QStandardItem(quantidadeProduto);
     QStandardItem *newDesc = new QStandardItem(descProduto);
+    QStandardItem *newId = new QStandardItem(idContTxt);
     rowCount = model->rowCount();
     model->setItem(rowCount, 0, newNome);
     model->setItem(rowCount, 1, newQuantidade);
     model->setItem(rowCount, 2, newDesc);
+    model->setItem(rowCount, 3, newId);
     QFile arquivo("../QEstoqueLoja/estoque.txt");
     if (arquivo.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
         // Crie um objeto QTextStream para escrever no arquivo

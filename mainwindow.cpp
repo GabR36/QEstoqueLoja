@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include "produto.h"
+#include <QXmlStreamWriter>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -49,6 +50,44 @@ MainWindow::MainWindow(QWidget *parent)
         model->setItem(rowCount, 1, newQuantidade);
         model->setItem(rowCount, 2, newDesc);
     }
+    // teste xml
+
+    QFile file("../QEstoqueLoja/exemplo.xml");
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qDebug() << "Falha ao criar o arquivo XML";
+    }
+
+    // Crie um QXmlStreamWriter e associe-o ao arquivo
+    QXmlStreamWriter xmlWriter(&file);
+
+    // Configurar o QXmlStreamWriter
+    xmlWriter.setAutoFormatting(true);  // Formatação automática para legibilidade
+
+    // Inicie o documento XML
+    xmlWriter.writeStartDocument();
+
+    // Escreva um elemento raiz
+    xmlWriter.writeStartElement("root");
+
+    // Escreva elementos filhos
+    xmlWriter.writeStartElement("produto");
+        xmlWriter.writeStartElement("nome");
+        xmlWriter.writeCharacters("machado");
+        xmlWriter.writeEndElement();
+        xmlWriter.writeStartElement("quantidade");
+        xmlWriter.writeEndElement();
+        xmlWriter.writeStartElement("descricao");
+        xmlWriter.writeEndElement();
+    xmlWriter.writeEndElement();
+
+    // Encerre o elemento raiz
+    xmlWriter.writeEndElement();
+
+    // Finalize o documento XML
+    xmlWriter.writeEndDocument();
+
+    // Feche o arquivo
+    file.close();
 }
 
 MainWindow::~MainWindow()

@@ -12,7 +12,12 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QFile arquivo("../QEstoqueLoja/estoque.txt");
+    QFile arquivo("../QEstoqueLoja/estoque.xml");
+    QXmlStreamWriter xmlWriter(&arquivo);
+    xmlWriter.setAutoFormatting(true);
+    if (!arquivo.exists()){
+        xmlWriter.writeStartDocument();
+    }
     if (arquivo.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QTextStream entrada(&arquivo);
         while(!entrada.atEnd()){

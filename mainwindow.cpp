@@ -4,7 +4,8 @@
 #include <QTextStream>
 #include <QMessageBox>
 #include "produto.h"
-
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -49,6 +50,13 @@ MainWindow::MainWindow(QWidget *parent)
         model->setItem(rowCount, 1, newQuantidade);
         model->setItem(rowCount, 2, newDesc);
     }
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("estoque.db");
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados.";
+    }
+
+
 }
 
 MainWindow::~MainWindow()

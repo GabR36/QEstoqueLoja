@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include "produto.h"
 #include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -12,26 +13,45 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    // começo leitura do arquivo
     QFile arquivo("../QEstoqueLoja/estoque.xml");
-    QXmlStreamWriter xmlWriter(&arquivo);
-    xmlWriter.setAutoFormatting(true);
     if (!arquivo.exists()){
-        xmlWriter.writeStartDocument();
+        if (arquivo.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+            QXmlStreamWriter xmlWriter(&arquivo);
+            xmlWriter.setAutoFormatting(true);
+            xmlWriter.writeStartDocument();
+            xmlWriter.writeStartElement("produtos");
+            arquivo.close();
+        }
+        qDebug() << "erro ao iniciar arquivo xml.";
     }
     if (arquivo.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream entrada(&arquivo);
-        while(!entrada.atEnd()){
-            QString linha = entrada.readLine();
-            QStringList elementos = linha.split(',');
-            if (elementos.size() == 3){
-                QString nome = elementos[0];
-                int quant = elementos[1].toInt();
-                QString desc = elementos[2];
-                Produto novoProduto(nome, desc, quant);
-                produtos.push_back(novoProduto);
+        QXmlStreamReader xmlReader(&arquivo);
+        QString nome, quant, desc;
+        while(!xmlReader.atEnd()){
+            xmlReader.readNext();
+            if (xmlReader.isStartElement()){
+                if (xmlReader.name() == QStringLiteral("nome")){
+                    xmlReader.readNext();
+                    nome = xmlReader.text().toString();
+                }
+                else {
+                    if (xmlReader.name() == QStringLiteral("quantidade")){
+                        xmlReader.readNext();
+                        quant = xmlReader.text().toString();
+                    }
+                    else {
+                        if (xmlReader.name() == QStringLiteral("descricao")){
+                            xmlReader.readNext();
+                            desc = xmlReader.text().toString();
+                        }
+                    }
+                }
             }
-            else{
-                qDebug() << "erro.";
+            if (xmlReader.isEndElement() && xmlReader.name() == QStringLiteral("produto")) {
+                Produto novoProduto(nome, desc, quant.toInt());
+                produtos.push_back(novoProduto);
+                qDebug() << produtos[1].nome;
             }
         }
         arquivo.close();
@@ -39,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
     else {
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao abrir o arquivo.");
     }
+    // fim da leitura do arquivo
     ui->Ledit_Nome->setFocus();
     model->setHorizontalHeaderItem(0, new QStandardItem("Nome"));
     model->setHorizontalHeaderItem(1, new QStandardItem("Quantidade"));
@@ -55,44 +76,6 @@ MainWindow::MainWindow(QWidget *parent)
         model->setItem(rowCount, 1, newQuantidade);
         model->setItem(rowCount, 2, newDesc);
     }
-    // teste xml
-
-    QFile file("../QEstoqueLoja/exemplo.xml");
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qDebug() << "Falha ao criar o arquivo XML";
-    }
-
-    // Crie um QXmlStreamWriter e associe-o ao arquivo
-    QXmlStreamWriter xmlWriter(&file);
-
-    // Configurar o QXmlStreamWriter
-    xmlWriter.setAutoFormatting(true);  // Formatação automática para legibilidade
-
-    // Inicie o documento XML
-    xmlWriter.writeStartDocument();
-
-    // Escreva um elemento raiz
-    xmlWriter.writeStartElement("root");
-
-    // Escreva elementos filhos
-    xmlWriter.writeStartElement("produto");
-        xmlWriter.writeStartElement("nome");
-        xmlWriter.writeCharacters("machado");
-        xmlWriter.writeEndElement();
-        xmlWriter.writeStartElement("quantidade");
-        xmlWriter.writeEndElement();
-        xmlWriter.writeStartElement("descricao");
-        xmlWriter.writeEndElement();
-    xmlWriter.writeEndElement();
-
-    // Encerre o elemento raiz
-    xmlWriter.writeEndElement();
-
-    // Finalize o documento XML
-    xmlWriter.writeEndDocument();
-
-    // Feche o arquivo
-    file.close();
 }
 
 MainWindow::~MainWindow()
@@ -108,7 +91,6 @@ void MainWindow::on_Btn_Enviar_clicked()
     descProduto = ui->Ledit_Desc->text();
     Produto addProduto(nomeProduto, descProduto, quantidadeProduto.toInt());
     produtos.push_back(addProduto);
-    registro = nomeProduto + "," + quantidadeProduto + "," + descProduto + "\n";
     QStandardItem *newNome = new QStandardItem(nomeProduto);
     QStandardItem *newQuantidade = new QStandardItem(quantidadeProduto);
     QStandardItem *newDesc = new QStandardItem(descProduto);
@@ -116,13 +98,23 @@ void MainWindow::on_Btn_Enviar_clicked()
     model->setItem(rowCount, 0, newNome);
     model->setItem(rowCount, 1, newQuantidade);
     model->setItem(rowCount, 2, newDesc);
-    QFile arquivo("../QEstoqueLoja/estoque.txt");
+    // começo escrita do arquivo
+    QFile arquivo("../QEstoqueLoja/estoque.xml");
     if (arquivo.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
-        // Crie um objeto QTextStream para escrever no arquivo
-        QTextStream out(&arquivo);
-        // Escreva os dados no arquivo
-        out << registro;
-        // Feche o arquivo
+        QXmlStreamWriter xmlWriter(&arquivo);
+        xmlWriter.setAutoFormatting(true);
+        xmlWriter.writeStartElement("produto");
+        xmlWriter.writeStartElement("nome");
+        xmlWriter.writeCharacters(addProduto.nome);
+        xmlWriter.writeEndElement();
+        xmlWriter.writeStartElement("quantidade");
+        xmlWriter.writeCharacters(QString::number(addProduto.quantidade));
+        xmlWriter.writeEndElement();
+        xmlWriter.writeStartElement("descricao");
+        xmlWriter.writeCharacters(addProduto.descricao);
+        xmlWriter.writeEndElement();
+        xmlWriter.writeEndElement();
+        xmlWriter.writeEndDocument();
         arquivo.flush();
         arquivo.close();
         ui->Ledit_Desc->clear();
@@ -132,5 +124,6 @@ void MainWindow::on_Btn_Enviar_clicked()
     } else {
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao escrever no arquivo.");
     }
+    // fim escrita do arquivo
 }
 

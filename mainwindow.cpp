@@ -55,8 +55,15 @@ MainWindow::MainWindow(QWidget *parent)
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";
     }
-
-
+    QSqlQuery query;
+    query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY, nome TEXT, quantidade INTEGER, descricao TEXT)");
+    if (query.isActive()) {
+        qDebug() << "Tabela criada com sucesso!";
+    } else {
+        qDebug() << "Erro ao criar tabela: ";
+    }
+    qDebug() << db.tables();
+    QSqlDatabase::database().close();
 }
 
 MainWindow::~MainWindow()

@@ -50,13 +50,12 @@ MainWindow::MainWindow(QWidget *parent)
         model->setItem(rowCount, 1, newQuantidade);
         model->setItem(rowCount, 2, newDesc);
     }
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("estoque.db");
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";
     }
     QSqlQuery query;
-    query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY, nome TEXT, quantidade INTEGER, descricao TEXT)");
+    query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT, quantidade INTEGER, descricao TEXT)");
     if (query.isActive()) {
         qDebug() << "Tabela criada com sucesso!";
     } else {
@@ -102,6 +101,26 @@ void MainWindow::on_Btn_Enviar_clicked()
         ui->Ledit_Nome->setFocus();
     } else {
         QMessageBox::warning(this,"ERRO", "Algo deu errado ao escrever no arquivo.");
+    }
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. botao enviar.";
+    }
+    QSqlQuery query;
+
+    // Definir o comando SQL de inserção
+    QString insertSql = "INSERT INTO produtos (nome, quantidade, descricao) VALUES (:valor2, :valor3, :valor4)";
+    query.prepare(insertSql);
+
+    // Atribuir valores aos parâmetros
+    query.bindValue(":valor2", nomeProduto);
+    query.bindValue(":valor3", quantidadeProduto);
+    query.bindValue(":valor4", descProduto);
+
+    // Executar a consulta
+    if (query.exec()) {
+        qDebug() << "Inserção bem-sucedida!";
+    } else {
+        qDebug() << "Erro na inserção: ";
     }
 }
 

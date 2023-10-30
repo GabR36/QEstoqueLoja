@@ -5,6 +5,7 @@
 #include <QStandardItemModel>
 #include <vector>
 #include "produto.h"
+#include <QSqlDatabase>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -19,6 +20,7 @@ public:
     int rowCount;
     QStandardItemModel *model = new QStandardItemModel();
     std::vector<Produto> produtos;
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 

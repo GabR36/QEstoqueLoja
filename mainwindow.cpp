@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
             xmlWriter.setAutoFormatting(true);
             xmlWriter.writeStartDocument();
             xmlWriter.writeStartElement("produtos");
+            xmlWriter.writeEndDocument();
             arquivo.close();
         }
         qDebug() << "erro ao iniciar arquivo xml.";
@@ -102,7 +103,6 @@ void MainWindow::on_Btn_Enviar_clicked()
     QFile arquivo("../QEstoqueLoja/estoque.xml");
     if (arquivo.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
         QXmlStreamWriter xmlWriter(&arquivo);
-        xmlWriter.setAutoFormatting(true);
         xmlWriter.writeStartElement("produto");
         xmlWriter.writeStartElement("nome");
         xmlWriter.writeCharacters(addProduto.nome);

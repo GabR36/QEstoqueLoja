@@ -18,7 +18,6 @@ class MainWindow : public QMainWindow
 public:
     QString nomeProduto, quantidadeProduto, registro, descProduto;
     int rowCount;
-    QStandardItemModel *model = new QStandardItemModel();
     std::vector<Produto> produtos;
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     MainWindow(QWidget *parent = nullptr);

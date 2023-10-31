@@ -30,5 +30,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    void atualizarTableview();
 };
 #endif // MAINWINDOW_H

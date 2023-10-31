@@ -28,8 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug() << db.tables();
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
-    model->setQuery("SELECT * FROM produtos");
-    ui->Tview_Produtos->setModel(model);
+    atualizarTableview();
     QSqlDatabase::database().close();
 }
 
@@ -38,6 +37,10 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::atualizarTableview(){
+    model->setQuery("SELECT * FROM produtos");
+    ui->Tview_Produtos->setModel(model);
+}
 
 void MainWindow::on_Btn_Enviar_clicked()
 {
@@ -60,8 +63,7 @@ void MainWindow::on_Btn_Enviar_clicked()
     } else {
         qDebug() << "Erro na inserção: ";
     }
-    model->setQuery("SELECT * FROM produtos");
-    ui->Tview_Produtos->setModel(model);
+    atualizarTableview();
     QSqlDatabase::database().close();
 }
 

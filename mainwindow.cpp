@@ -28,7 +28,6 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug() << db.tables();
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
-    QSqlQueryModel* model = new QSqlQueryModel;
     model->setQuery("SELECT * FROM produtos");
     ui->Tview_Produtos->setModel(model);
     QSqlDatabase::database().close();
@@ -45,6 +44,7 @@ void MainWindow::on_Btn_Enviar_clicked()
     nomeProduto = ui->Ledit_Nome->text();
     quantidadeProduto = ui->Ledit_Quantidade->text();
     descProduto = ui->Ledit_Desc->text();
+
     // adicionar ao banco de dados
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao enviar.";
@@ -60,6 +60,8 @@ void MainWindow::on_Btn_Enviar_clicked()
     } else {
         qDebug() << "Erro na inserção: ";
     }
+    model->setQuery("SELECT * FROM produtos");
+    ui->Tview_Produtos->setModel(model);
     QSqlDatabase::database().close();
 }
 

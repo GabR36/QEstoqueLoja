@@ -6,6 +6,7 @@
 #include <vector>
 #include "produto.h"
 #include <QSqlDatabase>
+#include <QSqlQueryModel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -20,6 +21,7 @@ public:
     int rowCount;
     std::vector<Produto> produtos;
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    QSqlQueryModel* model = new QSqlQueryModel;
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 

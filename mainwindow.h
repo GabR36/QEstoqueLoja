@@ -28,6 +28,8 @@ public:
 private slots:
     void on_Btn_Enviar_clicked();
 
+    void on_Btn_Delete_clicked();
+
 private:
     Ui::MainWindow *ui;
     void atualizarTableview();

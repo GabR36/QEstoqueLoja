@@ -67,3 +67,24 @@ void MainWindow::on_Btn_Enviar_clicked()
     QSqlDatabase::database().close();
 }
 
+
+void MainWindow::on_Btn_Delete_clicked()
+{
+    QString idDelet = ui->Ledit_Delete->text();
+    // remover registro do banco de dados
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. botao deletar.";
+    }
+    QSqlQuery query;
+
+    query.prepare("DELETE FROM produtos WHERE id = :valor1");
+    query.bindValue(":valor1", idDelet);
+    if (query.exec()) {
+        qDebug() << "Inserção bem-sucedida!";
+    } else {
+        qDebug() << "Erro na inserção: ";
+    }
+    atualizarTableview();
+    QSqlDatabase::database().close();
+}
+

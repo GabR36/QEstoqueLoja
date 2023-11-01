@@ -30,6 +30,8 @@ MainWindow::MainWindow(QWidget *parent)
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
     atualizarTableview();
     QSqlDatabase::database().close();
+    //
+    ui->Ledit_Nome->setFocus();
 }
 
 MainWindow::~MainWindow()
@@ -65,6 +67,11 @@ void MainWindow::on_Btn_Enviar_clicked()
     }
     atualizarTableview();
     QSqlDatabase::database().close();
+    // limpar campos para nova inserçao
+    ui->Ledit_Desc->clear();
+    ui->Ledit_Nome->clear();
+    ui->Ledit_Quantidade->clear();
+    ui->Ledit_Nome->setFocus();
 }
 
 
@@ -86,5 +93,8 @@ void MainWindow::on_Btn_Delete_clicked()
     }
     atualizarTableview();
     QSqlDatabase::database().close();
+    // limpar campo para nova inserçao
+    ui->Ledit_Delete->clear();
+    ui->Ledit_Delete->setFocus();
 }
 

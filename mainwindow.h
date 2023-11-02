@@ -17,8 +17,6 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    int rowCount;
-    std::vector<Produto> produtos;
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     QSqlQueryModel* model = new QSqlQueryModel;
     MainWindow(QWidget *parent = nullptr);

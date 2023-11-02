@@ -57,7 +57,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>70</x>
@@ -143,6 +143,28 @@
       <widget class="QPushButton" name="Btn_Enviar">
        <property name="text">
         <string>Enviar</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>320</y>
+      <width>381</width>
+      <height>55</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_7">
+     <item>
+      <widget class="QLineEdit" name="Ledit_Pesquisa"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Btn_Pesquisa">
+       <property name="text">
+        <string>pesquisar</string>
        </property>
       </widget>
      </item>

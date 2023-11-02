@@ -102,3 +102,9 @@ void MainWindow::on_Btn_Delete_clicked()
     ui->Ledit_Delete->setFocus();
 }
 
+
+void MainWindow::on_Btn_Pesquisa_clicked()
+{
+
+}
+

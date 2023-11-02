@@ -27,6 +27,8 @@ private slots:
 
     void on_Btn_Delete_clicked();
 
+    void on_Btn_Pesquisa_clicked();
+
 private:
     Ui::MainWindow *ui;
     void atualizarTableview();

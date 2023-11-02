@@ -105,6 +105,21 @@ void MainWindow::on_Btn_Delete_clicked()
 
 void MainWindow::on_Btn_Pesquisa_clicked()
 {
+    QString pesquisa = ui->Ledit_Pesquisa->text();
+    // mostrar na tableview a consulta
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. botao pesquisar.";
+    }
+    QSqlQuery query;
+    query.prepare("SELECT * FROM produtos WHERE nome LIKE :valor1");
+    query.bindValue(":valor1", "%" + pesquisa + "%");
+    if (query.exec()){
+        model->setQuery(query);
+        ui->Tview_Produtos->setModel(model);
+
+    } else {
+        qDebug() << "consulta nao executada.";
+    }
 
 }
 

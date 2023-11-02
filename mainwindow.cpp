@@ -19,7 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "erro ao abrir banco de dados.";
     }
     QSqlQuery query;
-    query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT, quantidade INTEGER, descricao TEXT)");
+    query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2))");
     if (query.isActive()) {
         qDebug() << "Tabela criada com sucesso!";
     } else {
@@ -46,9 +46,11 @@ void MainWindow::atualizarTableview(){
 
 void MainWindow::on_Btn_Enviar_clicked()
 {
+    QString nomeProduto, quantidadeProduto, descProduto, precoProduto;
     nomeProduto = ui->Ledit_Nome->text();
     quantidadeProduto = ui->Ledit_Quantidade->text();
     descProduto = ui->Ledit_Desc->text();
+    precoProduto = ui->Ledit_Preco->text();
 
     // adicionar ao banco de dados
     if(!db.open()){
@@ -56,10 +58,11 @@ void MainWindow::on_Btn_Enviar_clicked()
     }
     QSqlQuery query;
 
-    query.prepare("INSERT INTO produtos (nome, quantidade, descricao) VALUES (:valor1, :valor2, :valor3)");
+    query.prepare("INSERT INTO produtos (nome, quantidade, descricao, preco) VALUES (:valor1, :valor2, :valor3, :valor4)");
     query.bindValue(":valor1", nomeProduto);
     query.bindValue(":valor2", quantidadeProduto);
     query.bindValue(":valor3", descProduto);
+    query.bindValue(":valor4", precoProduto);
     if (query.exec()) {
         qDebug() << "Inserção bem-sucedida!";
     } else {
@@ -71,6 +74,7 @@ void MainWindow::on_Btn_Enviar_clicked()
     ui->Ledit_Desc->clear();
     ui->Ledit_Nome->clear();
     ui->Ledit_Quantidade->clear();
+    ui->Ledit_Preco->clear();
     ui->Ledit_Nome->setFocus();
 }
 

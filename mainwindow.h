@@ -17,7 +17,6 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    QString nomeProduto, quantidadeProduto, registro, descProduto;
     int rowCount;
     std::vector<Produto> produtos;
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");

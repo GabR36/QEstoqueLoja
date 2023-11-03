@@ -29,6 +29,8 @@ private slots:
 
     void on_Btn_Pesquisa_clicked();
 
+    void on_Btn_Vender_clicked();
+
 private:
     Ui::MainWindow *ui;
     void atualizarTableview();

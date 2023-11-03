@@ -115,3 +115,9 @@ void MainWindow::on_Btn_Pesquisa_clicked()
     QSqlDatabase::database().close();
 }
 
+
+void MainWindow::on_Btn_Vender_clicked()
+{
+
+}
+

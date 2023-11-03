@@ -142,3 +142,30 @@ void MainWindow::on_Btn_Vender_clicked()
     ui->Ledit_VendaId->clear();
 }
 
+
+void MainWindow::on_pushButton_clicked()
+{
+    QString idVenda = ui->Ledit_VendaId->text();
+    QString quantVenda = ui->Ledit_VendaQuant->text();
+    // alterar banco de dados
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. botao comprar.";
+    }
+    QSqlQuery query;
+
+    query.prepare("UPDATE produtos SET quantidade = quantidade + :valor1 WHERE id = :valor2");
+    query.bindValue(":valor1", quantVenda);
+    query.bindValue(":valor2", idVenda);
+    if (query.exec()) {
+        qDebug() << "Inserção bem-sucedida!";
+    } else {
+        qDebug() << "Erro na inserção: ";
+    }
+    // mostrar na tableview
+    atualizarTableview();
+    QSqlDatabase::database().close();
+    // limpar campos para nova inserção
+    ui->Ledit_VendaQuant->clear();
+    ui->Ledit_VendaId->clear();
+}
+

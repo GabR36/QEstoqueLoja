@@ -175,43 +175,54 @@
      <rect>
       <x>40</x>
       <y>340</y>
-      <width>237</width>
-      <height>88</height>
+      <width>239</width>
+      <height>120</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout_8">
+    <layout class="QVBoxLayout" name="verticalLayout_9">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Quantidade: </string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Quantidade: </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="Ledit_VendaQuant"/>
+         </item>
+        </layout>
        </item>
        <item>
-        <widget class="QLineEdit" name="Ledit_VendaQuant"/>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>ID: </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="Ledit_VendaId"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Btn_Vender">
+         <property name="text">
+          <string>Vender</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_7">
-       <item>
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>ID: </string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="Ledit_VendaId"/>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QPushButton" name="Btn_Vender">
+      <widget class="QPushButton" name="pushButton">
        <property name="text">
-        <string>Vender</string>
+        <string>Comprar</string>
        </property>
       </widget>
      </item>

@@ -160,6 +160,7 @@ void MainWindow::compravenda(QString idVenda, QString quantVenda, bool compraven
     // limpar campos para nova inserção
     ui->Ledit_VendaQuant->clear();
     ui->Ledit_VendaId->clear();
+    //adsa
 }
 
 

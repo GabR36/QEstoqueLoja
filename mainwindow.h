@@ -31,10 +31,11 @@ private slots:
 
     void on_Btn_Vender_clicked();
 
-    void on_pushButton_clicked();
+    void on_Btn_Comprar_clicked();
 
 private:
     Ui::MainWindow *ui;
     void atualizarTableview();
+    void compravenda(QString idVenda, QString quantVenda, bool compravenda);
 };
 #endif // MAINWINDOW_H

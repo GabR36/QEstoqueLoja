@@ -91,9 +91,9 @@ void MainWindow::on_Btn_Delete_clicked()
     query.prepare("DELETE FROM produtos WHERE id = :valor1");
     query.bindValue(":valor1", idDelet);
     if (query.exec()) {
-        qDebug() << "Inserção bem-sucedida!";
+        qDebug() << "Delete bem-sucedido!";
     } else {
-        qDebug() << "Erro na inserção: ";
+        qDebug() << "Erro no Delete: ";
     }
     atualizarTableview();
     QSqlDatabase::database().close();

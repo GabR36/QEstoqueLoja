@@ -8,6 +8,7 @@
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
 
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -33,9 +34,17 @@ private slots:
 
     void on_Btn_Comprar_clicked();
 
+
+
 private:
     Ui::MainWindow *ui;
     void atualizarTableview();
     void compravenda(QString idVenda, QString quantVenda, bool compravenda);
+
+
+
+
+
+
 };
 #endif // MAINWINDOW_H

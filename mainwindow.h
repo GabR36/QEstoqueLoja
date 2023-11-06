@@ -7,6 +7,7 @@
 #include "produto.h"
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
+#include <qsqltablemodel.h>
 
 
 QT_BEGIN_NAMESPACE
@@ -18,6 +19,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    QSqlTableModel *vendasModel;
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     QSqlQueryModel* model = new QSqlQueryModel;
     MainWindow(QWidget *parent = nullptr);

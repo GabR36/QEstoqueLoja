@@ -33,6 +33,8 @@ private slots:
 
     void on_Btn_Comprar_clicked();
 
+    void on_Btn_Alterar_clicked();
+
 private:
     Ui::MainWindow *ui;
     void atualizarTableview();

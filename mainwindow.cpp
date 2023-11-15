@@ -160,3 +160,9 @@ void MainWindow::compravenda(QString idVenda, QString quantVenda, bool compraven
     ui->Ledit_VendaId->clear();
 }
 
+
+void MainWindow::on_Btn_Alterar_clicked()
+{
+
+}
+

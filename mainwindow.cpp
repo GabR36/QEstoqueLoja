@@ -7,6 +7,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QSqlQueryModel>
+#include "alterarproduto.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -163,6 +164,7 @@ void MainWindow::compravenda(QString idVenda, QString quantVenda, bool compraven
 
 void MainWindow::on_Btn_Alterar_clicked()
 {
-
+    AlterarProduto *alterar = new AlterarProduto;
+    alterar->show();
 }
 

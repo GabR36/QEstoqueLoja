@@ -8,6 +8,7 @@
 #include <QtSql/QSqlQuery>
 #include <QSqlQueryModel>
 #include "alterarproduto.h"
+#include "QItemSelectionModel"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -164,6 +165,18 @@ void MainWindow::compravenda(QString idVenda, QString quantVenda, bool compraven
 
 void MainWindow::on_Btn_Alterar_clicked()
 {
+    // obter id selecionado
+    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+    QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
+    QVariant nomeVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 1));
+    QVariant quantVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
+    QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
+    QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 4));
+    int productId = idVariant.toInt();
+    qDebug() << productId;
+    qDebug() << precoVariant;
+    // criar janela
     AlterarProduto *alterar = new AlterarProduto;
     alterar->show();
 }

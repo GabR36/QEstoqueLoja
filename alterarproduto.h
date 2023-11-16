@@ -14,6 +14,7 @@ class AlterarProduto : public QDialog
 public:
     explicit AlterarProduto(QWidget *parent = nullptr);
     ~AlterarProduto();
+    void TrazerInfo(QString nome, QString desc, QString quant, QString preco);
 
 private:
     Ui::AlterarProduto *ui;

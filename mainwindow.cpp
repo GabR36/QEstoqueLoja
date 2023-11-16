@@ -174,10 +174,15 @@ void MainWindow::on_Btn_Alterar_clicked()
     QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
     QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 4));
     int productId = idVariant.toInt();
+    QString productNome = nomeVariant.toString();
+    QString productQuant = quantVariant.toString();
+    QString productDesc = descVariant.toString();
+    QString productPreco = precoVariant.toString();
     qDebug() << productId;
-    qDebug() << precoVariant;
+    qDebug() << productPreco;
     // criar janela
     AlterarProduto *alterar = new AlterarProduto;
+    alterar->TrazerInfo(productNome, productDesc, productQuant, productPreco);
     alterar->show();
 }
 

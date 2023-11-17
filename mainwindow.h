@@ -19,6 +19,7 @@ class MainWindow : public QMainWindow
 public:
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     QSqlQueryModel* model = new QSqlQueryModel;
+    void atualizarTableview();
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
@@ -37,7 +38,6 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    void atualizarTableview();
     void compravenda(QString idVenda, QString quantVenda, bool compravenda);
 };
 #endif // MAINWINDOW_H

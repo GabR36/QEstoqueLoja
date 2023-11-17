@@ -173,7 +173,7 @@ void MainWindow::on_Btn_Alterar_clicked()
     QVariant quantVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
     QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
     QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 4));
-    int productId = idVariant.toInt();
+    QString productId = idVariant.toString();
     QString productNome = nomeVariant.toString();
     QString productQuant = quantVariant.toString();
     QString productDesc = descVariant.toString();
@@ -182,7 +182,9 @@ void MainWindow::on_Btn_Alterar_clicked()
     qDebug() << productPreco;
     // criar janela
     AlterarProduto *alterar = new AlterarProduto;
-    alterar->TrazerInfo(productNome, productDesc, productQuant, productPreco);
+//    alterar->janelaPrincipal = &this;
+    alterar->idAlt = productId;
+    alterar->TrazerInfo(productNome, productDesc, productQuant, productPreco, this);
     alterar->show();
 }
 

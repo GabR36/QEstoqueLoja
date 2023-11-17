@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox">
+  <widget class="QDialogButtonBox" name="Btn_AltAceitar">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -29,7 +29,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -105,7 +105,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>buttonBox</sender>
+   <sender>Btn_AltAceitar</sender>
    <signal>accepted()</signal>
    <receiver>AlterarProduto</receiver>
    <slot>accept()</slot>
@@ -121,7 +121,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>buttonBox</sender>
+   <sender>Btn_AltAceitar</sender>
    <signal>rejected()</signal>
    <receiver>AlterarProduto</receiver>
    <slot>reject()</slot>

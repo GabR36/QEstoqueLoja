@@ -182,9 +182,9 @@ void MainWindow::on_Btn_Alterar_clicked()
     qDebug() << productPreco;
     // criar janela
     AlterarProduto *alterar = new AlterarProduto;
-//    alterar->janelaPrincipal = &this;
+    alterar->janelaPrincipal = this;
     alterar->idAlt = productId;
-    alterar->TrazerInfo(productNome, productDesc, productQuant, productPreco, this);
+    alterar->TrazerInfo(productNome, productDesc, productQuant, productPreco);
     alterar->show();
 }
 

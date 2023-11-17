@@ -8,7 +8,6 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
     ui(new Ui::AlterarProduto)
 {
     ui->setupUi(this);
-    ui->Ledit_AltNome->setText("teste");
 }
 
 AlterarProduto::~AlterarProduto()
@@ -16,13 +15,11 @@ AlterarProduto::~AlterarProduto()
     delete ui;
 }
 
- void AlterarProduto::TrazerInfo(QString nome, QString desc, QString quant, QString preco, MainWindow *janela){
+ void AlterarProduto::TrazerInfo(QString nome, QString desc, QString quant, QString preco){
     ui->Ledit_AltNome->setText(nome);
     ui->Ledit_AltDesc->setText(desc);
     ui->Ledit_AltQuant->setText(quant);
     ui->Ledit_AltPreco->setText(preco);
-
-    janelaPrincipal = janela;
 }
 
 void AlterarProduto::on_Btn_AltAceitar_accepted()

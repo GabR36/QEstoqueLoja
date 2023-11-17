@@ -17,7 +17,7 @@ public:
     QString idAlt;
     explicit AlterarProduto(QWidget *parent = nullptr);
     ~AlterarProduto();
-    void TrazerInfo(QString nome, QString desc, QString quant, QString preco, MainWindow *janela);
+    void TrazerInfo(QString nome, QString desc, QString quant, QString preco);
 
 private slots:
     void on_Btn_AltAceitar_accepted();

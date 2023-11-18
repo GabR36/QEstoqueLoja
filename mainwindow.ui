@@ -174,7 +174,7 @@
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>340</y>
+      <y>420</y>
       <width>239</width>
       <height>120</height>
      </rect>
@@ -231,8 +231,8 @@
    <widget class="QPushButton" name="Btn_Alterar">
     <property name="geometry">
      <rect>
-      <x>50</x>
-      <y>500</y>
+      <x>90</x>
+      <y>350</y>
       <width>101</width>
       <height>24</height>
      </rect>
@@ -240,6 +240,28 @@
     <property name="text">
      <string>Alterar</string>
     </property>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>400</y>
+      <width>421</width>
+      <height>151</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_10">
+     <item>
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>Ultimas Vendas:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTableView" name="tableViewVendas"/>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

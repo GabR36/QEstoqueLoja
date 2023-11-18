@@ -9,12 +9,17 @@
 #include <QSqlQueryModel>
 #include "alterarproduto.h"
 #include "QItemSelectionModel"
+#include "vender.h"
+#include <qsqltablemodel.h>
 
+QSqlTableModel *vendasModel;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);  
+    ui->setupUi(this);
+
+
     // criar banco de dados e tabela se não foi ainda.
     db.setDatabaseName("estoque.db");
     if(!db.open()){
@@ -27,13 +32,42 @@ MainWindow::MainWindow(QWidget *parent)
     } else {
         qDebug() << "Erro ao criar tabela: ";
     }
+    query.exec("CREATE TABLE vendas (id INTEGER PRIMARY KEY AUTOINCREMENT, produto_id INTEGER, quantidade INTEGER, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP)");
+    if (query.isActive()) {
+        qDebug() << "Tabela de vendas criada com sucesso!";
+    } else {
+        qDebug() << "Erro ao criar tabela de vendas: ";
+    }
     qDebug() << db.tables();
+
+
+
+
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
     atualizarTableview();
     QSqlDatabase::database().close();
     //
     ui->Ledit_Nome->setFocus();
+
+    QSqlTableModel *vendasModel;
+    vendasModel = new QSqlTableModel(this);
+    vendasModel->setTable("vendas");
+    vendasModel->select(); // Carrega os dados da tabela de vendas
+
+    // Configure o QTableView para exibir as vendas
+    ui->tableViewVendas->setModel(vendasModel);
+    ui->tableViewVendas->setEditTriggers(QAbstractItemView::NoEditTriggers); // Impede a edição das células
+    ui->tableViewVendas->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); // Expande colunas para ajustar a largura
+
+
+
+
+
+
+
+
+
 }
 
 MainWindow::~MainWindow()
@@ -44,6 +78,11 @@ MainWindow::~MainWindow()
 void MainWindow::atualizarTableview(){
     model->setQuery("SELECT * FROM produtos");
     ui->Tview_Produtos->setModel(model);
+
+
+
+//    model->setQuery("SELECT * FROM vendas");
+//    ui->tableViewVendas->setModel(model);
 }
 
 void MainWindow::on_Btn_Enviar_clicked()
@@ -79,6 +118,7 @@ void MainWindow::on_Btn_Enviar_clicked()
     ui->Ledit_Preco->clear();
     ui->Ledit_Nome->setFocus();
 }
+
 
 
 void MainWindow::on_Btn_Delete_clicked()
@@ -123,6 +163,14 @@ void MainWindow::on_Btn_Vender_clicked()
     QString idVenda = ui->Ledit_VendaId->text();
     QString quantVenda = ui->Ledit_VendaQuant->text();
     compravenda(idVenda, quantVenda, false);
+
+    ui->tableViewVendas->setModel(vendasModel);
+
+
+
+
+
+
 }
 
 
@@ -131,7 +179,10 @@ void MainWindow::on_Btn_Comprar_clicked()
     QString idVenda = ui->Ledit_VendaId->text();
     QString quantVenda = ui->Ledit_VendaQuant->text();
     compravenda(idVenda, quantVenda, true);
+
+
 }
+
 
 void MainWindow::compravenda(QString idVenda, QString quantVenda, bool compravenda){
     QString maismenos;
@@ -153,6 +204,35 @@ void MainWindow::compravenda(QString idVenda, QString quantVenda, bool compraven
         qDebug() << "Inserção bem-sucedida!";
     } else {
         qDebug() << "Erro na inserção: ";
+    }
+
+    query.prepare("UPDATE produtos SET quantidade = quantidade " + maismenos + " :valor1 WHERE id = :valor2");
+    query.bindValue(":valor1", quantVenda);
+    query.bindValue(":valor2", idVenda);
+    if (query.exec()) {
+        qDebug() << "Atualização de quantidade bem-sucedida!";
+    } else {
+        qDebug() << "Erro na atualização de quantidade: ";
+    }
+
+
+    query.prepare("INSERT INTO vendas (produto_id, quantidade) VALUES (:valor1, :valor2)");
+    query.bindValue(":valor1", idVenda);
+    query.bindValue(":valor2", quantVenda);
+    if (query.exec()) {
+        qDebug() << "Venda registrada com sucesso!";
+    } else {
+        qDebug() << "Erro ao registrar venda: ";
+    }
+
+    // Atualizar a tabela de produtos
+    query.prepare("UPDATE produtos SET quantidade = quantidade " + maismenos + " :valor1 WHERE id = :valor2");
+    query.bindValue(":valor1", quantVenda);
+    query.bindValue(":valor2", idVenda);
+    if (query.exec()) {
+        qDebug() << "Atualização de quantidade bem-sucedida!";
+    } else {
+        qDebug() << "Erro na atualização de quantidade: ";
     }
     // mostrar na tableview
     atualizarTableview();

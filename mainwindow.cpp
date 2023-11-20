@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "erro ao abrir banco de dados.";
     }
     QSqlQuery query;
-    query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, nome TEXT, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2))");
+    query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2))");
     if (query.isActive()) {
         qDebug() << "Tabela criada com sucesso!";
     } else {
@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
     atualizarTableview();
     QSqlDatabase::database().close();
     //
-    ui->Ledit_Nome->setFocus();
+    ui->Ledit_Desc->setFocus();
 
     QSqlTableModel *vendasModel;
     vendasModel = new QSqlTableModel(this);
@@ -87,8 +87,7 @@ void MainWindow::atualizarTableview(){
 
 void MainWindow::on_Btn_Enviar_clicked()
 {
-    QString nomeProduto, quantidadeProduto, descProduto, precoProduto;
-    nomeProduto = ui->Ledit_Nome->text();
+    QString quantidadeProduto, descProduto, precoProduto;
     quantidadeProduto = ui->Ledit_Quantidade->text();
     descProduto = ui->Ledit_Desc->text();
     precoProduto = ui->Ledit_Preco->text();
@@ -99,11 +98,10 @@ void MainWindow::on_Btn_Enviar_clicked()
     }
     QSqlQuery query;
 
-    query.prepare("INSERT INTO produtos (nome, quantidade, descricao, preco) VALUES (:valor1, :valor2, :valor3, :valor4)");
-    query.bindValue(":valor1", nomeProduto);
-    query.bindValue(":valor2", quantidadeProduto);
-    query.bindValue(":valor3", descProduto);
-    query.bindValue(":valor4", precoProduto);
+    query.prepare("INSERT INTO produtos (quantidade, descricao, preco) VALUES (:valor1, :valor2, :valor3)");
+    query.bindValue(":valor1", quantidadeProduto);
+    query.bindValue(":valor2", descProduto);
+    query.bindValue(":valor3", precoProduto);
     if (query.exec()) {
         qDebug() << "Inserção bem-sucedida!";
     } else {
@@ -113,10 +111,9 @@ void MainWindow::on_Btn_Enviar_clicked()
     QSqlDatabase::database().close();
     // limpar campos para nova inserçao
     ui->Ledit_Desc->clear();
-    ui->Ledit_Nome->clear();
     ui->Ledit_Quantidade->clear();
     ui->Ledit_Preco->clear();
-    ui->Ledit_Nome->setFocus();
+    ui->Ledit_Desc->setFocus();
 }
 
 
@@ -152,7 +149,7 @@ void MainWindow::on_Btn_Pesquisa_clicked()
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao pesquisar.";
     }
-    model->setQuery("SELECT * FROM produtos WHERE nome LIKE '%" + pesquisa + "%'");
+    model->setQuery("SELECT * FROM produtos WHERE descricao LIKE '%" + pesquisa + "%'");
     ui->Tview_Produtos->setModel(model);
     QSqlDatabase::database().close();
 }
@@ -250,12 +247,10 @@ void MainWindow::on_Btn_Alterar_clicked()
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
     QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
-    QVariant nomeVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 1));
-    QVariant quantVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
-    QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
-    QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 4));
+    QVariant quantVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 1));
+    QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
+    QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
     QString productId = idVariant.toString();
-    QString productNome = nomeVariant.toString();
     QString productQuant = quantVariant.toString();
     QString productDesc = descVariant.toString();
     QString productPreco = precoVariant.toString();
@@ -265,7 +260,7 @@ void MainWindow::on_Btn_Alterar_clicked()
     AlterarProduto *alterar = new AlterarProduto;
     alterar->janelaPrincipal = this;
     alterar->idAlt = productId;
-    alterar->TrazerInfo(productNome, productDesc, productQuant, productPreco);
+    alterar->TrazerInfo(productDesc, productQuant, productPreco);
     alterar->show();
 }
 

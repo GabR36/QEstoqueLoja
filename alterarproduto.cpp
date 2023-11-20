@@ -15,8 +15,7 @@ AlterarProduto::~AlterarProduto()
     delete ui;
 }
 
- void AlterarProduto::TrazerInfo(QString nome, QString desc, QString quant, QString preco){
-    ui->Ledit_AltNome->setText(nome);
+ void AlterarProduto::TrazerInfo(QString desc, QString quant, QString preco){
     ui->Ledit_AltDesc->setText(desc);
     ui->Ledit_AltQuant->setText(quant);
     ui->Ledit_AltPreco->setText(preco);
@@ -24,7 +23,6 @@ AlterarProduto::~AlterarProduto()
 
 void AlterarProduto::on_Btn_AltAceitar_accepted()
 {
-    QString nome = ui->Ledit_AltNome->text();
     QString desc = ui->Ledit_AltDesc->text();
     QString quant = ui->Ledit_AltQuant->text();
     QString preco = ui->Ledit_AltPreco->text();
@@ -35,12 +33,11 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
     }
     QSqlQuery query;
 
-    query.prepare("UPDATE produtos SET quantidade = :valor2, nome = :valor3, descricao = :valor4, preco = :valor5 WHERE id = :valor1");
+    query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4 WHERE id = :valor1");
     query.bindValue(":valor1", idAlt);
     query.bindValue(":valor2", quant);
-    query.bindValue(":valor3", nome);
-    query.bindValue(":valor4", desc);
-    query.bindValue(":valor5", preco);
+    query.bindValue(":valor3", desc);
+    query.bindValue(":valor4", preco);
     if (query.exec()) {
         qDebug() << "Alteracao bem-sucedida!";
     } else {

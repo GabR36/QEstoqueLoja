@@ -29,6 +29,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         produto.h produto.cpp
         alterarproduto.h alterarproduto.cpp alterarproduto.ui
         vender.h vender.cpp vender.ui
+        vendas.h vendas.cpp vendas.ui
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET QEstoqueLoja APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

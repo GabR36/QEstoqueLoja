@@ -37,6 +37,8 @@ private slots:
 
     void on_Btn_Alterar_clicked();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     void compravenda(QString idVenda, QString quantVenda, bool compravenda);

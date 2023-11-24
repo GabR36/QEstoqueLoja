@@ -2,6 +2,7 @@
 #define VENDA_H
 
 #include <QDialog>
+#include <vector>
 
 namespace Ui {
 class venda;
@@ -19,6 +20,7 @@ private slots:
     void on_Btn_SelecionarProduto_clicked();
 
 private:
+    std::vector<QString> vetorIds;
     Ui::venda *ui;
 };
 

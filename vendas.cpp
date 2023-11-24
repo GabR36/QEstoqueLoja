@@ -7,14 +7,21 @@ Vendas::Vendas(QWidget *parent) :
     ui(new Ui::Vendas)
 {
     ui->setupUi(this);
-    QSqlQueryModel *modelo = new QSqlQueryModel;
-    modelo->setQuery("SELECT * FROM vendas2");
-    ui->Tview_Vendas2->setModel(modelo);
-    modelo->setQuery("SELECT * FROM produtos_vendidos");
-    ui->Tview_ProdutosVendidos->setModel(modelo);
+    QSqlQueryModel *modeloVendas2 = new QSqlQueryModel;
+    modeloVendas2->setQuery("SELECT * FROM vendas2");
+    ui->Tview_Vendas2->setModel(modeloVendas2);
+    QSqlQueryModel *modeloProdVendidos = new QSqlQueryModel;
+    modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
+    ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
 }
 
 Vendas::~Vendas()
 {
     delete ui;
 }
+
+void Vendas::on_Btn_InserirVenda_clicked()
+{
+
+}
+

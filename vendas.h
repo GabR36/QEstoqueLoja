@@ -15,6 +15,9 @@ public:
     explicit Vendas(QWidget *parent = nullptr);
     ~Vendas();
 
+private slots:
+    void on_Btn_InserirVenda_clicked();
+
 private:
     Ui::Vendas *ui;
 };

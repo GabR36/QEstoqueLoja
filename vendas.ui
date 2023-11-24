@@ -33,6 +33,19 @@
     </rect>
    </property>
   </widget>
+  <widget class="QPushButton" name="Btn_InserirVenda">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>180</y>
+     <width>151</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Inserir Venda</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

@@ -1,6 +1,7 @@
 #include "vendas.h"
 #include "ui_vendas.h"
 #include <QSqlQueryModel>
+#include "venda.h"
 
 Vendas::Vendas(QWidget *parent) :
     QWidget(parent),
@@ -22,6 +23,7 @@ Vendas::~Vendas()
 
 void Vendas::on_Btn_InserirVenda_clicked()
 {
-
+    venda *inserirVenda = new venda;
+    inserirVenda->show();
 }
 

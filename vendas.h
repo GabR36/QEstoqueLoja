@@ -2,6 +2,7 @@
 #define VENDAS_H
 
 #include <QWidget>
+#include <QSqlDatabase>
 
 namespace Ui {
 class Vendas;
@@ -12,6 +13,7 @@ class Vendas : public QWidget
     Q_OBJECT
 
 public:
+    QSqlDatabase db;
     explicit Vendas(QWidget *parent = nullptr);
     ~Vendas();
 

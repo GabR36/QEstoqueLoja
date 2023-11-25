@@ -1,6 +1,7 @@
 #include "venda.h"
 #include "ui_venda.h"
 #include <QSqlQueryModel>
+#include <QSqlQuery>
 
 venda::venda(QWidget *parent) :
     QDialog(parent),
@@ -35,5 +36,28 @@ void venda::on_Btn_SelecionarProduto_clicked()
     ui->Tview_ProdutosSelecionados->setModel(modeloSelecionados);
     qDebug() << idQuery;
     qDebug() << vetorIds;
+}
+
+
+void venda::on_buttonBox_accepted()
+{
+    QString cliente = ui->Ledit_Cliente->text();
+    // adicionar ao banco de dados
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. botao enviar.";
+    }
+    QSqlQuery query;
+
+    query.prepare("INSERT INTO vendas2 (cliente) VALUES (:valor1)");
+    query.bindValue(":valor1", cliente);
+
+    if (query.exec()) {
+        qDebug() << "Inserção bem-sucedida!";
+    } else {
+        qDebug() << "Erro na inserção: ";
+    }
+
+    query.prepare("INSERT INTO produtos_vendidos ");
+    QSqlDatabase::database().close();
 }
 

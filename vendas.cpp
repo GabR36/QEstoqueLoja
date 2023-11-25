@@ -24,6 +24,7 @@ Vendas::~Vendas()
 void Vendas::on_Btn_InserirVenda_clicked()
 {
     venda *inserirVenda = new venda;
+    inserirVenda->db = db;
     inserirVenda->show();
 }
 

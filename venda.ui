@@ -52,24 +52,42 @@
   <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>50</x>
+     <x>10</x>
      <y>70</y>
-     <width>207</width>
-     <height>57</height>
+     <width>293</width>
+     <height>90</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <widget class="QLabel" name="label">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Cliente: </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="Ledit_Cliente"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Cliente: </string>
+         <string>Quantidade Vendida: </string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="Ledit_Cliente"/>
+       <widget class="QLineEdit" name="lineEdit"/>
       </item>
      </layout>
     </item>

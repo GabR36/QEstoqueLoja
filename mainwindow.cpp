@@ -281,6 +281,7 @@ void MainWindow::on_Btn_Alterar_clicked()
 void MainWindow::on_pushButton_clicked()
 {
     Vendas *vendas = new Vendas;
+    vendas->db = db;
     vendas->show();
 }
 

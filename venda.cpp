@@ -20,20 +20,22 @@ venda::~venda()
 
 void venda::on_Btn_SelecionarProduto_clicked()
 {
+    QString quantVendido = ui->Ledit_QuantVendido->text();
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
     QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
     QString idProduto = idVariant.toString();
-    vetorIds.push_back(idProduto);
+    vetorIds.push_back(std::make_pair(idProduto, quantVendido));
     QString idQuery;
-    for (int i = 0; i < vetorIds.size(); i++){
-        idQuery = idQuery + " id = " + vetorIds[i] + " OR";
+    for (const auto& id : vetorIds){
+        idQuery = idQuery + " id = " + id.first + " OR";
     }
     int ultimoEspaço = idQuery.lastIndexOf(' ');
     idQuery = idQuery.left(ultimoEspaço);
     QSqlQueryModel *modeloSelecionados = new QSqlQueryModel;
     modeloSelecionados->setQuery("SELECT * FROM produtos WHERE" + idQuery);
     ui->Tview_ProdutosSelecionados->setModel(modeloSelecionados);
+    ui->Ledit_QuantVendido->clear();
     qDebug() << idQuery;
     qDebug() << vetorIds;
 }
@@ -41,23 +43,23 @@ void venda::on_Btn_SelecionarProduto_clicked()
 
 void venda::on_buttonBox_accepted()
 {
-    QString cliente = ui->Ledit_Cliente->text();
-    // adicionar ao banco de dados
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao enviar.";
-    }
-    QSqlQuery query;
+//    QString cliente = ui->Ledit_Cliente->text();
+//    // adicionar ao banco de dados
+//    if(!db.open()){
+//        qDebug() << "erro ao abrir banco de dados. botao enviar.";
+//    }
+//    QSqlQuery query;
 
-    query.prepare("INSERT INTO vendas2 (cliente) VALUES (:valor1)");
-    query.bindValue(":valor1", cliente);
+//    query.prepare("INSERT INTO vendas2 (cliente) VALUES (:valor1)");
+//    query.bindValue(":valor1", cliente);
 
-    if (query.exec()) {
-        qDebug() << "Inserção bem-sucedida!";
-    } else {
-        qDebug() << "Erro na inserção: ";
-    }
+//    if (query.exec()) {
+//        qDebug() << "Inserção bem-sucedida!";
+//    } else {
+//        qDebug() << "Erro na inserção: ";
+//    }
 
-    query.prepare("INSERT INTO produtos_vendidos ");
-    QSqlDatabase::database().close();
+//    query.prepare("INSERT INTO produtos_vendidos ");
+//    QSqlDatabase::database().close();
 }
 

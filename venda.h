@@ -24,7 +24,7 @@ private slots:
     void on_buttonBox_accepted();
 
 private:
-    std::vector<QString> vetorIds;
+    std::vector<std::pair<QString, QString>> vetorIds;
     Ui::venda *ui;
 };
 

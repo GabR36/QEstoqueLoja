@@ -14,6 +14,8 @@ venda::venda(QWidget *parent) :
     ui->Tview_Produtos->setModel(modeloProdutos);
     modeloSelecionados.setHorizontalHeaderItem(0, new QStandardItem("ID_Produto"));
     modeloSelecionados.setHorizontalHeaderItem(1, new QStandardItem("Quantidade_Vendida"));
+    modeloSelecionados.setHorizontalHeaderItem(2, new QStandardItem("Descricao"));
+    modeloSelecionados.setHorizontalHeaderItem(3, new QStandardItem("Preço"));
     ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
 }
 
@@ -29,12 +31,16 @@ void venda::on_Btn_SelecionarProduto_clicked()
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
     QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
+    QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
+    QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
     QString idProduto = idVariant.toString();
+    QString descProduto = descVariant.toString();
+    QString precoProduto = precoVariant.toString();
     vetorIds.push_back(std::make_pair(idProduto, quantVendido));
     ui->Ledit_QuantVendido->clear();
     qDebug() << vetorIds;
     // mostrar na tabela Selecionados
-    modeloSelecionados.appendRow({new QStandardItem(idProduto), new QStandardItem(quantVendido)});
+    modeloSelecionados.appendRow({new QStandardItem(idProduto), new QStandardItem(quantVendido), new QStandardItem(descProduto), new QStandardItem(precoProduto)});
     ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
 }
 

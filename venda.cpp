@@ -47,23 +47,34 @@ void venda::on_Btn_SelecionarProduto_clicked()
 
 void venda::on_buttonBox_accepted()
 {
-//    QString cliente = ui->Ledit_Cliente->text();
-//    // adicionar ao banco de dados
-//    if(!db.open()){
-//        qDebug() << "erro ao abrir banco de dados. botao enviar.";
-//    }
-//    QSqlQuery query;
+    QString cliente = ui->Ledit_Cliente->text();
+    // adicionar ao banco de dados
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. botao aceitar venda.";
+    }
+    QSqlQuery query;
 
-//    query.prepare("INSERT INTO vendas2 (cliente) VALUES (:valor1)");
-//    query.bindValue(":valor1", cliente);
-
-//    if (query.exec()) {
-//        qDebug() << "Inserção bem-sucedida!";
-//    } else {
-//        qDebug() << "Erro na inserção: ";
-//    }
-
-//    query.prepare("INSERT INTO produtos_vendidos ");
-//    QSqlDatabase::database().close();
+    query.prepare("INSERT INTO vendas2 (cliente) VALUES (:valor1)");
+    query.bindValue(":valor1", cliente);
+    QString idVenda;
+    if (query.exec()) {
+        idVenda = query.lastInsertId().toString();
+        qDebug() << "Inserção bem-sucedida!";
+    } else {
+        qDebug() << "Erro na inserção: ";
+    }
+    // adicionar ao banco de dados
+    for (const auto& selecionado : vetorIds) {
+        query.prepare("INSERT INTO produtos_vendidos (id_produto, quantidade, id_venda) VALUES (:valor1, :valor2, :valor3)");
+        query.bindValue(":valor1", selecionado.first);
+        query.bindValue(":valor2", selecionado.second);
+        query.bindValue(":valor3", idVenda);
+        if (query.exec()) {
+            qDebug() << "Inserção prod_vendidos bem-sucedida!";
+        } else {
+            qDebug() << "Erro na inserção prod_vendidos: ";
+        }
+    }
+    QSqlDatabase::database().close();
 }
 

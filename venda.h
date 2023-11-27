@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <vector>
 #include <QSqlDatabase>
+#include <QStandardItemModel>
 
 namespace Ui {
 class venda;
@@ -24,6 +25,7 @@ private slots:
     void on_buttonBox_accepted();
 
 private:
+    QStandardItemModel modeloSelecionados;
     std::vector<std::pair<QString, QString>> vetorIds;
     Ui::venda *ui;
 };

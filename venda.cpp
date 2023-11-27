@@ -2,6 +2,7 @@
 #include "ui_venda.h"
 #include <QSqlQueryModel>
 #include <QSqlQuery>
+#include <QStandardItemModel>
 
 venda::venda(QWidget *parent) :
     QDialog(parent),
@@ -11,6 +12,9 @@ venda::venda(QWidget *parent) :
     QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
     modeloProdutos->setQuery("SELECT * FROM produtos");
     ui->Tview_Produtos->setModel(modeloProdutos);
+    modeloSelecionados.setHorizontalHeaderItem(0, new QStandardItem("ID_Produto"));
+    modeloSelecionados.setHorizontalHeaderItem(1, new QStandardItem("Quantidade_Vendida"));
+    ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
 }
 
 venda::~venda()
@@ -20,24 +24,18 @@ venda::~venda()
 
 void venda::on_Btn_SelecionarProduto_clicked()
 {
+    // pegar id do produto selecionado e quant do Ledit
     QString quantVendido = ui->Ledit_QuantVendido->text();
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
     QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
     QString idProduto = idVariant.toString();
     vetorIds.push_back(std::make_pair(idProduto, quantVendido));
-    QString idQuery;
-    for (const auto& id : vetorIds){
-        idQuery = idQuery + " id = " + id.first + " OR";
-    }
-    int ultimoEspaço = idQuery.lastIndexOf(' ');
-    idQuery = idQuery.left(ultimoEspaço);
-    QSqlQueryModel *modeloSelecionados = new QSqlQueryModel;
-    modeloSelecionados->setQuery("SELECT * FROM produtos WHERE" + idQuery);
-    ui->Tview_ProdutosSelecionados->setModel(modeloSelecionados);
     ui->Ledit_QuantVendido->clear();
-    qDebug() << idQuery;
     qDebug() << vetorIds;
+    // mostrar na tabela Selecionados
+    modeloSelecionados.appendRow({new QStandardItem(idProduto), new QStandardItem(quantVendido)});
+    ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
 }
 
 

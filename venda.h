@@ -5,6 +5,7 @@
 #include <vector>
 #include <QSqlDatabase>
 #include <QStandardItemModel>
+#include "vendas.h"
 
 namespace Ui {
 class venda;
@@ -15,6 +16,8 @@ class venda : public QDialog
     Q_OBJECT
 
 public:
+    QSqlDatabase db2 = QSqlDatabase::addDatabase("QSQLITE");
+    Vendas *janelaVenda;
     QSqlDatabase db;
     explicit venda(QWidget *parent = nullptr);
     ~venda();
@@ -22,7 +25,7 @@ public:
 private slots:
     void on_Btn_SelecionarProduto_clicked();
 
-    void on_buttonBox_accepted();
+    void on_BtnBox_Venda_accepted();
 
 private:
     QStandardItemModel modeloSelecionados;

@@ -8,12 +8,8 @@ Vendas::Vendas(QWidget *parent) :
     ui(new Ui::Vendas)
 {
     ui->setupUi(this);
-    QSqlQueryModel *modeloVendas2 = new QSqlQueryModel;
-    modeloVendas2->setQuery("SELECT * FROM vendas2");
-    ui->Tview_Vendas2->setModel(modeloVendas2);
-    QSqlQueryModel *modeloProdVendidos = new QSqlQueryModel;
-    modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
-    ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
+    db2.setDatabaseName("estoque.db");
+    atualizarTabelas();
 }
 
 Vendas::~Vendas()
@@ -24,7 +20,19 @@ Vendas::~Vendas()
 void Vendas::on_Btn_InserirVenda_clicked()
 {
     venda *inserirVenda = new venda;
+    inserirVenda->janelaVenda = this;
     inserirVenda->db = db;
     inserirVenda->show();
+}
+
+void Vendas::atualizarTabelas(){
+    if(!db2.open()){
+        qDebug() << "erro ao abrir banco de dados. botao venda.";
+    }
+    modeloVendas2->setQuery("SELECT * FROM vendas2");
+    ui->Tview_Vendas2->setModel(modeloVendas2);
+    modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
+    ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
+    QSqlDatabase::database().close();
 }
 

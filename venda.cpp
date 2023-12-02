@@ -9,6 +9,7 @@ venda::venda(QWidget *parent) :
     ui(new Ui::venda)
 {
     ui->setupUi(this);
+    db2.setDatabaseName("estoque.db");
     QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
     modeloProdutos->setQuery("SELECT * FROM produtos");
     ui->Tview_Produtos->setModel(modeloProdutos);
@@ -45,14 +46,15 @@ void venda::on_Btn_SelecionarProduto_clicked()
 }
 
 
-void venda::on_buttonBox_accepted()
+void venda::on_BtnBox_Venda_accepted()
 {
     QString cliente = ui->Ledit_Cliente->text();
     // adicionar ao banco de dados
-    if(!db.open()){
+    if(!db2.open()){
         qDebug() << "erro ao abrir banco de dados. botao aceitar venda.";
+        return;
     }
-    QSqlQuery query;
+    QSqlQuery query(db2);
 
     query.prepare("INSERT INTO vendas2 (cliente) VALUES (:valor1)");
     query.bindValue(":valor1", cliente);
@@ -75,6 +77,7 @@ void venda::on_buttonBox_accepted()
             qDebug() << "Erro na inserção prod_vendidos: ";
         }
     }
-    QSqlDatabase::database().close();
+    db2.close();
+    janelaVenda->atualizarTabelas();
 }
 

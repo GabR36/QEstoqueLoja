@@ -11,6 +11,7 @@
 #include "QItemSelectionModel"
 #include "vender.h"
 #include <qsqltablemodel.h>
+#include "vendas.h"
 
 QSqlTableModel *vendasModel;
 MainWindow::MainWindow(QWidget *parent)
@@ -37,6 +38,18 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "Tabela de vendas criada com sucesso!";
     } else {
         qDebug() << "Erro ao criar tabela de vendas: ";
+    }
+    query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP)");
+    if (query.isActive()) {
+        qDebug() << "Tabela de vendas2 criada com sucesso!";
+    } else {
+        qDebug() << "Erro ao criar tabela de vendas2: ";
+    }
+    query.exec("CREATE TABLE produtos_vendidos (id INTEGER PRIMARY KEY AUTOINCREMENT, id_produto INTEGER, id_venda INTEGER, quantidade INTEGER, FOREIGN KEY (id_produto) REFERENCES produtos(id), FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
+    if (query.isActive()) {
+        qDebug() << "Tabela de produtos_vendidos criada com sucesso!";
+    } else {
+        qDebug() << "Erro ao criar tabela de produtos_vendidos: ";
     }
     qDebug() << db.tables();
 
@@ -262,5 +275,12 @@ void MainWindow::on_Btn_Alterar_clicked()
     alterar->idAlt = productId;
     alterar->TrazerInfo(productDesc, productQuant, productPreco);
     alterar->show();
+}
+
+
+void MainWindow::on_Btn_Venda_clicked()
+{
+    Vendas *vendas = new Vendas;
+    vendas->show();
 }
 

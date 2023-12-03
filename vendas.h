@@ -14,8 +14,7 @@ class Vendas : public QWidget
     Q_OBJECT
 
 public:
-    QSqlDatabase db2 = QSqlDatabase::addDatabase("QSQLITE");
-    QSqlDatabase db;
+    QSqlDatabase db = QSqlDatabase::database();
     explicit Vendas(QWidget *parent = nullptr);
     ~Vendas();
     void atualizarTabelas();

@@ -16,9 +16,8 @@ class venda : public QDialog
     Q_OBJECT
 
 public:
-    QSqlDatabase db2 = QSqlDatabase::addDatabase("QSQLITE");
     Vendas *janelaVenda;
-    QSqlDatabase db;
+    QSqlDatabase db = QSqlDatabase::database();
     explicit venda(QWidget *parent = nullptr);
     ~venda();
 

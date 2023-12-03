@@ -9,10 +9,13 @@ venda::venda(QWidget *parent) :
     ui(new Ui::venda)
 {
     ui->setupUi(this);
-    db2.setDatabaseName("estoque.db");
     QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. construtor venda.";
+    }
     modeloProdutos->setQuery("SELECT * FROM produtos");
     ui->Tview_Produtos->setModel(modeloProdutos);
+    db.close();
     modeloSelecionados.setHorizontalHeaderItem(0, new QStandardItem("ID_Produto"));
     modeloSelecionados.setHorizontalHeaderItem(1, new QStandardItem("Quantidade_Vendida"));
     modeloSelecionados.setHorizontalHeaderItem(2, new QStandardItem("Descricao"));
@@ -50,11 +53,11 @@ void venda::on_BtnBox_Venda_accepted()
 {
     QString cliente = ui->Ledit_Cliente->text();
     // adicionar ao banco de dados
-    if(!db2.open()){
+    if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao aceitar venda.";
         return;
     }
-    QSqlQuery query(db2);
+    QSqlQuery query;
 
     query.prepare("INSERT INTO vendas2 (cliente) VALUES (:valor1)");
     query.bindValue(":valor1", cliente);
@@ -77,7 +80,7 @@ void venda::on_BtnBox_Venda_accepted()
             qDebug() << "Erro na inserção prod_vendidos: ";
         }
     }
-    db2.close();
+    db.close();
     janelaVenda->atualizarTabelas();
 }
 

@@ -38,6 +38,15 @@
      <height>192</height>
     </rect>
    </property>
+   <property name="selectionMode">
+    <enum>QAbstractItemView::SingleSelection</enum>
+   </property>
+   <property name="selectionBehavior">
+    <enum>QAbstractItemView::SelectRows</enum>
+   </property>
+   <attribute name="verticalHeaderVisible">
+    <bool>false</bool>
+   </attribute>
   </widget>
   <widget class="QTableView" name="Tview_ProdutosSelecionados">
    <property name="geometry">

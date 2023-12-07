@@ -139,7 +139,6 @@ void MainWindow::on_Btn_Delete_clicked()
     QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
     QString productId = idVariant.toString();
 
-    QString idDelet = ui->Ledit_Delete->text();
     // remover registro do banco de dados
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao deletar.";
@@ -155,9 +154,6 @@ void MainWindow::on_Btn_Delete_clicked()
     }
     atualizarTableview();
     QSqlDatabase::database().close();
-    // limpar campo para nova inserçao
-    ui->Ledit_Delete->clear();
-    ui->Ledit_Delete->setFocus();
 }
 
 

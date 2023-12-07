@@ -133,6 +133,12 @@ void MainWindow::on_Btn_Enviar_clicked()
 
 void MainWindow::on_Btn_Delete_clicked()
 {
+    // obter id selecionado
+    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+    QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
+    QString productId = idVariant.toString();
+
     QString idDelet = ui->Ledit_Delete->text();
     // remover registro do banco de dados
     if(!db.open()){
@@ -141,7 +147,7 @@ void MainWindow::on_Btn_Delete_clicked()
     QSqlQuery query;
 
     query.prepare("DELETE FROM produtos WHERE id = :valor1");
-    query.bindValue(":valor1", idDelet);
+    query.bindValue(":valor1", productId);
     if (query.exec()) {
         qDebug() << "Delete bem-sucedido!";
     } else {

@@ -27,39 +27,6 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>240</y>
-      <width>346</width>
-      <height>57</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_4">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_4">
-       <item>
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>id do produto a ser deletado: </string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="Ledit_Delete"/>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QPushButton" name="Btn_Delete">
-       <property name="text">
-        <string>Deletar Produto</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
       <x>370</x>
       <y>320</y>
       <width>381</width>
@@ -220,16 +187,23 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>330</y>
-      <width>131</width>
-      <height>56</height>
+      <x>70</x>
+      <y>230</y>
+      <width>231</width>
+      <height>91</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <widget class="QPushButton" name="Btn_Delete">
+       <property name="text">
+        <string>Deletar</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <widget class="QPushButton" name="Btn_Alterar">
        <property name="text">

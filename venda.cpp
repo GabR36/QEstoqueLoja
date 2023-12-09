@@ -4,6 +4,7 @@
 #include <QSqlQuery>
 #include <QStandardItemModel>
 
+
 venda::venda(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::venda)
@@ -21,6 +22,9 @@ venda::venda(QWidget *parent) :
     modeloSelecionados.setHorizontalHeaderItem(2, new QStandardItem("Descricao"));
     modeloSelecionados.setHorizontalHeaderItem(3, new QStandardItem("Preço"));
     ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+    // Selecionar a primeira linha da tabela
+    QModelIndex firstIndex = modeloProdutos->index(0, 0);
+    ui->Tview_Produtos->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
 }
 
 venda::~venda()

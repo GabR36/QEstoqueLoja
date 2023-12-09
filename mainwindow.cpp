@@ -62,6 +62,9 @@ MainWindow::MainWindow(QWidget *parent)
     QSqlDatabase::database().close();
     //
     ui->Ledit_Desc->setFocus();
+    // Selecionar a primeira linha da tabela
+    QModelIndex firstIndex = model->index(0, 0);
+    ui->Tview_Produtos->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
 
     QSqlTableModel *vendasModel;
     vendasModel = new QSqlTableModel(this);

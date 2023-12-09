@@ -9,6 +9,11 @@ Vendas::Vendas(QWidget *parent) :
 {
     ui->setupUi(this);
     atualizarTabelas();
+    // Selecionar a primeira linha das tabelas
+    QModelIndex firstIndex = modeloVendas2->index(0, 0);
+    ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
+    QModelIndex firstIndex2 = modeloProdVendidos->index(0, 0);
+    ui->Tview_ProdutosVendidos->selectionModel()->select(firstIndex2, QItemSelectionModel::Select);
 }
 
 Vendas::~Vendas()

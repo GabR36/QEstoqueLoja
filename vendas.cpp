@@ -14,6 +14,10 @@ Vendas::Vendas(QWidget *parent) :
     ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
     QModelIndex firstIndex2 = modeloProdVendidos->index(0, 0);
     ui->Tview_ProdutosVendidos->selectionModel()->select(firstIndex2, QItemSelectionModel::Select);
+    // Obter o modelo de seleção da tabela
+    QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
+    // Conectar o sinal de seleção ao slot personalizado
+    connect(selectionModel, &QItemSelectionModel::selectionChanged,this, &Vendas::handleSelectionChange);
 }
 
 Vendas::~Vendas()
@@ -39,3 +43,15 @@ void Vendas::atualizarTabelas(){
     db.close();
 }
 
+
+void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
+    // Este slot é chamado sempre que a seleção na tabela muda
+    Q_UNUSED(deselected);
+
+    qDebug() << "Registro(s) selecionado(s):";
+
+    // Iterar pelos índices selecionados e imprimir suas informações
+    foreach (const QModelIndex &index, selected.indexes()) {
+        qDebug() << "Row:" << index.row() << "Column:" << index.column() << "Value:" << index.data();
+    }
+}

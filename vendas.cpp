@@ -14,6 +14,10 @@ Vendas::Vendas(QWidget *parent) :
     ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
     QModelIndex firstIndex2 = modeloProdVendidos->index(0, 0);
     ui->Tview_ProdutosVendidos->selectionModel()->select(firstIndex2, QItemSelectionModel::Select);
+    // Obter o modelo de seleção da tabela
+    QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
+    // Conectar o sinal de seleção ao slot personalizado
+    connect(selectionModel, &QItemSelectionModel::selectionChanged,this, &Vendas::handleSelectionChange);
 }
 
 Vendas::~Vendas()
@@ -39,3 +43,20 @@ void Vendas::atualizarTabelas(){
     db.close();
 }
 
+
+void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
+    // Este slot é chamado sempre que a seleção na tabela muda
+    Q_UNUSED(deselected);
+
+    qDebug() << "Registro(s) selecionado(s):";
+
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. handleselectionchange";
+    }
+    QModelIndex selectedIndex = selected.indexes().first();
+    QVariant idVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 0));
+    QString productId = idVariant.toString();
+    modeloProdVendidos->setQuery("SELECT produtos.descricao, produtos_vendidos.quantidade, produtos.preco FROM produtos_vendidos JOIN produtos ON produtos_vendidos.id_produto = produtos.id WHERE id_venda = " + productId);
+    ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
+    db.close();
+}

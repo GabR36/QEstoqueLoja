@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
+#include <QItemSelection>
 
 namespace Ui {
 class Vendas;
@@ -21,6 +22,7 @@ public:
 
 private slots:
     void on_Btn_InserirVenda_clicked();
+    void handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected);
 
 private:
     QSqlQueryModel *modeloProdVendidos = new QSqlQueryModel;

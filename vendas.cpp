@@ -53,10 +53,6 @@ void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSe
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. handleselectionchange";
     }
-    // // Iterar pelos índices selecionados e imprimir suas informações
-    // foreach (const QModelIndex &index, selected.indexes()) {
-    //     qDebug() << "Row:" << index.row() << "Column:" << index.column() << "Value:" << index.data();
-    // }
     QModelIndex selectedIndex = selected.indexes().first();
     QVariant idVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 0));
     QString productId = idVariant.toString();

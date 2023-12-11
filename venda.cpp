@@ -103,7 +103,13 @@ void venda::handleSelectionChange(const QItemSelection &selected, const QItemSel
     }
     QModelIndex selectedIndex = selected.indexes().first();
     QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
+    QVariant quantVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 1));
+    QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
     QString productId = idVariant.toString();
+    QString productQuant = quantVariant.toString();
+    QString productPreco = precoVariant.toString();
+    ui->Ledit_QuantVendido->setText(productQuant);
+    ui->Ledit_Preco->setText(productPreco);
     qDebug() << productId;
     db.close();
 }

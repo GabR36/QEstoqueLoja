@@ -50,8 +50,17 @@ void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSe
 
     qDebug() << "Registro(s) selecionado(s):";
 
-    // Iterar pelos índices selecionados e imprimir suas informações
-    foreach (const QModelIndex &index, selected.indexes()) {
-        qDebug() << "Row:" << index.row() << "Column:" << index.column() << "Value:" << index.data();
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. handleselectionchange";
     }
+    // // Iterar pelos índices selecionados e imprimir suas informações
+    // foreach (const QModelIndex &index, selected.indexes()) {
+    //     qDebug() << "Row:" << index.row() << "Column:" << index.column() << "Value:" << index.data();
+    // }
+    QModelIndex selectedIndex = selected.indexes().first();
+    QVariant idVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 0));
+    QString productId = idVariant.toString();
+    modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos WHERE id_venda = " + productId);
+    ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
+    db.close();
 }

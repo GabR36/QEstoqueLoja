@@ -25,6 +25,10 @@ venda::venda(QWidget *parent) :
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = modeloProdutos->index(0, 0);
     ui->Tview_Produtos->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
+    // Obter o modelo de seleção da tabela
+    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    // Conectar o sinal de seleção ao slot personalizado
+    connect(selectionModel, &QItemSelectionModel::selectionChanged,this, &venda::handleSelectionChange);
 }
 
 venda::~venda()
@@ -86,5 +90,21 @@ void venda::on_BtnBox_Venda_accepted()
     }
     db.close();
     janelaVenda->atualizarTabelas();
+}
+
+void venda::handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
+    // Este slot é chamado sempre que a seleção na tabela muda
+    Q_UNUSED(deselected);
+
+    qDebug() << "Registro(s) selecionado(s):";
+
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. handleselectionchange Venda";
+    }
+    QModelIndex selectedIndex = selected.indexes().first();
+    QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
+    QString productId = idVariant.toString();
+    qDebug() << productId;
+    db.close();
 }
 

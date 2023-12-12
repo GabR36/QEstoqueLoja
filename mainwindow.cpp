@@ -122,6 +122,23 @@ void MainWindow::on_Btn_Enviar_clicked()
         // Armazene o preço em uma variável ou faça o que precisar com ele
         // Neste exemplo, apenas exibimos uma mensagem
         QMessageBox::information(this, "Sucesso", "Preço válido: " + QString::number(price));
+        // adicionar ao banco de dados
+        if(!db.open()){
+            qDebug() << "erro ao abrir banco de dados. botao enviar.";
+        }
+        QSqlQuery query;
+
+        query.prepare("INSERT INTO produtos (quantidade, descricao, preco) VALUES (:valor1, :valor2, :valor3)");
+        query.bindValue(":valor1", quantidadeProduto);
+        query.bindValue(":valor2", descProduto);
+        query.bindValue(":valor3", precoProduto);
+        if (query.exec()) {
+            qDebug() << "Inserção bem-sucedida!";
+        } else {
+            qDebug() << "Erro na inserção: ";
+        }
+        atualizarTableview();
+        QSqlDatabase::database().close();
     }
     else
     {
@@ -129,23 +146,7 @@ void MainWindow::on_Btn_Enviar_clicked()
         QMessageBox::warning(this, "Erro", "Por favor, insira um preço válido.");
     }
 
-    // adicionar ao banco de dados
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao enviar.";
-    }
-    QSqlQuery query;
 
-    query.prepare("INSERT INTO produtos (quantidade, descricao, preco) VALUES (:valor1, :valor2, :valor3)");
-    query.bindValue(":valor1", quantidadeProduto);
-    query.bindValue(":valor2", descProduto);
-    query.bindValue(":valor3", precoProduto);
-    if (query.exec()) {
-        qDebug() << "Inserção bem-sucedida!";
-    } else {
-        qDebug() << "Erro na inserção: ";
-    }
-    atualizarTableview();
-    QSqlDatabase::database().close();
     // limpar campos para nova inserçao
     ui->Ledit_Desc->clear();
     ui->Ledit_Quantidade->clear();

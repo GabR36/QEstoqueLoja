@@ -39,13 +39,13 @@ MainWindow::MainWindow(QWidget *parent)
     } else {
         qDebug() << "Erro ao criar tabela de vendas: ";
     }
-    query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP)");
+    query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2))");
     if (query.isActive()) {
         qDebug() << "Tabela de vendas2 criada com sucesso!";
     } else {
         qDebug() << "Erro ao criar tabela de vendas2: ";
     }
-    query.exec("CREATE TABLE produtos_vendidos (id INTEGER PRIMARY KEY AUTOINCREMENT, id_produto INTEGER, id_venda INTEGER, quantidade INTEGER, preco_vendido INTEGER, FOREIGN KEY (id_produto) REFERENCES produtos(id), FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
+    query.exec("CREATE TABLE produtos_vendidos (id INTEGER PRIMARY KEY AUTOINCREMENT, id_produto INTEGER, id_venda INTEGER, quantidade INTEGER, preco_vendido DECIMAL(10,2), FOREIGN KEY (id_produto) REFERENCES produtos(id), FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
     if (query.isActive()) {
         qDebug() << "Tabela de produtos_vendidos criada com sucesso!";
     } else {

@@ -61,6 +61,11 @@ void venda::on_Btn_SelecionarProduto_clicked()
 void venda::on_BtnBox_Venda_accepted()
 {
     QString cliente = ui->Ledit_Cliente->text();
+    float totalSelecionados = 0;
+    for (const QVector<QString> &registro : vetorIds) {
+        totalSelecionados = totalSelecionados + registro[2].toFloat();
+        qDebug() << registro[2].toFloat();
+    }
     // adicionar ao banco de dados
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao aceitar venda.";
@@ -68,8 +73,9 @@ void venda::on_BtnBox_Venda_accepted()
     }
     QSqlQuery query;
 
-    query.prepare("INSERT INTO vendas2 (cliente) VALUES (:valor1)");
+    query.prepare("INSERT INTO vendas2 (cliente, total) VALUES (:valor1, :valor2)");
     query.bindValue(":valor1", cliente);
+    query.bindValue(":valor2", totalSelecionados);
     QString idVenda;
     if (query.exec()) {
         idVenda = query.lastInsertId().toString();

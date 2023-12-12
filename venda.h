@@ -2,7 +2,7 @@
 #define VENDA_H
 
 #include <QDialog>
-#include <vector>
+#include <QVector>
 #include <QSqlDatabase>
 #include <QStandardItemModel>
 #include "vendas.h"
@@ -31,7 +31,7 @@ private slots:
 
 private:
     QStandardItemModel modeloSelecionados;
-    std::vector<std::pair<QString, QString>> vetorIds;
+     QVector<QVector<QString>> vetorIds;
     Ui::venda *ui;
 };
 

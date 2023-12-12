@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
     } else {
         qDebug() << "Erro ao criar tabela de vendas2: ";
     }
-    query.exec("CREATE TABLE produtos_vendidos (id INTEGER PRIMARY KEY AUTOINCREMENT, id_produto INTEGER, id_venda INTEGER, quantidade INTEGER, FOREIGN KEY (id_produto) REFERENCES produtos(id), FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
+    query.exec("CREATE TABLE produtos_vendidos (id INTEGER PRIMARY KEY AUTOINCREMENT, id_produto INTEGER, id_venda INTEGER, quantidade INTEGER, preco_vendido INTEGER, FOREIGN KEY (id_produto) REFERENCES produtos(id), FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
     if (query.isActive()) {
         qDebug() << "Tabela de produtos_vendidos criada com sucesso!";
     } else {

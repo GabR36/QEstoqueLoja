@@ -3,6 +3,7 @@
 #include <QSqlQueryModel>
 #include <QSqlQuery>
 #include <QStandardItemModel>
+#include <QVector>
 
 
 venda::venda(QWidget *parent) :
@@ -20,7 +21,7 @@ venda::venda(QWidget *parent) :
     modeloSelecionados.setHorizontalHeaderItem(0, new QStandardItem("ID_Produto"));
     modeloSelecionados.setHorizontalHeaderItem(1, new QStandardItem("Quantidade_Vendida"));
     modeloSelecionados.setHorizontalHeaderItem(2, new QStandardItem("Descricao"));
-    modeloSelecionados.setHorizontalHeaderItem(3, new QStandardItem("Preço"));
+    modeloSelecionados.setHorizontalHeaderItem(3, new QStandardItem("Preço Vendido"));
     ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = modeloProdutos->index(0, 0);
@@ -40,19 +41,20 @@ void venda::on_Btn_SelecionarProduto_clicked()
 {
     // pegar id do produto selecionado e quant do Ledit
     QString quantVendido = ui->Ledit_QuantVendido->text();
+    QString precoVendido = ui->Ledit_Preco->text();
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
     QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
     QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
-    QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
     QString idProduto = idVariant.toString();
     QString descProduto = descVariant.toString();
-    QString precoProduto = precoVariant.toString();
-    vetorIds.push_back(std::make_pair(idProduto, quantVendido));
+    QVector<QString> registro1 = {idProduto, quantVendido, precoVendido};
+    vetorIds.append(registro1);
     ui->Ledit_QuantVendido->clear();
+    ui->Ledit_Preco->clear();
     qDebug() << vetorIds;
     // mostrar na tabela Selecionados
-    modeloSelecionados.appendRow({new QStandardItem(idProduto), new QStandardItem(quantVendido), new QStandardItem(descProduto), new QStandardItem(precoProduto)});
+    modeloSelecionados.appendRow({new QStandardItem(idProduto), new QStandardItem(quantVendido), new QStandardItem(descProduto), new QStandardItem(precoVendido)});
     ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
 }
 
@@ -77,11 +79,12 @@ void venda::on_BtnBox_Venda_accepted()
         qDebug() << "Erro na inserção: ";
     }
     // adicionar ao banco de dados
-    for (const auto& selecionado : vetorIds) {
-        query.prepare("INSERT INTO produtos_vendidos (id_produto, quantidade, id_venda) VALUES (:valor1, :valor2, :valor3)");
-        query.bindValue(":valor1", selecionado.first);
-        query.bindValue(":valor2", selecionado.second);
-        query.bindValue(":valor3", idVenda);
+    for (const QVector<QString> &registro : vetorIds) {
+        query.prepare("INSERT INTO produtos_vendidos (id_produto, quantidade, preco_vendido, id_venda) VALUES (:valor1, :valor2, :valor3, :valor4)");
+        query.bindValue(":valor1", registro[0]);
+        query.bindValue(":valor2", registro[1]);
+        query.bindValue(":valor3", registro[2]);
+        query.bindValue(":valor4", idVenda);
         if (query.exec()) {
             qDebug() << "Inserção prod_vendidos bem-sucedida!";
         } else {

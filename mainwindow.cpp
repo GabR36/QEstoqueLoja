@@ -12,6 +12,7 @@
 #include "vender.h"
 #include <qsqltablemodel.h>
 #include "vendas.h"
+#include <QDoubleValidator>
 
 QSqlTableModel *vendasModel;
 MainWindow::MainWindow(QWidget *parent)
@@ -107,6 +108,26 @@ void MainWindow::on_Btn_Enviar_clicked()
     quantidadeProduto = ui->Ledit_Quantidade->text();
     descProduto = ui->Ledit_Desc->text();
     precoProduto = ui->Ledit_Preco->text();
+
+    // Substitua ',' por '.' se necessário
+    precoProduto.replace(',', '.');
+
+    // Converta o texto para um número
+    bool conversionOk;
+    double price = precoProduto.toDouble(&conversionOk);
+
+    // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
+    if (conversionOk && price >= 0)
+    {
+        // Armazene o preço em uma variável ou faça o que precisar com ele
+        // Neste exemplo, apenas exibimos uma mensagem
+        QMessageBox::information(this, "Sucesso", "Preço válido: " + QString::number(price));
+    }
+    else
+    {
+        // Exiba uma mensagem de erro se o preço não for válido
+        QMessageBox::warning(this, "Erro", "Por favor, insira um preço válido.");
+    }
 
     // adicionar ao banco de dados
     if(!db.open()){

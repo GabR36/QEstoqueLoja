@@ -11,7 +11,6 @@ venda::venda(QWidget *parent) :
     ui(new Ui::venda)
 {
     ui->setupUi(this);
-    QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. construtor venda.";
     }
@@ -115,5 +114,18 @@ void venda::handleSelectionChange(const QItemSelection &selected, const QItemSel
     ui->Ledit_Preco->setText(productPreco);
     qDebug() << productId;
     db.close();
+}
+
+
+void venda::on_Btn_Pesquisa_clicked()
+{
+    QString pesquisa = ui->Ledit_Pesquisa->text();
+    // mostrar na tableview a consulta
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. botao pesquisar.";
+    }
+    modeloProdutos->setQuery("SELECT * FROM produtos WHERE descricao LIKE '%" + pesquisa + "%'");
+    ui->Tview_Produtos->setModel(modeloProdutos);
+    QSqlDatabase::database().close();
 }
 

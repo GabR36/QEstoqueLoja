@@ -29,7 +29,10 @@ private slots:
 
     void handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected);
 
+    void on_Btn_Pesquisa_clicked();
+
 private:
+    QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
     QStandardItemModel modeloSelecionados;
      QVector<QVector<QString>> vetorIds;
     Ui::venda *ui;

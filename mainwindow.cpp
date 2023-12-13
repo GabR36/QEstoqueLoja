@@ -12,6 +12,7 @@
 #include "vender.h"
 #include <qsqltablemodel.h>
 #include "vendas.h"
+#include <QDoubleValidator>
 
 QSqlTableModel *vendasModel;
 MainWindow::MainWindow(QWidget *parent)
@@ -39,13 +40,13 @@ MainWindow::MainWindow(QWidget *parent)
     } else {
         qDebug() << "Erro ao criar tabela de vendas: ";
     }
-    query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP)");
+    query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2))");
     if (query.isActive()) {
         qDebug() << "Tabela de vendas2 criada com sucesso!";
     } else {
         qDebug() << "Erro ao criar tabela de vendas2: ";
     }
-    query.exec("CREATE TABLE produtos_vendidos (id INTEGER PRIMARY KEY AUTOINCREMENT, id_produto INTEGER, id_venda INTEGER, quantidade INTEGER, FOREIGN KEY (id_produto) REFERENCES produtos(id), FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
+    query.exec("CREATE TABLE produtos_vendidos (id INTEGER PRIMARY KEY AUTOINCREMENT, id_produto INTEGER, id_venda INTEGER, quantidade INTEGER, preco_vendido DECIMAL(10,2), FOREIGN KEY (id_produto) REFERENCES produtos(id), FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
     if (query.isActive()) {
         qDebug() << "Tabela de produtos_vendidos criada com sucesso!";
     } else {
@@ -108,23 +109,44 @@ void MainWindow::on_Btn_Enviar_clicked()
     descProduto = ui->Ledit_Desc->text();
     precoProduto = ui->Ledit_Preco->text();
 
-    // adicionar ao banco de dados
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao enviar.";
-    }
-    QSqlQuery query;
+    // Substitua ',' por '.' se necessário
+    precoProduto.replace(',', '.');
 
-    query.prepare("INSERT INTO produtos (quantidade, descricao, preco) VALUES (:valor1, :valor2, :valor3)");
-    query.bindValue(":valor1", quantidadeProduto);
-    query.bindValue(":valor2", descProduto);
-    query.bindValue(":valor3", precoProduto);
-    if (query.exec()) {
-        qDebug() << "Inserção bem-sucedida!";
-    } else {
-        qDebug() << "Erro na inserção: ";
+    // Converta o texto para um número
+    bool conversionOk;
+    double price = precoProduto.toDouble(&conversionOk);
+
+    // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
+    if (conversionOk && price >= 0)
+    {
+        // Armazene o preço em uma variável ou faça o que precisar com ele
+        // Neste exemplo, apenas exibimos uma mensagem
+        QMessageBox::information(this, "Sucesso", "Preço válido: " + QString::number(price));
+        // adicionar ao banco de dados
+        if(!db.open()){
+            qDebug() << "erro ao abrir banco de dados. botao enviar.";
+        }
+        QSqlQuery query;
+
+        query.prepare("INSERT INTO produtos (quantidade, descricao, preco) VALUES (:valor1, :valor2, :valor3)");
+        query.bindValue(":valor1", quantidadeProduto);
+        query.bindValue(":valor2", descProduto);
+        query.bindValue(":valor3", precoProduto);
+        if (query.exec()) {
+            qDebug() << "Inserção bem-sucedida!";
+        } else {
+            qDebug() << "Erro na inserção: ";
+        }
+        atualizarTableview();
+        QSqlDatabase::database().close();
     }
-    atualizarTableview();
-    QSqlDatabase::database().close();
+    else
+    {
+        // Exiba uma mensagem de erro se o preço não for válido
+        QMessageBox::warning(this, "Erro", "Por favor, insira um preço válido.");
+    }
+
+
     // limpar campos para nova inserçao
     ui->Ledit_Desc->clear();
     ui->Ledit_Quantidade->clear();

@@ -2,10 +2,11 @@
 #define VENDA_H
 
 #include <QDialog>
-#include <vector>
+#include <QVector>
 #include <QSqlDatabase>
 #include <QStandardItemModel>
 #include "vendas.h"
+#include <QItemSelection>
 
 namespace Ui {
 class venda;
@@ -26,9 +27,14 @@ private slots:
 
     void on_BtnBox_Venda_accepted();
 
+    void handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected);
+
+    void on_Btn_Pesquisa_clicked();
+
 private:
+    QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
     QStandardItemModel modeloSelecionados;
-    std::vector<std::pair<QString, QString>> vetorIds;
+     QVector<QVector<QString>> vetorIds;
     Ui::venda *ui;
 };
 

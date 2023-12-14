@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>585</width>
+    <width>653</width>
     <height>465</height>
    </rect>
   </property>
@@ -16,9 +16,9 @@
   <widget class="QTableView" name="Tview_Vendas2">
    <property name="geometry">
     <rect>
-     <x>290</x>
+     <x>225</x>
      <y>20</y>
-     <width>256</width>
+     <width>401</width>
      <height>192</height>
     </rect>
    </property>
@@ -28,6 +28,9 @@
    <property name="selectionBehavior">
     <enum>QAbstractItemView::SelectRows</enum>
    </property>
+   <attribute name="horizontalHeaderStretchLastSection">
+    <bool>true</bool>
+   </attribute>
    <attribute name="verticalHeaderVisible">
     <bool>false</bool>
    </attribute>
@@ -35,9 +38,9 @@
   <widget class="QTableView" name="Tview_ProdutosVendidos">
    <property name="geometry">
     <rect>
-     <x>290</x>
+     <x>225</x>
      <y>240</y>
-     <width>256</width>
+     <width>401</width>
      <height>192</height>
     </rect>
    </property>
@@ -47,6 +50,15 @@
    <property name="selectionBehavior">
     <enum>QAbstractItemView::SelectRows</enum>
    </property>
+   <attribute name="horizontalHeaderCascadingSectionResizes">
+    <bool>false</bool>
+   </attribute>
+   <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+    <bool>false</bool>
+   </attribute>
+   <attribute name="horizontalHeaderStretchLastSection">
+    <bool>true</bool>
+   </attribute>
    <attribute name="verticalHeaderVisible">
     <bool>false</bool>
    </attribute>

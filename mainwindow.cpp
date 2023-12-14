@@ -77,8 +77,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableViewVendas->setEditTriggers(QAbstractItemView::NoEditTriggers); // Impede a edição das células
     ui->tableViewVendas->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); // Expande colunas para ajustar a largura
 
-
-
+    // ajustar tamanho colunas
+    // coluna descricao
+    ui->Tview_Produtos->setColumnWidth(2, 200);
+    // coluna quantidade
+    ui->Tview_Produtos->setColumnWidth(1, 85);
 
 
 

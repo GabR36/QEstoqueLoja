@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>820</width>
     <height>600</height>
    </rect>
   </property>
@@ -19,7 +19,7 @@
      <rect>
       <x>370</x>
       <y>30</y>
-      <width>381</width>
+      <width>411</width>
       <height>271</height>
      </rect>
     </property>
@@ -29,6 +29,12 @@
     <property name="selectionBehavior">
      <enum>QAbstractItemView::SelectRows</enum>
     </property>
+    <attribute name="horizontalHeaderCascadingSectionResizes">
+     <bool>false</bool>
+    </attribute>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>50</number>
+    </attribute>
     <attribute name="horizontalHeaderStretchLastSection">
      <bool>true</bool>
     </attribute>
@@ -41,7 +47,7 @@
      <rect>
       <x>370</x>
       <y>320</y>
-      <width>381</width>
+      <width>411</width>
       <height>55</height>
      </rect>
     </property>
@@ -238,7 +244,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
+     <width>820</width>
      <height>21</height>
     </rect>
    </property>

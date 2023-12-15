@@ -18,6 +18,15 @@ Vendas::Vendas(QWidget *parent) :
     QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
     // Conectar o sinal de seleção ao slot personalizado
     connect(selectionModel, &QItemSelectionModel::selectionChanged,this, &Vendas::handleSelectionChange);
+    // ajustar tamanho colunas
+    // coluna data
+    ui->Tview_Vendas2->setColumnWidth(2, 150);
+    // coluna cliente
+    ui->Tview_Vendas2->setColumnWidth(1, 100);
+    // coluna descricao
+    ui->Tview_ProdutosVendidos->setColumnWidth(0, 200);
+    // coluna quantidade
+    ui->Tview_ProdutosVendidos->setColumnWidth(1, 85);
 }
 
 Vendas::~Vendas()

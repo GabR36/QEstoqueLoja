@@ -165,23 +165,43 @@ void MainWindow::on_Btn_Delete_clicked()
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
     QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
+    QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
     QString productId = idVariant.toString();
+    QString productDesc = descVariant.toString();
 
-    // remover registro do banco de dados
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao deletar.";
-    }
-    QSqlQuery query;
+    // Cria uma mensagem de confirmação
+    QMessageBox::StandardButton resposta;
+    resposta = QMessageBox::question(
+        nullptr,
+        "Confirmação",
+        "Tem certeza que deseja excluir o produto:\n\n"
+        "id: " + productId + "\n"
+        "Descrição: " + productDesc,
+        QMessageBox::Yes | QMessageBox::No
+    );
+    // Verifica a resposta do usuário
+    if (resposta == QMessageBox::Yes) {
 
-    query.prepare("DELETE FROM produtos WHERE id = :valor1");
-    query.bindValue(":valor1", productId);
-    if (query.exec()) {
-        qDebug() << "Delete bem-sucedido!";
-    } else {
-        qDebug() << "Erro no Delete: ";
+        // remover registro do banco de dados
+        if(!db.open()){
+            qDebug() << "erro ao abrir banco de dados. botao deletar.";
+        }
+        QSqlQuery query;
+
+        query.prepare("DELETE FROM produtos WHERE id = :valor1");
+        query.bindValue(":valor1", productId);
+        if (query.exec()) {
+            qDebug() << "Delete bem-sucedido!";
+        } else {
+            qDebug() << "Erro no Delete: ";
+        }
+        atualizarTableview();
+        QSqlDatabase::database().close();
     }
-    atualizarTableview();
-    QSqlDatabase::database().close();
+    else {
+        // O usuário escolheu não deletar o produto
+        qDebug() << "A exclusão do produto foi cancelada.";
+    }
 }
 
 

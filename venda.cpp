@@ -61,9 +61,6 @@ void venda::on_Btn_SelecionarProduto_clicked()
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
     if (conversionOk && price >= 0)
     {
-        // Armazene o preço em uma variável ou faça o que precisar com ele
-        // Neste exemplo, apenas exibimos uma mensagem
-        QMessageBox::information(this, "Sucesso", "Preço válido: " + QString::number(price));
         QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
         QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
         QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));

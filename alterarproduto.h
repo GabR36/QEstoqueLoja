@@ -15,6 +15,9 @@ class AlterarProduto : public QDialog
 public:
     MainWindow *janelaPrincipal;
     QString idAlt;
+    QString descAlt;
+    QString precoAlt;
+    QString quantAlt;
     explicit AlterarProduto(QWidget *parent = nullptr);
     ~AlterarProduto();
     void TrazerInfo(QString desc, QString quant, QString preco);

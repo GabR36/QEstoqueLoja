@@ -122,9 +122,6 @@ void MainWindow::on_Btn_Enviar_clicked()
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
     if (conversionOk && price >= 0)
     {
-        // Armazene o preço em uma variável ou faça o que precisar com ele
-        // Neste exemplo, apenas exibimos uma mensagem
-        QMessageBox::information(this, "Sucesso", "Preço válido: " + QString::number(price));
         // adicionar ao banco de dados
         if(!db.open()){
             qDebug() << "erro ao abrir banco de dados. botao enviar.";

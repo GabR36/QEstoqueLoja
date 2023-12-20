@@ -41,9 +41,6 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
     if (conversionOk && price >= 0)
     {
-        // Armazene o preço em uma variável ou faça o que precisar com ele
-        // Neste exemplo, apenas exibimos uma mensagem
-        QMessageBox::information(this, "Sucesso", "Preço válido: " + QString::number(price));
         // Cria uma mensagem de confirmação
         QMessageBox::StandardButton resposta;
         resposta = QMessageBox::question(

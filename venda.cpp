@@ -89,7 +89,7 @@ void venda::on_BtnBox_Venda_accepted()
     QString cliente = ui->Ledit_Cliente->text();
     float totalSelecionados = 0;
     for (const QVector<QString> &registro : vetorIds) {
-        totalSelecionados = totalSelecionados + registro[2].toFloat();
+        totalSelecionados = totalSelecionados + registro[1].toFloat() * registro[2].toFloat();
         qDebug() << registro[2].toFloat();
     }
     // adicionar ao banco de dados

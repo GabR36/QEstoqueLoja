@@ -121,6 +121,14 @@ void venda::on_BtnBox_Venda_accepted()
         } else {
             qDebug() << "Erro na inserção prod_vendidos: ";
         }
+        query.prepare("UPDATE produtos SET quantidade = quantidade - :valor2 WHERE id = :valor1");
+        query.bindValue(":valor1", registro[0]);
+        query.bindValue(":valor2", registro[1]);
+        if (query.exec()) {
+            qDebug() << "update quantidade bem-sucedida!";
+        } else {
+            qDebug() << "Erro na update quantidade: ";
+        }
     }
     db.close();
     janelaVenda->atualizarTabelas();

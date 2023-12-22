@@ -7,6 +7,7 @@
 #include <QStandardItemModel>
 #include "vendas.h"
 #include <QItemSelection>
+#include "mainwindow.h"
 
 namespace Ui {
 class venda;
@@ -18,6 +19,7 @@ class venda : public QDialog
 
 public:
     Vendas *janelaVenda;
+    MainWindow *janelaPrincipal;
     QSqlDatabase db = QSqlDatabase::database();
     explicit venda(QWidget *parent = nullptr);
     ~venda();

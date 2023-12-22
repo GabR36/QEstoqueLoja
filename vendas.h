@@ -5,6 +5,7 @@
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
 #include <QItemSelection>
+#include "mainwindow.h"
 
 namespace Ui {
 class Vendas;
@@ -15,6 +16,7 @@ class Vendas : public QWidget
     Q_OBJECT
 
 public:
+    MainWindow *janelaPrincipal;
     QSqlDatabase db = QSqlDatabase::database();
     explicit Vendas(QWidget *parent = nullptr);
     ~Vendas();

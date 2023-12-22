@@ -38,6 +38,7 @@ void Vendas::on_Btn_InserirVenda_clicked()
 {
     venda *inserirVenda = new venda;
     inserirVenda->janelaVenda = this;
+    inserirVenda->janelaPrincipal = janelaPrincipal;
     inserirVenda->show();
 }
 

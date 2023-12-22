@@ -96,9 +96,12 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::atualizarTableview(){
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. atualizarTableView";
+    }
     model->setQuery("SELECT * FROM produtos");
     ui->Tview_Produtos->setModel(model);
-
+    db.close();
 
 
 //    model->setQuery("SELECT * FROM vendas");
@@ -328,6 +331,7 @@ void MainWindow::on_Btn_Alterar_clicked()
 void MainWindow::on_Btn_Venda_clicked()
 {
     Vendas *vendas = new Vendas;
+    vendas->janelaPrincipal = this;
     vendas->show();
 }
 

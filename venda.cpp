@@ -132,6 +132,7 @@ void venda::on_BtnBox_Venda_accepted()
     }
     db.close();
     janelaVenda->atualizarTabelas();
+    janelaPrincipal->atualizarTableview();
 }
 
 void venda::handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {

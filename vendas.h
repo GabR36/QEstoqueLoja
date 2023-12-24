@@ -26,6 +26,8 @@ private slots:
     void on_Btn_InserirVenda_clicked();
     void handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected);
 
+    void on_CBox_Mes_activated(int index);
+
 private:
     QSqlQueryModel *modeloProdVendidos = new QSqlQueryModel;
     QSqlQueryModel *modeloVendas2 = new QSqlQueryModel;

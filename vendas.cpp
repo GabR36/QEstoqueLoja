@@ -2,6 +2,7 @@
 #include "ui_vendas.h"
 #include <QSqlQueryModel>
 #include "venda.h"
+#include <QDate>
 
 Vendas::Vendas(QWidget *parent) :
     QWidget(parent),
@@ -27,6 +28,21 @@ Vendas::Vendas(QWidget *parent) :
     ui->Tview_ProdutosVendidos->setColumnWidth(0, 200);
     // coluna quantidade
     ui->Tview_ProdutosVendidos->setColumnWidth(1, 85);
+
+    // adicionar meses ao seletor de meses combobox
+    ui->CBox_Mes->addItem("Todos");
+    ui->CBox_Mes->addItem("Janeiro");
+    ui->CBox_Mes->addItem("Fevereiro");
+    ui->CBox_Mes->addItem("Março");
+    ui->CBox_Mes->addItem("Abril");
+    ui->CBox_Mes->addItem("Maio");
+    ui->CBox_Mes->addItem("Junho");
+    ui->CBox_Mes->addItem("Julho");
+    ui->CBox_Mes->addItem("Agosto");
+    ui->CBox_Mes->addItem("Setembro");
+    ui->CBox_Mes->addItem("Outubro");
+    ui->CBox_Mes->addItem("Novembro");
+    ui->CBox_Mes->addItem("Dezembro");
 }
 
 Vendas::~Vendas()
@@ -70,3 +86,24 @@ void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSe
     ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
     db.close();
 }
+
+void Vendas::on_CBox_Mes_activated(int index)
+{
+    qDebug() << index;
+
+    if (index != 0){
+        if(!db.open()){
+            qDebug() << "erro ao abrir banco de dados. cbox_activated";
+        }
+        modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + QString::number(index) + "'");
+        db.close();
+    }
+    else{
+        if(!db.open()){
+            qDebug() << "erro ao abrir banco de dados. cbox_activated";
+        }
+        modeloVendas2->setQuery("SELECT * FROM vendas2");
+        db.close();
+    }
+}
+

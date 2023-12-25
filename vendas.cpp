@@ -3,6 +3,7 @@
 #include <QSqlQueryModel>
 #include "venda.h"
 #include <QDate>
+#include <QtSql>
 
 Vendas::Vendas(QWidget *parent) :
     QWidget(parent),
@@ -29,6 +30,20 @@ Vendas::Vendas(QWidget *parent) :
     // coluna quantidade
     ui->Tview_ProdutosVendidos->setColumnWidth(1, 85);
 
+    // adicionar items combobox com base nas datas disponiveis
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir o banco de dados:";
+    }
+    QSqlQuery query;
+    if (query.exec("SELECT DISTINCT strftime('%d', data_hora) AS data_disponivel FROM vendas2")) {
+        // Iterar sobre os resultados
+        while (query.next()) {
+            QString dia = query.value(0).toString();
+            qDebug() << dia;
+        }
+    } else {
+        qDebug() << "Erro ao executar a consulta:" << query.lastError().text();
+    }
     // adicionar meses ao seletor de meses combobox
     ui->CBox_Mes->addItem("Todos");
     ui->CBox_Mes->addItem("Janeiro");
@@ -43,6 +58,8 @@ Vendas::Vendas(QWidget *parent) :
     ui->CBox_Mes->addItem("Outubro");
     ui->CBox_Mes->addItem("Novembro");
     ui->CBox_Mes->addItem("Dezembro");
+
+
 }
 
 Vendas::~Vendas()

@@ -86,17 +86,24 @@
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>30</y>
+     <y>20</y>
      <width>111</width>
-     <height>56</height>
+     <height>88</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <widget class="QComboBox" name="CBox_Mes"/>
+     <widget class="QComboBox" name="CBox_Ano"/>
     </item>
     <item>
-     <widget class="QComboBox" name="CBox_Dia"/>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QComboBox" name="CBox_Mes"/>
+      </item>
+      <item>
+       <widget class="QComboBox" name="CBox_Dia"/>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

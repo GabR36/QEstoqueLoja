@@ -31,41 +31,90 @@ Vendas::Vendas(QWidget *parent) :
     ui->Tview_ProdutosVendidos->setColumnWidth(1, 85);
 
     // adicionar items combobox com base nas datas disponiveis
+    QVector<QString> dias;
+    QVector<int> meses;
+    QVector<QString> anos;
     if (!db.open()) {
         qDebug() << "Erro ao abrir o banco de dados:";
     }
     QSqlQuery query;
-    if (query.exec("SELECT DISTINCT strftime('%d', data_hora) AS data_disponivel FROM vendas2")) {
+    if (query.exec("SELECT DISTINCT strftime('%d', data_hora) FROM vendas2")) {
         // Iterar sobre os resultados
         while (query.next()) {
             QString dia = query.value(0).toString();
-            qDebug() << dia;
+            dias.push_back(dia);
         }
     } else {
         qDebug() << "Erro ao executar a consulta:" << query.lastError().text();
     }
-    // adicionar meses ao seletor de meses combobox
+    if (query.exec("SELECT DISTINCT strftime('%m', data_hora) FROM vendas2")) {
+        // Iterar sobre os resultados
+        while (query.next()) {
+            int mes = query.value(0).toInt();
+            meses.push_back(mes);
+        }
+    } else {
+        qDebug() << "Erro ao executar a consulta:" << query.lastError().text();
+    }
+    if (query.exec("SELECT DISTINCT strftime('%Y', data_hora) FROM vendas2")) {
+        // Iterar sobre os resultados
+        while (query.next()) {
+            QString ano = query.value(0).toString();
+            anos.push_back(ano);
+        }
+    } else {
+        qDebug() << "Erro ao executar a consulta:" << query.lastError().text();
+    }
+    db.close();
+    qDebug() << anos;
+    qDebug() << dias;
+    qDebug() << meses;
+
+    // adicionar meses ao seletor de mes combobox
+    // transformar os numeros de mes em nomes de meses
     ui->CBox_Mes->addItem("Todos");
-    ui->CBox_Mes->addItem("Janeiro");
-    ui->CBox_Mes->addItem("Fevereiro");
-    ui->CBox_Mes->addItem("Março");
-    ui->CBox_Mes->addItem("Abril");
-    ui->CBox_Mes->addItem("Maio");
-    ui->CBox_Mes->addItem("Junho");
-    ui->CBox_Mes->addItem("Julho");
-    ui->CBox_Mes->addItem("Agosto");
-    ui->CBox_Mes->addItem("Setembro");
-    ui->CBox_Mes->addItem("Outubro");
-    ui->CBox_Mes->addItem("Novembro");
-    ui->CBox_Mes->addItem("Dezembro");
+    for(int mes : meses){
+        switch (mes) {
+        case 1:
+            ui->CBox_Mes->addItem("Janeiro");
+        case 2:
+            ui->CBox_Mes->addItem("Fevereiro");
+        case 3:
+            ui->CBox_Mes->addItem("Março");
+        case 4:
+            ui->CBox_Mes->addItem("Abril");
+        case 5:
+            ui->CBox_Mes->addItem("Maio");
+        case 6:
+            ui->CBox_Mes->addItem("Junho");
+        case 7:
+            ui->CBox_Mes->addItem("Julho");
+        case 8:
+            ui->CBox_Mes->addItem("Agosto");
+        case 9:
+            ui->CBox_Mes->addItem("Setembro");
+        case 10:
+            ui->CBox_Mes->addItem("Outubro");
+        case 11:
+            ui->CBox_Mes->addItem("Novembro");
+        case 12:
+            ui->CBox_Mes->addItem("Dezembro");
+        default:
+            qDebug() << "mes invalido..";
+        }
+    }
 
     // adicionar dias ao seletor de dias combobox
     ui->CBox_Dia->addItem("Todos");
-    for (int i = 1; i < 32; i++){
-        // ate 31 dias
-        ui->CBox_Dia->addItem(QString::number(i));
+    for(QString &dia : dias){
+        ui->CBox_Dia->addItem(dia);
     }
 
+    // adicionar os anos ao seletor de anos combobox
+    ui->CBox_Ano->addItem("Todos");
+    for(QString &ano : anos){
+        ui->CBox_Ano->addItem(ano);
+    }
 
 }
 

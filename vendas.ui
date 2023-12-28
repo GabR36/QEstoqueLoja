@@ -82,15 +82,23 @@
     <string>Inserir Venda</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="CBox_Mes">
+  <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
      <x>40</x>
      <y>30</y>
      <width>111</width>
-     <height>24</height>
+     <height>56</height>
     </rect>
    </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QComboBox" name="CBox_Mes"/>
+    </item>
+    <item>
+     <widget class="QComboBox" name="CBox_Dia"/>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>

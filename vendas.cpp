@@ -59,6 +59,13 @@ Vendas::Vendas(QWidget *parent) :
     ui->CBox_Mes->addItem("Novembro");
     ui->CBox_Mes->addItem("Dezembro");
 
+    // adicionar dias ao seletor de dias combobox
+    ui->CBox_Dia->addItem("Todos");
+    for (int i = 1; i < 32; i++){
+        // ate 31 dias
+        ui->CBox_Dia->addItem(QString::number(i));
+    }
+
 
 }
 
@@ -108,19 +115,92 @@ void Vendas::on_CBox_Mes_activated(int index)
 {
     qDebug() << index;
 
-    if (index != 0){
+    int indexDia = ui->CBox_Dia->currentIndex();
+    qDebug() << indexDia;
+
+    if (index != 0 && indexDia != 0){
         if(!db.open()){
             qDebug() << "erro ao abrir banco de dados. cbox_activated";
         }
-        modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + QString::number(index) + "'");
+        modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + QString::number(index) + "' AND strftime('%d', data_hora) = '" + QString::number(indexDia) + "'");
         db.close();
     }
     else{
+        if (index == 0 && indexDia == 0){
+            // os dois estao selecionados 'todos'
+            if(!db.open()){
+                qDebug() << "erro ao abrir banco de dados. cbox_activated";
+            }
+            modeloVendas2->setQuery("SELECT * FROM vendas2");
+            db.close();
+
+        }
+        else {
+            if (indexDia == 0){
+                // apenas o dia é todos
+                if(!db.open()){
+                    qDebug() << "erro ao abrir banco de dados. cbox_activated";
+                }
+                modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + QString::number(index) + "'");
+                db.close();
+            }
+            else{
+                // apenas o mes é todos
+                if(!db.open()){
+                    qDebug() << "erro ao abrir banco de dados. cbox_activated (index todos)";
+                }
+                modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%d', data_hora) = '" + QString::number(indexDia) + "'");
+                db.close();
+            }
+        }
+
+    }
+}
+
+
+void Vendas::on_CBox_Dia_activated(int index)
+{
+    qDebug() << index;
+
+    int indexMes = ui->CBox_Mes->currentIndex();
+    qDebug() << indexMes;
+
+    if (index != 0 && indexMes != 0){
         if(!db.open()){
             qDebug() << "erro ao abrir banco de dados. cbox_activated";
         }
-        modeloVendas2->setQuery("SELECT * FROM vendas2");
+        modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + QString::number(indexMes) + "' AND strftime('%d', data_hora) = '" + QString::number(index) + "'");
         db.close();
+    }
+    else{
+        if (index == 0 && indexMes == 0){
+            // os dois estao selecionados 'todos'
+            if(!db.open()){
+                qDebug() << "erro ao abrir banco de dados. cbox_activated";
+            }
+            modeloVendas2->setQuery("SELECT * FROM vendas2");
+            db.close();
+
+        }
+        else {
+            if (index == 0){
+                // apenas o dia é todos
+                if(!db.open()){
+                    qDebug() << "erro ao abrir banco de dados. cbox_activated";
+                }
+                modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + QString::number(indexMes) + "'");
+                db.close();
+            }
+            else{
+                // apenas o mes é todos
+                if(!db.open()){
+                    qDebug() << "erro ao abrir banco de dados. cbox_activated (index todos)";
+                }
+                modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%d', data_hora) = '" + QString::number(index) + "'");
+                db.close();
+            }
+        }
+
     }
 }
 

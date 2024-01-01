@@ -254,23 +254,56 @@ void Vendas::on_CBox_Ano_activated(int index)
     qDebug() << valorMes;
     qDebug() << valorDia;
 
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. cbox_activated";
+    }
+
     if (indexMes == 0 && indexDia == 0 && index == 0){
         // todos os seletores estao em 'todos'
-        if(!db.open()){
-            qDebug() << "erro ao abrir banco de dados. cbox_activated";
-        }
         modeloVendas2->setQuery("SELECT * FROM vendas2");
-        db.close();
     }
     else{
         if (indexMes != 0 && indexDia != 0 && index != 0){
             // nenhum seletor esta em 'todos'
-            if(!db.open()){
-                qDebug() << "erro ao abrir banco de dados. cbox_activated";
-            }
             modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + valorMes + "' AND strftime('%d', data_hora) = '" + valorDia + "' AND strftime('%Y', data_hora) = '" + valorAno + "'");
-            db.close();
+        }
+        else{
+            if (indexMes == 0 && indexDia != 0 && index != 0){
+                // so o mes esta com todos
+                modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%d', data_hora) = '" + valorDia + "' AND strftime('%Y', data_hora) = '" + valorAno + "'");
+            }
+            else {
+                if (indexMes == 0 && indexDia == 0 && index != 0){
+                   // mes e dia estao com todos
+                    modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%Y', data_hora) = '" + valorAno + "'");
+                }
+                else{
+                    if (indexMes == 0 && indexDia != 0 && index == 0){
+                        // mes e ano estao com todos
+                        modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%d', data_hora) = '" + valorDia + "'");
+                    }
+                    else{
+                        if (indexMes != 0 && indexDia == 0 && index != 0){
+                            // apenas dia esta com todos
+                            modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + valorMes + "' AND strftime('%Y', data_hora) = '" + valorAno + "'");
+                        }
+                        else{
+                            if (indexMes != 0 && indexDia == 0 && index == 0){
+                                // dia e ano esta com todos
+                                modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + valorMes + "'");
+                            }
+                            else {
+                                if (indexMes != 0 && indexDia != 0 && index == 0){
+                                    // apenas ano esta com todos
+                                    modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + valorMes + "' AND strftime('%d', data_hora) = '" + valorDia + "'");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
+    db.close();
 }
 

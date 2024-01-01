@@ -14,7 +14,6 @@
 #include "vendas.h"
 #include <QDoubleValidator>
 
-QSqlTableModel *vendasModel;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -33,12 +32,6 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "Tabela criada com sucesso!";
     } else {
         qDebug() << "Erro ao criar tabela: ";
-    }
-    query.exec("CREATE TABLE vendas (id INTEGER PRIMARY KEY AUTOINCREMENT, produto_id INTEGER, quantidade INTEGER, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP)");
-    if (query.isActive()) {
-        qDebug() << "Tabela de vendas criada com sucesso!";
-    } else {
-        qDebug() << "Erro ao criar tabela de vendas: ";
     }
     query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2))");
     if (query.isActive()) {
@@ -67,16 +60,6 @@ MainWindow::MainWindow(QWidget *parent)
     QModelIndex firstIndex = model->index(0, 0);
     ui->Tview_Produtos->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
 
-    QSqlTableModel *vendasModel;
-    vendasModel = new QSqlTableModel(this);
-    vendasModel->setTable("vendas");
-    vendasModel->select(); // Carrega os dados da tabela de vendas
-
-    // Configure o QTableView para exibir as vendas
-    ui->tableViewVendas->setModel(vendasModel);
-    ui->tableViewVendas->setEditTriggers(QAbstractItemView::NoEditTriggers); // Impede a edição das células
-    ui->tableViewVendas->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch); // Expande colunas para ajustar a largura
-
     // ajustar tamanho colunas
     // coluna descricao
     ui->Tview_Produtos->setColumnWidth(2, 200);
@@ -102,10 +85,6 @@ void MainWindow::atualizarTableview(){
     model->setQuery("SELECT * FROM produtos");
     ui->Tview_Produtos->setModel(model);
     db.close();
-
-
-//    model->setQuery("SELECT * FROM vendas");
-//    ui->tableViewVendas->setModel(model);
 }
 
 void MainWindow::on_Btn_Enviar_clicked()
@@ -218,90 +197,6 @@ void MainWindow::on_Btn_Pesquisa_clicked()
 }
 
 
-void MainWindow::on_Btn_Vender_clicked()
-{
-    QString idVenda = ui->Ledit_VendaId->text();
-    QString quantVenda = ui->Ledit_VendaQuant->text();
-    compravenda(idVenda, quantVenda, false);
-
-    ui->tableViewVendas->setModel(vendasModel);
-
-
-
-
-
-
-}
-
-
-void MainWindow::on_Btn_Comprar_clicked()
-{
-    QString idVenda = ui->Ledit_VendaId->text();
-    QString quantVenda = ui->Ledit_VendaQuant->text();
-    compravenda(idVenda, quantVenda, true);
-
-
-}
-
-
-void MainWindow::compravenda(QString idVenda, QString quantVenda, bool compravenda){
-    QString maismenos;
-    if (compravenda){
-        maismenos = "+";
-    } else {
-        maismenos = "-";
-    }
-    // alterar banco de dados
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao comprar.";
-    }
-    QSqlQuery query;
-
-    query.prepare("UPDATE produtos SET quantidade = quantidade " + maismenos + " :valor1 WHERE id = :valor2");
-    query.bindValue(":valor1", quantVenda);
-    query.bindValue(":valor2", idVenda);
-    if (query.exec()) {
-        qDebug() << "Inserção bem-sucedida!";
-    } else {
-        qDebug() << "Erro na inserção: ";
-    }
-
-    query.prepare("UPDATE produtos SET quantidade = quantidade " + maismenos + " :valor1 WHERE id = :valor2");
-    query.bindValue(":valor1", quantVenda);
-    query.bindValue(":valor2", idVenda);
-    if (query.exec()) {
-        qDebug() << "Atualização de quantidade bem-sucedida!";
-    } else {
-        qDebug() << "Erro na atualização de quantidade: ";
-    }
-
-
-    query.prepare("INSERT INTO vendas (produto_id, quantidade) VALUES (:valor1, :valor2)");
-    query.bindValue(":valor1", idVenda);
-    query.bindValue(":valor2", quantVenda);
-    if (query.exec()) {
-        qDebug() << "Venda registrada com sucesso!";
-    } else {
-        qDebug() << "Erro ao registrar venda: ";
-    }
-
-    // Atualizar a tabela de produtos
-    query.prepare("UPDATE produtos SET quantidade = quantidade " + maismenos + " :valor1 WHERE id = :valor2");
-    query.bindValue(":valor1", quantVenda);
-    query.bindValue(":valor2", idVenda);
-    if (query.exec()) {
-        qDebug() << "Atualização de quantidade bem-sucedida!";
-    } else {
-        qDebug() << "Erro na atualização de quantidade: ";
-    }
-    // mostrar na tableview
-    atualizarTableview();
-    QSqlDatabase::database().close();
-    // limpar campos para nova inserção
-    ui->Ledit_VendaQuant->clear();
-    ui->Ledit_VendaId->clear();
-    //adsa
-}
 
 
 void MainWindow::on_Btn_Alterar_clicked()

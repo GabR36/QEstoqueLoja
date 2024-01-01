@@ -33,6 +33,8 @@ private slots:
     void on_CBox_Ano_activated(int index);
 
 private:
+    void LabelLucro();
+    void LabelLucro(QString whereQuery);
     void queryCBox (int indexAno, int indexMes, int indexDia);
     QMap<QString, int> mapaMeses;
     QSqlQueryModel *modeloProdVendidos = new QSqlQueryModel;

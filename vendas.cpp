@@ -103,25 +103,9 @@ Vendas::Vendas(QWidget *parent) :
     }
 
     // colocar valores nos labels de lucro etc
-    float total;
-    int quantidadeVendas;
-    if (query.exec("SELECT SUM(total) FROM vendas2")) {
-        while (query.next()) {
-            total = query.value(0).toFloat();
-        }
-    }
-    if (query.exec("SELECT COUNT(*) FROM vendas2")) {
-        while (query.next()) {
-            quantidadeVendas = query.value(0).toInt();
-        }
-    }
-    qDebug() << total;
+    LabelLucro();
+    //
     db.close();
-    float lucro = total*0.28; // assumindo que o lucro é 40% do preco de venda
-    ui->Lbl_Total->setText(QString::number(total));
-    ui->Lbl_Lucro->setText(QString::number(lucro));
-    ui->Lbl_Quantidade->setText(QString::number(quantidadeVendas));
-
 }
 
 Vendas::~Vendas()
@@ -196,45 +180,60 @@ void Vendas::queryCBox (int indexAno, int indexMes, int indexDia){
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. cbox_activated";
     }
-
+    QString whereQuery = "";
     if (indexMes == 0 && indexDia == 0 && indexAno == 0){
         // todos os seletores estao em 'todos'
         modeloVendas2->setQuery("SELECT * FROM vendas2");
+        LabelLucro();
     }
     else{
         if (indexMes != 0 && indexDia != 0 && indexAno != 0){
             // nenhum seletor esta em 'todos'
-            modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + valorMes + "' AND strftime('%d', data_hora) = '" + valorDia + "' AND strftime('%Y', data_hora) = '" + valorAno + "'");
+            whereQuery = "WHERE strftime('%m', data_hora) = '" + valorMes + "' AND strftime('%d', data_hora) = '" + valorDia + "' AND strftime('%Y', data_hora) = '" + valorAno + "'";
+            modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery);
+            LabelLucro(whereQuery);
         }
         else{
             if (indexMes == 0 && indexDia != 0 && indexAno != 0){
                 // so o mes esta com todos
-                modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%d', data_hora) = '" + valorDia + "' AND strftime('%Y', data_hora) = '" + valorAno + "'");
+                whereQuery = "WHERE strftime('%d', data_hora) = '" + valorDia + "' AND strftime('%Y', data_hora) = '" + valorAno + "'";
+                modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery);
+                LabelLucro(whereQuery);
             }
             else {
                 if (indexMes == 0 && indexDia == 0 && indexAno != 0){
                     // mes e dia estao com todos
-                    modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%Y', data_hora) = '" + valorAno + "'");
+                    whereQuery = "WHERE strftime('%Y', data_hora) = '" + valorAno + "'";
+                    modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery);
+                    LabelLucro(whereQuery);
                 }
                 else{
                     if (indexMes == 0 && indexDia != 0 && indexAno == 0){
                         // mes e ano estao com todos
-                        modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%d', data_hora) = '" + valorDia + "'");
+                        whereQuery = "WHERE strftime('%d', data_hora) = '" + valorDia + "'";
+                        modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery);
+                        LabelLucro(whereQuery);
                     }
                     else{
                         if (indexMes != 0 && indexDia == 0 && indexAno != 0){
                             // apenas dia esta com todos
-                            modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + valorMes + "' AND strftime('%Y', data_hora) = '" + valorAno + "'");
+                            whereQuery = "WHERE strftime('%m', data_hora) = '" + valorMes + "' AND strftime('%Y', data_hora) = '" + valorAno + "'";
+                            modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery);
+                            LabelLucro(whereQuery);
                         }
                         else{
                             if (indexMes != 0 && indexDia == 0 && indexAno == 0){
                                 // dia e ano esta com todos
-                                modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + valorMes + "'");
+                                whereQuery = "WHERE strftime('%m', data_hora) = '" + valorMes + "'";
+                                modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery);
+                                LabelLucro(whereQuery);
                             }
                             else {
                                 if (indexMes != 0 && indexDia != 0 && indexAno == 0){
                                     // apenas ano esta com todos
-                                    modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + valorMes + "' AND strftime('%d', data_hora) = '" + valorDia + "'");
+                                    whereQuery = "WHERE strftime('%m', data_hora) = '" + valorMes + "' AND strftime('%d', data_hora) = '" + valorDia + "'";
+                                    modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery);
+                                    LabelLucro(whereQuery);
                                 }
                             }
                         }
@@ -245,5 +244,35 @@ void Vendas::queryCBox (int indexAno, int indexMes, int indexDia){
     }
     db.close();
 
+}
+
+void Vendas::LabelLucro(QString whereQuery){
+    // colocar valores nos labels de lucro etc
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. labelLucro";
+    }
+    QSqlQuery query;
+    float total = 0;
+    int quantidadeVendas = 0;
+    if (query.exec("SELECT SUM(total) FROM vendas2 " + whereQuery)) {
+        while (query.next()) {
+            total = query.value(0).toFloat();
+        }
+    }
+    if (query.exec("SELECT COUNT(*) FROM vendas2 " + whereQuery)) {
+        while (query.next()) {
+            quantidadeVendas = query.value(0).toInt();
+        }
+    }
+    float lucro = total*0.28; // assumindo que o lucro é 40% do preco de venda
+    ui->Lbl_Total->setText(QString::number(total));
+    ui->Lbl_Lucro->setText(QString::number(lucro));
+    ui->Lbl_Quantidade->setText(QString::number(quantidadeVendas));
+    db.close();
+}
+
+void Vendas::LabelLucro(){
+    // para ser chamada sem argumentos
+    LabelLucro(QString());
 }
 

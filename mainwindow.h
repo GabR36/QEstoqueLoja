@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <vector>
-#include "produto.h"
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
 

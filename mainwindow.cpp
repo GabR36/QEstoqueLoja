@@ -3,13 +3,11 @@
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
-#include "produto.h"
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QSqlQueryModel>
 #include "alterarproduto.h"
 #include "QItemSelectionModel"
-#include "vender.h"
 #include <qsqltablemodel.h>
 #include "vendas.h"
 #include <QDoubleValidator>

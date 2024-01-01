@@ -72,36 +72,23 @@ Vendas::Vendas(QWidget *parent) :
 
     // adicionar meses ao seletor de mes combobox
     // transformar os numeros de mes em nomes de meses
+    mapaMeses = {
+        {"Janeiro", 1},
+        {"Fevereiro", 2},
+        {"Março", 3},
+        {"Abril", 4},
+        {"Maio", 5},
+        {"Junho", 6},
+        {"Julho", 7},
+        {"Agosto", 8},
+        {"Setembro", 9},
+        {"Outubro", 10},
+        {"Novembro", 11},
+        {"Dezembro", 12}
+    };
     ui->CBox_Mes->addItem("Todos");
     for(int mes : meses){
-        switch (mes) {
-        case 1:
-            ui->CBox_Mes->addItem("Janeiro");
-        case 2:
-            ui->CBox_Mes->addItem("Fevereiro");
-        case 3:
-            ui->CBox_Mes->addItem("Março");
-        case 4:
-            ui->CBox_Mes->addItem("Abril");
-        case 5:
-            ui->CBox_Mes->addItem("Maio");
-        case 6:
-            ui->CBox_Mes->addItem("Junho");
-        case 7:
-            ui->CBox_Mes->addItem("Julho");
-        case 8:
-            ui->CBox_Mes->addItem("Agosto");
-        case 9:
-            ui->CBox_Mes->addItem("Setembro");
-        case 10:
-            ui->CBox_Mes->addItem("Outubro");
-        case 11:
-            ui->CBox_Mes->addItem("Novembro");
-        case 12:
-            ui->CBox_Mes->addItem("Dezembro");
-        default:
-            qDebug() << "mes invalido..";
-        }
+            ui->CBox_Mes->addItem(mapaMeses.key(mes));
     }
 
     // adicionar dias ao seletor de dias combobox
@@ -250,6 +237,40 @@ void Vendas::on_CBox_Dia_activated(int index)
             }
         }
 
+    }
+}
+
+
+void Vendas::on_CBox_Ano_activated(int index)
+{
+    int indexDia = ui->CBox_Dia->currentIndex();
+    int indexMes = ui->CBox_Mes->currentIndex();
+    QString valorAno = ui->CBox_Ano->itemText(index);
+    QString valorMes = QString::number(mapaMeses.value(ui->CBox_Mes->itemText(indexMes)));
+    QString valorDia = ui->CBox_Dia->itemText(indexDia);
+
+    qDebug() << "valores indexes ano, mes, dia";
+    qDebug() << valorAno;
+    qDebug() << valorMes;
+    qDebug() << valorDia;
+
+    if (indexMes == 0 && indexDia == 0 && index == 0){
+        // todos os seletores estao em 'todos'
+        if(!db.open()){
+            qDebug() << "erro ao abrir banco de dados. cbox_activated";
+        }
+        modeloVendas2->setQuery("SELECT * FROM vendas2");
+        db.close();
+    }
+    else{
+        if (indexMes != 0 && indexDia != 0 && index != 0){
+            // nenhum seletor esta em 'todos'
+            if(!db.open()){
+                qDebug() << "erro ao abrir banco de dados. cbox_activated";
+            }
+            modeloVendas2->setQuery("SELECT * FROM vendas2 WHERE strftime('%m', data_hora) = '" + valorMes + "' AND strftime('%d', data_hora) = '" + valorDia + "' AND strftime('%Y', data_hora) = '" + valorAno + "'");
+            db.close();
+        }
     }
 }
 

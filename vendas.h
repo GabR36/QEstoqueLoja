@@ -30,7 +30,10 @@ private slots:
 
     void on_CBox_Dia_activated(int index);
 
+    void on_CBox_Ano_activated(int index);
+
 private:
+    QMap<QString, int> mapaMeses;
     QSqlQueryModel *modeloProdVendidos = new QSqlQueryModel;
     QSqlQueryModel *modeloVendas2 = new QSqlQueryModel;
     Ui::Vendas *ui;

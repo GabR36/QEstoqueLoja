@@ -65,7 +65,6 @@ Vendas::Vendas(QWidget *parent) :
     } else {
         qDebug() << "Erro ao executar a consulta:" << query.lastError().text();
     }
-    db.close();
     qDebug() << anos;
     qDebug() << dias;
     qDebug() << meses;
@@ -102,6 +101,26 @@ Vendas::Vendas(QWidget *parent) :
     for(QString &ano : anos){
         ui->CBox_Ano->addItem(ano);
     }
+
+    // colocar valores nos labels de lucro etc
+    float total;
+    int quantidadeVendas;
+    if (query.exec("SELECT SUM(total) FROM vendas2")) {
+        while (query.next()) {
+            total = query.value(0).toFloat();
+        }
+    }
+    if (query.exec("SELECT COUNT(*) FROM vendas2")) {
+        while (query.next()) {
+            quantidadeVendas = query.value(0).toInt();
+        }
+    }
+    qDebug() << total;
+    db.close();
+    float lucro = total*0.28; // assumindo que o lucro é 40% do preco de venda
+    ui->Lbl_Total->setText(QString::number(total));
+    ui->Lbl_Lucro->setText(QString::number(lucro));
+    ui->Lbl_Quantidade->setText(QString::number(quantidadeVendas));
 
 }
 

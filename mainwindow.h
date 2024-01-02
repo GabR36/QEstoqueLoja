@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <vector>
-#include "produto.h"
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
 
@@ -31,17 +30,12 @@ private slots:
 
     void on_Btn_Pesquisa_clicked();
 
-    void on_Btn_Vender_clicked();
-
-    void on_Btn_Comprar_clicked();
-
     void on_Btn_Alterar_clicked();
 
     void on_Btn_Venda_clicked();
 
 private:
-    Ui::MainWindow *ui;
-    void compravenda(QString idVenda, QString quantVenda, bool compravenda);
+    Ui::MainWindow *ui;   
 
 
 

@@ -26,9 +26,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(QEstoqueLoja
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        produto.h produto.cpp
+
         alterarproduto.h alterarproduto.cpp alterarproduto.ui
-        vender.h vender.cpp vender.ui
+
         vendas.h vendas.cpp vendas.ui
         venda.h venda.cpp venda.ui
     )

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Vendas</string>
+   <string>Vendas - QEstoqueLoja</string>
   </property>
   <widget class="QTableView" name="Tview_Vendas2">
    <property name="geometry">

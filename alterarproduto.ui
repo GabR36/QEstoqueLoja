@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Alterar Produto</string>
+   <string>Alterar Produto - QEstoqueLoja</string>
   </property>
   <widget class="QDialogButtonBox" name="Btn_AltAceitar">
    <property name="geometry">

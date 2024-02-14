@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Venda</string>
+   <string>Venda - QEstoqueLoja</string>
   </property>
   <widget class="QDialogButtonBox" name="BtnBox_Venda">
    <property name="geometry">
@@ -163,7 +163,7 @@
     <string>Produtos Selecionados</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Venda</string>
   </property>
   <widget class="QDialogButtonBox" name="BtnBox_Venda">
    <property name="geometry">

@@ -158,18 +158,26 @@
      </item>
     </layout>
    </widget>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>820</width>
-     <height>21</height>
-    </rect>
-   </property>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>20</y>
+      <width>251</width>
+      <height>171</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Adicionar Produto</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionteste">
+   <property name="text">
+    <string>teste</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

@@ -75,20 +75,6 @@
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="Lbl_Quantidade">
-         <property name="text">
-          <string>quantidade:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="Ledit_Quantidade"/>
-       </item>
-      </layout>
-     </item>
-     <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QLabel" name="label_2">
@@ -99,6 +85,20 @@
        </item>
        <item>
         <widget class="QLineEdit" name="Ledit_Desc"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="Lbl_Quantidade">
+         <property name="text">
+          <string>quantidade:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="Ledit_Quantidade"/>
        </item>
       </layout>
      </item>

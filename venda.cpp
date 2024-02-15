@@ -56,25 +56,33 @@ void venda::on_Btn_SelecionarProduto_clicked()
 
     // Converta o texto para um número
     bool conversionOk;
+    bool conversionOkQuant;
     double price = precoVendido.toDouble(&conversionOk);
+    double quantInt = quantVendido.toInt(&conversionOkQuant);
 
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
     if (conversionOk && price >= 0)
     {
-        QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
-        QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
-        QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
-        QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
-        QString idProduto = idVariant.toString();
-        QString descProduto = descVariant.toString();
-        QVector<QString> registro1 = {idProduto, quantVendido, precoVendido};
-        vetorIds.append(registro1);
-        ui->Ledit_QuantVendido->clear();
-        ui->Ledit_Preco->clear();
-        qDebug() << vetorIds;
-        // mostrar na tabela Selecionados
-        modeloSelecionados.appendRow({new QStandardItem(idProduto), new QStandardItem(quantVendido), new QStandardItem(descProduto), new QStandardItem(precoVendido)});
-        ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+        if(conversionOkQuant){
+            QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+            QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+            QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
+            QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
+            QString idProduto = idVariant.toString();
+            QString descProduto = descVariant.toString();
+            QVector<QString> registro1 = {idProduto, quantVendido, precoVendido};
+            vetorIds.append(registro1);
+            ui->Ledit_QuantVendido->clear();
+            ui->Ledit_Preco->clear();
+            qDebug() << vetorIds;
+            // mostrar na tabela Selecionados
+            modeloSelecionados.appendRow({new QStandardItem(idProduto), new QStandardItem(quantVendido), new QStandardItem(descProduto), new QStandardItem(precoVendido)});
+            ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+        }
+        else {
+            QMessageBox::warning(this, "Erro", "Por favor, insira uma quantidade válida.");
+        }
+
     }
     else
     {

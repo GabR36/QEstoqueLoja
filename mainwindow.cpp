@@ -66,9 +66,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-
-
-
 }
 
 MainWindow::~MainWindow()
@@ -97,41 +94,51 @@ void MainWindow::on_Btn_Enviar_clicked()
 
     // Converta o texto para um número
     bool conversionOk;
+    bool conversionOkQuant;
     double price = precoProduto.toDouble(&conversionOk);
+    int quantidadeInt = quantidadeProduto.toInt(&conversionOkQuant);
 
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
     if (conversionOk && price >= 0)
     {
-        // adicionar ao banco de dados
-        if(!db.open()){
-            qDebug() << "erro ao abrir banco de dados. botao enviar.";
-        }
-        QSqlQuery query;
+        if (conversionOkQuant){
+            // adicionar ao banco de dados
+            if(!db.open()){
+                qDebug() << "erro ao abrir banco de dados. botao enviar.";
+            }
+            QSqlQuery query;
 
-        query.prepare("INSERT INTO produtos (quantidade, descricao, preco) VALUES (:valor1, :valor2, :valor3)");
-        query.bindValue(":valor1", quantidadeProduto);
-        query.bindValue(":valor2", descProduto);
-        query.bindValue(":valor3", precoProduto);
-        if (query.exec()) {
-            qDebug() << "Inserção bem-sucedida!";
-        } else {
-            qDebug() << "Erro na inserção: ";
+            query.prepare("INSERT INTO produtos (quantidade, descricao, preco) VALUES (:valor1, :valor2, :valor3)");
+            query.bindValue(":valor1", quantidadeProduto);
+            query.bindValue(":valor2", descProduto);
+            query.bindValue(":valor3", precoProduto);
+            if (query.exec()) {
+                qDebug() << "Inserção bem-sucedida!";
+            } else {
+                qDebug() << "Erro na inserção: ";
+            }
+            atualizarTableview();
+            QSqlDatabase::database().close();
+
+            // limpar campos para nova inserçao
+            ui->Ledit_Desc->clear();
+            ui->Ledit_Quantidade->clear();
+            ui->Ledit_Preco->clear();
+            ui->Ledit_Desc->setFocus();
         }
-        atualizarTableview();
-        QSqlDatabase::database().close();
+        else{
+            QMessageBox::warning(this, "Erro", "Por favor, insira uma quantidade válida.");
+            ui->Ledit_Quantidade->clear();
+        }
     }
     else
     {
         // Exiba uma mensagem de erro se o preço não for válido
         QMessageBox::warning(this, "Erro", "Por favor, insira um preço válido.");
+        ui->Ledit_Preco->clear();
     }
 
 
-    // limpar campos para nova inserçao
-    ui->Ledit_Desc->clear();
-    ui->Ledit_Quantidade->clear();
-    ui->Ledit_Preco->clear();
-    ui->Ledit_Desc->setFocus();
 }
 
 

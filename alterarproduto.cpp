@@ -36,52 +36,59 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
 
     // Converta o texto para um número
     bool conversionOk;
+    bool conversionOkQuant;
     double price = preco.toDouble(&conversionOk);
+    int quantInt = quant.toInt(&conversionOkQuant);
 
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
     if (conversionOk && price >= 0)
     {
-        // Cria uma mensagem de confirmação
-        QMessageBox::StandardButton resposta;
-        resposta = QMessageBox::question(
-            nullptr,
-            "Confirmação",
-            "Tem certeza que deseja alterar o produto:\n\n"
-            "id: " + idAlt + "\n"
-            "Descrição: " + descAlt + "\n"
-            "Quantidade: " + quantAlt + "\n"
-            "Preço: " + precoAlt + "\n\n"
-            "Para: \n\n"
-            "Descrição: " + desc + "\n"
-            "Quantidade: " + quant + "\n"
-            "Preço: " + preco + "\n\n",
-            QMessageBox::Yes | QMessageBox::No
-        );
-        // Verifica a resposta do usuário
-        if (resposta == QMessageBox::Yes) {
-            // alterar banco de dados
-            if(!janelaPrincipal->db.open()){
-                qDebug() << "erro ao abrir banco de dados. botao alterar->aceitar.";
-            }
-            QSqlQuery query;
+        if (conversionOkQuant){
+            // Cria uma mensagem de confirmação
+            QMessageBox::StandardButton resposta;
+            resposta = QMessageBox::question(
+                nullptr,
+                "Confirmação",
+                "Tem certeza que deseja alterar o produto:\n\n"
+                "id: " + idAlt + "\n"
+                              "Descrição: " + descAlt + "\n"
+                                "Quantidade: " + quantAlt + "\n"
+                                 "Preço: " + precoAlt + "\n\n"
+                                 "Para: \n\n"
+                                 "Descrição: " + desc + "\n"
+                             "Quantidade: " + quant + "\n"
+                              "Preço: " + preco + "\n\n",
+                QMessageBox::Yes | QMessageBox::No
+                );
+            // Verifica a resposta do usuário
+            if (resposta == QMessageBox::Yes) {
+                // alterar banco de dados
+                if(!janelaPrincipal->db.open()){
+                    qDebug() << "erro ao abrir banco de dados. botao alterar->aceitar.";
+                }
+                QSqlQuery query;
 
-            query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4 WHERE id = :valor1");
-            query.bindValue(":valor1", idAlt);
-            query.bindValue(":valor2", quant);
-            query.bindValue(":valor3", desc);
-            query.bindValue(":valor4", preco);
-            if (query.exec()) {
-                qDebug() << "Alteracao bem-sucedida!";
-            } else {
-                qDebug() << "Erro na alteracao: ";
+                query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4 WHERE id = :valor1");
+                query.bindValue(":valor1", idAlt);
+                query.bindValue(":valor2", quant);
+                query.bindValue(":valor3", desc);
+                query.bindValue(":valor4", preco);
+                if (query.exec()) {
+                    qDebug() << "Alteracao bem-sucedida!";
+                } else {
+                    qDebug() << "Erro na alteracao: ";
+                }
+                // mostrar na tableview
+                janelaPrincipal->atualizarTableview();
+                QSqlDatabase::database().close();
             }
-            // mostrar na tableview
-            janelaPrincipal->atualizarTableview();
-            QSqlDatabase::database().close();
+            else {
+                // O usuário escolheu não alterar o produto
+                qDebug() << "A alteraçao do produto foi cancelada.";
+            }
         }
         else {
-            // O usuário escolheu não alterar o produto
-            qDebug() << "A alteraçao do produto foi cancelada.";
+            QMessageBox::warning(this, "Erro", "Por favor, insira uma quantidade válida.");
         }
     }
     else

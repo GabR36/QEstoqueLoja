@@ -25,11 +25,19 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "erro ao abrir banco de dados.";
     }
     QSqlQuery query;
-    query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2))");
+    query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2), codigo_barras VARCHAR(20) UNIQUE)");
     if (query.isActive()) {
         qDebug() << "Tabela criada com sucesso!";
     } else {
         qDebug() << "Erro ao criar tabela: ";
+        // colocar coluna do codigo de barras nao presente nas versoes anteriores
+        query.exec("ALTER TABLE produtos ADD COLUMN codigo_barras VARCHAR(20)");
+        if (query.isActive()){
+            qDebug() << "coluna codigo barras adicionada com sucesso!";
+        }
+        else {
+            qDebug() << "Erro ao adicionar coluna codigo barras";
+        }
     }
     query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2))");
     if (query.isActive()) {
@@ -63,7 +71,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Tview_Produtos->setColumnWidth(2, 200);
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
-
 
 
 }

@@ -16,13 +16,15 @@ AlterarProduto::~AlterarProduto()
     delete ui;
 }
 
- void AlterarProduto::TrazerInfo(QString desc, QString quant, QString preco){
+ void AlterarProduto::TrazerInfo(QString desc, QString quant, QString preco, QString barras){
     descAlt = desc;
     quantAlt = quant;
     precoAlt = preco;
+    barrasAlt = barras;
     ui->Ledit_AltDesc->setText(desc);
     ui->Ledit_AltQuant->setText(quant);
     ui->Ledit_AltPreco->setText(preco);
+    ui->Ledit_AltBarras->setText(barras);
 }
 
 void AlterarProduto::on_Btn_AltAceitar_accepted()
@@ -30,6 +32,7 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
     QString desc = ui->Ledit_AltDesc->text();
     QString quant = ui->Ledit_AltQuant->text();
     QString preco = ui->Ledit_AltPreco->text();
+    QString barras = ui->Ledit_AltBarras->text();
 
     // Substitua ',' por '.' se necessário
     preco.replace(',', '.');
@@ -53,11 +56,13 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
                 "id: " + idAlt + "\n"
                               "Descrição: " + descAlt + "\n"
                                 "Quantidade: " + quantAlt + "\n"
-                                 "Preço: " + precoAlt + "\n\n"
+                                 "Preço: " + precoAlt + "\n"
+                                 "Código de Barras: " + barrasAlt + "\n\n"
                                  "Para: \n\n"
                                  "Descrição: " + desc + "\n"
                              "Quantidade: " + quant + "\n"
-                              "Preço: " + preco + "\n\n",
+                              "Preço: " + preco + "\n"
+                            "Código de Barras: " + barras + "\n\n",
                 QMessageBox::Yes | QMessageBox::No
                 );
             // Verifica a resposta do usuário
@@ -68,11 +73,12 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
                 }
                 QSqlQuery query;
 
-                query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4 WHERE id = :valor1");
+                query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4, codigo_barras = :valor5 WHERE id = :valor1");
                 query.bindValue(":valor1", idAlt);
                 query.bindValue(":valor2", quant);
                 query.bindValue(":valor3", desc);
                 query.bindValue(":valor4", preco);
+                query.bindValue(":valor5", barras);
                 if (query.exec()) {
                     qDebug() << "Alteracao bem-sucedida!";
                 } else {

@@ -68,7 +68,7 @@
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>230</y>
+      <y>250</y>
       <width>231</width>
       <height>91</height>
      </rect>
@@ -100,10 +100,10 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>50</x>
+      <x>30</x>
       <y>30</y>
-      <width>261</width>
-      <height>171</height>
+      <width>281</width>
+      <height>191</height>
      </rect>
     </property>
     <property name="title">
@@ -114,8 +114,8 @@
       <rect>
        <x>30</x>
        <y>30</y>
-       <width>211</width>
-       <height>121</height>
+       <width>241</width>
+       <height>150</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -162,6 +162,20 @@
        </layout>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Codigo de Barras:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="Ledit_Barras"/>
+        </item>
+       </layout>
+      </item>
+      <item>
        <widget class="QPushButton" name="Btn_Enviar">
         <property name="text">
          <string>Enviar</string>
@@ -189,6 +203,7 @@
    <zorder>layoutWidget</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>label</zorder>
+   <zorder>Ledit_Barras</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionteste">

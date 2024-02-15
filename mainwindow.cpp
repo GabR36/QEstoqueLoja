@@ -91,10 +91,11 @@ void MainWindow::atualizarTableview(){
 
 void MainWindow::on_Btn_Enviar_clicked()
 {
-    QString quantidadeProduto, descProduto, precoProduto;
+    QString quantidadeProduto, descProduto, precoProduto, barrasProduto;
     quantidadeProduto = ui->Ledit_Quantidade->text();
     descProduto = ui->Ledit_Desc->text();
     precoProduto = ui->Ledit_Preco->text();
+    barrasProduto = ui->Ledit_Barras->text();
 
     // Substitua ',' por '.' se necessário
     precoProduto.replace(',', '.');
@@ -115,10 +116,11 @@ void MainWindow::on_Btn_Enviar_clicked()
             }
             QSqlQuery query;
 
-            query.prepare("INSERT INTO produtos (quantidade, descricao, preco) VALUES (:valor1, :valor2, :valor3)");
+            query.prepare("INSERT INTO produtos (quantidade, descricao, preco, codigo_barras) VALUES (:valor1, :valor2, :valor3, :valor4)");
             query.bindValue(":valor1", quantidadeProduto);
             query.bindValue(":valor2", descProduto);
             query.bindValue(":valor3", precoProduto);
+            query.bindValue(":valor4", barrasProduto);
             if (query.exec()) {
                 qDebug() << "Inserção bem-sucedida!";
             } else {
@@ -131,6 +133,7 @@ void MainWindow::on_Btn_Enviar_clicked()
             ui->Ledit_Desc->clear();
             ui->Ledit_Quantidade->clear();
             ui->Ledit_Preco->clear();
+            ui->Ledit_Barras->clear();
             ui->Ledit_Desc->setFocus();
         }
         else{
@@ -220,17 +223,19 @@ void MainWindow::on_Btn_Alterar_clicked()
     QVariant quantVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 1));
     QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
     QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
+    QVariant barrasVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 4));
     QString productId = idVariant.toString();
     QString productQuant = quantVariant.toString();
     QString productDesc = descVariant.toString();
     QString productPreco = precoVariant.toString();
+    QString productBarras = barrasVariant.toString();
     qDebug() << productId;
     qDebug() << productPreco;
     // criar janela
     AlterarProduto *alterar = new AlterarProduto;
     alterar->janelaPrincipal = this;
     alterar->idAlt = productId;
-    alterar->TrazerInfo(productDesc, productQuant, productPreco);
+    alterar->TrazerInfo(productDesc, productQuant, productPreco, productBarras);
     alterar->show();
 }
 

@@ -35,7 +35,7 @@
      <x>10</x>
      <y>20</y>
      <width>239</width>
-     <height>111</height>
+     <height>130</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -85,6 +85,20 @@
       </item>
       <item>
        <widget class="QLineEdit" name="Ledit_AltPreco"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Código de Barras:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="Ledit_AltBarras"/>
       </item>
      </layout>
     </item>

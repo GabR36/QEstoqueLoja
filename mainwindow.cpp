@@ -77,7 +77,7 @@ void MainWindow::atualizarTableview(){
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. atualizarTableView";
     }
-    model->setQuery("SELECT * FROM produtos");
+    model->setQuery("SELECT * FROM produtos ORDER BY id DESC");
     ui->Tview_Produtos->setModel(model);
     db.close();
 }

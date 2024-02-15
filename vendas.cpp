@@ -125,7 +125,7 @@ void Vendas::atualizarTabelas(){
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao venda.";
     }
-    modeloVendas2->setQuery("SELECT * FROM vendas2");
+    modeloVendas2->setQuery("SELECT * FROM vendas2 ORDER BY id DESC");
     ui->Tview_Vendas2->setModel(modeloVendas2);
     modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
     ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
@@ -183,7 +183,7 @@ void Vendas::queryCBox (int indexAno, int indexMes, int indexDia){
     QString whereQuery = "";
     if (indexMes == 0 && indexDia == 0 && indexAno == 0){
         // todos os seletores estao em 'todos'
-        modeloVendas2->setQuery("SELECT * FROM vendas2");
+        modeloVendas2->setQuery("SELECT * FROM vendas2 ORDER BY id DESC");
         LabelLucro();
     }
     else{

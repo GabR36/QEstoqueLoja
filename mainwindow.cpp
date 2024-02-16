@@ -122,7 +122,8 @@ void MainWindow::on_Btn_Enviar_clicked()
                 qDebug() << "Erro na consulta: contagem codigo barras";
             }
             query.next();
-            bool barrasExiste = query.value(0).toInt() > 0;
+            bool barrasExiste = query.value(0).toInt() > 0 && barrasProduto != "";
+            qDebug() << barrasProduto;
 
             if (!barrasExiste){
                 // adicionar ao banco de dados

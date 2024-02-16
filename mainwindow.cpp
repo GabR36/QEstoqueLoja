@@ -100,10 +100,12 @@ void MainWindow::atualizarTableview(){
 void MainWindow::on_Btn_Enviar_clicked()
 {
     QString quantidadeProduto, descProduto, precoProduto, barrasProduto;
+    bool nfProduto;
     quantidadeProduto = ui->Ledit_Quantidade->text();
     descProduto = ui->Ledit_Desc->text();
     precoProduto = ui->Ledit_Preco->text();
     barrasProduto = ui->Ledit_Barras->text();
+    nfProduto = ui->Check_Nf->isChecked();
 
     // Substitua ',' por '.' se necessário
     precoProduto.replace(',', '.');
@@ -140,11 +142,12 @@ void MainWindow::on_Btn_Enviar_clicked()
                 }
                 QSqlQuery query;
 
-                query.prepare("INSERT INTO produtos (quantidade, descricao, preco, codigo_barras) VALUES (:valor1, :valor2, :valor3, :valor4)");
+                query.prepare("INSERT INTO produtos (quantidade, descricao, preco, codigo_barras, nf) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5)");
                 query.bindValue(":valor1", quantidadeProduto);
                 query.bindValue(":valor2", descProduto);
                 query.bindValue(":valor3", precoProduto);
                 query.bindValue(":valor4", barrasProduto);
+                query.bindValue(":valor5", nfProduto);
                 if (query.exec()) {
                     qDebug() << "Inserção bem-sucedida!";
                 } else {
@@ -158,6 +161,7 @@ void MainWindow::on_Btn_Enviar_clicked()
                 ui->Ledit_Quantidade->clear();
                 ui->Ledit_Preco->clear();
                 ui->Ledit_Barras->clear();
+                ui->Check_Nf->setChecked(false);
                 ui->Ledit_Desc->setFocus();
             }
             else {

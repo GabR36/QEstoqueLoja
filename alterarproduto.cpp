@@ -47,50 +47,69 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
     if (conversionOk && price >= 0)
     {
         if (conversionOkQuant){
-            // Cria uma mensagem de confirmação
-            QMessageBox::StandardButton resposta;
-            resposta = QMessageBox::question(
-                nullptr,
-                "Confirmação",
-                "Tem certeza que deseja alterar o produto:\n\n"
-                "id: " + idAlt + "\n"
-                              "Descrição: " + descAlt + "\n"
-                                "Quantidade: " + quantAlt + "\n"
-                                 "Preço: " + precoAlt + "\n"
-                                 "Código de Barras: " + barrasAlt + "\n\n"
-                                 "Para: \n\n"
-                                 "Descrição: " + desc + "\n"
-                             "Quantidade: " + quant + "\n"
-                              "Preço: " + preco + "\n"
-                            "Código de Barras: " + barras + "\n\n",
-                QMessageBox::Yes | QMessageBox::No
-                );
-            // Verifica a resposta do usuário
-            if (resposta == QMessageBox::Yes) {
-                // alterar banco de dados
-                if(!janelaPrincipal->db.open()){
-                    qDebug() << "erro ao abrir banco de dados. botao alterar->aceitar.";
-                }
-                QSqlQuery query;
+            // verificar se o codigo de barras ja existe
+            if(!janelaPrincipal->db.open()){
+                qDebug() << "erro ao abrir banco de dados. botao alterar.";
+            }
+            QSqlQuery query;
 
-                query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4, codigo_barras = :valor5 WHERE id = :valor1");
-                query.bindValue(":valor1", idAlt);
-                query.bindValue(":valor2", quant);
-                query.bindValue(":valor3", desc);
-                query.bindValue(":valor4", preco);
-                query.bindValue(":valor5", barras);
-                if (query.exec()) {
-                    qDebug() << "Alteracao bem-sucedida!";
-                } else {
-                    qDebug() << "Erro na alteracao: ";
+            query.prepare("SELECT COUNT(*) FROM produtos WHERE codigo_barras = :codigoBarras");
+            query.bindValue(":codigoBarras", barras);
+            if (!query.exec()) {
+                qDebug() << "Erro na consulta: contagem codigo barras";
+            }
+            query.next();
+            bool barrasExiste = query.value(0).toInt() > 0 && barras != "" && barras != barrasAlt;
+            qDebug() << barras;
+            if (!barrasExiste){
+                // Cria uma mensagem de confirmação
+                QMessageBox::StandardButton resposta;
+                resposta = QMessageBox::question(
+                    nullptr,
+                    "Confirmação",
+                    "Tem certeza que deseja alterar o produto:\n\n"
+                    "id: " + idAlt + "\n"
+                                  "Descrição: " + descAlt + "\n"
+                                    "Quantidade: " + quantAlt + "\n"
+                                     "Preço: " + precoAlt + "\n"
+                                     "Código de Barras: " + barrasAlt + "\n\n"
+                                      "Para: \n\n"
+                                      "Descrição: " + desc + "\n"
+                                 "Quantidade: " + quant + "\n"
+                                  "Preço: " + preco + "\n"
+                                  "Código de Barras: " + barras + "\n\n",
+                    QMessageBox::Yes | QMessageBox::No
+                    );
+                // Verifica a resposta do usuário
+                if (resposta == QMessageBox::Yes) {
+                    // alterar banco de dados
+                    if(!janelaPrincipal->db.open()){
+                        qDebug() << "erro ao abrir banco de dados. botao alterar->aceitar.";
+                    }
+                    QSqlQuery query;
+
+                    query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4, codigo_barras = :valor5 WHERE id = :valor1");
+                    query.bindValue(":valor1", idAlt);
+                    query.bindValue(":valor2", quant);
+                    query.bindValue(":valor3", desc);
+                    query.bindValue(":valor4", preco);
+                    query.bindValue(":valor5", barras);
+                    if (query.exec()) {
+                        qDebug() << "Alteracao bem-sucedida!";
+                    } else {
+                        qDebug() << "Erro na alteracao: ";
+                    }
+                    // mostrar na tableview
+                    janelaPrincipal->atualizarTableview();
+                    QSqlDatabase::database().close();
                 }
-                // mostrar na tableview
-                janelaPrincipal->atualizarTableview();
-                QSqlDatabase::database().close();
+                else {
+                    // O usuário escolheu não alterar o produto
+                    qDebug() << "A alteraçao do produto foi cancelada.";
+                }
             }
             else {
-                // O usuário escolheu não alterar o produto
-                qDebug() << "A alteraçao do produto foi cancelada.";
+                QMessageBox::warning(this, "Erro", "Esse código de barras já foi registrado.");
             }
         }
         else {

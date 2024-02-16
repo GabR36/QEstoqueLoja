@@ -16,15 +16,17 @@ AlterarProduto::~AlterarProduto()
     delete ui;
 }
 
- void AlterarProduto::TrazerInfo(QString desc, QString quant, QString preco, QString barras){
+ void AlterarProduto::TrazerInfo(QString desc, QString quant, QString preco, QString barras, bool nf){
     descAlt = desc;
     quantAlt = quant;
     precoAlt = preco;
     barrasAlt = barras;
+    nfAlt = nf;
     ui->Ledit_AltDesc->setText(desc);
     ui->Ledit_AltQuant->setText(quant);
     ui->Ledit_AltPreco->setText(preco);
     ui->Ledit_AltBarras->setText(barras);
+    ui->Check_AltNf->setChecked(nf);
 }
 
 void AlterarProduto::on_Btn_AltAceitar_accepted()
@@ -33,6 +35,7 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
     QString quant = ui->Ledit_AltQuant->text();
     QString preco = ui->Ledit_AltPreco->text();
     QString barras = ui->Ledit_AltBarras->text();
+    bool nf = ui->Check_AltNf->isChecked();
 
     // Substitua ',' por '.' se necessário
     preco.replace(',', '.');
@@ -62,6 +65,8 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
             bool barrasExiste = query.value(0).toInt() > 0 && barras != "" && barras != barrasAlt;
             qDebug() << barras;
             if (!barrasExiste){
+                QString nfAltString = nfAlt ? "1" : "0";
+                QString nfString = nf ? "1" : "0";
                 // Cria uma mensagem de confirmação
                 QMessageBox::StandardButton resposta;
                 resposta = QMessageBox::question(
@@ -72,12 +77,14 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
                                   "Descrição: " + descAlt + "\n"
                                     "Quantidade: " + quantAlt + "\n"
                                      "Preço: " + precoAlt + "\n"
-                                     "Código de Barras: " + barrasAlt + "\n\n"
+                                     "Código de Barras: " + barrasAlt + "\n"
+                                      "NF: " + nfAltString  + "\n\n"
                                       "Para: \n\n"
                                       "Descrição: " + desc + "\n"
                                  "Quantidade: " + quant + "\n"
                                   "Preço: " + preco + "\n"
-                                  "Código de Barras: " + barras + "\n\n",
+                                  "Código de Barras: " + barras + "\n"
+                                    "NF: " + nfString + "\n\n",
                     QMessageBox::Yes | QMessageBox::No
                     );
                 // Verifica a resposta do usuário
@@ -88,12 +95,13 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
                     }
                     QSqlQuery query;
 
-                    query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4, codigo_barras = :valor5 WHERE id = :valor1");
+                    query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4, codigo_barras = :valor5, nf = :valor6 WHERE id = :valor1");
                     query.bindValue(":valor1", idAlt);
                     query.bindValue(":valor2", quant);
                     query.bindValue(":valor3", desc);
                     query.bindValue(":valor4", preco);
                     query.bindValue(":valor5", barras);
+                    query.bindValue(":valor6", nf);
                     if (query.exec()) {
                         qDebug() << "Alteracao bem-sucedida!";
                     } else {

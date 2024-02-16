@@ -19,9 +19,10 @@ public:
     QString precoAlt;
     QString quantAlt;
     QString barrasAlt;
+    bool nfAlt;
     explicit AlterarProduto(QWidget *parent = nullptr);
     ~AlterarProduto();
-    void TrazerInfo(QString desc, QString quant, QString preco, QString barras);
+    void TrazerInfo(QString desc, QString quant, QString preco, QString barras, bool nf);
 
 private slots:
     void on_Btn_AltAceitar_accepted();

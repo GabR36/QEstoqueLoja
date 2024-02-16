@@ -110,31 +110,59 @@ void MainWindow::on_Btn_Enviar_clicked()
     if (conversionOk && price >= 0)
     {
         if (conversionOkQuant){
-            // adicionar ao banco de dados
+            // verificar se o codigo de barras ja existe
             if(!db.open()){
                 qDebug() << "erro ao abrir banco de dados. botao enviar.";
             }
             QSqlQuery query;
 
-            query.prepare("INSERT INTO produtos (quantidade, descricao, preco, codigo_barras) VALUES (:valor1, :valor2, :valor3, :valor4)");
-            query.bindValue(":valor1", quantidadeProduto);
-            query.bindValue(":valor2", descProduto);
-            query.bindValue(":valor3", precoProduto);
-            query.bindValue(":valor4", barrasProduto);
-            if (query.exec()) {
-                qDebug() << "Inserção bem-sucedida!";
-            } else {
-                qDebug() << "Erro na inserção: ";
+            query.prepare("SELECT COUNT(*) FROM produtos WHERE codigo_barras = :codigoBarras");
+            query.bindValue(":codigoBarras", barrasProduto);
+            if (!query.exec()) {
+                qDebug() << "Erro na consulta: contagem codigo barras";
             }
-            atualizarTableview();
-            QSqlDatabase::database().close();
+            query.next();
+            bool barrasExiste = query.value(0).toInt() > 0;
 
-            // limpar campos para nova inserçao
-            ui->Ledit_Desc->clear();
-            ui->Ledit_Quantidade->clear();
-            ui->Ledit_Preco->clear();
-            ui->Ledit_Barras->clear();
-            ui->Ledit_Desc->setFocus();
+            if (!barrasExiste){
+                // adicionar ao banco de dados
+                if(!db.open()){
+                    qDebug() << "erro ao abrir banco de dados. botao enviar.";
+                }
+                QSqlQuery query;
+
+                query.prepare("INSERT INTO produtos (quantidade, descricao, preco, codigo_barras) VALUES (:valor1, :valor2, :valor3, :valor4)");
+                query.bindValue(":valor1", quantidadeProduto);
+                query.bindValue(":valor2", descProduto);
+                query.bindValue(":valor3", precoProduto);
+                query.bindValue(":valor4", barrasProduto);
+                if (query.exec()) {
+                    qDebug() << "Inserção bem-sucedida!";
+                } else {
+                    qDebug() << "Erro na inserção: ";
+                }
+                atualizarTableview();
+                QSqlDatabase::database().close();
+
+                // limpar campos para nova inserçao
+                ui->Ledit_Desc->clear();
+                ui->Ledit_Quantidade->clear();
+                ui->Ledit_Preco->clear();
+                ui->Ledit_Barras->clear();
+                ui->Ledit_Desc->setFocus();
+            }
+            else {
+                // codigo de barras existe, mostrar mensagem e
+                // mostrar registro na tabela
+                QMessageBox::warning(this, "Erro", "Esse código de barras já foi registrado.");
+                if(!db.open()){
+                    qDebug() << "erro ao abrir banco de dados. codigo de barras existente";
+                }
+                model->setQuery("SELECT * FROM produtos WHERE codigo_barras = " + barrasProduto);
+                ui->Tview_Produtos->setModel(model);
+                db.close();
+            }
+
         }
         else{
             QMessageBox::warning(this, "Erro", "Por favor, insira uma quantidade válida.");

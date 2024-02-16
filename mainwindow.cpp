@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "erro ao abrir banco de dados.";
     }
     QSqlQuery query;
-    query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2), codigo_barras VARCHAR(20) UNIQUE)");
+    query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2), codigo_barras VARCHAR(20) UNIQUE, nf BOOLEAN)");
     if (query.isActive()) {
         qDebug() << "Tabela criada com sucesso!";
     } else {
@@ -37,6 +37,14 @@ MainWindow::MainWindow(QWidget *parent)
         }
         else {
             qDebug() << "Erro ao adicionar coluna codigo barras";
+        }
+        // colocar coluna do nf nao presente nas versoes anteriores
+        query.exec("ALTER TABLE produtos ADD COLUMN nf BOOLEAN");
+        if (query.isActive()){
+            qDebug() << "coluna nf adicionada com sucesso!";
+        }
+        else {
+            qDebug() << "Erro ao adicionar coluna nf";
         }
     }
     query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2))");
@@ -92,10 +100,12 @@ void MainWindow::atualizarTableview(){
 void MainWindow::on_Btn_Enviar_clicked()
 {
     QString quantidadeProduto, descProduto, precoProduto, barrasProduto;
+    bool nfProduto;
     quantidadeProduto = ui->Ledit_Quantidade->text();
     descProduto = ui->Ledit_Desc->text();
     precoProduto = ui->Ledit_Preco->text();
     barrasProduto = ui->Ledit_Barras->text();
+    nfProduto = ui->Check_Nf->isChecked();
 
     // Substitua ',' por '.' se necessário
     precoProduto.replace(',', '.');
@@ -132,11 +142,12 @@ void MainWindow::on_Btn_Enviar_clicked()
                 }
                 QSqlQuery query;
 
-                query.prepare("INSERT INTO produtos (quantidade, descricao, preco, codigo_barras) VALUES (:valor1, :valor2, :valor3, :valor4)");
+                query.prepare("INSERT INTO produtos (quantidade, descricao, preco, codigo_barras, nf) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5)");
                 query.bindValue(":valor1", quantidadeProduto);
                 query.bindValue(":valor2", descProduto);
                 query.bindValue(":valor3", precoProduto);
                 query.bindValue(":valor4", barrasProduto);
+                query.bindValue(":valor5", nfProduto);
                 if (query.exec()) {
                     qDebug() << "Inserção bem-sucedida!";
                 } else {
@@ -150,6 +161,7 @@ void MainWindow::on_Btn_Enviar_clicked()
                 ui->Ledit_Quantidade->clear();
                 ui->Ledit_Preco->clear();
                 ui->Ledit_Barras->clear();
+                ui->Check_Nf->setChecked(false);
                 ui->Ledit_Desc->setFocus();
             }
             else {
@@ -253,18 +265,20 @@ void MainWindow::on_Btn_Alterar_clicked()
     QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
     QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
     QVariant barrasVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 4));
+    QVariant nfVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 5));
     QString productId = idVariant.toString();
     QString productQuant = quantVariant.toString();
     QString productDesc = descVariant.toString();
     QString productPreco = precoVariant.toString();
     QString productBarras = barrasVariant.toString();
+    bool productNf = nfVariant.toBool();
     qDebug() << productId;
     qDebug() << productPreco;
     // criar janela
     AlterarProduto *alterar = new AlterarProduto;
     alterar->janelaPrincipal = this;
     alterar->idAlt = productId;
-    alterar->TrazerInfo(productDesc, productQuant, productPreco, productBarras);
+    alterar->TrazerInfo(productDesc, productQuant, productPreco, productBarras, productNf);
     alterar->show();
 }
 

@@ -35,7 +35,7 @@
      <x>10</x>
      <y>20</y>
      <width>239</width>
-     <height>130</height>
+     <height>158</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -101,6 +101,13 @@
        <widget class="QLineEdit" name="Ledit_AltBarras"/>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="Check_AltNf">
+      <property name="text">
+       <string>NF</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

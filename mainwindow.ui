@@ -100,10 +100,10 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>30</x>
-      <y>30</y>
+      <x>40</x>
+      <y>20</y>
       <width>281</width>
-      <height>191</height>
+      <height>221</height>
      </rect>
     </property>
     <property name="title">
@@ -115,7 +115,7 @@
        <x>30</x>
        <y>30</y>
        <width>241</width>
-       <height>150</height>
+       <height>178</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -176,6 +176,16 @@
        </layout>
       </item>
       <item>
+       <widget class="QCheckBox" name="Check_Nf">
+        <property name="text">
+         <string>NF</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="Btn_Enviar">
         <property name="text">
          <string>Enviar</string>
@@ -203,7 +213,6 @@
    <zorder>layoutWidget</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>label</zorder>
-   <zorder>Ledit_Barras</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionteste">

@@ -120,7 +120,7 @@ void MainWindow::on_Btn_Enviar_clicked()
     bool conversionOk;
     bool conversionOkQuant;
     double price = precoProduto.toDouble(&conversionOk);
-    int quantidadeInt = quantidadeProduto.toInt(&conversionOkQuant);
+    quantidadeProduto.toInt(&conversionOkQuant);
 
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
     if (conversionOk && price >= 0)

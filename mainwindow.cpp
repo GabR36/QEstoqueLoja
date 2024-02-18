@@ -253,7 +253,7 @@ void MainWindow::on_Btn_Pesquisa_clicked()
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao pesquisar.";
     }
-    model->setQuery("SELECT * FROM produtos WHERE descricao LIKE '%" + pesquisa + "%'");
+    model->setQuery("SELECT * FROM produtos WHERE descricao LIKE '%" + pesquisa + "%' ORDER BY id DESC");
     ui->Tview_Produtos->setModel(model);
     QSqlDatabase::database().close();
 }

@@ -32,6 +32,10 @@ private slots:
 
     void on_CBox_Ano_activated(int index);
 
+    void on_Btn_DeletarVenda_clicked();
+
+    void on_Btn_AlterarVenda_clicked();
+
 private:
     void LabelLucro();
     void LabelLucro(QString whereQuery);

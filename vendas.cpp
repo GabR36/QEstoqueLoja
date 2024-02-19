@@ -4,6 +4,7 @@
 #include "venda.h"
 #include <QDate>
 #include <QtSql>
+#include <QMessageBox>
 
 Vendas::Vendas(QWidget *parent) :
     QWidget(parent),
@@ -274,5 +275,66 @@ void Vendas::LabelLucro(QString whereQuery){
 void Vendas::LabelLucro(){
     // para ser chamada sem argumentos
     LabelLucro(QString());
+}
+
+
+void Vendas::on_Btn_DeletarVenda_clicked()
+{
+    // obter id selecionado
+    QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
+    QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+    QVariant idVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 0));
+    QVariant valorVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 3));
+    QString productId = idVariant.toString();
+    QString productValor = valorVariant.toString();
+
+    // Cria uma mensagem de confirmação
+    QMessageBox::StandardButton resposta;
+    resposta = QMessageBox::question(
+        nullptr,
+        "Confirmação",
+        "Tem certeza que deseja excluir a venda:\n\n"
+        "id: " + productId + "\n"
+                          "Valor total: " + productValor,
+        QMessageBox::Yes | QMessageBox::No
+        );
+    // Verifica a resposta do usuário
+    if (resposta == QMessageBox::Yes) {
+
+        // remover registro do banco de dados
+        if(!db.open()){
+            qDebug() << "erro ao abrir banco de dados. botao deletar.";
+        }
+        QSqlQuery query;
+
+        // deletar a venda
+        query.prepare("DELETE FROM vendas2 WHERE id = :valor1");
+        query.bindValue(":valor1", productId);
+        if (query.exec()) {
+            qDebug() << "Delete bem-sucedido!";
+        } else {
+            qDebug() << "Erro no Delete: ";
+        }
+        // deletar os produtos vendidos
+        query.prepare("DELETE FROM produtos_vendidos WHERE id_venda = :valor1");
+        query.bindValue(":valor1", productId);
+        if (query.exec()) {
+            qDebug() << "Delete bem-sucedido!";
+        } else {
+            qDebug() << "Erro no Delete: ";
+        }
+        atualizarTabelas();
+        db.close();
+    }
+    else {
+        // O usuário escolheu não deletar o produto
+        qDebug() << "A exclusão da venda foi cancelada.";
+    }
+}
+
+
+void Vendas::on_Btn_AlterarVenda_clicked()
+{
+
 }
 

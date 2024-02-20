@@ -13,6 +13,23 @@
   <property name="windowTitle">
    <string>Vendas - QEstoqueLoja</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">#Vendas{
+background-color: rgb(199, 199, 199);
+
+}
+QPushButton{
+background-color: rgb(43, 132, 191);
+color: rgb(255, 255, 255);
+}
+QGroupBox{
+background-color:rgb(170, 170, 170);
+	font: 700 9pt &quot;Segoe UI&quot;;
+font-size: 15px;
+
+}
+</string>
+  </property>
   <widget class="QTableView" name="Tview_Vendas2">
    <property name="geometry">
     <rect>
@@ -157,6 +174,10 @@
      <height>16</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 15px;
+font: 700 9pt &quot;Segoe UI&quot;;</string>
+   </property>
    <property name="text">
     <string>Vendas:</string>
    </property>
@@ -169,6 +190,10 @@
      <width>231</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 15px;
+font: 700 9pt &quot;Segoe UI&quot;;</string>
    </property>
    <property name="text">
     <string>Produtos vendidos nessa venda:</string>

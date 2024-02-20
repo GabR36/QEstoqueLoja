@@ -6,22 +6,45 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>820</width>
-    <height>439</height>
+    <width>1069</width>
+    <height>563</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Janela Principal - QEstoqueLoja</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">#MainWindow{
+background-color: rgb(199, 199, 199);
+
+}
+QPushButton{
+background-color: rgb(43, 132, 191);
+color: rgb(255, 255, 255);
+font-size: 15px;
+}
+QGroupBox{
+background-color:rgb(170, 170, 170);
+	font: 700 9pt &quot;Segoe UI&quot;;
+	font-size: 15px;
+}
+</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTableView" name="Tview_Produtos">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>30</y>
-      <width>411</width>
-      <height>271</height>
+      <x>490</x>
+      <y>50</y>
+      <width>551</width>
+      <height>261</height>
      </rect>
+    </property>
+    <property name="baseSize">
+     <size>
+      <width>100</width>
+      <height>200</height>
+     </size>
     </property>
     <property name="selectionMode">
      <enum>QAbstractItemView::SingleSelection</enum>
@@ -45,10 +68,10 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>370</x>
+      <x>490</x>
       <y>320</y>
-      <width>411</width>
-      <height>55</height>
+      <width>551</width>
+      <height>65</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -68,9 +91,9 @@
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>250</y>
-      <width>231</width>
-      <height>91</height>
+      <y>320</y>
+      <width>291</width>
+      <height>131</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -88,23 +111,19 @@
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="Btn_Venda">
-       <property name="text">
-        <string>Venda</string>
-       </property>
-      </widget>
-     </item>
     </layout>
    </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
       <x>40</x>
-      <y>20</y>
-      <width>281</width>
-      <height>221</height>
+      <y>40</y>
+      <width>341</width>
+      <height>271</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
     </property>
     <property name="title">
      <string>Adicionar Produto</string>
@@ -114,8 +133,8 @@
       <rect>
        <x>30</x>
        <y>30</y>
-       <width>241</width>
-       <height>178</height>
+       <width>291</width>
+       <height>201</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -198,14 +217,34 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>380</x>
-      <y>10</y>
-      <width>62</width>
+      <x>510</x>
+      <y>20</y>
+      <width>91</width>
       <height>16</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">font: 700 9pt &quot;Segoe UI&quot;;
+font-size: 15px;</string>
+    </property>
     <property name="text">
      <string>Produtos:</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Btn_Venda">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>460</y>
+      <width>291</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(0, 85, 127)</string>
+    </property>
+    <property name="text">
+     <string>Venda</string>
     </property>
    </widget>
    <zorder>groupBox</zorder>
@@ -213,6 +252,7 @@
    <zorder>layoutWidget</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>label</zorder>
+   <zorder>Btn_Venda</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionteste">

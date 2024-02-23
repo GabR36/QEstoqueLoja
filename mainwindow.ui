@@ -7,14 +7,16 @@
     <x>0</x>
     <y>0</y>
     <width>1069</width>
-    <height>563</height>
+    <height>643</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Janela Principal - QEstoqueLoja</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#MainWindow{
+   <string notr="true">
+
+#MainWindow{
 background-color: rgb(199, 199, 199);
 
 }
@@ -22,6 +24,7 @@ QPushButton{
 background-color: rgb(43, 132, 191);
 color: rgb(255, 255, 255);
 font-size: 15px;
+border-radius: 13px;
 }
 QGroupBox{
 background-color:rgb(170, 170, 170);
@@ -34,8 +37,8 @@ background-color:rgb(170, 170, 170);
    <widget class="QTableView" name="Tview_Produtos">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>50</y>
+      <x>470</x>
+      <y>80</y>
       <width>551</width>
       <height>261</height>
      </rect>
@@ -46,11 +49,17 @@ background-color:rgb(170, 170, 170);
       <height>200</height>
      </size>
     </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
     <property name="selectionMode">
      <enum>QAbstractItemView::SingleSelection</enum>
     </property>
     <property name="selectionBehavior">
      <enum>QAbstractItemView::SelectRows</enum>
+    </property>
+    <property name="gridStyle">
+     <enum>Qt::DashLine</enum>
     </property>
     <attribute name="horizontalHeaderCascadingSectionResizes">
      <bool>false</bool>
@@ -68,8 +77,8 @@ background-color:rgb(170, 170, 170);
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>320</y>
+      <x>470</x>
+      <y>350</y>
       <width>551</width>
       <height>65</height>
      </rect>
@@ -90,10 +99,10 @@ background-color:rgb(170, 170, 170);
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>320</y>
+      <x>50</x>
+      <y>350</y>
       <width>291</width>
-      <height>131</height>
+      <height>111</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -106,6 +115,10 @@ background-color:rgb(170, 170, 170);
      </item>
      <item>
       <widget class="QPushButton" name="Btn_Alterar">
+       <property name="styleSheet">
+        <string notr="true">border-radius: 13px;
+</string>
+       </property>
        <property name="text">
         <string>Alterar</string>
        </property>
@@ -116,8 +129,8 @@ background-color:rgb(170, 170, 170);
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>40</x>
-      <y>40</y>
+      <x>20</x>
+      <y>70</y>
       <width>341</width>
       <height>271</height>
      </rect>
@@ -217,8 +230,8 @@ background-color:rgb(170, 170, 170);
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>20</y>
+      <x>490</x>
+      <y>50</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -234,17 +247,34 @@ font-size: 15px;</string>
    <widget class="QPushButton" name="Btn_Venda">
     <property name="geometry">
      <rect>
-      <x>70</x>
+      <x>50</x>
       <y>460</y>
       <width>291</width>
       <height>51</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color: rgb(0, 85, 127)</string>
+     <string notr="true">
+background-color: rgb(33, 105, 149);</string>
     </property>
     <property name="text">
      <string>Venda</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>0</y>
+      <width>341</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap resource="Imagens/recursosImg.qrc">:/QEstoqueLOja/mkaoyvbl.png</pixmap>
     </property>
    </widget>
    <zorder>groupBox</zorder>
@@ -253,6 +283,7 @@ font-size: 15px;</string>
    <zorder>layoutWidget</zorder>
    <zorder>label</zorder>
    <zorder>Btn_Venda</zorder>
+   <zorder>label_5</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionteste">
@@ -261,6 +292,8 @@ font-size: 15px;</string>
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="Imagens/recursosImg.qrc"/>
+ </resources>
  <connections/>
 </ui>

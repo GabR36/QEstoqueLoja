@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
 
+
     // criar banco de dados e tabela se não foi ainda.
     db.setDatabaseName("estoque.db");
     if(!db.open()){
@@ -79,6 +80,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Tview_Produtos->setColumnWidth(2, 200);
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
+
+    ui->Btn_Venda->setIcon(QIcon(":/QEstoqueLOja/shopping.png"));
+    ui->Btn_Alterar->setIcon(QIcon(":/QEstoqueLOja/rebase.png"));
+    ui->Btn_Delete->setIcon(QIcon(":/QEstoqueLOja/delete.png"));
+    ui->Btn_Pesquisa->setIcon(QIcon(":/QEstoqueLOja/search.png"));
 
 
 }

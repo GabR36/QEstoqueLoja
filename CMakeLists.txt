@@ -14,6 +14,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql
 
 set(TS_FILES QEstoqueLoja_pt_BR.ts)
 
+
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp

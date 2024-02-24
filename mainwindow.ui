@@ -25,6 +25,7 @@ background-color: rgb(43, 132, 191);
 color: rgb(255, 255, 255);
 font-size: 15px;
 border-radius: 13px;
+
 }
 QGroupBox{
 background-color:rgb(170, 170, 170);
@@ -51,6 +52,10 @@ background-color:rgb(170, 170, 170);
     </property>
     <property name="autoFillBackground">
      <bool>false</bool>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">
+  border: 2px solid;</string>
     </property>
     <property name="selectionMode">
      <enum>QAbstractItemView::SingleSelection</enum>
@@ -86,43 +91,6 @@ background-color:rgb(170, 170, 170);
     <layout class="QVBoxLayout" name="verticalLayout_7">
      <item>
       <widget class="QLineEdit" name="Ledit_Pesquisa"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="Btn_Pesquisa">
-       <property name="text">
-        <string>pesquisar</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>50</x>
-      <y>350</y>
-      <width>291</width>
-      <height>111</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <widget class="QPushButton" name="Btn_Delete">
-       <property name="text">
-        <string>Deletar</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="Btn_Alterar">
-       <property name="styleSheet">
-        <string notr="true">border-radius: 13px;
-</string>
-       </property>
-       <property name="text">
-        <string>Alterar</string>
-       </property>
-      </widget>
      </item>
     </layout>
    </widget>
@@ -249,7 +217,7 @@ font-size: 15px;</string>
      <rect>
       <x>50</x>
       <y>460</y>
-      <width>291</width>
+      <width>281</width>
       <height>51</height>
      </rect>
     </property>
@@ -259,6 +227,12 @@ background-color: rgb(33, 105, 149);</string>
     </property>
     <property name="text">
      <string>Venda</string>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>18</width>
+      <height>18</height>
+     </size>
     </property>
    </widget>
    <widget class="QLabel" name="label_5">
@@ -277,13 +251,76 @@ background-color: rgb(33, 105, 149);</string>
      <pixmap resource="Imagens/recursosImg.qrc">:/QEstoqueLOja/mkaoyvbl.png</pixmap>
     </property>
    </widget>
+   <widget class="QPushButton" name="Btn_Delete">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>390</y>
+      <width>281</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Deletar</string>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>18</width>
+      <height>18</height>
+     </size>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Btn_Alterar">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>350</y>
+      <width>281</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius: 13px;
+</string>
+    </property>
+    <property name="text">
+     <string>Alterar</string>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>18</width>
+      <height>18</height>
+     </size>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Btn_Pesquisa">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>410</y>
+      <width>551</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>pesquisar</string>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>18</width>
+      <height>18</height>
+     </size>
+    </property>
+   </widget>
    <zorder>groupBox</zorder>
    <zorder>Tview_Produtos</zorder>
-   <zorder>layoutWidget</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>label</zorder>
    <zorder>Btn_Venda</zorder>
    <zorder>label_5</zorder>
+   <zorder>Btn_Delete</zorder>
+   <zorder>Btn_Alterar</zorder>
+   <zorder>Btn_Pesquisa</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionteste">

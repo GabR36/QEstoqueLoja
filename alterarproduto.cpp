@@ -9,6 +9,7 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
     ui(new Ui::AlterarProduto)
 {
     ui->setupUi(this);
+
 }
 
 AlterarProduto::~AlterarProduto()

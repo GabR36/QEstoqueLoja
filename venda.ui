@@ -13,6 +13,24 @@
   <property name="windowTitle">
    <string>Venda - QEstoqueLoja</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">#venda{
+background-color: rgb(199, 199, 199);
+font-size: 15px;
+
+}
+QPushButton{
+background-color: rgb(43, 132, 191);
+color: rgb(255, 255, 255);
+font-size: 15px;
+}
+QGroupBox{
+background-color:rgb(170, 170, 170);
+	font: 700 9pt &quot;Segoe UI&quot;;
+	font-size: 15px;
+}
+</string>
+  </property>
   <widget class="QDialogButtonBox" name="BtnBox_Venda">
    <property name="geometry">
     <rect>
@@ -159,6 +177,10 @@
      <height>16</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 15px;
+font: 700 9pt &quot;Segoe UI&quot;;</string>
+   </property>
    <property name="text">
     <string>Produtos Selecionados</string>
    </property>
@@ -193,6 +215,10 @@
      <width>161</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 15px;
+font: 700 9pt &quot;Segoe UI&quot;;</string>
    </property>
    <property name="text">
     <string>Catalogo de Produtos</string>

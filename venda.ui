@@ -76,7 +76,7 @@ background-color:rgb(170, 170, 170);
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>82</y>
+     <y>110</y>
      <width>295</width>
      <height>111</height>
     </rect>
@@ -191,7 +191,7 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
      <x>10</x>
      <y>20</y>
      <width>289</width>
-     <height>25</height>
+     <height>28</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -222,6 +222,19 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
    </property>
    <property name="text">
     <string>Catalogo de Produtos</string>
+   </property>
+  </widget>
+  <widget class="QDateTimeEdit" name="DateEdt_Venda">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>50</y>
+     <width>141</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <property name="calendarPopup">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>

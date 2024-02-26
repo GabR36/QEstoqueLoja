@@ -39,6 +39,9 @@ venda::venda(QWidget *parent) :
     ui->Tview_ProdutosSelecionados->setColumnWidth(1, 180);
     // coluna descricao
     ui->Tview_ProdutosSelecionados->setColumnWidth(2, 250);
+
+    // colocar a data atual no dateEdit
+    ui->DateEdt_Venda->setDateTime(QDateTime::currentDateTime());
 }
 
 venda::~venda()

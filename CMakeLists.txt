@@ -9,10 +9,13 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# set(CMAKE_PREFIX_PATH "C:/Qt/6.6.2/mingw_64/lib/cmake")
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql)
 
 set(TS_FILES QEstoqueLoja_pt_BR.ts)
+
 
 set(PROJECT_SOURCES
         main.cpp
@@ -31,6 +34,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
         vendas.h vendas.cpp vendas.ui
         venda.h venda.cpp venda.ui
+        Imagens/recursosImg.qrc
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET QEstoqueLoja APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

@@ -13,6 +13,23 @@
   <property name="windowTitle">
    <string>Alterar Produto - QEstoqueLoja</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">AlterarProduto{
+background-color: rgb(199, 199, 199);
+
+}
+QPushButton{
+background-color: rgb(43, 132, 191);
+color: rgb(255, 255, 255);
+font-size: 15px;
+}
+QGroupBox{
+background-color:rgb(170, 170, 170);
+	font: 700 9pt &quot;Segoe UI&quot;;
+	font-size: 15px;
+}
+</string>
+  </property>
   <widget class="QDialogButtonBox" name="Btn_AltAceitar">
    <property name="geometry">
     <rect>

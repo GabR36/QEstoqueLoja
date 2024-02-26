@@ -3,10 +3,18 @@
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
+#include <qguiapplication.h>
+#include <qicon.h>
 
 int main(int argc, char *argv[])
 {
+
+    QGuiApplication app(argc, argv);
+    QGuiApplication::setWindowIcon(QIcon(":/QEstoqueLOja/QeLogo.png"));
+
+
     QApplication a(argc, argv);
+
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
@@ -17,6 +25,7 @@ int main(int argc, char *argv[])
             break;
         }
     }
+
     MainWindow w;
     w.show();
     return a.exec();

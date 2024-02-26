@@ -331,10 +331,3 @@ void Vendas::on_Btn_DeletarVenda_clicked()
         qDebug() << "A exclusão da venda foi cancelada.";
     }
 }
-
-
-void Vendas::on_Btn_AlterarVenda_clicked()
-{
-
-}
-

@@ -92,7 +92,7 @@ font-size: 15px;
      <x>10</x>
      <y>190</y>
      <width>208</width>
-     <height>68</height>
+     <height>74</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -204,7 +204,7 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
       <x>10</x>
       <y>30</y>
       <width>111</width>
-      <height>88</height>
+      <height>94</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -237,31 +237,18 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
     <string>Inserir Venda</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QPushButton" name="Btn_DeletarVenda">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>320</y>
-     <width>101</width>
-     <height>56</height>
+     <y>340</y>
+     <width>99</width>
+     <height>26</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_4">
-    <item>
-     <widget class="QPushButton" name="Btn_DeletarVenda">
-      <property name="text">
-       <string>Deletar venda</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="Btn_AlterarVenda">
-      <property name="text">
-       <string>Alterar Venda</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
+   <property name="text">
+    <string>Deletar venda</string>
+   </property>
   </widget>
  </widget>
  <resources/>

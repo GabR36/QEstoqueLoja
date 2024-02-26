@@ -110,9 +110,11 @@ void venda::on_BtnBox_Venda_accepted()
     }
     QSqlQuery query;
 
-    query.prepare("INSERT INTO vendas2 (cliente, total) VALUES (:valor1, :valor2)");
+    query.prepare("INSERT INTO vendas2 (cliente, total, data_hora) VALUES (:valor1, :valor2, :valor3)");
     query.bindValue(":valor1", cliente);
     query.bindValue(":valor2", totalSelecionados);
+    // inserir a data do dateedit
+    query.bindValue(":valor3", ui->DateEdt_Venda->dateTime().toString("dd-MM-yyyy HH:mm:ss"));
     QString idVenda;
     if (query.exec()) {
         idVenda = query.lastInsertId().toString();

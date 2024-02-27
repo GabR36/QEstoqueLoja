@@ -75,10 +75,10 @@ background-color:rgb(170, 170, 170);
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>110</y>
+     <x>20</x>
+     <y>190</y>
      <width>295</width>
-     <height>111</height>
+     <height>91</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -113,13 +113,6 @@ background-color:rgb(170, 170, 170);
        <widget class="QLineEdit" name="Ledit_Preco"/>
       </item>
      </layout>
-    </item>
-    <item>
-     <widget class="QPushButton" name="Btn_SelecionarProduto">
-      <property name="text">
-       <string>Selecionar Produto</string>
-      </property>
-     </widget>
     </item>
    </layout>
   </widget>
@@ -227,14 +220,27 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
   <widget class="QDateTimeEdit" name="DateEdt_Venda">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>50</y>
+     <x>20</x>
+     <y>60</y>
      <width>141</width>
      <height>27</height>
     </rect>
    </property>
    <property name="calendarPopup">
     <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="Btn_SelecionarProduto">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>110</y>
+     <width>293</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Selecionar Produto</string>
    </property>
   </widget>
  </widget>

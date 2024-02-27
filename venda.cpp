@@ -27,7 +27,7 @@ venda::venda(QWidget *parent) :
     QModelIndex firstIndex = modeloProdutos->index(0, 0);
     ui->Tview_Produtos->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
     // Obter o modelo de seleção da tabela
-    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    QItemSelectionModel *selectionModel = ui->Tview_ProdutosSelecionados->selectionModel();
     // Conectar o sinal de seleção ao slot personalizado
     connect(selectionModel, &QItemSelectionModel::selectionChanged,this, &venda::handleSelectionChange);
     // ajustar tamanho colunas
@@ -158,9 +158,9 @@ void venda::handleSelectionChange(const QItemSelection &selected, const QItemSel
         qDebug() << "erro ao abrir banco de dados. handleselectionchange Venda";
     }
     QModelIndex selectedIndex = selected.indexes().first();
-    QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
-    QVariant quantVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 1));
-    QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
+    QVariant idVariant = ui->Tview_ProdutosSelecionados->model()->data(ui->Tview_ProdutosSelecionados->model()->index(selectedIndex.row(), 0));
+    QVariant quantVariant = ui->Tview_ProdutosSelecionados->model()->data(ui->Tview_ProdutosSelecionados->model()->index(selectedIndex.row(), 1));
+    QVariant precoVariant = ui->Tview_ProdutosSelecionados->model()->data(ui->Tview_ProdutosSelecionados->model()->index(selectedIndex.row(), 3));
     QString productId = idVariant.toString();
     QString productQuant = quantVariant.toString();
     QString productPreco = precoVariant.toString();

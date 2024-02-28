@@ -55,19 +55,17 @@ void venda::on_Btn_SelecionarProduto_clicked()
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
     QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
     QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
-    QVariant quantVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 1));
     QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
     QString idProduto = idVariant.toString();
     QString descProduto = descVariant.toString();
     QString precoProduto = precoVariant.toString();
-    QString quantProduto = quantVariant.toString();
-    QVector<QString> registro1 = {idProduto, quantProduto, precoProduto};
+    QVector<QString> registro1 = {idProduto, "1", precoProduto};
     vetorIds.append(registro1);
     ui->Ledit_QuantVendido->clear();
     ui->Ledit_Preco->clear();
     qDebug() << vetorIds;
     // mostrar na tabela Selecionados
-    modeloSelecionados.appendRow({new QStandardItem(idProduto), new QStandardItem(quantProduto), new QStandardItem(descProduto), new QStandardItem(precoProduto)});
+    modeloSelecionados.appendRow({new QStandardItem(idProduto), new QStandardItem("1"), new QStandardItem(descProduto), new QStandardItem(precoProduto)});
     ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
 }
 

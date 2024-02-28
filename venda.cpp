@@ -178,3 +178,22 @@ void venda::on_Ledit_QuantVendido_textChanged(const QString &arg1)
     ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
 }
 
+
+void venda::on_Ledit_Preco_textChanged(const QString &arg1)
+{
+    // slot sempre que o preço for alterado, mudar o produto selecionado
+
+    // pegar o produto selecionado
+    QItemSelectionModel *selectionModel = ui->Tview_ProdutosSelecionados->selectionModel();
+    QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+    int registroSelecionado = selectedIndex.row();
+    // pegar o valor no line edit
+    QString preco = ui->Ledit_Preco->text();
+    //
+    vetorIds[registroSelecionado][2] = preco;
+    qDebug() << vetorIds;
+    QModelIndex precoIndice = modeloSelecionados.index(registroSelecionado, 3);
+    modeloSelecionados.setData(precoIndice, preco);
+    ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+}
+

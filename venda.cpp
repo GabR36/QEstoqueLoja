@@ -51,49 +51,25 @@ venda::~venda()
 
 void venda::on_Btn_SelecionarProduto_clicked()
 {
-    // pegar id do produto selecionado e quant do Ledit
-    QString quantVendido = ui->Ledit_QuantVendido->text();
-    QString precoVendido = ui->Ledit_Preco->text();
-    // Substitua ',' por '.' se necessário
-    precoVendido.replace(',', '.');
-
-    // Converta o texto para um número
-    bool conversionOk;
-    bool conversionOkQuant;
-    double price = precoVendido.toDouble(&conversionOk);
-    double quantInt = quantVendido.toInt(&conversionOkQuant);
-
-    // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
-    if (conversionOk && price >= 0)
-    {
-        if(conversionOkQuant){
-            QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
-            QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
-            QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
-            QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
-            QString idProduto = idVariant.toString();
-            QString descProduto = descVariant.toString();
-            QVector<QString> registro1 = {idProduto, quantVendido, precoVendido};
-            vetorIds.append(registro1);
-            ui->Ledit_QuantVendido->clear();
-            ui->Ledit_Preco->clear();
-            qDebug() << vetorIds;
-            // mostrar na tabela Selecionados
-            modeloSelecionados.appendRow({new QStandardItem(idProduto), new QStandardItem(quantVendido), new QStandardItem(descProduto), new QStandardItem(precoVendido)});
-            ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
-        }
-        else {
-            QMessageBox::warning(this, "Erro", "Por favor, insira uma quantidade válida.");
-        }
-
-    }
-    else
-    {
-        // Exiba uma mensagem de erro se o preço não for válido
-        QMessageBox::warning(this, "Erro", "Por favor, insira um preço válido.");
-    }
+    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+    QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
+    QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
+    QVariant quantVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 1));
+    QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
+    QString idProduto = idVariant.toString();
+    QString descProduto = descVariant.toString();
+    QString precoProduto = precoVariant.toString();
+    QString quantProduto = quantVariant.toString();
+    QVector<QString> registro1 = {idProduto, quantProduto, precoProduto};
+    vetorIds.append(registro1);
+    ui->Ledit_QuantVendido->clear();
+    ui->Ledit_Preco->clear();
+    qDebug() << vetorIds;
+    // mostrar na tabela Selecionados
+    modeloSelecionados.appendRow({new QStandardItem(idProduto), new QStandardItem(quantProduto), new QStandardItem(descProduto), new QStandardItem(precoProduto)});
+    ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
 }
-
 
 void venda::on_BtnBox_Venda_accepted()
 {
@@ -181,5 +157,24 @@ void venda::on_Btn_Pesquisa_clicked()
     modeloProdutos->setQuery("SELECT * FROM produtos WHERE descricao LIKE '%" + pesquisa + "%'");
     ui->Tview_Produtos->setModel(modeloProdutos);
     QSqlDatabase::database().close();
+}
+
+
+void venda::on_Ledit_QuantVendido_textChanged(const QString &arg1)
+{
+    // slot sempre que a quantidade for alterada, mudar o produto selecionado
+
+    // pegar o produto selecionado
+    QItemSelectionModel *selectionModel = ui->Tview_ProdutosSelecionados->selectionModel();
+    QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+    int registroSelecionado = selectedIndex.row();
+    // pegar o valor no line edit
+    QString quantidade = ui->Ledit_QuantVendido->text();
+    //
+    vetorIds[registroSelecionado][1] = quantidade;
+    qDebug() << vetorIds;
+    QModelIndex quantidadeIndice = modeloSelecionados.index(registroSelecionado, 1);
+    modeloSelecionados.setData(quantidadeIndice, quantidade);
+    ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
 }
 

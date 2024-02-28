@@ -33,6 +33,8 @@ private slots:
 
     void on_Btn_Pesquisa_clicked();
 
+    void on_Ledit_QuantVendido_textChanged(const QString &arg1);
+
 private:
     QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
     QStandardItemModel modeloSelecionados;

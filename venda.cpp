@@ -69,59 +69,6 @@ void venda::on_Btn_SelecionarProduto_clicked()
     ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
 }
 
-void venda::on_BtnBox_Venda_accepted()
-{
-    QString cliente = ui->Ledit_Cliente->text();
-    float totalSelecionados = 0;
-    for (const QVector<QString> &registro : vetorIds) {
-        totalSelecionados = totalSelecionados + registro[1].toFloat() * registro[2].toFloat();
-        qDebug() << registro[2].toFloat();
-    }
-    // adicionar ao banco de dados
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao aceitar venda.";
-        return;
-    }
-    QSqlQuery query;
-
-    query.prepare("INSERT INTO vendas2 (cliente, total, data_hora) VALUES (:valor1, :valor2, :valor3)");
-    query.bindValue(":valor1", cliente);
-    query.bindValue(":valor2", totalSelecionados);
-    // inserir a data do dateedit
-    query.bindValue(":valor3", ui->DateEdt_Venda->dateTime().toString("dd-MM-yyyy HH:mm:ss"));
-    QString idVenda;
-    if (query.exec()) {
-        idVenda = query.lastInsertId().toString();
-        qDebug() << "Inserção bem-sucedida!";
-    } else {
-        qDebug() << "Erro na inserção: ";
-    }
-    // adicionar ao banco de dados
-    for (const QVector<QString> &registro : vetorIds) {
-        query.prepare("INSERT INTO produtos_vendidos (id_produto, quantidade, preco_vendido, id_venda) VALUES (:valor1, :valor2, :valor3, :valor4)");
-        query.bindValue(":valor1", registro[0]);
-        query.bindValue(":valor2", registro[1]);
-        query.bindValue(":valor3", registro[2]);
-        query.bindValue(":valor4", idVenda);
-        if (query.exec()) {
-            qDebug() << "Inserção prod_vendidos bem-sucedida!";
-        } else {
-            qDebug() << "Erro na inserção prod_vendidos: ";
-        }
-        query.prepare("UPDATE produtos SET quantidade = quantidade - :valor2 WHERE id = :valor1");
-        query.bindValue(":valor1", registro[0]);
-        query.bindValue(":valor2", registro[1]);
-        if (query.exec()) {
-            qDebug() << "update quantidade bem-sucedida!";
-        } else {
-            qDebug() << "Erro na update quantidade: ";
-        }
-    }
-    db.close();
-    janelaVenda->atualizarTabelas();
-    janelaPrincipal->atualizarTableview();
-}
-
 void venda::handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
     // Este slot é chamado sempre que a seleção na tabela muda
     Q_UNUSED(deselected);
@@ -193,5 +140,98 @@ void venda::on_Ledit_Preco_textChanged(const QString &arg1)
     QModelIndex precoIndice = modeloSelecionados.index(registroSelecionado, 3);
     modeloSelecionados.setData(precoIndice, preco);
     ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+}
+
+
+void venda::on_Ledit_Barras_returnPressed()
+{
+    // código de barras inserido
+    // verificar se o codigo de barras ja existe
+    QString barrasProduto = ui->Ledit_Barras->text();
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. botao enviar.";
+    }
+    QSqlQuery query;
+
+    query.prepare("SELECT COUNT(*) FROM produtos WHERE codigo_barras = :codigoBarras");
+    query.bindValue(":codigoBarras", barrasProduto);
+    if (!query.exec()) {
+        qDebug() << "Erro na consulta: contagem codigo barras";
+    }
+    query.next();
+    bool barrasExiste = query.value(0).toInt() > 0 && barrasProduto != "";
+    qDebug() << barrasProduto;
+    if(barrasExiste){
+        // o código existe
+        QSqlQuery query;
+
+        query.prepare("SELECT * FROM produtos WHERE codigo_barras = :codigoBarras");
+        query.bindValue(":codigoBarras", barrasProduto);
+        if (!query.exec()) {
+            qDebug() << "Erro na consulta: contagem codigo barras";
+        }
+        query.next();
+        QString idBarras = query.value(0).toString();
+        qDebug() << idBarras;
+    }
+    else{
+        // o código não existe
+
+    }
+}
+
+
+void venda::on_Btn_Aceitar_clicked()
+{
+    QString cliente = ui->Ledit_Cliente->text();
+    float totalSelecionados = 0;
+    for (const QVector<QString> &registro : vetorIds) {
+        totalSelecionados = totalSelecionados + registro[1].toFloat() * registro[2].toFloat();
+        qDebug() << registro[2].toFloat();
+    }
+    // adicionar ao banco de dados
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. botao aceitar venda.";
+        return;
+    }
+    QSqlQuery query;
+
+    query.prepare("INSERT INTO vendas2 (cliente, total, data_hora) VALUES (:valor1, :valor2, :valor3)");
+    query.bindValue(":valor1", cliente);
+    query.bindValue(":valor2", totalSelecionados);
+    // inserir a data do dateedit
+    query.bindValue(":valor3", ui->DateEdt_Venda->dateTime().toString("dd-MM-yyyy HH:mm:ss"));
+    QString idVenda;
+    if (query.exec()) {
+        idVenda = query.lastInsertId().toString();
+        qDebug() << "Inserção bem-sucedida!";
+    } else {
+        qDebug() << "Erro na inserção: ";
+    }
+    // adicionar ao banco de dados
+    for (const QVector<QString> &registro : vetorIds) {
+        query.prepare("INSERT INTO produtos_vendidos (id_produto, quantidade, preco_vendido, id_venda) VALUES (:valor1, :valor2, :valor3, :valor4)");
+        query.bindValue(":valor1", registro[0]);
+        query.bindValue(":valor2", registro[1]);
+        query.bindValue(":valor3", registro[2]);
+        query.bindValue(":valor4", idVenda);
+        if (query.exec()) {
+            qDebug() << "Inserção prod_vendidos bem-sucedida!";
+        } else {
+            qDebug() << "Erro na inserção prod_vendidos: ";
+        }
+        query.prepare("UPDATE produtos SET quantidade = quantidade - :valor2 WHERE id = :valor1");
+        query.bindValue(":valor1", registro[0]);
+        query.bindValue(":valor2", registro[1]);
+        if (query.exec()) {
+            qDebug() << "update quantidade bem-sucedida!";
+        } else {
+            qDebug() << "Erro na update quantidade: ";
+        }
+    }
+    db.close();
+    janelaVenda->atualizarTabelas();
+    janelaPrincipal->atualizarTableview();
+    this->close();
 }
 

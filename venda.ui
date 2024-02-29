@@ -14,8 +14,8 @@
    <string>Venda - QEstoqueLoja</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#venda{
-background-color: rgb(199, 199, 199);
+    <string notr="true">#venda{
+    background-color: rgb(199, 199, 199);
 font-size: 15px;
 
 }
@@ -30,23 +30,8 @@ background-color:rgb(170, 170, 170);
 	font-size: 15px;
 }
 </string>
-  </property>
-  <widget class="QDialogButtonBox" name="BtnBox_Venda">
-   <property name="geometry">
-    <rect>
-     <x>380</x>
-     <y>530</y>
-     <width>341</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-   </property>
-  </widget>
+</property>
+
   <widget class="QTableView" name="Tview_ProdutosSelecionados">
    <property name="geometry">
     <rect>
@@ -220,7 +205,7 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
   <widget class="QDateTimeEdit" name="DateEdt_Venda">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>80</x>
      <y>60</y>
      <width>141</width>
      <height>27</height>
@@ -234,7 +219,7 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>110</y>
+     <y>140</y>
      <width>293</width>
      <height>41</height>
     </rect>
@@ -243,40 +228,42 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
     <string>Selecionar Produto</string>
    </property>
   </widget>
+  <widget class="QPushButton" name="Btn_Aceitar">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>530</y>
+     <width>151</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Registrar Venda</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>100</y>
+     <width>301</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_4">
+    <item>
+     <widget class="QLabel" name="label_6">
+      <property name="text">
+       <string>Código de barras:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="Ledit_Barras"/>
+    </item>
+   </layout>
+  </widget>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>BtnBox_Venda</sender>
-   <signal>accepted()</signal>
-   <receiver>venda</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>BtnBox_Venda</sender>
-   <signal>rejected()</signal>
-   <receiver>venda</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

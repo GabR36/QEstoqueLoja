@@ -172,11 +172,23 @@ void venda::on_Ledit_Barras_returnPressed()
         }
         query.next();
         QString idBarras = query.value(0).toString();
+        QString descBarras = query.value(2).toString();
+        QString precoBarras = query.value(3).toString();
         qDebug() << idBarras;
+
+        QVector<QString> registro1 = {idBarras, "1", precoBarras};
+        vetorIds.append(registro1);
+        ui->Ledit_QuantVendido->clear();
+        ui->Ledit_Preco->clear();
+        qDebug() << vetorIds;
+        // mostrar na tabela Selecionados
+        modeloSelecionados.appendRow({new QStandardItem(idBarras), new QStandardItem("1"), new QStandardItem(descBarras), new QStandardItem(precoBarras)});
+        ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+
     }
     else{
         // o código não existe
-
+        QMessageBox::warning(this, "Erro", "Esse código de barras não foi registrado ainda.");
     }
 }
 

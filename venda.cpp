@@ -61,8 +61,6 @@ void venda::on_Btn_SelecionarProduto_clicked()
     QString precoProduto = precoVariant.toString();
     QVector<QString> registro1 = {idProduto, "1", precoProduto};
     vetorIds.append(registro1);
-    ui->Ledit_QuantVendido->clear();
-    ui->Ledit_Preco->clear();
     qDebug() << vetorIds;
     // mostrar na tabela Selecionados
     modeloSelecionados.appendRow({new QStandardItem(idProduto), new QStandardItem("1"), new QStandardItem(descProduto), new QStandardItem(precoProduto)});
@@ -178,12 +176,12 @@ void venda::on_Ledit_Barras_returnPressed()
 
         QVector<QString> registro1 = {idBarras, "1", precoBarras};
         vetorIds.append(registro1);
-        ui->Ledit_QuantVendido->clear();
-        ui->Ledit_Preco->clear();
         qDebug() << vetorIds;
         // mostrar na tabela Selecionados
         modeloSelecionados.appendRow({new QStandardItem(idBarras), new QStandardItem("1"), new QStandardItem(descBarras), new QStandardItem(precoBarras)});
         ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+
+        ui->Ledit_Barras->clear();
 
     }
     else{

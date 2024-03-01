@@ -307,6 +307,31 @@ void Vendas::on_Btn_DeletarVenda_clicked()
         }
         QSqlQuery query;
 
+        // pegar os ids dos produtos e quantidades para adicionar depois
+        query.prepare("SELECT id_produto, quantidade FROM produtos_vendidos WHERE id_venda = :valor1");
+        query.bindValue(":valor1", productId);
+        if (query.exec()) {
+            qDebug() << "query bem-sucedido!";
+        } else {
+            qDebug() << "Erro no query: ";
+        }
+        while (query.next()){
+            QString idProduto = query.value(0).toString();
+            QString quantProduto = query.value(1).toString();
+            qDebug() << idProduto;
+            qDebug() <<  quantProduto;
+            QSqlQuery updatequery;
+            updatequery.prepare("UPDATE produtos SET quantidade = quantidade + :quantidade WHERE id = :id");
+            updatequery.bindValue(":id", idProduto);
+            updatequery.bindValue(":quantidade", quantProduto);
+            if (updatequery.exec()) {
+                qDebug() << "query UPDATE bem-sucedido!";
+            } else {
+                qDebug() << "Erro no query UPDATE: ";
+            }
+        }
+
+
         // deletar a venda
         query.prepare("DELETE FROM vendas2 WHERE id = :valor1");
         query.bindValue(":valor1", productId);
@@ -322,7 +347,7 @@ void Vendas::on_Btn_DeletarVenda_clicked()
             qDebug() << "Delete bem-sucedido!";
         } else {
             qDebug() << "Erro no Delete: ";
-        }
+        }      
         atualizarTabelas();
         db.close();
     }

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>relatorios</class>
+ <widget class="QWidget" name="relatorios">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>929</width>
+    <height>597</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Relatórios</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+
+#relatorios
+{
+background-color: rgb(199, 199, 199);
+
+}
+QPushButton{
+background-color: rgb(43, 132, 191);
+color: rgb(255, 255, 255);
+font-size: 15px;
+border-radius: 13px;
+
+}
+QGroupBox{
+background-color:rgb(170, 170, 170);
+	font: 700 9pt &quot;Segoe UI&quot;;
+	font-size: 15px;
+}
+</string>
+  </property>
+  <widget class="QPushButton" name="Btn_PdfGen">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>70</y>
+     <width>241</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Gerar PDF items estoque</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

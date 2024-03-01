@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>QEstoqueLOja/LOGO.jpg</file>
         <file>QEstoqueLOja/mkaoyvbl.png</file>
         <file>../../../../../../Pictures/css icons/QEstoqueLOja/simbolo-monetario-do-dolar.png</file>
         <file>QEstoqueLOja/simbolo-monetario-do-dolar.png</file>
@@ -18,5 +17,6 @@
         <file>QEstoqueLOja/shopping.png</file>
         <file>QEstoqueLOja/tune.png</file>
         <file>QEstoqueLOja/search.png</file>
+        <file>QEstoqueLOja/monitoring.svg</file>
     </qresource>
 </RCC>

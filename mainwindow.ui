@@ -312,6 +312,29 @@ background-color: rgb(33, 105, 149);</string>
      </size>
     </property>
    </widget>
+   <widget class="QPushButton" name="Btn_Relatorios">
+    <property name="geometry">
+     <rect>
+      <x>50</x>
+      <y>530</y>
+      <width>281</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">
+background-color: rgb(33, 105, 149);</string>
+    </property>
+    <property name="text">
+     <string>Relatórios</string>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>18</width>
+      <height>18</height>
+     </size>
+    </property>
+   </widget>
    <zorder>groupBox</zorder>
    <zorder>Tview_Produtos</zorder>
    <zorder>layoutWidget</zorder>
@@ -321,6 +344,7 @@ background-color: rgb(33, 105, 149);</string>
    <zorder>Btn_Delete</zorder>
    <zorder>Btn_Alterar</zorder>
    <zorder>Btn_Pesquisa</zorder>
+   <zorder>Btn_Relatorios</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionteste">

@@ -41,6 +41,9 @@ background-color:rgb(170, 170, 170);
      <height>192</height>
     </rect>
    </property>
+   <property name="editTriggers">
+    <set>QAbstractItemView::NoEditTriggers</set>
+   </property>
    <property name="selectionMode">
     <enum>QAbstractItemView::SingleSelection</enum>
    </property>

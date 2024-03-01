@@ -193,12 +193,9 @@ void venda::on_Ledit_Barras_returnPressed()
 
 void venda::on_Btn_Aceitar_clicked()
 {
+    // inserir a venda
     QString cliente = ui->Ledit_Cliente->text();
-    float totalSelecionados = 0;
-    for (const QVector<QString> &registro : vetorIds) {
-        totalSelecionados = totalSelecionados + registro[1].toFloat() * registro[2].toFloat();
-        qDebug() << registro[2].toFloat();
-    }
+
     // adicionar ao banco de dados
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao aceitar venda.";
@@ -208,7 +205,7 @@ void venda::on_Btn_Aceitar_clicked()
 
     query.prepare("INSERT INTO vendas2 (cliente, total, data_hora) VALUES (:valor1, :valor2, :valor3)");
     query.bindValue(":valor1", cliente);
-    query.bindValue(":valor2", totalSelecionados);
+    query.bindValue(":valor2", Total());
     // inserir a data do dateedit
     query.bindValue(":valor3", ui->DateEdt_Venda->dateTime().toString("dd-MM-yyyy HH:mm:ss"));
     QString idVenda;
@@ -218,12 +215,26 @@ void venda::on_Btn_Aceitar_clicked()
     } else {
         qDebug() << "Erro na inserção: ";
     }
+    // inserir os produtos da venda
+
+    // pegar os valores da tabela dos produtos selecionados
+    QList<QList<QVariant>> rowDataList;
+    for (int row = 0; row < modeloSelecionados.rowCount(); ++row){
+        QList<QVariant> rowData;
+        for (int col = 0; col < modeloSelecionados.columnCount(); col++){
+            QModelIndex index = modeloSelecionados.index(row, col);
+            rowData.append(modeloSelecionados.data(index));
+        }
+        rowDataList.append(rowData);
+    }
+    qDebug() << rowDataList;
+
     // adicionar ao banco de dados
-    for (const QVector<QString> &registro : vetorIds) {
+    for (const QList<QVariant> &rowdata : rowDataList) {
         query.prepare("INSERT INTO produtos_vendidos (id_produto, quantidade, preco_vendido, id_venda) VALUES (:valor1, :valor2, :valor3, :valor4)");
-        query.bindValue(":valor1", registro[0]);
-        query.bindValue(":valor2", registro[1]);
-        query.bindValue(":valor3", registro[2]);
+        query.bindValue(":valor1", rowdata[1]);
+        query.bindValue(":valor2", rowdata[2]);
+        query.bindValue(":valor3", rowdata[4]);
         query.bindValue(":valor4", idVenda);
         if (query.exec()) {
             qDebug() << "Inserção prod_vendidos bem-sucedida!";
@@ -231,8 +242,8 @@ void venda::on_Btn_Aceitar_clicked()
             qDebug() << "Erro na inserção prod_vendidos: ";
         }
         query.prepare("UPDATE produtos SET quantidade = quantidade - :valor2 WHERE id = :valor1");
-        query.bindValue(":valor1", registro[0]);
-        query.bindValue(":valor2", registro[1]);
+        query.bindValue(":valor1", rowdata[2]);
+        query.bindValue(":valor2", rowdata[1]);
         if (query.exec()) {
             qDebug() << "update quantidade bem-sucedida!";
         } else {

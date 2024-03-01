@@ -42,8 +42,8 @@ private slots:
 private:
     QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
     QStandardItemModel modeloSelecionados;
-     QVector<QVector<QString>> vetorIds;
     Ui::venda *ui;
+     QString Total();
 };
 
 #endif // VENDA_H

@@ -59,12 +59,11 @@ void venda::on_Btn_SelecionarProduto_clicked()
     QString idProduto = idVariant.toString();
     QString descProduto = descVariant.toString();
     QString precoProduto = precoVariant.toString();
-    QVector<QString> registro1 = {idProduto, "1", precoProduto};
-    vetorIds.append(registro1);
-    qDebug() << vetorIds;
     // mostrar na tabela Selecionados
     modeloSelecionados.appendRow({new QStandardItem(idProduto), new QStandardItem("1"), new QStandardItem(descProduto), new QStandardItem(precoProduto)});
     ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+    // mostrar total
+    ui->Lbl_Total->setText(Total());
 }
 
 void venda::handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
@@ -114,11 +113,11 @@ void venda::on_Ledit_QuantVendido_textChanged(const QString &arg1)
     // pegar o valor no line edit
     QString quantidade = ui->Ledit_QuantVendido->text();
     //
-    vetorIds[registroSelecionado][1] = quantidade;
-    qDebug() << vetorIds;
     QModelIndex quantidadeIndice = modeloSelecionados.index(registroSelecionado, 1);
     modeloSelecionados.setData(quantidadeIndice, quantidade);
     ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+    // mostrar total
+    ui->Lbl_Total->setText(Total());
 }
 
 
@@ -133,11 +132,11 @@ void venda::on_Ledit_Preco_textChanged(const QString &arg1)
     // pegar o valor no line edit
     QString preco = ui->Ledit_Preco->text();
     //
-    vetorIds[registroSelecionado][2] = preco;
-    qDebug() << vetorIds;
     QModelIndex precoIndice = modeloSelecionados.index(registroSelecionado, 3);
     modeloSelecionados.setData(precoIndice, preco);
     ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+    // mostrar total
+    ui->Lbl_Total->setText(Total());
 }
 
 
@@ -174,14 +173,14 @@ void venda::on_Ledit_Barras_returnPressed()
         QString precoBarras = query.value(3).toString();
         qDebug() << idBarras;
 
-        QVector<QString> registro1 = {idBarras, "1", precoBarras};
-        vetorIds.append(registro1);
-        qDebug() << vetorIds;
         // mostrar na tabela Selecionados
         modeloSelecionados.appendRow({new QStandardItem(idBarras), new QStandardItem("1"), new QStandardItem(descBarras), new QStandardItem(precoBarras)});
         ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
 
         ui->Ledit_Barras->clear();
+
+        // mostrar total
+        ui->Lbl_Total->setText(Total());
 
     }
     else{
@@ -199,7 +198,6 @@ void venda::on_Btn_Aceitar_clicked()
     // adicionar ao banco de dados
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao aceitar venda.";
-        return;
     }
     QSqlQuery query;
 
@@ -232,9 +230,9 @@ void venda::on_Btn_Aceitar_clicked()
     // adicionar ao banco de dados
     for (const QList<QVariant> &rowdata : rowDataList) {
         query.prepare("INSERT INTO produtos_vendidos (id_produto, quantidade, preco_vendido, id_venda) VALUES (:valor1, :valor2, :valor3, :valor4)");
-        query.bindValue(":valor1", rowdata[1]);
-        query.bindValue(":valor2", rowdata[2]);
-        query.bindValue(":valor3", rowdata[4]);
+        query.bindValue(":valor1", rowdata[0]);
+        query.bindValue(":valor2", rowdata[1]);
+        query.bindValue(":valor3", rowdata[3]);
         query.bindValue(":valor4", idVenda);
         if (query.exec()) {
             qDebug() << "Inserção prod_vendidos bem-sucedida!";
@@ -242,7 +240,7 @@ void venda::on_Btn_Aceitar_clicked()
             qDebug() << "Erro na inserção prod_vendidos: ";
         }
         query.prepare("UPDATE produtos SET quantidade = quantidade - :valor2 WHERE id = :valor1");
-        query.bindValue(":valor1", rowdata[2]);
+        query.bindValue(":valor1", rowdata[0]);
         query.bindValue(":valor2", rowdata[1]);
         if (query.exec()) {
             qDebug() << "update quantidade bem-sucedida!";
@@ -256,3 +254,13 @@ void venda::on_Btn_Aceitar_clicked()
     this->close();
 }
 
+QString venda::Total(){
+    // Obtendo os dados da tabela e calculando o valor total da venda
+    double totalValue = 0.0;
+    for (int row = 0; row < modeloSelecionados.rowCount(); ++row) {
+        int quantidade = modeloSelecionados.data(modeloSelecionados.index(row, 1)).toInt();  // Coluna de quantidade
+        double preco = modeloSelecionados.data(modeloSelecionados.index(row, 3)).toDouble();  // Coluna de preço
+        totalValue += quantidade * preco;
+    }
+    return QString::number(totalValue);
+}

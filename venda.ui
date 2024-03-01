@@ -241,7 +241,7 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
     <string>Registrar Venda</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -260,6 +260,42 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
     </item>
     <item>
      <widget class="QLineEdit" name="Ledit_Barras"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>520</y>
+     <width>201</width>
+     <height>39</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_5">
+    <item>
+     <widget class="QLabel" name="label_7">
+      <property name="font">
+       <font>
+        <pointsize>20</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Total:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="Lbl_Total">
+      <property name="font">
+       <font>
+        <pointsize>20</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>

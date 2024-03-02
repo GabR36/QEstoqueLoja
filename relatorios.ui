@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>929</width>
-    <height>597</height>
+    <width>537</width>
+    <height>342</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,11 +38,14 @@ background-color:rgb(170, 170, 170);
   <widget class="QPushButton" name="Btn_PdfGen">
    <property name="geometry">
     <rect>
-     <x>220</x>
-     <y>70</y>
+     <x>130</x>
+     <y>120</y>
      <width>241</width>
      <height>41</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 700 9pt &quot;Segoe UI&quot;;</string>
    </property>
    <property name="text">
     <string>Gerar PDF items estoque</string>

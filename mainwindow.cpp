@@ -11,6 +11,7 @@
 #include <qsqltablemodel.h>
 #include "vendas.h"
 #include <QDoubleValidator>
+#include "relatorios.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -85,6 +86,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Btn_Alterar->setIcon(QIcon(":/QEstoqueLOja/rebase.png"));
     ui->Btn_Delete->setIcon(QIcon(":/QEstoqueLOja/delete.png"));
     ui->Btn_Pesquisa->setIcon(QIcon(":/QEstoqueLOja/search.png"));
+    ui->Btn_Relatorios->setIcon(QIcon(":/QEstoqueLOja/monitoring.svg"));
 
 
 }
@@ -294,5 +296,19 @@ void MainWindow::on_Btn_Venda_clicked()
     Vendas *vendas = new Vendas;
     vendas->janelaPrincipal = this;
     vendas->show();
+}
+
+
+void MainWindow::on_pushButton_clicked()
+{
+       relatorios *relatorios1 = new relatorios;
+    relatorios1->show();
+}
+
+
+void MainWindow::on_Btn_Relatorios_clicked()
+{
+    relatorios *relatorios1 = new relatorios;
+    relatorios1->show();
 }
 

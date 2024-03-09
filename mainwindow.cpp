@@ -301,8 +301,7 @@ void MainWindow::on_Btn_Venda_clicked()
 
 void MainWindow::on_pushButton_clicked()
 {
-       relatorios *relatorios1 = new relatorios;
-    relatorios1->show();
+
 }
 
 

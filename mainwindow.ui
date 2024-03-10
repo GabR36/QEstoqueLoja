@@ -10,6 +10,24 @@
     <height>643</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>1069</width>
+    <height>643</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>1069</width>
+    <height>643</height>
+   </size>
+  </property>
+  <property name="sizeIncrement">
+   <size>
+    <width>1</width>
+    <height>1</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Janela Principal - QEstoqueLoja</string>
   </property>

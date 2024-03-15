@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent)
     atualizarTableview();
     QSqlDatabase::database().close();
     //
-    ui->Ledit_Desc->setFocus();
+    ui->Ledit_Barras->setFocus();
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = model->index(0, 0);
     ui->Tview_Produtos->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
@@ -168,7 +168,7 @@ void MainWindow::on_Btn_Enviar_clicked()
                 ui->Ledit_Preco->clear();
                 ui->Ledit_Barras->clear();
                 ui->Check_Nf->setChecked(false);
-                ui->Ledit_Desc->setFocus();
+                ui->Ledit_Barras->setFocus();
             }
             else {
                 // codigo de barras existe, mostrar mensagem e

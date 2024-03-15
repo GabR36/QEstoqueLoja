@@ -296,3 +296,36 @@ void MainWindow::on_Btn_Venda_clicked()
     vendas->show();
 }
 
+
+void MainWindow::on_Ledit_Barras_returnPressed()
+{
+    QString barrasProduto = ui->Ledit_Barras->text();
+    // verificar se o codigo de barras ja existe
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. botao enviar.";
+    }
+    QSqlQuery query;
+
+    query.prepare("SELECT COUNT(*) FROM produtos WHERE codigo_barras = :codigoBarras");
+    query.bindValue(":codigoBarras", barrasProduto);
+    if (!query.exec()) {
+        qDebug() << "Erro na consulta: contagem codigo barras";
+    }
+    query.next();
+    bool barrasExiste = query.value(0).toInt() > 0 && barrasProduto != "";
+    qDebug() << barrasProduto;
+
+    if (barrasExiste){
+        // codigo de barras existe, mostrar mensagem e
+        // mostrar registro na tabela
+        QMessageBox::warning(this, "Erro", "Esse código de barras já foi registrado.");
+        if(!db.open()){
+            qDebug() << "erro ao abrir banco de dados. codigo de barras existente";
+        }
+        model->setQuery("SELECT * FROM produtos WHERE codigo_barras = " + barrasProduto);
+        ui->Tview_Produtos->setModel(model);
+        db.close();
+    }
+    ui->Ledit_Desc->setFocus();
+}
+

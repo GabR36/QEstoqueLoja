@@ -38,7 +38,8 @@ private slots:
     void on_Ledit_Barras_returnPressed();
 
 private:
-    Ui::MainWindow *ui;   
+    Ui::MainWindow *ui;
+    bool verificarCodigoBarras();
 
 
 

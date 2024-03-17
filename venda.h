@@ -27,17 +27,23 @@ public:
 private slots:
     void on_Btn_SelecionarProduto_clicked();
 
-    void on_BtnBox_Venda_accepted();
-
     void handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected);
 
     void on_Btn_Pesquisa_clicked();
 
+    void on_Ledit_QuantVendido_textChanged(const QString &arg1);
+
+    void on_Ledit_Preco_textChanged(const QString &arg1);
+
+    void on_Ledit_Barras_returnPressed();
+
+    void on_Btn_Aceitar_clicked();
+
 private:
     QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
     QStandardItemModel modeloSelecionados;
-     QVector<QVector<QString>> vetorIds;
     Ui::venda *ui;
+     QString Total();
 };
 
 #endif // VENDA_H

@@ -3,6 +3,10 @@
     <qresource prefix="/">
         <file>QEstoqueLOja/delete.png</file>
         <file>QEstoqueLOja/dollarc.png</file>
+        <file>QEstoqueLOja/LOGO.jpg</file>
+        <file>QEstoqueLOja/mkaoyvbl.png</file>
+        <file>QEstoqueLOja/simbolo-monetario-do-dolar.png</file>
+        <file>QEstoqueLOja/icons8-dollar-50.png</file>
         <file>QEstoqueLOja/gjuy11.ico</file>
         <file>QEstoqueLOja/ICONEjanela.ico</file>
         <file>QEstoqueLOja/ICONEjanela.png</file>

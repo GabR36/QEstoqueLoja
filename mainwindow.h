@@ -35,12 +35,13 @@ private slots:
 
     void on_Btn_Venda_clicked();
 
-    void on_pushButton_clicked();
-
     void on_Btn_Relatorios_clicked();
+    
+    void on_Ledit_Barras_returnPressed();
 
 private:
-    Ui::MainWindow *ui;   
+    Ui::MainWindow *ui;
+    bool verificarCodigoBarras();
 
 
 

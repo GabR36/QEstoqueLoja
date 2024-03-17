@@ -141,6 +141,20 @@ background-color:rgb(170, 170, 170);
        <enum>QLayout::SetDefaultConstraint</enum>
       </property>
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Codigo de Barras:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="Ledit_Barras"/>
+        </item>
+       </layout>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QLabel" name="label_2">
@@ -179,20 +193,6 @@ background-color:rgb(170, 170, 170);
         </item>
         <item>
          <widget class="QLineEdit" name="Ledit_Preco"/>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
-        <item>
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Codigo de Barras:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="Ledit_Barras"/>
         </item>
        </layout>
       </item>

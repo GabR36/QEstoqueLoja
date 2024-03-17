@@ -71,7 +71,7 @@ MainWindow::MainWindow(QWidget *parent)
     atualizarTableview();
     QSqlDatabase::database().close();
     //
-    ui->Ledit_Desc->setFocus();
+    ui->Ledit_Barras->setFocus();
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = model->index(0, 0);
     ui->Tview_Produtos->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
@@ -122,28 +122,14 @@ void MainWindow::on_Btn_Enviar_clicked()
     bool conversionOk;
     bool conversionOkQuant;
     double price = precoProduto.toDouble(&conversionOk);
-    int quantidadeInt = quantidadeProduto.toInt(&conversionOkQuant);
+    quantidadeProduto.toInt(&conversionOkQuant);
 
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
     if (conversionOk && price >= 0)
     {
         if (conversionOkQuant){
             // verificar se o codigo de barras ja existe
-            if(!db.open()){
-                qDebug() << "erro ao abrir banco de dados. botao enviar.";
-            }
-            QSqlQuery query;
-
-            query.prepare("SELECT COUNT(*) FROM produtos WHERE codigo_barras = :codigoBarras");
-            query.bindValue(":codigoBarras", barrasProduto);
-            if (!query.exec()) {
-                qDebug() << "Erro na consulta: contagem codigo barras";
-            }
-            query.next();
-            bool barrasExiste = query.value(0).toInt() > 0 && barrasProduto != "";
-            qDebug() << barrasProduto;
-
-            if (!barrasExiste){
+            if (!verificarCodigoBarras()){
                 // adicionar ao banco de dados
                 if(!db.open()){
                     qDebug() << "erro ao abrir banco de dados. botao enviar.";
@@ -170,20 +156,8 @@ void MainWindow::on_Btn_Enviar_clicked()
                 ui->Ledit_Preco->clear();
                 ui->Ledit_Barras->clear();
                 ui->Check_Nf->setChecked(false);
-                ui->Ledit_Desc->setFocus();
+                ui->Ledit_Barras->setFocus();
             }
-            else {
-                // codigo de barras existe, mostrar mensagem e
-                // mostrar registro na tabela
-                QMessageBox::warning(this, "Erro", "Esse código de barras já foi registrado.");
-                if(!db.open()){
-                    qDebug() << "erro ao abrir banco de dados. codigo de barras existente";
-                }
-                model->setQuery("SELECT * FROM produtos WHERE codigo_barras = " + barrasProduto);
-                ui->Tview_Produtos->setModel(model);
-                db.close();
-            }
-
         }
         else{
             QMessageBox::warning(this, "Erro", "Por favor, insira uma quantidade válida.");
@@ -255,7 +229,7 @@ void MainWindow::on_Btn_Pesquisa_clicked()
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao pesquisar.";
     }
-    model->setQuery("SELECT * FROM produtos WHERE descricao LIKE '%" + pesquisa + "%'");
+    model->setQuery("SELECT * FROM produtos WHERE descricao LIKE '%" + pesquisa + "%' ORDER BY id DESC");
     ui->Tview_Produtos->setModel(model);
     QSqlDatabase::database().close();
 }
@@ -299,15 +273,51 @@ void MainWindow::on_Btn_Venda_clicked()
 }
 
 
-void MainWindow::on_pushButton_clicked()
-{
-
-}
-
 
 void MainWindow::on_Btn_Relatorios_clicked()
 {
     relatorios *relatorios1 = new relatorios;
     relatorios1->show();
+}
+
+void MainWindow::on_Ledit_Barras_returnPressed()
+{
+    // verificar se o codigo de barras existe
+    verificarCodigoBarras();
+    ui->Ledit_Desc->setFocus();
+}
+
+bool MainWindow::verificarCodigoBarras(){
+    QString barrasProduto = ui->Ledit_Barras->text();
+    // verificar se o codigo de barras ja existe
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. botao enviar.";
+    }
+    QSqlQuery query;
+
+    query.prepare("SELECT COUNT(*) FROM produtos WHERE codigo_barras = :codigoBarras");
+    query.bindValue(":codigoBarras", barrasProduto);
+    if (!query.exec()) {
+        qDebug() << "Erro na consulta: contagem codigo barras";
+    }
+    query.next();
+    bool barrasExiste = query.value(0).toInt() > 0 && barrasProduto != "";
+    qDebug() << barrasProduto;
+
+    if (barrasExiste){
+        // codigo de barras existe, mostrar mensagem e
+        // mostrar registro na tabela
+        QMessageBox::warning(this, "Erro", "Esse código de barras já foi registrado.");
+        if(!db.open()){
+            qDebug() << "erro ao abrir banco de dados. codigo de barras existente";
+        }
+        model->setQuery("SELECT * FROM produtos WHERE codigo_barras = " + barrasProduto);
+        ui->Tview_Produtos->setModel(model);
+        db.close();
+        return true;
+    }
+    else{
+        return false;
+    }
 }
 

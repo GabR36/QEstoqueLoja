@@ -4,6 +4,7 @@
 #include "venda.h"
 #include <QDate>
 #include <QtSql>
+#include <QMessageBox>
 
 Vendas::Vendas(QWidget *parent) :
     QWidget(parent),
@@ -276,3 +277,82 @@ void Vendas::LabelLucro(){
     LabelLucro(QString());
 }
 
+
+void Vendas::on_Btn_DeletarVenda_clicked()
+{
+    // obter id selecionado
+    QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
+    QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+    QVariant idVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 0));
+    QVariant valorVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 3));
+    QString productId = idVariant.toString();
+    QString productValor = valorVariant.toString();
+
+    // Cria uma mensagem de confirmação
+    QMessageBox::StandardButton resposta;
+    resposta = QMessageBox::question(
+        nullptr,
+        "Confirmação",
+        "Tem certeza que deseja excluir a venda:\n\n"
+        "id: " + productId + "\n"
+                          "Valor total: " + productValor,
+        QMessageBox::Yes | QMessageBox::No
+        );
+    // Verifica a resposta do usuário
+    if (resposta == QMessageBox::Yes) {
+
+        // remover registro do banco de dados
+        if(!db.open()){
+            qDebug() << "erro ao abrir banco de dados. botao deletar.";
+        }
+        QSqlQuery query;
+
+        // pegar os ids dos produtos e quantidades para adicionar depois
+        query.prepare("SELECT id_produto, quantidade FROM produtos_vendidos WHERE id_venda = :valor1");
+        query.bindValue(":valor1", productId);
+        if (query.exec()) {
+            qDebug() << "query bem-sucedido!";
+        } else {
+            qDebug() << "Erro no query: ";
+        }
+        while (query.next()){
+            QString idProduto = query.value(0).toString();
+            QString quantProduto = query.value(1).toString();
+            qDebug() << idProduto;
+            qDebug() <<  quantProduto;
+            QSqlQuery updatequery;
+            updatequery.prepare("UPDATE produtos SET quantidade = quantidade + :quantidade WHERE id = :id");
+            updatequery.bindValue(":id", idProduto);
+            updatequery.bindValue(":quantidade", quantProduto);
+            if (updatequery.exec()) {
+                qDebug() << "query UPDATE bem-sucedido!";
+            } else {
+                qDebug() << "Erro no query UPDATE: ";
+            }
+        }
+
+
+        // deletar a venda
+        query.prepare("DELETE FROM vendas2 WHERE id = :valor1");
+        query.bindValue(":valor1", productId);
+        if (query.exec()) {
+            qDebug() << "Delete bem-sucedido!";
+        } else {
+            qDebug() << "Erro no Delete: ";
+        }
+        // deletar os produtos vendidos
+        query.prepare("DELETE FROM produtos_vendidos WHERE id_venda = :valor1");
+        query.bindValue(":valor1", productId);
+        if (query.exec()) {
+            qDebug() << "Delete bem-sucedido!";
+        } else {
+            qDebug() << "Erro no Delete: ";
+        }      
+        atualizarTabelas();
+        db.close();
+    }
+    else {
+        // O usuário escolheu não deletar o produto
+        qDebug() << "A exclusão da venda foi cancelada.";
+    }
+}

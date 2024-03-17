@@ -45,7 +45,7 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
     bool conversionOk;
     bool conversionOkQuant;
     double price = preco.toDouble(&conversionOk);
-    int quantInt = quant.toInt(&conversionOkQuant);
+    quant.toInt(&conversionOkQuant);
 
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
     if (conversionOk && price >= 0)

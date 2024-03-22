@@ -45,6 +45,17 @@ font-size: 15px;
 border-radius: 13px;
 
 }
+
+QPushButton:hover{
+	background-color: rgb(13, 92, 161);
+}
+QPushButton:pressed{
+	
+color: rgb(255, 255, 255);
+	background-color: rgb(153, 193, 241);
+font-size: 15px;
+border-radius: 13px;
+}
 QGroupBox{
 background-color:rgb(170, 170, 170);
 	font: 700 9pt &quot;Segoe UI&quot;;
@@ -115,7 +126,7 @@ background-color:rgb(170, 170, 170);
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>60</x>
       <y>70</y>
       <width>341</width>
       <height>271</height>
@@ -236,15 +247,25 @@ font-size: 15px;</string>
    <widget class="QPushButton" name="Btn_Venda">
     <property name="geometry">
      <rect>
-      <x>50</x>
+      <x>90</x>
       <y>460</y>
       <width>281</width>
       <height>51</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">
-background-color: rgb(33, 105, 149);</string>
+     <string notr="true">#Btn_Venda{
+background-color: rgb(33, 105, 149);
+
+}
+
+#Btn_Venda:hover{
+	background-color:rgb(03,75,119);
+
+}
+#Btn_Venda:pressed{
+background-color: rgb(153, 193, 241);
+}</string>
     </property>
     <property name="text">
      <string>Venda</string>
@@ -259,7 +280,7 @@ background-color: rgb(33, 105, 149);</string>
    <widget class="QLabel" name="label_5">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>60</x>
       <y>0</y>
       <width>341</width>
       <height>61</height>
@@ -275,7 +296,7 @@ background-color: rgb(33, 105, 149);</string>
    <widget class="QPushButton" name="Btn_Delete">
     <property name="geometry">
      <rect>
-      <x>50</x>
+      <x>90</x>
       <y>390</y>
       <width>281</width>
       <height>31</height>
@@ -294,7 +315,7 @@ background-color: rgb(33, 105, 149);</string>
    <widget class="QPushButton" name="Btn_Alterar">
     <property name="geometry">
      <rect>
-      <x>50</x>
+      <x>90</x>
       <y>350</y>
       <width>281</width>
       <height>31</height>
@@ -336,15 +357,25 @@ background-color: rgb(33, 105, 149);</string>
    <widget class="QPushButton" name="Btn_Relatorios">
     <property name="geometry">
      <rect>
-      <x>50</x>
+      <x>90</x>
       <y>530</y>
       <width>281</width>
       <height>51</height>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">
-background-color: rgb(33, 105, 149);</string>
+     <string notr="true">#Btn_Relatorios{
+background-color: rgb(33, 105, 149);
+}
+#Btn_Relatorios:hover{
+background-color:rgb(03,75,119);
+}
+#Btn_Relatorios:pressed{
+
+	background-color: rgb(153, 193, 241);
+
+}
+</string>
     </property>
     <property name="text">
      <string>Relatórios</string>

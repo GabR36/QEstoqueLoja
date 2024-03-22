@@ -14,7 +14,9 @@
    <string>Alterar Produto - QEstoqueLoja</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">AlterarProduto{
+   <string notr="true">
+
+#AlterarProduto{
 background-color: rgb(199, 199, 199);
 
 }
@@ -22,6 +24,19 @@ QPushButton{
 background-color: rgb(43, 132, 191);
 color: rgb(255, 255, 255);
 font-size: 15px;
+border-radius: 13px;
+
+}
+
+QPushButton:hover{
+	background-color: rgb(13, 92, 161);
+}
+QPushButton:pressed{
+	
+color: rgb(255, 255, 255);
+	background-color: rgb(153, 193, 241);
+font-size: 15px;
+border-radius: 13px;
 }
 QGroupBox{
 background-color:rgb(170, 170, 170);

@@ -62,6 +62,7 @@ void relatorios::on_Btn_PdfGen_clicked()
 
 
 
+
     while (query.next()) {
         QString data1 = query.value(0).toString(); // id
         QString data2 = query.value(1).toString(); // quant
@@ -72,7 +73,7 @@ void relatorios::on_Btn_PdfGen_clicked()
         if (startY + lineHeight * row > availableHeight) {
             // Se não houver, inicie uma nova página
             writer.newPage();
-            startY = 1500; // Reinicie a coordenada Y inicial
+            startY = 100; // Reinicie a coordenada Y inicial
             row = 1; // Reinicie o contador de linha
         }
 
@@ -85,12 +86,13 @@ void relatorios::on_Btn_PdfGen_clicked()
         double valueData4 = data4.toDouble(); // Converte o valor para double
         sumData4 += valueData4; // Adiciona o valor à soma total
         ++row;
+
     }
-    // Desenha a soma dos preços na última página
-    painter.drawText(4000, 1000, "Soma dos preços: R$ " + QString::number(sumData4));
 
+    // Desenha a soma dos preços apenas na primeira página
+    // painter.drawText(4000, 1000, "Soma dos preços: R$ " + QString::number(sumData4));
 
-    painter.end();
+    // painter.end();
 
     db.close();
 

@@ -89,10 +89,10 @@ void relatorios::on_Btn_PdfGen_clicked()
 
     }
 
-    // Desenha a soma dos preços apenas na primeira página
-    // painter.drawText(4000, 1000, "Soma dos preços: R$ " + QString::number(sumData4));
+    //Desenha a soma dos preços apenas na primeira página
+    painter.drawText(4000, 1000, "Soma dos preços: R$ " + QString::number(sumData4));
 
-    // painter.end();
+    painter.end();
 
     db.close();
 

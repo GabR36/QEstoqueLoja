@@ -261,6 +261,7 @@ void MainWindow::on_Btn_Alterar_clicked()
     alterar->janelaPrincipal = this;
     alterar->idAlt = productId;
     alterar->TrazerInfo(productDesc, productQuant, productPreco, productBarras, productNf);
+    alterar->setWindowModality(Qt::ApplicationModal);
     alterar->show();
 }
 
@@ -269,6 +270,7 @@ void MainWindow::on_Btn_Venda_clicked()
 {
     Vendas *vendas = new Vendas;
     vendas->janelaPrincipal = this;
+    vendas->setWindowModality(Qt::ApplicationModal);
     vendas->show();
 }
 
@@ -277,6 +279,7 @@ void MainWindow::on_Btn_Venda_clicked()
 void MainWindow::on_Btn_Relatorios_clicked()
 {
     relatorios *relatorios1 = new relatorios;
+    relatorios1->setWindowModality(Qt::ApplicationModal);
     relatorios1->show();
 }
 

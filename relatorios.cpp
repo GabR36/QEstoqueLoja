@@ -32,10 +32,6 @@ void relatorios::on_Btn_PdfGen_clicked()
         return;
     }
 
-
-
-    //QSqlQuery query("SELECT * FROM produtos");
-
     QPdfWriter writer(fileName);
     writer.setPageSize(QPageSize(QPageSize::A4));
     QPainter painter(&writer);
@@ -57,17 +53,35 @@ void relatorios::on_Btn_PdfGen_clicked()
     painter.drawText(8500, 1500, "Preço R$");
 
     QSqlQuery query("SELECT * FROM produtos");
-    int row = 1;
+
+    int row2 = 1;
     double sumData4 = 0.0;
-
-
-
-
-    while (query.next()) {
-        QString data1 = query.value(0).toString(); // id
-        QString data2 = query.value(1).toString(); // quant
-        QString data3 = query.value(2).toString(); // desc
+    while(query.next()){
         QString data4 = query.value(3).toString(); // preco
+        double valueData4 = data4.toDouble(); // Converte o valor para double
+        sumData4 += valueData4; // Adiciona o valor à soma total
+
+
+        ++row2;
+    };
+
+    painter.drawText(5000, 1000,"total R$:" + QString::number( sumData4));
+    painter.drawText(8000, 1000,"total itens:" + QString::number( row2));
+
+    QSqlQuery query2("SELECT * FROM produtos");
+
+
+
+
+    int row = 1;
+  //  double sumData4 = 0.0;
+
+
+    while (query2.next()) {
+        QString data1 = query2.value(0).toString(); // id
+        QString data2 = query2.value(1).toString(); // quant
+        QString data3 = query2.value(2).toString(); // desc
+        QString data4 = query2.value(3).toString(); // preco
 
         // Verifica se há espaço suficiente na página atual para desenhar outra linha
         if (startY + lineHeight * row > availableHeight) {
@@ -85,12 +99,13 @@ void relatorios::on_Btn_PdfGen_clicked()
 
         double valueData4 = data4.toDouble(); // Converte o valor para double
         sumData4 += valueData4; // Adiciona o valor à soma total
-        ++row;
 
+        ++row;
     }
 
-    //Desenha a soma dos preços apenas na primeira página
-    painter.drawText(4000, 1000, "Soma dos preços: R$ " + QString::number(sumData4));
+    // // Desenha a quantidade de itens e a soma dos preços apenas na primeira página
+    // painter.drawText(4000, 1000, "Quantidade de Itens: " + QString::number(totalItems));
+    // painter.drawText(4000, 1100, "Soma dos preços: R$ " + QString::number(sumData4));
 
     painter.end();
 
@@ -99,13 +114,10 @@ void relatorios::on_Btn_PdfGen_clicked()
     // Abre o PDF após a criação
     QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
 
-
 }
 
 
-
-void relatorios::on_Btn_CsvGen_clicked()
-{
+void relatorios::on_Btn_CsvGen_clicked(){
 
     QString fileName = QFileDialog::getSaveFileName(nullptr, "Salvar Arquivo CSV", "", "Arquivos CSV (*.csv)");
 

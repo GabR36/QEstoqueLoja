@@ -1,308 +1,325 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
-  <class>venda</class>
-  <widget class="QDialog" name="venda">
-    <property name="geometry">
-      <rect>
-	<x>0</x>
-	<y>0</y>
-	<width>769</width>
-	<height>572</height>
-      </rect>
-    </property>
-    <property name="windowTitle">
-      <string>Venda - QEstoqueLoja</string>
-    </property>
-    <property name="styleSheet">
-      <string notr="true">#venda{
-      background-color: rgb(199, 199, 199);
-      font-size: 15px;
+ <class>venda</class>
+ <widget class="QDialog" name="venda">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>769</width>
+    <height>574</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>10</width>
+    <height>15</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Venda - QEstoqueLoja</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
 
-      }
-      QPushButton{
-      background-color: rgb(43, 132, 191);
-      color: rgb(255, 255, 255);
-      font-size: 15px;
-      }
-      QGroupBox{
-      background-color:rgb(170, 170, 170);
-      font: 700 9pt &quot;Segoe UI&quot;;
-      font-size: 15px;
-      }
-      </string>
-    </property>
+#venda{
+background-color: rgb(199, 199, 199);
 
-  <widget class="QTableView" name="Tview_ProdutosSelecionados">
-    <property name="geometry">
-      <rect>
-	<x>30</x>
-	<y>320</y>
-	<width>711</width>
-	<height>192</height>
-      </rect>
-    </property>
-    <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-    </property>
-    <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
-    </property>
-    <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-    </property>
-    <attribute name="horizontalHeaderDefaultSectionSize">
-      <number>100</number>
-    </attribute>
-    <attribute name="horizontalHeaderStretchLastSection">
-      <bool>true</bool>
-    </attribute>
-    <attribute name="verticalHeaderVisible">
-      <bool>false</bool>
-    </attribute>
-  </widget>
+}
+QPushButton{
+background-color: rgb(43, 132, 191);
+color: rgb(255, 255, 255);
+font-size: 15px;
+border-radius: 13px;
+
+}
+
+QPushButton:hover{
+	background-color: rgb(13, 92, 161);
+}
+QPushButton:pressed{
+	
+color: rgb(255, 255, 255);
+	background-color: rgb(153, 193, 241);
+font-size: 15px;
+border-radius: 13px;
+}
+QGroupBox{
+background-color:rgb(170, 170, 170);
+	font: 700 9pt &quot;Segoe UI&quot;;
+	font-size: 15px;
+}
+</string>
+  </property>
   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-      <rect>
-	<x>20</x>
-	<y>190</y>
-	<width>295</width>
-	<height>91</height>
-      </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_3">
+   <property name="geometry">
+    <rect>
+     <x>22</x>
+     <y>140</y>
+     <width>301</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_3">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-	<layout class="QVBoxLayout" name="verticalLayout_2">
-	  <item>
-	    <layout class="QHBoxLayout" name="horizontalLayout_2">
-              <item>
-		<widget class="QLabel" name="label_2">
-		  <property name="text">
-		    <string>Quantidade Vendida: </string>
-		  </property>
-		</widget>
-              </item>
-              <item>
-		<widget class="QLineEdit" name="Ledit_QuantVendido"/>
-              </item>
-	    </layout>
-	  </item>
-	</layout>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Quantidade Vendida: </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="Ledit_QuantVendido"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Preço: </string>
+        </property>
+       </widget>
       </item>
       <item>
-	<layout class="QHBoxLayout" name="horizontalLayout_3">
-	  <item>
-	    <widget class="QLabel" name="label_3">
-              <property name="text">
-		<string>Preço: </string>
-              </property>
-	    </widget>
-	  </item>
-	  <item>
-	    <widget class="QLineEdit" name="Ledit_Preco"/>
-	  </item>
-	</layout>
+       <widget class="QLineEdit" name="Ledit_Preco"/>
       </item>
-    </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-      <rect>
-	<x>340</x>
-	<y>40</y>
-	<width>401</width>
-	<height>255</height>
-      </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_4">
-      <item>
-	<widget class="QTableView" name="Tview_Produtos">
-	  <property name="selectionMode">
-	    <enum>QAbstractItemView::SingleSelection</enum>
-	  </property>
-	  <property name="selectionBehavior">
-	    <enum>QAbstractItemView::SelectRows</enum>
-	  </property>
-	  <attribute name="horizontalHeaderDefaultSectionSize">
-	    <number>50</number>
-	  </attribute>
-	  <attribute name="horizontalHeaderStretchLastSection">
-	    <bool>true</bool>
-	  </attribute>
-	  <attribute name="verticalHeaderVisible">
-	    <bool>false</bool>
-	  </attribute>
-	</widget>
-      </item>
-      <item>
-	<layout class="QVBoxLayout" name="verticalLayout_7">
-	  <item>
-	    <widget class="QLineEdit" name="Ledit_Pesquisa"/>
-	  </item>
-	  <item>
-	    <widget class="QPushButton" name="Btn_Pesquisa">
-              <property name="text">
-		<string>pesquisar</string>
-              </property>
-	    </widget>
-	  </item>
-	</layout>
-      </item>
-    </layout>
-  </widget>
-  <widget class="QLabel" name="label_4">
-    <property name="geometry">
-      <rect>
-	<x>40</x>
-	<y>300</y>
-	<width>161</width>
-	<height>16</height>
-      </rect>
-    </property>
-    <property name="styleSheet">
-      <string notr="true">font-size: 15px;
-      font: 700 9pt &quot;Segoe UI&quot;;</string>
-    </property>
-    <property name="text">
-      <string>Produtos Selecionados</string>
-    </property>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-      <rect>
-	<x>10</x>
-	<y>20</y>
-	<width>289</width>
-	<height>28</height>
-      </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-	<widget class="QLabel" name="label">
-	  <property name="text">
-	    <string>Cliente: </string>
-	  </property>
-	</widget>
-      </item>
-      <item>
-	<widget class="QLineEdit" name="Ledit_Cliente"/>
-      </item>
-    </layout>
-  </widget>
-  <widget class="QLabel" name="label_5">
-    <property name="geometry">
-      <rect>
-	<x>340</x>
-	<y>10</y>
-	<width>161</width>
-	<height>16</height>
-      </rect>
-    </property>
-    <property name="styleSheet">
-      <string notr="true">font-size: 15px;
-      font: 700 9pt &quot;Segoe UI&quot;;</string>
-    </property>
-    <property name="text">
-      <string>Catalogo de Produtos</string>
-    </property>
-  </widget>
-  <widget class="QDateTimeEdit" name="DateEdt_Venda">
-    <property name="geometry">
-      <rect>
-	<x>80</x>
-	<y>60</y>
-	<width>141</width>
-	<height>27</height>
-      </rect>
-    </property>
-    <property name="calendarPopup">
-      <bool>true</bool>
-    </property>
+     </layout>
+    </item>
+   </layout>
   </widget>
   <widget class="QPushButton" name="Btn_SelecionarProduto">
-    <property name="geometry">
-      <rect>
-	<x>20</x>
-	<y>140</y>
-	<width>293</width>
-	<height>41</height>
-      </rect>
-    </property>
-    <property name="text">
-      <string>Selecionar Produto</string>
-    </property>
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>240</y>
+     <width>301</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>12</horstretch>
+     <verstretch>11</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Selecionar Produto</string>
+   </property>
   </widget>
   <widget class="QPushButton" name="Btn_Aceitar">
-    <property name="geometry">
-      <rect>
-	<x>580</x>
-	<y>530</y>
-	<width>151</width>
-	<height>26</height>
-      </rect>
-    </property>
-    <property name="text">
-      <string>Registrar Venda</string>
-    </property>
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>530</y>
+     <width>161</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Registrar Venda</string>
+   </property>
   </widget>
   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-      <rect>
-	<x>10</x>
-	<y>100</y>
-	<width>301</width>
-	<height>28</height>
-      </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <item>
-	<widget class="QLabel" name="label_6">
-	  <property name="text">
-	    <string>Código de barras:</string>
-	  </property>
-	</widget>
-      </item>
-      <item>
-	<widget class="QLineEdit" name="Ledit_Barras"/>
-      </item>
-    </layout>
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>520</y>
+     <width>531</width>
+     <height>39</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_5">
+    <item>
+     <widget class="QLabel" name="label_7">
+      <property name="font">
+       <font>
+        <pointsize>20</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Total:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="Lbl_Total">
+      <property name="font">
+       <font>
+        <pointsize>20</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QWidget" name="">
-    <property name="geometry">
-      <rect>
-	<x>30</x>
-	<y>520</y>
-	<width>201</width>
-	<height>39</height>
-      </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>10</y>
+     <width>391</width>
+     <height>271</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_6">
+    <item>
+     <widget class="QLabel" name="label_5">
+      <property name="styleSheet">
+       <string notr="true">font-size: 15px;
+      font: 700 9pt &quot;Segoe UI&quot;;</string>
+      </property>
+      <property name="text">
+       <string>Catalogo de Produtos</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-	<widget class="QLabel" name="label_7">
-	  <property name="font">
-	    <font>
-              <pointsize>20</pointsize>
-	    </font>
-	  </property>
-	  <property name="text">
-	    <string>Total:</string>
-	  </property>
-	</widget>
+       <widget class="QTableView" name="Tview_Produtos">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>50</number>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+       </widget>
       </item>
       <item>
-	<widget class="QLabel" name="Lbl_Total">
-	  <property name="font">
-	    <font>
-              <pointsize>20</pointsize>
-	    </font>
-	  </property>
-	  <property name="text">
-	    <string/>
-	  </property>
-	</widget>
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item>
+         <widget class="QLineEdit" name="Ledit_Pesquisa"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="Btn_Pesquisa">
+          <property name="text">
+           <string>pesquisar</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
-    </layout>
+     </layout>
+    </item>
+   </layout>
   </widget>
-</widget>
-<resources/>
-<connections/>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>300</y>
+     <width>711</width>
+     <height>214</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_5">
+    <item>
+     <widget class="QLabel" name="label_4">
+      <property name="styleSheet">
+       <string notr="true">font-size: 15px;
+      font: 700 9pt &quot;Segoe UI&quot;;</string>
+      </property>
+      <property name="text">
+       <string>Produtos Selecionados</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTableView" name="Tview_ProdutosSelecionados">
+      <property name="editTriggers">
+       <set>QAbstractItemView::NoEditTriggers</set>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectRows</enum>
+      </property>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>100</number>
+      </attribute>
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>301</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QDateTimeEdit" name="DateEdt_Venda">
+      <property name="calendarPopup">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Cliente: </string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="Ledit_Cliente"/>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QLabel" name="label_6">
+        <property name="styleSheet">
+         <string notr="true">
+color: rgb(237, 51, 59);</string>
+        </property>
+        <property name="text">
+         <string>Código de barras:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="Ledit_Barras"/>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
 </ui>

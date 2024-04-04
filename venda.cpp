@@ -106,6 +106,11 @@ void venda::on_Ledit_QuantVendido_textChanged(const QString &arg1)
 {
     // slot sempre que a quantidade for alterada, mudar o produto selecionado
 
+    // Verificar se há algum registro selecionado na tabela
+    if(ui->Tview_ProdutosSelecionados->selectionModel()->selectedIndexes().isEmpty()) {
+        // Se não houver nenhum registro selecionado, sair da função
+        return;
+    }
     // pegar o produto selecionado
     QItemSelectionModel *selectionModel = ui->Tview_ProdutosSelecionados->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
@@ -125,6 +130,11 @@ void venda::on_Ledit_Preco_textChanged(const QString &arg1)
 {
     // slot sempre que o preço for alterado, mudar o produto selecionado
 
+    // Verificar se há algum registro selecionado na tabela
+    if(ui->Tview_ProdutosSelecionados->selectionModel()->selectedIndexes().isEmpty()) {
+        // Se não houver nenhum registro selecionado, sair da função
+        return;
+    }
     // pegar o produto selecionado
     QItemSelectionModel *selectionModel = ui->Tview_ProdutosSelecionados->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();

@@ -113,6 +113,9 @@ background-color:rgb(170, 170, 170);
    <property name="text">
     <string>Selecionar Produto</string>
    </property>
+   <property name="autoDefault">
+    <bool>false</bool>
+   </property>
   </widget>
   <widget class="QPushButton" name="Btn_Aceitar">
    <property name="geometry">
@@ -125,6 +128,9 @@ background-color:rgb(170, 170, 170);
    </property>
    <property name="text">
     <string>Registrar Venda</string>
+   </property>
+   <property name="autoDefault">
+    <bool>false</bool>
    </property>
   </widget>
   <widget class="QWidget" name="layoutWidget">
@@ -163,7 +169,7 @@ background-color:rgb(170, 170, 170);
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>340</x>
@@ -215,6 +221,9 @@ background-color:rgb(170, 170, 170);
           <property name="text">
            <string>pesquisar</string>
           </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
          </widget>
         </item>
        </layout>
@@ -223,7 +232,7 @@ background-color:rgb(170, 170, 170);
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>30</x>
@@ -268,7 +277,7 @@ background-color:rgb(170, 170, 170);
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>20</x>

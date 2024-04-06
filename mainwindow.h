@@ -39,6 +39,10 @@ private slots:
     
     void on_Ledit_Barras_returnPressed();
 
+    void on_actionGerar_Relat_rio_PDF_triggered();
+
+    void on_actionGerar_Relat_rio_CSV_triggered();
+
 private:
     Ui::MainWindow *ui;
     bool verificarCodigoBarras();

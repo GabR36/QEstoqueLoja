@@ -399,9 +399,46 @@ background-color:rgb(03,75,119);
    <zorder>Btn_Relatorios</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1069</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuGerarrelat_rios">
+    <property name="title">
+     <string>Relatórios</string>
+    </property>
+    <addaction name="actionGerar_Relat_rio_PDF"/>
+    <addaction name="actionGerar_Relat_rio_CSV"/>
+   </widget>
+   <addaction name="menuGerarrelat_rios"/>
+  </widget>
   <action name="actionteste">
    <property name="text">
     <string>teste</string>
+   </property>
+  </action>
+  <action name="actionGerar_Relat_rio_PDF">
+   <property name="text">
+    <string>Gerar lista Produtos PDF</string>
+   </property>
+   <property name="shortcut">
+    <string>F8</string>
+   </property>
+  </action>
+  <action name="actionGerar_Relat_rio_CSV">
+   <property name="text">
+    <string>Gerar lista Produtos CSV</string>
+   </property>
+   <property name="statusTip">
+    <string> F12</string>
+   </property>
+   <property name="shortcut">
+    <string>F7</string>
    </property>
   </action>
  </widget>

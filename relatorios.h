@@ -6,6 +6,13 @@
 #include <QSqlQueryModel>
 #include <QItemSelection>
 #include "mainwindow.h"
+#include <QPainter>
+#include <QFileDialog>
+#include <QPdfWriter>
+#include <QSqlQueryModel>
+#include <QSqlQuery>
+#include <QtSql>
+#include <QDesktopServices>
 namespace Ui {
 class relatorios;
 }

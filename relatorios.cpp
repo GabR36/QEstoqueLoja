@@ -1,13 +1,7 @@
 #include "relatorios.h"
 #include "ui_relatorios.h"
 //#include <QDebug>;
-#include <QPainter>
-#include <QFileDialog>
-#include <QPdfWriter>
-#include <QSqlQueryModel>
-#include <QSqlQuery>
-#include <QtSql>
-#include <QDesktopServices>
+
 
 relatorios::relatorios(QWidget *parent)
     : QWidget(parent)

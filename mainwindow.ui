@@ -415,6 +415,13 @@ background-color:rgb(03,75,119);
     <addaction name="actionGerar_Relat_rio_PDF"/>
     <addaction name="actionGerar_Relat_rio_CSV"/>
    </widget>
+   <widget class="QMenu" name="menuVendas">
+    <property name="title">
+     <string>Vendas</string>
+    </property>
+    <addaction name="actionRealizar_Venda"/>
+   </widget>
+   <addaction name="menuVendas"/>
    <addaction name="menuGerarrelat_rios"/>
   </widget>
   <action name="actionteste">
@@ -439,6 +446,14 @@ background-color:rgb(03,75,119);
    </property>
    <property name="shortcut">
     <string>F7</string>
+   </property>
+  </action>
+  <action name="actionRealizar_Venda">
+   <property name="text">
+    <string>Realizar Venda</string>
+   </property>
+   <property name="shortcut">
+    <string>F1</string>
    </property>
   </action>
  </widget>

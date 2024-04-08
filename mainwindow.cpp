@@ -12,6 +12,7 @@
 #include "vendas.h"
 #include <QDoubleValidator>
 #include "relatorios.h"
+#include "venda.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -462,5 +463,19 @@ void MainWindow::on_actionGerar_Relat_rio_CSV_triggered()
     // Fechando o arquivo e desconectando do banco de dados
     file.close();
     db.close();
+}
+
+
+void MainWindow::on_actionRealizar_Venda_triggered()
+{
+    Vendas *janelaVenda = new Vendas;
+   // MainWindow *janelaPrincipal;
+   // QSqlDatabase db = QSqlDatabase::database();
+    //explicit venda(QWidget *parent = nullptr);
+    venda *inserirVenda = new venda;
+    inserirVenda->janelaVenda = janelaVenda;
+    inserirVenda->janelaPrincipal = this;
+    inserirVenda->setWindowModality(Qt::ApplicationModal);
+    inserirVenda->show();
 }
 

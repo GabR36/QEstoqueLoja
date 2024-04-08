@@ -6,6 +6,7 @@
 #include <vector>
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
+//#include "vendas.h"
 
 
 
@@ -18,6 +19,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     QSqlQueryModel* model = new QSqlQueryModel;
     void atualizarTableview();
@@ -42,6 +44,8 @@ private slots:
     void on_actionGerar_Relat_rio_PDF_triggered();
 
     void on_actionGerar_Relat_rio_CSV_triggered();
+
+    void on_actionRealizar_Venda_triggered();
 
 private:
     Ui::MainWindow *ui;

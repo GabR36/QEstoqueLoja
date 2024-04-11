@@ -42,6 +42,9 @@ venda::venda(QWidget *parent) :
 
     // colocar a data atual no dateEdit
     ui->DateEdt_Venda->setDateTime(QDateTime::currentDateTime());
+
+    // setar o foco no codigo de barras
+    ui->Ledit_Barras->setFocus();
 }
 
 venda::~venda()

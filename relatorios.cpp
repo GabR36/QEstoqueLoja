@@ -1,13 +1,7 @@
 #include "relatorios.h"
 #include "ui_relatorios.h"
 //#include <QDebug>;
-#include <QPainter>
-#include <QFileDialog>
-#include <QPdfWriter>
-#include <QSqlQueryModel>
-#include <QSqlQuery>
-#include <QtSql>
-#include <QDesktopServices>
+
 
 relatorios::relatorios(QWidget *parent)
     : QWidget(parent)
@@ -57,8 +51,10 @@ void relatorios::on_Btn_PdfGen_clicked()
     int row2 = 1;
     double sumData4 = 0.0;
     while(query.next()){
+        QString data2 = query.value(1).toString(); // quant
+
         QString data4 = query.value(3).toString(); // preco
-        double valueData4 = data4.toDouble(); // Converte o valor para double
+        double valueData4 = data4.toDouble() * data2.toInt(); // Converte o valor para double
         sumData4 += valueData4; // Adiciona o valor à soma total
 
 

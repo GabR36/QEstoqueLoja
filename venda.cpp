@@ -243,7 +243,7 @@ void venda::on_Btn_Aceitar_clicked()
         QString cliente = ui->Ledit_Cliente->text();
         QString data = ui->DateEdt_Venda->dateTime().toString("dd-MM-yyyy HH:mm:ss");
 
-        pagamento *JanelaPagamento = new pagamento;
+        pagamento *JanelaPagamento = new pagamento(Total());
         JanelaPagamento->janelaVenda = this;
         JanelaPagamento->cliente = cliente;
         JanelaPagamento->data = data;

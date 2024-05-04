@@ -240,9 +240,14 @@ void venda::on_Btn_Aceitar_clicked()
     qDebug() << erro;
     if (!erro){
         // se nao tiver erro na validaçao, prossiga
+        QString cliente = ui->Ledit_Cliente->text();
+        QString data = ui->DateEdt_Venda->dateTime().toString("dd-MM-yyyy HH:mm:ss");
 
         pagamento *JanelaPagamento = new pagamento;
         JanelaPagamento->janelaVenda = this;
+        JanelaPagamento->cliente = cliente;
+        JanelaPagamento->data = data;
+        JanelaPagamento->rowDataList = rowDataList;
         JanelaPagamento->setWindowModality(Qt::ApplicationModal);
         JanelaPagamento->show();    
     }

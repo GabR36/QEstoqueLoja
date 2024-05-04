@@ -16,6 +16,9 @@ public:
     explicit pagamento(QWidget *parent = nullptr);
     ~pagamento();
     venda *janelaVenda;
+    QString cliente;
+    QString data;
+    QList<QList<QVariant>> rowDataList;
 
 private slots:
     void on_buttonBox_accepted();

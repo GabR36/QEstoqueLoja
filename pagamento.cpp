@@ -17,8 +17,6 @@ pagamento::~pagamento()
 void pagamento::on_buttonBox_accepted()
 {
     // inserir a venda
-    QString cliente = janelaVenda->ui->Ledit_Cliente->text();
-    QString data = janelaVenda->ui->DateEdt_Venda->dateTime().toString("dd-MM-yyyy HH:mm:ss");
 
     // adicionar ao banco de dados
     if(!janelaVenda->db.open()){
@@ -41,7 +39,7 @@ void pagamento::on_buttonBox_accepted()
     // inserir os produtos da venda
 
     // adicionar ao banco de dados
-    for (const QList<QVariant> &rowdata : janelaVenda->rowDataList) {
+    for (const QList<QVariant> &rowdata : rowDataList) {
         query.prepare("INSERT INTO produtos_vendidos (id_produto, quantidade, preco_vendido, id_venda) VALUES (:valor1, :valor2, :valor3, :valor4)");
         query.bindValue(":valor1", rowdata[0]);
         query.bindValue(":valor2", rowdata[1]);
@@ -64,6 +62,9 @@ void pagamento::on_buttonBox_accepted()
     janelaVenda->db.close();
     janelaVenda->janelaVenda->atualizarTabelas();
     janelaVenda->janelaPrincipal->atualizarTableview();
+
+    // fechar as janelas
     this->close();
+    janelaVenda->close();
 }
 

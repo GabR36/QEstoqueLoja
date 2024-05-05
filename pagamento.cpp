@@ -33,6 +33,13 @@ void pagamento::on_buttonBox_accepted()
     QString recebido = ui->Ledit_Recebido->text();
     QString forma_pagamento = ui->CBox_FormaPagamento->currentText();
 
+    // se a forma de pagamento não for dinheiro atribua o valor total para
+    // o valor recebido e 0 para o troco
+    if (ui->CBox_FormaPagamento->currentIndex() != 0){
+        troco = "0";
+        recebido = totalGlobal;
+    }
+
     query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6)");
     query.bindValue(":valor1", cliente);
     query.bindValue(":valor2", totalGlobal);

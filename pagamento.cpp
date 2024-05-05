@@ -71,3 +71,13 @@ void pagamento::on_buttonBox_accepted()
     janelaVenda->close();
 }
 
+
+void pagamento::on_Ledit_Recebido_textChanged(const QString &arg1)
+{
+    QString dinRecebido = ui->Ledit_Recebido->text();
+    float troco = dinRecebido.toFloat() - totalGlobal.toFloat();
+
+    ui->Lbl_Troco->setText(QString::number(troco));
+
+}
+

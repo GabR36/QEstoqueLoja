@@ -24,6 +24,8 @@ public:
 private slots:
     void on_buttonBox_accepted();
 
+    void on_Ledit_Recebido_textChanged(const QString &arg1);
+
 private:
     Ui::pagamento *ui;
 };

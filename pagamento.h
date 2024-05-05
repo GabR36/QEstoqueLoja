@@ -26,6 +26,8 @@ private slots:
 
     void on_Ledit_Recebido_textChanged(const QString &arg1);
 
+    void on_CBox_FormaPagamento_activated(int index);
+
 private:
     Ui::pagamento *ui;
 };

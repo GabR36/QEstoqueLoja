@@ -10,6 +10,8 @@ pagamento::pagamento(QString total, QWidget *parent)
 
     totalGlobal = total;
     ui->Lbl_ResumoTotal->setText(total);
+
+    ui->Ledit_Recebido->setFocus();
 }
 
 pagamento::~pagamento()
@@ -79,5 +81,24 @@ void pagamento::on_Ledit_Recebido_textChanged(const QString &arg1)
 
     ui->Lbl_Troco->setText(QString::number(troco));
 
+}
+
+
+void pagamento::on_CBox_FormaPagamento_activated(int index)
+{
+    // mostrar ou esconder campos relacionados ao troco
+    // a depender da forma dinheiro ser selecionada
+    if (index == 0){
+        ui->Lbl_Troco->show();
+        ui->label_2->show();
+        ui->label_3->show();
+        ui->Ledit_Recebido->show();
+    }
+    else {
+        ui->Lbl_Troco->hide();
+        ui->label_2->hide();
+        ui->label_3->hide();
+        ui->Ledit_Recebido->hide();
+    }
 }
 

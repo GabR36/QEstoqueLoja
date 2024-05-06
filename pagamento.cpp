@@ -114,17 +114,47 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
 {
     // mostrar ou esconder campos relacionados ao troco
     // a depender da forma dinheiro ser selecionada
-    if (index == 0){
+    switch (index) {
+    case 0:
         ui->Lbl_Troco->show();
         ui->label_2->show();
         ui->label_3->show();
         ui->Ledit_Recebido->show();
-    }
-    else {
+        ui->label_8->hide();
+        ui->Ledit_Taxa->hide();
+        ui->label_10->hide();
+        ui->Lbl_TotalTaxa->hide();
+        break;
+    case 2:
         ui->Lbl_Troco->hide();
         ui->label_2->hide();
         ui->label_3->hide();
         ui->Ledit_Recebido->hide();
+        ui->label_8->show();
+        ui->Ledit_Taxa->show();
+        ui->label_10->show();
+        ui->Lbl_TotalTaxa->show();
+        break;
+    case 3:
+        ui->Lbl_Troco->hide();
+        ui->label_2->hide();
+        ui->label_3->hide();
+        ui->Ledit_Recebido->hide();
+        ui->label_8->show();
+        ui->Ledit_Taxa->show();
+        ui->label_10->show();
+        ui->Lbl_TotalTaxa->show();
+        break;
+    default:
+        ui->Lbl_Troco->hide();
+        ui->label_2->hide();
+        ui->label_3->hide();
+        ui->Ledit_Recebido->hide();
+        ui->label_8->hide();
+        ui->Ledit_Taxa->hide();
+        ui->label_10->hide();
+        ui->Lbl_TotalTaxa->hide();
+        break;
     }
 }
 

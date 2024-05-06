@@ -35,9 +35,9 @@
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>190</y>
-     <width>253</width>
+     <x>41</x>
+     <y>191</y>
+     <width>226</width>
      <height>28</height>
     </rect>
    </property>
@@ -77,96 +77,6 @@
        </property>
       </item>
      </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="layoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>230</y>
-     <width>281</width>
-     <height>156</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_8">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_9">
-        <item>
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>Taxa:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="Ledit_Taxa"/>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Quantia Recebida (R$):</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="Ledit_Recebido"/>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Troco (R$):</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="Lbl_Troco">
-        <property name="font">
-         <font>
-          <pointsize>20</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>0</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_7">
-      <item>
-       <widget class="QLabel" name="label_10">
-        <property name="text">
-         <string>Total após taxa (R$):</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="Lbl_TotalTaxa">
-        <property name="font">
-         <font>
-          <pointsize>20</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>TextLabel</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </item>
    </layout>
   </widget>
@@ -264,6 +174,112 @@
      </item>
     </layout>
    </widget>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>41</x>
+     <y>225</y>
+     <width>271</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Quantia Recebida (R$):</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="Ledit_Recebido"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>41</x>
+     <y>259</y>
+     <width>201</width>
+     <height>39</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <item>
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Troco (R$):</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="Lbl_Troco">
+      <property name="font">
+       <font>
+        <pointsize>20</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>41</x>
+     <y>338</y>
+     <width>250</width>
+     <height>39</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_7">
+    <item>
+     <widget class="QLabel" name="label_10">
+      <property name="text">
+       <string>Total após taxa (R$):</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="Lbl_TotalTaxa">
+      <property name="font">
+       <font>
+        <pointsize>20</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>41</x>
+     <y>304</y>
+     <width>165</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_8">
+    <item>
+     <widget class="QLabel" name="label_8">
+      <property name="text">
+       <string>Taxa:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="Ledit_Taxa"/>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>

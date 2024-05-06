@@ -16,6 +16,12 @@ pagamento::pagamento(QString total, QString cliente, QString data, QWidget *pare
     ui->Lbl_ResumoData->setText(data);
 
     ui->Ledit_Recebido->setFocus();
+
+    // esconder os campos nao relativos a forma dinheiro (taxa e valor apos taxa)
+    ui->label_8->hide();
+    ui->Ledit_Taxa->hide();
+    ui->label_10->hide();
+    ui->Lbl_TotalTaxa->hide();
 }
 
 pagamento::~pagamento()

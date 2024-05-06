@@ -114,8 +114,12 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
 {
     // mostrar ou esconder campos relacionados ao troco
     // a depender da forma dinheiro ser selecionada
+    QString taxaDebito  = "3";
+    QString taxaCredito = "4";
+    float totalTaxa;
     switch (index) {
     case 0:
+        // dinheiro
         ui->Lbl_Troco->show();
         ui->label_2->show();
         ui->label_3->show();
@@ -126,6 +130,7 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->Lbl_TotalTaxa->hide();
         break;
     case 2:
+        // credito
         ui->Lbl_Troco->hide();
         ui->label_2->hide();
         ui->label_3->hide();
@@ -134,8 +139,13 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Taxa->show();
         ui->label_10->show();
         ui->Lbl_TotalTaxa->show();
+
+        ui->Ledit_Taxa->setText(taxaCredito);
+        totalTaxa = totalGlobal.toFloat() * (1 + taxaCredito.toFloat()/100);
+        ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa));
         break;
     case 3:
+        // debito
         ui->Lbl_Troco->hide();
         ui->label_2->hide();
         ui->label_3->hide();
@@ -144,6 +154,10 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Taxa->show();
         ui->label_10->show();
         ui->Lbl_TotalTaxa->show();
+
+        ui->Ledit_Taxa->setText(taxaDebito);
+        totalTaxa = totalGlobal.toFloat() * (1 + taxaDebito.toFloat()/100);
+        ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa));
         break;
     default:
         ui->Lbl_Troco->hide();

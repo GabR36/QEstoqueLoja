@@ -7,17 +7,17 @@
     <x>0</x>
     <y>0</y>
     <width>558</width>
-    <height>437</height>
+    <height>454</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Pagamento - QEstoqueLoja</string>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
      <x>180</x>
-     <y>370</y>
+     <y>400</y>
      <width>341</width>
      <height>32</height>
     </rect>
@@ -37,7 +37,7 @@
     <rect>
      <x>40</x>
      <y>190</y>
-     <width>226</width>
+     <width>253</width>
      <height>28</height>
     </rect>
    </property>
@@ -84,18 +84,36 @@
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>250</y>
+     <y>230</y>
      <width>281</width>
-     <height>75</height>
+     <height>156</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_8">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Taxa:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="Ledit_Taxa"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Quantia Recebida:</string>
+         <string>Quantia Recebida (R$):</string>
         </property>
        </widget>
       </item>
@@ -109,7 +127,7 @@
       <item>
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Troco:</string>
+         <string>Troco (R$):</string>
         </property>
        </widget>
       </item>
@@ -122,6 +140,29 @@
         </property>
         <property name="text">
          <string>0</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_7">
+      <item>
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Total após taxa (R$):</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="Lbl_TotalTaxa">
+        <property name="font">
+         <font>
+          <pointsize>20</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
         </property>
        </widget>
       </item>
@@ -157,31 +198,71 @@
      <string>Resumo</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_5">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>50</y>
-      <width>58</width>
-      <height>18</height>
+      <width>114</width>
+      <height>74</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Total:</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="Lbl_ResumoTotal">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>50</y>
-      <width>58</width>
-      <height>18</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>0</string>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Total (R$):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="Lbl_ResumoTotal">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Cliente:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="Lbl_ResumoCliente">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_6">
+       <item>
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Data:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="Lbl_ResumoData">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </widget>
   </widget>
  </widget>

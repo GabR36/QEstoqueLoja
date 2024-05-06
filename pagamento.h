@@ -13,11 +13,11 @@ class pagamento : public QDialog
     Q_OBJECT
 
 public:
-    explicit pagamento(QString total, QWidget *parent = nullptr);
+    explicit pagamento(QString total, QString cliente, QString data, QWidget *parent = nullptr);
     ~pagamento();
     venda *janelaVenda;
-    QString cliente;
-    QString data;
+    QString clienteGlobal;
+    QString dataGlobal;
     QList<QList<QVariant>> rowDataList;
     QString totalGlobal;
 

@@ -2,7 +2,7 @@
 #include "ui_pagamento.h"
 #include <QSqlQuery>
 
-pagamento::pagamento(QString total, QWidget *parent)
+pagamento::pagamento(QString total, QString cliente, QString data, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::pagamento)
 {
@@ -10,6 +10,10 @@ pagamento::pagamento(QString total, QWidget *parent)
 
     totalGlobal = total;
     ui->Lbl_ResumoTotal->setText(total);
+    clienteGlobal = cliente;
+    ui->Lbl_ResumoCliente->setText(cliente);
+    dataGlobal = data;
+    ui->Lbl_ResumoData->setText(data);
 
     ui->Ledit_Recebido->setFocus();
 }
@@ -41,10 +45,10 @@ void pagamento::on_buttonBox_accepted()
     }
 
     query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6)");
-    query.bindValue(":valor1", cliente);
+    query.bindValue(":valor1", clienteGlobal);
     query.bindValue(":valor2", totalGlobal);
     // inserir a data do dateedit
-    query.bindValue(":valor3", data);
+    query.bindValue(":valor3", dataGlobal);
     //
     query.bindValue(":valor4", forma_pagamento);
     query.bindValue(":valor5", recebido);

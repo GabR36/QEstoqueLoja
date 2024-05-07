@@ -172,3 +172,13 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
     }
 }
 
+
+void pagamento::on_Ledit_Taxa_textChanged(const QString &arg1)
+{
+    // calcular e mostrar valor a pagar apos as taxas conforme
+    // digita a taxa
+    QString novaTaxa = ui->Ledit_Taxa->text();
+    float totalTaxa = totalGlobal.toFloat() * (1 + novaTaxa.toFloat()/100);
+    ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa));
+}
+

@@ -28,6 +28,8 @@ private slots:
 
     void on_CBox_FormaPagamento_activated(int index);
 
+    void on_Ledit_Taxa_textChanged(const QString &arg1);
+
 private:
     Ui::pagamento *ui;
 };

@@ -42,6 +42,8 @@ void pagamento::on_buttonBox_accepted()
     QString troco = ui->Lbl_Troco->text();
     QString recebido = ui->Ledit_Recebido->text();
     QString forma_pagamento = ui->CBox_FormaPagamento->currentText();
+    QString taxa = ui->Ledit_Taxa->text();
+    QString valor_final = ui->Lbl_TotalTaxa->text();
 
     // se a forma de pagamento não for dinheiro atribua o valor total para
     // o valor recebido e 0 para o troco
@@ -50,7 +52,14 @@ void pagamento::on_buttonBox_accepted()
         recebido = totalGlobal;
     }
 
-    query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6)");
+    // se a forma de pagamento não for credito ou débito atribua o valor da taxa para
+    // zero e o valor final para o total dos produtos
+    if (ui->CBox_FormaPagamento->currentIndex() != 2 && ui->CBox_FormaPagamento->currentIndex() != 3){
+        taxa = "0";
+        valor_final = totalGlobal;
+    }
+
+    query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco, taxa, valor_final) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, :valor8)");
     query.bindValue(":valor1", clienteGlobal);
     query.bindValue(":valor2", totalGlobal);
     // inserir a data do dateedit
@@ -59,6 +68,8 @@ void pagamento::on_buttonBox_accepted()
     query.bindValue(":valor4", forma_pagamento);
     query.bindValue(":valor5", recebido);
     query.bindValue(":valor6", troco);
+    query.bindValue(":valor7", taxa);
+    query.bindValue(":valor8", valor_final);
 
     QString idVenda;
     if (query.exec()) {

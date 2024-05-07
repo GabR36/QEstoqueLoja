@@ -52,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
     }
 
-    query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2), forma_pagamento VARCHAR(20), valor_recebido DECIMAL(10,2), troco DECIMAL(10,2))");
+    query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2), forma_pagamento VARCHAR(20), valor_recebido DECIMAL(10,2), troco DECIMAL(10,2), taxa DECIMAL(10,2),valor_final DECIMAL(10,2))");
     if (query.isActive()) {
         qDebug() << "Tabela de vendas2 criada com sucesso!";
     } else {
@@ -88,6 +88,22 @@ MainWindow::MainWindow(QWidget *parent)
         }
         else {
             qDebug() << "Erro ao adicionar coluna troco";
+        }
+        // colocar coluna taxa nao presente nas versoes anteriores
+        query.exec("ALTER TABLE vendas2 ADD COLUMN taxa DECIMAL(10,2)");
+        if (query.isActive()){
+            qDebug() << "coluna taxa adicionada com sucesso!";
+        }
+        else {
+            qDebug() << "Erro ao adicionar coluna taxa";
+        }
+        // colocar coluna valor_final nao presente nas versoes anteriores
+        query.exec("ALTER TABLE vendas2 ADD COLUMN valor_final DECIMAL(10,2)");
+        if (query.isActive()){
+            qDebug() << "coluna valor_final adicionada com sucesso!";
+        }
+        else {
+            qDebug() << "Erro ao adicionar coluna valor_final";
         }
     }
 

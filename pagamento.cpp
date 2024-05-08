@@ -1,6 +1,7 @@
 #include "pagamento.h"
 #include "ui_pagamento.h"
 #include <QSqlQuery>
+#include <QMessageBox>
 
 pagamento::pagamento(QString total, QString cliente, QString data, QWidget *parent)
     : QDialog(parent)
@@ -50,6 +51,26 @@ void pagamento::on_buttonBox_accepted()
     if (ui->CBox_FormaPagamento->currentIndex() != 0){
         troco = "0";
         recebido = totalGlobal;
+    }
+    else {
+        // a forma é dinheiro e precisa verificar o input do valor recebido
+        qDebug() << "forma dinheiro, validar valor recebido";
+        recebido.replace(',', '.');
+        qDebug() << recebido;
+        bool conversionOkRecebido;
+        // testar se o recebido consegue ser converido em float e se é maior ou igual ao total
+        bool maiorQueTotal = recebido.toFloat(&conversionOkRecebido) >= totalGlobal.toFloat();
+        if (!maiorQueTotal){
+            // caso não seja maior ou igual que o total avalie como erro.
+            conversionOkRecebido = false;
+        }
+        qDebug() << conversionOkRecebido;
+        if (!conversionOkRecebido){
+            // algo deu errado na conversao, recebido nao validado
+            // inserir mensagem de erro e impedir insersao de venda
+            QMessageBox::warning(this, "Erro", "Por favor, insira um valor recebido válido.");
+            return;
+        }
     }
 
     // se a forma de pagamento não for credito ou débito atribua o valor da taxa para

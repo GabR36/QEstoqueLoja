@@ -2,6 +2,7 @@
 #include "ui_pagamento.h"
 #include <QSqlQuery>
 #include <QMessageBox>
+#include <QDoubleValidator>
 
 pagamento::pagamento(QString total, QString cliente, QString data, QWidget *parent)
     : QDialog(parent)
@@ -23,6 +24,10 @@ pagamento::pagamento(QString total, QString cliente, QString data, QWidget *pare
     ui->Ledit_Taxa->hide();
     ui->label_10->hide();
     ui->Lbl_TotalTaxa->hide();
+
+    // validador
+    QDoubleValidator *validador = new QDoubleValidator();
+    ui->Ledit_Taxa->setValidator(validador);
 }
 
 pagamento::~pagamento()
@@ -78,6 +83,22 @@ void pagamento::on_buttonBox_accepted()
     if (ui->CBox_FormaPagamento->currentIndex() != 2 && ui->CBox_FormaPagamento->currentIndex() != 3){
         taxa = "0";
         valor_final = totalGlobal;
+    }
+    else{
+        // a forma de pagamento é crédito ou débito
+        qDebug() << "forma crédito/débito, validar taxa";
+        taxa.replace(',', '.');
+        qDebug() << recebido;
+        bool conversionOkTaxa;
+        // testar se a taxa consegue ser converido em float
+        taxa.toFloat(&conversionOkTaxa);
+        qDebug() << conversionOkTaxa;
+        if (!conversionOkTaxa){
+            // algo deu errado na conversao, troco nao validado
+            // inserir mensagem de erro e impedir insersao de venda
+            QMessageBox::warning(this, "Erro", "Por favor, insira uma taxa válida.");
+            return;
+        }
     }
 
     query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco, taxa, valor_final) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, :valor8)");

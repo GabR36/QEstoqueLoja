@@ -28,6 +28,7 @@ pagamento::pagamento(QString total, QString cliente, QString data, QWidget *pare
     // validador
     QDoubleValidator *validador = new QDoubleValidator();
     ui->Ledit_Taxa->setValidator(validador);
+    ui->Ledit_Recebido->setValidator(validador);
 }
 
 pagamento::~pagamento()
@@ -156,6 +157,7 @@ void pagamento::on_buttonBox_accepted()
 void pagamento::on_Ledit_Recebido_textChanged(const QString &arg1)
 {
     QString dinRecebido = ui->Ledit_Recebido->text();
+    dinRecebido.replace(',', '.');
     float troco = dinRecebido.toFloat() - totalGlobal.toFloat();
 
     ui->Lbl_Troco->setText(QString::number(troco));
@@ -231,6 +233,7 @@ void pagamento::on_Ledit_Taxa_textChanged(const QString &arg1)
     // calcular e mostrar valor a pagar apos as taxas conforme
     // digita a taxa
     QString novaTaxa = ui->Ledit_Taxa->text();
+    novaTaxa.replace(',', '.');
     float totalTaxa = totalGlobal.toFloat() * (1 + novaTaxa.toFloat()/100);
     ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa));
 }

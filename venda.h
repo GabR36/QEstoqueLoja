@@ -23,6 +23,8 @@ public:
     QSqlDatabase db = QSqlDatabase::database();
     explicit venda(QWidget *parent = nullptr);
     ~venda();
+    QString Total();
+
 
 private slots:
     void on_Btn_SelecionarProduto_clicked();
@@ -43,7 +45,6 @@ private:
     QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
     QStandardItemModel modeloSelecionados;
     Ui::venda *ui;
-     QString Total();
 };
 
 #endif // VENDA_H

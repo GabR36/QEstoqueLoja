@@ -51,12 +51,62 @@ MainWindow::MainWindow(QWidget *parent)
             qDebug() << "Erro ao adicionar coluna nf";
         }
     }
-    query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2))");
+
+    query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2), forma_pagamento VARCHAR(20), valor_recebido DECIMAL(10,2), troco DECIMAL(10,2), taxa DECIMAL(10,2),valor_final DECIMAL(10,2))");
     if (query.isActive()) {
         qDebug() << "Tabela de vendas2 criada com sucesso!";
     } else {
         qDebug() << "Erro ao criar tabela de vendas2: ";
+        // colocar coluna forma_pagamento nao presente nas versoes anteriores
+        query.exec("ALTER TABLE vendas2 ADD COLUMN forma_pagamento VARCHAR(20)");
+        if (query.isActive()){
+            qDebug() << "coluna forma_pagamento adicionada com sucesso!";
+        }
+        else {
+            qDebug() << "Erro ao adicionar coluna forma_pagamento";
+        }
+        // colocar coluna valor_recebido nao presente nas versoes anteriores
+        query.exec("ALTER TABLE vendas2 ADD COLUMN valor_recebido DECIMAL(10,2)");
+        if (query.isActive()){
+            qDebug() << "coluna valor_recbido adicionada com sucesso!";
+        }
+        else {
+            qDebug() << "Erro ao adicionar coluna valor_recebido";
+        }
+        // colocar coluna forma_pagamento nao presente nas versoes anteriores
+        query.exec("ALTER TABLE vendas2 ADD COLUMN forma_pagamento VARCHAR(20)");
+        if (query.isActive()){
+            qDebug() << "coluna forma_pagamento adicionada com sucesso!";
+        }
+        else {
+            qDebug() << "Erro ao adicionar coluna forma_pagamento";
+        }
+        // colocar coluna troco nao presente nas versoes anteriores
+        query.exec("ALTER TABLE vendas2 ADD COLUMN troco DECIMAL(10,2)");
+        if (query.isActive()){
+            qDebug() << "coluna troco adicionada com sucesso!";
+        }
+        else {
+            qDebug() << "Erro ao adicionar coluna troco";
+        }
+        // colocar coluna taxa nao presente nas versoes anteriores
+        query.exec("ALTER TABLE vendas2 ADD COLUMN taxa DECIMAL(10,2)");
+        if (query.isActive()){
+            qDebug() << "coluna taxa adicionada com sucesso!";
+        }
+        else {
+            qDebug() << "Erro ao adicionar coluna taxa";
+        }
+        // colocar coluna valor_final nao presente nas versoes anteriores
+        query.exec("ALTER TABLE vendas2 ADD COLUMN valor_final DECIMAL(10,2)");
+        if (query.isActive()){
+            qDebug() << "coluna valor_final adicionada com sucesso!";
+        }
+        else {
+            qDebug() << "Erro ao adicionar coluna valor_final";
+        }
     }
+
     query.exec("CREATE TABLE produtos_vendidos (id INTEGER PRIMARY KEY AUTOINCREMENT, id_produto INTEGER, id_venda INTEGER, quantidade INTEGER, preco_vendido DECIMAL(10,2), FOREIGN KEY (id_produto) REFERENCES produtos(id), FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
     if (query.isActive()) {
         qDebug() << "Tabela de produtos_vendidos criada com sucesso!";

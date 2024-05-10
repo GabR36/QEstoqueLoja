@@ -160,7 +160,7 @@ void pagamento::on_Ledit_Recebido_textChanged(const QString &arg1)
     dinRecebido.replace(',', '.');
     float troco = dinRecebido.toFloat() - totalGlobal.toFloat();
 
-    ui->Lbl_Troco->setText(QString::number(troco));
+    ui->Lbl_Troco->setText(QString::number(troco, 'f', 2));
 
 }
 
@@ -197,7 +197,7 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
 
         ui->Ledit_Taxa->setText(taxaCredito);
         totalTaxa = totalGlobal.toFloat() * (1 + taxaCredito.toFloat()/100);
-        ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa));
+        ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa, 'f', 2));
         break;
     case 3:
         // debito
@@ -212,7 +212,7 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
 
         ui->Ledit_Taxa->setText(taxaDebito);
         totalTaxa = totalGlobal.toFloat() * (1 + taxaDebito.toFloat()/100);
-        ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa));
+        ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa, 'f', 2));
         break;
     default:
         ui->Lbl_Troco->hide();
@@ -235,6 +235,6 @@ void pagamento::on_Ledit_Taxa_textChanged(const QString &arg1)
     QString novaTaxa = ui->Ledit_Taxa->text();
     novaTaxa.replace(',', '.');
     float totalTaxa = totalGlobal.toFloat() * (1 + novaTaxa.toFloat()/100);
-    ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa));
+    ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa, 'f', 2));
 }
 

@@ -127,7 +127,7 @@ background-color:rgb(170, 170, 170);
     </rect>
    </property>
    <property name="text">
-    <string>Registrar Venda</string>
+    <string>Próximo: Pagamento</string>
    </property>
    <property name="autoDefault">
     <bool>false</bool>

@@ -17,13 +17,13 @@ pagamento::pagamento(QString total, QString cliente, QString data, QWidget *pare
     dataGlobal = data;
     ui->Lbl_ResumoData->setText(data);
 
+    ui->Lbl_TotalTaxa->setText(total);
+
     ui->Ledit_Recebido->setFocus();
 
-    // esconder os campos nao relativos a forma dinheiro (taxa e valor apos taxa)
+    // esconder os campos nao relativos a forma dinheiro (taxa)
     ui->label_8->hide();
     ui->Ledit_Taxa->hide();
-    ui->label_10->hide();
-    ui->Lbl_TotalTaxa->hide();
 
     // validador
     QDoubleValidator *validador = new QDoubleValidator();
@@ -181,8 +181,6 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Recebido->show();
         ui->label_8->hide();
         ui->Ledit_Taxa->hide();
-        ui->label_10->hide();
-        ui->Lbl_TotalTaxa->hide();
         break;
     case 2:
         // credito
@@ -192,8 +190,6 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Recebido->hide();
         ui->label_8->show();
         ui->Ledit_Taxa->show();
-        ui->label_10->show();
-        ui->Lbl_TotalTaxa->show();
 
         ui->Ledit_Taxa->setText(taxaCredito);
         totalTaxa = totalGlobal.toFloat() * (1 + taxaCredito.toFloat()/100);
@@ -207,8 +203,6 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Recebido->hide();
         ui->label_8->show();
         ui->Ledit_Taxa->show();
-        ui->label_10->show();
-        ui->Lbl_TotalTaxa->show();
 
         ui->Ledit_Taxa->setText(taxaDebito);
         totalTaxa = totalGlobal.toFloat() * (1 + taxaDebito.toFloat()/100);
@@ -221,8 +215,6 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Recebido->hide();
         ui->label_8->hide();
         ui->Ledit_Taxa->hide();
-        ui->label_10->hide();
-        ui->Lbl_TotalTaxa->hide();
         break;
     }
 }

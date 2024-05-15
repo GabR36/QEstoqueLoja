@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>558</width>
-    <height>454</height>
+    <height>500</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>558</width>
-    <height>454</height>
+    <height>500</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>558</width>
-    <height>454</height>
+    <height>500</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -57,8 +57,8 @@ background-color:rgb(170, 170, 170);
    <property name="geometry">
     <rect>
      <x>180</x>
-     <y>400</y>
-     <width>341</width>
+     <y>450</y>
+     <width>351</width>
      <height>32</height>
     </rect>
    </property>
@@ -271,8 +271,8 @@ background-color:rgb(170, 170, 170);
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>41</x>
-     <y>338</y>
+     <x>40</x>
+     <y>390</y>
      <width>250</width>
      <height>39</height>
     </rect>
@@ -281,7 +281,7 @@ background-color:rgb(170, 170, 170);
     <item>
      <widget class="QLabel" name="label_10">
       <property name="text">
-       <string>Total após taxa (R$):</string>
+       <string>Valor Final (R$):</string>
       </property>
      </widget>
     </item>
@@ -318,6 +318,28 @@ background-color:rgb(170, 170, 170);
     </item>
     <item>
      <widget class="QLineEdit" name="Ledit_Taxa"/>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>340</y>
+     <width>195</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_9">
+    <item>
+     <widget class="QLabel" name="label_9">
+      <property name="text">
+       <string>Desconto (R$):</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLineEdit" name="Ledit_Desconto"/>
     </item>
    </layout>
   </widget>

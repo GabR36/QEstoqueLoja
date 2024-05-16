@@ -36,6 +36,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         venda.h venda.cpp venda.ui
         Imagens/recursosImg.qrc
         relatorios.h relatorios.cpp relatorios.ui
+        customdelegate.h customdelegate.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET QEstoqueLoja APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

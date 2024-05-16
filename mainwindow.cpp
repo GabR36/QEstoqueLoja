@@ -7,6 +7,7 @@
 #include <QtSql/QSqlQuery>
 #include <QSqlQueryModel>
 #include <QStyledItemDelegate>
+#include "customdelegate.h"
 #include "alterarproduto.h"
 #include "QItemSelectionModel"
 #include <qsqltablemodel.h>
@@ -99,32 +100,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
-class CustomDelegate : public QStyledItemDelegate {
-public:
-    CustomDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
-    // void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {     //preencher de vermelho a celula que consta 0
-    //     if (index.column() == 1) { // Assuming column 1 contains the quantity
-    //         QVariant value = index.data(Qt::DisplayRole);
-    //         if (value.toInt() == 0) {
-    //             painter->fillRect(option.rect, Qt::red);
-    //         }
-    //     }
-    //     QStyledItemDelegate::paint(painter, option, index);
-    // }
 
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {    // contornar de vermelho a celula que consta 0
-        if (index.column() == 1) { // Assuming column 1 contains the quantity
-            QVariant value = index.data(Qt::DisplayRole);
-            if (value.toInt() == 0) {
-                painter->save();
-                painter->setPen(Qt::red);
-                painter->drawRect(option.rect.adjusted(0, 0, -1, -1)); // Adjusted to draw the border inside the cell
-                painter->restore();
-            }
-        }
-        QStyledItemDelegate::paint(painter, option, index);
-    }
-};
 
 void MainWindow::atualizarTableview(){
     if(!db.open()){

@@ -6,6 +6,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QSqlQueryModel>
+#include <QStyledItemDelegate>
 #include "alterarproduto.h"
 #include "QItemSelectionModel"
 #include <qsqltablemodel.h>
@@ -71,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
     atualizarTableview();
+    ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(43, 132, 191)");
     QSqlDatabase::database().close();
     //
     ui->Ledit_Barras->setFocus();
@@ -97,13 +99,42 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+class CustomDelegate : public QStyledItemDelegate {
+public:
+    CustomDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
+    // void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {     //preencher de vermelho a celula que consta 0
+    //     if (index.column() == 1) { // Assuming column 1 contains the quantity
+    //         QVariant value = index.data(Qt::DisplayRole);
+    //         if (value.toInt() == 0) {
+    //             painter->fillRect(option.rect, Qt::red);
+    //         }
+    //     }
+    //     QStyledItemDelegate::paint(painter, option, index);
+    // }
+
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {    // contornar de vermelho a celula que consta 0
+        if (index.column() == 1) { // Assuming column 1 contains the quantity
+            QVariant value = index.data(Qt::DisplayRole);
+            if (value.toInt() == 0) {
+                painter->save();
+                painter->setPen(Qt::red);
+                painter->drawRect(option.rect.adjusted(0, 0, -1, -1)); // Adjusted to draw the border inside the cell
+                painter->restore();
+            }
+        }
+        QStyledItemDelegate::paint(painter, option, index);
+    }
+};
 
 void MainWindow::atualizarTableview(){
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. atualizarTableView";
     }
+    CustomDelegate *delegate = new CustomDelegate(this);
+    ui->Tview_Produtos->setItemDelegate(delegate);
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC");
     ui->Tview_Produtos->setModel(model);
+     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: red; color: white;");
     db.close();
 }
 

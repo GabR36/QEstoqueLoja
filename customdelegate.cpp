@@ -4,7 +4,7 @@
 CustomDelegate::CustomDelegate(QObject *parent) : QStyledItemDelegate(parent) {}
 
 void CustomDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    if (index.column() == 1) { // Assuming column 1 contains the quantity
+    if (index.column() == 1) {
         QVariant value = index.data(Qt::DisplayRole);
         if (value.toInt() <= 0) {
             painter->save();

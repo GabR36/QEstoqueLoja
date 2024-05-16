@@ -388,16 +388,6 @@ background-color:rgb(03,75,119);
      </size>
     </property>
    </widget>
-   <widget class="QTableView" name="tableView">
-    <property name="geometry">
-     <rect>
-      <x>540</x>
-      <y>460</y>
-      <width>256</width>
-      <height>192</height>
-     </rect>
-    </property>
-   </widget>
    <zorder>groupBox</zorder>
    <zorder>Tview_Produtos</zorder>
    <zorder>layoutWidget</zorder>
@@ -408,7 +398,6 @@ background-color:rgb(03,75,119);
    <zorder>Btn_Alterar</zorder>
    <zorder>Btn_Pesquisa</zorder>
    <zorder>Btn_Relatorios</zorder>
-   <zorder>tableView</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menuBar">

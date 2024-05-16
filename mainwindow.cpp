@@ -6,7 +6,6 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QSqlQueryModel>
-#include <QStyledItemDelegate>
 #include "customdelegate.h"
 #include "alterarproduto.h"
 #include "QItemSelectionModel"
@@ -110,7 +109,7 @@ void MainWindow::atualizarTableview(){
     ui->Tview_Produtos->setItemDelegate(delegate);
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC");
     ui->Tview_Produtos->setModel(model);
-     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: red; color: white;");
+    ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: red;"); // n funcionando
     db.close();
 }
 

@@ -303,7 +303,7 @@ void MainWindow::on_Btn_Alterar_clicked()
     QString productId = idVariant.toString();
     QString productQuant = quantVariant.toString();
     QString productDesc = descVariant.toString();
-    QString productPreco = precoVariant.toString();
+    QString productPreco = portugues.toString(precoVariant.toFloat());
     QString productBarras = barrasVariant.toString();
     bool productNf = nfVariant.toBool();
     qDebug() << productId;

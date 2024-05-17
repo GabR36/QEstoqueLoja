@@ -6,6 +6,7 @@
 #include <vector>
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
+#include <QLocale>
 //#include "vendas.h"
 
 
@@ -25,6 +26,7 @@ public:
     void atualizarTableview();
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    QLocale portugues;
 
 private slots:
     void on_Btn_Enviar_clicked();

@@ -13,6 +13,7 @@
 #include <QDoubleValidator>
 #include "relatorios.h"
 #include "venda.h"
+#include <QIntValidator>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -140,7 +141,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Btn_Pesquisa->setIcon(QIcon(":/QEstoqueLOja/search.png"));
     ui->Btn_Relatorios->setIcon(QIcon(":/QEstoqueLOja/monitoring.svg"));
 
-
+    // validadores para os campos
+    QDoubleValidator *DoubleValidador = new QDoubleValidator();
+    QIntValidator *IntValidador = new QIntValidator();
+    ui->Ledit_Preco->setValidator(DoubleValidador);
+    ui->Ledit_Quantidade->setValidator(IntValidador);
 }
 
 MainWindow::~MainWindow()
@@ -167,53 +172,48 @@ void MainWindow::on_Btn_Enviar_clicked()
     barrasProduto = ui->Ledit_Barras->text();
     nfProduto = ui->Check_Nf->isChecked();
 
-    // Substitua ',' por '.' se necessário
-    precoProduto.replace(',', '.');
-
     // Converta o texto para um número
     bool conversionOk;
     bool conversionOkQuant;
-    double price = precoProduto.toDouble(&conversionOk);
+    double price = portugues.toDouble(precoProduto, &conversionOk);
+    qDebug() << price;
     quantidadeProduto.toInt(&conversionOkQuant);
 
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
     if (conversionOk && price >= 0)
     {
-        if (conversionOkQuant){
-            // verificar se o codigo de barras ja existe
-            if (!verificarCodigoBarras()){
-                // adicionar ao banco de dados
-                if(!db.open()){
-                    qDebug() << "erro ao abrir banco de dados. botao enviar.";
-                }
-                QSqlQuery query;
-
-                query.prepare("INSERT INTO produtos (quantidade, descricao, preco, codigo_barras, nf) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5)");
-                query.bindValue(":valor1", quantidadeProduto);
-                query.bindValue(":valor2", descProduto);
-                query.bindValue(":valor3", precoProduto);
-                query.bindValue(":valor4", barrasProduto);
-                query.bindValue(":valor5", nfProduto);
-                if (query.exec()) {
-                    qDebug() << "Inserção bem-sucedida!";
-                } else {
-                    qDebug() << "Erro na inserção: ";
-                }
-                atualizarTableview();
-                QSqlDatabase::database().close();
-
-                // limpar campos para nova inserçao
-                ui->Ledit_Desc->clear();
-                ui->Ledit_Quantidade->clear();
-                ui->Ledit_Preco->clear();
-                ui->Ledit_Barras->clear();
-                ui->Check_Nf->setChecked(false);
-                ui->Ledit_Barras->setFocus();
+        // guardar no banco de dados o valor notado em local da linguagem
+        precoProduto = QString::number(price);
+        qDebug() << precoProduto;
+        // verificar se o codigo de barras ja existe
+        if (!verificarCodigoBarras()){
+            // adicionar ao banco de dados
+            if(!db.open()){
+                qDebug() << "erro ao abrir banco de dados. botao enviar.";
             }
-        }
-        else{
-            QMessageBox::warning(this, "Erro", "Por favor, insira uma quantidade válida.");
+            QSqlQuery query;
+
+            query.prepare("INSERT INTO produtos (quantidade, descricao, preco, codigo_barras, nf) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5)");
+            query.bindValue(":valor1", quantidadeProduto);
+            query.bindValue(":valor2", descProduto);
+            query.bindValue(":valor3", precoProduto);
+            query.bindValue(":valor4", barrasProduto);
+            query.bindValue(":valor5", nfProduto);
+            if (query.exec()) {
+                qDebug() << "Inserção bem-sucedida!";
+            } else {
+                qDebug() << "Erro na inserção: ";
+            }
+            atualizarTableview();
+            QSqlDatabase::database().close();
+
+            // limpar campos para nova inserçao
+            ui->Ledit_Desc->clear();
             ui->Ledit_Quantidade->clear();
+            ui->Ledit_Preco->clear();
+            ui->Ledit_Barras->clear();
+            ui->Check_Nf->setChecked(false);
+            ui->Ledit_Barras->setFocus();
         }
     }
     else

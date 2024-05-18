@@ -177,43 +177,51 @@ void MainWindow::on_Btn_Enviar_clicked()
     bool conversionOkQuant;
     double price = portugues.toDouble(precoProduto, &conversionOk);
     qDebug() << price;
-    quantidadeProduto.toInt(&conversionOkQuant);
+    // quantidade precisa ser transformada com ponto para ser armazenada no db
+    quantidadeProduto = QString::number(portugues.toInt(quantidadeProduto, &conversionOkQuant));
 
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
     if (conversionOk && price >= 0)
     {
-        // guardar no banco de dados o valor notado em local da linguagem
-        precoProduto = QString::number(price);
-        qDebug() << precoProduto;
-        // verificar se o codigo de barras ja existe
-        if (!verificarCodigoBarras()){
-            // adicionar ao banco de dados
-            if(!db.open()){
-                qDebug() << "erro ao abrir banco de dados. botao enviar.";
-            }
-            QSqlQuery query;
+        if (conversionOkQuant){
+            // guardar no banco de dados o valor notado em local da linguagem
+            precoProduto = QString::number(price);
+            qDebug() << precoProduto;
+            // verificar se o codigo de barras ja existe
+            if (!verificarCodigoBarras()){
+                // adicionar ao banco de dados
+                if(!db.open()){
+                    qDebug() << "erro ao abrir banco de dados. botao enviar.";
+                }
+                QSqlQuery query;
 
-            query.prepare("INSERT INTO produtos (quantidade, descricao, preco, codigo_barras, nf) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5)");
-            query.bindValue(":valor1", quantidadeProduto);
-            query.bindValue(":valor2", descProduto);
-            query.bindValue(":valor3", precoProduto);
-            query.bindValue(":valor4", barrasProduto);
-            query.bindValue(":valor5", nfProduto);
-            if (query.exec()) {
-                qDebug() << "Inserção bem-sucedida!";
-            } else {
-                qDebug() << "Erro na inserção: ";
-            }
-            atualizarTableview();
-            QSqlDatabase::database().close();
+                query.prepare("INSERT INTO produtos (quantidade, descricao, preco, codigo_barras, nf) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5)");
+                query.bindValue(":valor1", quantidadeProduto);
+                query.bindValue(":valor2", descProduto);
+                query.bindValue(":valor3", precoProduto);
+                query.bindValue(":valor4", barrasProduto);
+                query.bindValue(":valor5", nfProduto);
+                if (query.exec()) {
+                    qDebug() << "Inserção bem-sucedida!";
+                } else {
+                    qDebug() << "Erro na inserção: ";
+                }
+                atualizarTableview();
+                QSqlDatabase::database().close();
 
-            // limpar campos para nova inserçao
-            ui->Ledit_Desc->clear();
-            ui->Ledit_Quantidade->clear();
-            ui->Ledit_Preco->clear();
-            ui->Ledit_Barras->clear();
-            ui->Check_Nf->setChecked(false);
-            ui->Ledit_Barras->setFocus();
+                // limpar campos para nova inserçao
+                ui->Ledit_Desc->clear();
+                ui->Ledit_Quantidade->clear();
+                ui->Ledit_Preco->clear();
+                ui->Ledit_Barras->clear();
+                ui->Check_Nf->setChecked(false);
+                ui->Ledit_Barras->setFocus();
+            }
+        }
+        else {
+            // a quantidade é invalida
+            QMessageBox::warning(this, "Erro", "Por favor, insira uma quantiade válida.");
+            ui->Ledit_Quantidade->setFocus();
         }
     }
     else

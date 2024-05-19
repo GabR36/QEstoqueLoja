@@ -29,6 +29,7 @@ pagamento::pagamento(QString total, QString cliente, QString data, QWidget *pare
     QDoubleValidator *validador = new QDoubleValidator();
     ui->Ledit_Taxa->setValidator(validador);
     ui->Ledit_Recebido->setValidator(validador);
+    ui->Ledit_Desconto->setValidator(validador);
 }
 
 pagamento::~pagamento()
@@ -61,11 +62,10 @@ void pagamento::on_buttonBox_accepted()
     else {
         // a forma é dinheiro e precisa verificar o input do valor recebido
         qDebug() << "forma dinheiro, validar valor recebido";
-        recebido.replace(',', '.');
         qDebug() << recebido;
         bool conversionOkRecebido;
         // testar se o recebido consegue ser converido em float e se é maior ou igual ao total
-        bool maiorQueTotal = recebido.toFloat(&conversionOkRecebido) >= totalGlobal.toFloat();
+        bool maiorQueTotal = portugues.toFloat(recebido, &conversionOkRecebido) >= portugues.toFloat(totalGlobal);
         if (!maiorQueTotal){
             // caso não seja maior ou igual que o total avalie como erro.
             conversionOkRecebido = false;
@@ -88,11 +88,10 @@ void pagamento::on_buttonBox_accepted()
     else{
         // a forma de pagamento é crédito ou débito
         qDebug() << "forma crédito/débito, validar taxa";
-        taxa.replace(',', '.');
         qDebug() << recebido;
         bool conversionOkTaxa;
         // testar se a taxa consegue ser converido em float
-        taxa.toFloat(&conversionOkTaxa);
+        portugues.toFloat(taxa, &conversionOkTaxa);
         qDebug() << conversionOkTaxa;
         if (!conversionOkTaxa){
             // algo deu errado na conversao, troco nao validado
@@ -104,15 +103,17 @@ void pagamento::on_buttonBox_accepted()
 
     query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco, taxa, valor_final) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, :valor8)");
     query.bindValue(":valor1", clienteGlobal);
-    query.bindValue(":valor2", totalGlobal);
+    // precisa converter para notacao usa para inserir no banco de dados
+    query.bindValue(":valor2", QString::number(portugues.toFloat(totalGlobal)));
     // inserir a data do dateedit
     query.bindValue(":valor3", dataGlobal);
     //
     query.bindValue(":valor4", forma_pagamento);
-    query.bindValue(":valor5", recebido);
-    query.bindValue(":valor6", troco);
-    query.bindValue(":valor7", taxa);
-    query.bindValue(":valor8", valor_final);
+    // precisa converter para notacao usa para inserir no banco de dados
+    query.bindValue(":valor5", QString::number(portugues.toFloat(recebido)));
+    query.bindValue(":valor6", QString::number(portugues.toFloat(troco)));
+    query.bindValue(":valor7", QString::number(portugues.toFloat(taxa)));
+    query.bindValue(":valor8", QString::number(portugues.toFloat(valor_final)));
 
     QString idVenda;
     if (query.exec()) {
@@ -127,8 +128,9 @@ void pagamento::on_buttonBox_accepted()
     for (const QList<QVariant> &rowdata : rowDataList) {
         query.prepare("INSERT INTO produtos_vendidos (id_produto, quantidade, preco_vendido, id_venda) VALUES (:valor1, :valor2, :valor3, :valor4)");
         query.bindValue(":valor1", rowdata[0]);
-        query.bindValue(":valor2", rowdata[1]);
-        query.bindValue(":valor3", rowdata[3]);
+        // precisa converter para notacao usa para inserir no banco de dados
+        query.bindValue(":valor2", QString::number(portugues.toInt(rowdata[1])));
+        query.bindValue(":valor3", QString::number(portugues.toFloat(rowdata[3])));
         query.bindValue(":valor4", idVenda);
         if (query.exec()) {
             qDebug() << "Inserção prod_vendidos bem-sucedida!";
@@ -137,7 +139,8 @@ void pagamento::on_buttonBox_accepted()
         }
         query.prepare("UPDATE produtos SET quantidade = quantidade - :valor2 WHERE id = :valor1");
         query.bindValue(":valor1", rowdata[0]);
-        query.bindValue(":valor2", rowdata[1]);
+        // precisa converter para notacao usa para inserir no banco de dados
+        query.bindValue(":valor2", QString::number(portugues.toInt(rowdata[1])));
         if (query.exec()) {
             qDebug() << "update quantidade bem-sucedida!";
         } else {

@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "venda.h"
+#include <QLocale>
 
 namespace Ui {
 class pagamento;
@@ -20,6 +21,7 @@ public:
     QString dataGlobal;
     QList<QList<QVariant>> rowDataList;
     QString totalGlobal;
+    QLocale portugues;
 
 private slots:
     void on_buttonBox_accepted();

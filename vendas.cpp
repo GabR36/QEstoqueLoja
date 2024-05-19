@@ -267,9 +267,9 @@ void Vendas::LabelLucro(QString whereQuery){
         }
     }
     float lucro = total*0.28; // assumindo que o lucro é 40% do preco de venda
-    ui->Lbl_Total->setText(QString::number(total));
-    ui->Lbl_Lucro->setText(QString::number(lucro));
-    ui->Lbl_Quantidade->setText(QString::number(quantidadeVendas));
+    ui->Lbl_Total->setText(portugues.toString(total));
+    ui->Lbl_Lucro->setText(portugues.toString(lucro));
+    ui->Lbl_Quantidade->setText(portugues.toString(quantidadeVendas));
     db.close();
 }
 

@@ -17,13 +17,18 @@ pagamento::pagamento(QString total, QString cliente, QString data, QWidget *pare
     dataGlobal = data;
     ui->Lbl_ResumoData->setText(data);
 
-    ui->Lbl_TotalTaxa->setText(total);
-
     ui->Ledit_Recebido->setFocus();
 
     // esconder os campos nao relativos a forma dinheiro (taxa)
     ui->label_8->hide();
     ui->Ledit_Taxa->hide();
+
+    // valores padrao
+    ui->Ledit_Recebido->setText(totalGlobal);
+    ui->Lbl_Troco->setText("0");
+    ui->Ledit_Desconto->setText("0");
+    ui->Ledit_Taxa->setText("0");
+    ui->Lbl_TotalTaxa->setText(totalGlobal);
 
     // validador
     QDoubleValidator *validador = new QDoubleValidator();
@@ -129,8 +134,8 @@ void pagamento::on_buttonBox_accepted()
         query.prepare("INSERT INTO produtos_vendidos (id_produto, quantidade, preco_vendido, id_venda) VALUES (:valor1, :valor2, :valor3, :valor4)");
         query.bindValue(":valor1", rowdata[0]);
         // precisa converter para notacao usa para inserir no banco de dados
-        query.bindValue(":valor2", QString::number(portugues.toInt(rowdata[1])));
-        query.bindValue(":valor3", QString::number(portugues.toFloat(rowdata[3])));
+        query.bindValue(":valor2", QString::number(portugues.toInt(rowdata[1].toString())));
+        query.bindValue(":valor3", QString::number(portugues.toFloat(rowdata[3].toString())));
         query.bindValue(":valor4", idVenda);
         if (query.exec()) {
             qDebug() << "Inserção prod_vendidos bem-sucedida!";
@@ -140,7 +145,7 @@ void pagamento::on_buttonBox_accepted()
         query.prepare("UPDATE produtos SET quantidade = quantidade - :valor2 WHERE id = :valor1");
         query.bindValue(":valor1", rowdata[0]);
         // precisa converter para notacao usa para inserir no banco de dados
-        query.bindValue(":valor2", QString::number(portugues.toInt(rowdata[1])));
+        query.bindValue(":valor2", QString::number(portugues.toInt(rowdata[1].toString())));
         if (query.exec()) {
             qDebug() << "update quantidade bem-sucedida!";
         } else {
@@ -173,7 +178,6 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
     // a depender da forma dinheiro ser selecionada
     QString taxaDebito  = "3";
     QString taxaCredito = "4";
-    float totalTaxa;
     switch (index) {
     case 0:
         // dinheiro
@@ -183,6 +187,13 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Recebido->show();
         ui->label_8->hide();
         ui->Ledit_Taxa->hide();
+
+        // valores padrao
+        ui->Ledit_Recebido->setText(totalGlobal);
+        ui->Lbl_Troco->setText("0");
+        ui->Ledit_Desconto->setText("0");
+        ui->Ledit_Taxa->setText("0");
+        ui->Lbl_TotalTaxa->setText(totalGlobal);
         break;
     case 2:
         // credito
@@ -193,9 +204,12 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->label_8->show();
         ui->Ledit_Taxa->show();
 
+        // valores padrao
+        ui->Ledit_Recebido->setText(totalGlobal);
+        ui->Lbl_Troco->setText("0");
+        ui->Ledit_Desconto->setText("0");
         ui->Ledit_Taxa->setText(taxaCredito);
-        totalTaxa = totalGlobal.toFloat() * (1 + taxaCredito.toFloat()/100);
-        ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa, 'f', 2));
+        ui->Lbl_TotalTaxa->setText(portugues.toString(obterValorFinal(taxaCredito, "0")));
         break;
     case 3:
         // debito
@@ -206,9 +220,12 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->label_8->show();
         ui->Ledit_Taxa->show();
 
+        // valores padrao
+        ui->Ledit_Recebido->setText(totalGlobal);
+        ui->Lbl_Troco->setText("0");
+        ui->Ledit_Desconto->setText("0");
         ui->Ledit_Taxa->setText(taxaDebito);
-        totalTaxa = totalGlobal.toFloat() * (1 + taxaDebito.toFloat()/100);
-        ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa, 'f', 2));
+        ui->Lbl_TotalTaxa->setText(portugues.toString(obterValorFinal(taxaDebito, "0")));
         break;
     default:
         ui->Lbl_Troco->hide();
@@ -217,6 +234,13 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Recebido->hide();
         ui->label_8->hide();
         ui->Ledit_Taxa->hide();
+
+        // valores padrao
+        ui->Ledit_Recebido->setText(totalGlobal);
+        ui->Lbl_Troco->setText("0");
+        ui->Ledit_Desconto->setText("0");
+        ui->Ledit_Taxa->setText("0");
+        ui->Lbl_TotalTaxa->setText(totalGlobal);
         break;
     }
 }

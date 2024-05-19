@@ -107,7 +107,7 @@ void pagamento::on_buttonBox_accepted()
         return;
     }
 
-    query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco, taxa, valor_final) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, :valor8)");
+    query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco, taxa, valor_final, desconto) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, :valor8, :valor9)");
     query.bindValue(":valor1", clienteGlobal);
     // precisa converter para notacao usa para inserir no banco de dados
     query.bindValue(":valor2", QString::number(portugues.toFloat(totalGlobal)));
@@ -120,6 +120,7 @@ void pagamento::on_buttonBox_accepted()
     query.bindValue(":valor6", QString::number(portugues.toFloat(troco)));
     query.bindValue(":valor7", QString::number(portugues.toFloat(taxa)));
     query.bindValue(":valor8", QString::number(portugues.toFloat(valor_final)));
+    query.bindValue(":valor9", QString::number(portugues.toFloat(desconto)));
 
     QString idVenda;
     if (query.exec()) {

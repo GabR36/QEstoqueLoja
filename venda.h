@@ -8,6 +8,7 @@
 #include "vendas.h"
 #include <QItemSelection>
 #include "mainwindow.h"
+#include <QLocale>
 
 namespace Ui {
 class venda;
@@ -24,6 +25,7 @@ public:
     explicit venda(QWidget *parent = nullptr);
     ~venda();
     QString Total();
+    QLocale portugues;
 
 
 private slots:

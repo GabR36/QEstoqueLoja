@@ -57,53 +57,54 @@ void pagamento::on_buttonBox_accepted()
     QString forma_pagamento = ui->CBox_FormaPagamento->currentText();
     QString taxa = ui->Ledit_Taxa->text();
     QString valor_final = ui->Lbl_TotalTaxa->text();
+    QString desconto = ui->Ledit_Desconto->text();
 
-    // se a forma de pagamento não for dinheiro atribua o valor total para
-    // o valor recebido e 0 para o troco
-    if (ui->CBox_FormaPagamento->currentIndex() != 0){
-        troco = "0";
-        recebido = totalGlobal;
+    // validar line edits
+
+    // desconto
+    bool conversionOkDesconto;
+    // tentar converter para float e ser menor ou igual ao valor total
+    bool menorQueTotal = portugues.toFloat(desconto, &conversionOkDesconto) <= portugues.toFloat(totalGlobal);
+    if (!menorQueTotal){
+        conversionOkDesconto = false;
     }
-    else {
-        // a forma é dinheiro e precisa verificar o input do valor recebido
-        qDebug() << "forma dinheiro, validar valor recebido";
-        qDebug() << recebido;
-        bool conversionOkRecebido;
-        // testar se o recebido consegue ser converido em float e se é maior ou igual ao total
-        bool maiorQueTotal = portugues.toFloat(recebido, &conversionOkRecebido) >= portugues.toFloat(totalGlobal);
-        if (!maiorQueTotal){
-            // caso não seja maior ou igual que o total avalie como erro.
-            conversionOkRecebido = false;
-        }
-        qDebug() << conversionOkRecebido;
-        if (!conversionOkRecebido){
-            // algo deu errado na conversao, recebido nao validado
-            // inserir mensagem de erro e impedir insersao de venda
-            QMessageBox::warning(this, "Erro", "Por favor, insira um valor recebido válido.");
-            return;
-        }
+    if (!conversionOkDesconto){
+        // algo deu errado na conversao, desconto nao validado
+        // inserir mensagem de erro e impedir insersao de venda
+        QMessageBox::warning(this, "Erro", "Por favor, insira um desconto válido.");
+        return;
     }
 
-    // se a forma de pagamento não for credito ou débito atribua o valor da taxa para
-    // zero e o valor final para o total dos produtos
-    if (ui->CBox_FormaPagamento->currentIndex() != 2 && ui->CBox_FormaPagamento->currentIndex() != 3){
-        taxa = "0";
-        valor_final = totalGlobal;
+    // recebido
+    qDebug() << "validar valor recebido";
+    qDebug() << recebido;
+    bool conversionOkRecebido;
+    // testar se o recebido consegue ser convertido em float e se é maior ou igual ao total
+    bool maiorQueTotal = portugues.toFloat(recebido, &conversionOkRecebido) >= portugues.toFloat(totalGlobal);
+    if (!maiorQueTotal){
+        // caso não seja maior ou igual que o total avalie como erro.
+        conversionOkRecebido = false;
     }
-    else{
-        // a forma de pagamento é crédito ou débito
-        qDebug() << "forma crédito/débito, validar taxa";
-        qDebug() << recebido;
-        bool conversionOkTaxa;
-        // testar se a taxa consegue ser converido em float
-        portugues.toFloat(taxa, &conversionOkTaxa);
-        qDebug() << conversionOkTaxa;
-        if (!conversionOkTaxa){
-            // algo deu errado na conversao, troco nao validado
-            // inserir mensagem de erro e impedir insersao de venda
-            QMessageBox::warning(this, "Erro", "Por favor, insira uma taxa válida.");
-            return;
-        }
+    qDebug() << conversionOkRecebido;
+    if (!conversionOkRecebido){
+        // algo deu errado na conversao, recebido nao validado
+        // inserir mensagem de erro e impedir insersao de venda
+        QMessageBox::warning(this, "Erro", "Por favor, insira um valor recebido válido.");
+        return;
+    }
+
+    // taxa
+    qDebug() << "validar taxa";
+    qDebug() << recebido;
+    bool conversionOkTaxa;
+    // testar se a taxa consegue ser converido em float
+    portugues.toFloat(taxa, &conversionOkTaxa);
+    qDebug() << conversionOkTaxa;
+    if (!conversionOkTaxa){
+        // algo deu errado na conversao, troco nao validado
+        // inserir mensagem de erro e impedir insersao de venda
+        QMessageBox::warning(this, "Erro", "Por favor, insira uma taxa válida.");
+        return;
     }
 
     query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco, taxa, valor_final) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, :valor8)");

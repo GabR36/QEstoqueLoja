@@ -160,10 +160,9 @@ void pagamento::on_buttonBox_accepted()
 void pagamento::on_Ledit_Recebido_textChanged(const QString &arg1)
 {
     QString dinRecebido = ui->Ledit_Recebido->text();
-    dinRecebido.replace(',', '.');
-    float troco = dinRecebido.toFloat() - totalGlobal.toFloat();
+    float troco = portugues.toFloat(dinRecebido) - portugues.toFloat(totalGlobal);
 
-    ui->Lbl_Troco->setText(QString::number(troco, 'f', 2));
+    ui->Lbl_Troco->setText(portugues.toString(troco));
 
 }
 
@@ -225,11 +224,20 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
 
 void pagamento::on_Ledit_Taxa_textChanged(const QString &arg1)
 {
-    // calcular e mostrar valor a pagar apos as taxas conforme
-    // digita a taxa
     QString novaTaxa = ui->Ledit_Taxa->text();
-    novaTaxa.replace(',', '.');
-    float totalTaxa = totalGlobal.toFloat() * (1 + novaTaxa.toFloat()/100);
-    ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa, 'f', 2));
+    QString desconto = ui->Ledit_Desconto->text();
+    ui->Lbl_TotalTaxa->setText(portugues.toString(obterValorFinal(novaTaxa, desconto)));
+}
+
+float pagamento::obterValorFinal(QString taxa, QString desconto){
+    float valorFinal = portugues.toFloat(totalGlobal) * (1 + portugues.toFloat(taxa)/100) - portugues.toFloat(desconto);
+    return valorFinal;
+}
+
+void pagamento::on_Ledit_Desconto_textChanged(const QString &arg1)
+{
+    QString novaTaxa = ui->Ledit_Taxa->text();
+    QString desconto = ui->Ledit_Desconto->text();
+    ui->Lbl_TotalTaxa->setText(portugues.toString(obterValorFinal(novaTaxa, desconto)));
 }
 

@@ -26,10 +26,13 @@ set(PROJECT_SOURCES
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Imagens/QEstoqueLOja/AppIcon.rc")
+
+
     qt_add_executable(QEstoqueLoja
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-
+        ${APP_ICON_RESOURCE_WINDOWS}
         alterarproduto.h alterarproduto.cpp alterarproduto.ui
 
         vendas.h vendas.cpp vendas.ui
@@ -38,6 +41,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         relatorios.h relatorios.cpp relatorios.ui
         pagamento.h pagamento.cpp pagamento.ui
         customdelegate.h customdelegate.cpp
+
+
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET QEstoqueLoja APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -53,8 +58,10 @@ else()
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
+        set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Imagens/QEstoqueLOja/AppIcon.rc")
         add_executable(QEstoqueLoja
             ${PROJECT_SOURCES}
+            ${APP_ICON_RESOURCE_WINDOWS}
         )
     endif()
 

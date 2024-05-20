@@ -75,9 +75,9 @@ background-color:rgb(170, 170, 170);
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>41</x>
-     <y>191</y>
-     <width>226</width>
+     <x>40</x>
+     <y>190</y>
+     <width>236</width>
      <height>28</height>
     </rect>
    </property>
@@ -218,8 +218,8 @@ background-color:rgb(170, 170, 170);
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>41</x>
-     <y>225</y>
+     <x>40</x>
+     <y>360</y>
      <width>271</width>
      <height>28</height>
     </rect>
@@ -240,8 +240,8 @@ background-color:rgb(170, 170, 170);
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>41</x>
-     <y>259</y>
+     <x>40</x>
+     <y>400</y>
      <width>201</width>
      <height>39</height>
     </rect>
@@ -272,7 +272,7 @@ background-color:rgb(170, 170, 170);
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>390</y>
+     <y>310</y>
      <width>250</width>
      <height>39</height>
     </rect>
@@ -302,8 +302,8 @@ background-color:rgb(170, 170, 170);
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
-     <x>41</x>
-     <y>304</y>
+     <x>40</x>
+     <y>270</y>
      <width>165</width>
      <height>28</height>
     </rect>
@@ -321,11 +321,11 @@ background-color:rgb(170, 170, 170);
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>340</y>
+     <y>230</y>
      <width>195</width>
      <height>28</height>
     </rect>

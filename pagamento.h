@@ -37,6 +37,7 @@ private slots:
 private:
     Ui::pagamento *ui;
     float obterValorFinal(QString taxa, QString desconto);
+    void descontoTaxa();
 };
 
 #endif // PAGAMENTO_H

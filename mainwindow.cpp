@@ -13,6 +13,7 @@
 #include <QDoubleValidator>
 #include "relatorios.h"
 #include "venda.h"
+#include <QIntValidator>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -52,7 +53,7 @@ MainWindow::MainWindow(QWidget *parent)
         }
     }
 
-    query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2), forma_pagamento VARCHAR(20), valor_recebido DECIMAL(10,2), troco DECIMAL(10,2), taxa DECIMAL(10,2),valor_final DECIMAL(10,2))");
+    query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2), forma_pagamento VARCHAR(20), valor_recebido DECIMAL(10,2), troco DECIMAL(10,2), taxa DECIMAL(10,2),valor_final DECIMAL(10,2), desconto DECIMAL(10,2))");
     if (query.isActive()) {
         qDebug() << "Tabela de vendas2 criada com sucesso!";
     } else {
@@ -105,6 +106,14 @@ MainWindow::MainWindow(QWidget *parent)
         else {
             qDebug() << "Erro ao adicionar coluna valor_final";
         }
+        // colocar coluna desconto nao presente nas versoes anteriores
+        query.exec("ALTER TABLE vendas2 ADD COLUMN desconto DECIMAL(10,2)");
+        if (query.isActive()){
+            qDebug() << "coluna desconto adicionada com sucesso!";
+        }
+        else {
+            qDebug() << "Erro ao adicionar coluna desconto";
+        }
     }
 
     query.exec("CREATE TABLE produtos_vendidos (id INTEGER PRIMARY KEY AUTOINCREMENT, id_produto INTEGER, id_venda INTEGER, quantidade INTEGER, preco_vendido DECIMAL(10,2), FOREIGN KEY (id_produto) REFERENCES produtos(id), FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
@@ -140,7 +149,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Btn_Pesquisa->setIcon(QIcon(":/QEstoqueLOja/search.png"));
     ui->Btn_Relatorios->setIcon(QIcon(":/QEstoqueLOja/monitoring.svg"));
 
-
+    // validadores para os campos
+    QDoubleValidator *DoubleValidador = new QDoubleValidator();
+    QIntValidator *IntValidador = new QIntValidator();
+    ui->Ledit_Preco->setValidator(DoubleValidador);
+    ui->Ledit_Quantidade->setValidator(IntValidador);
 }
 
 MainWindow::~MainWindow()
@@ -167,19 +180,21 @@ void MainWindow::on_Btn_Enviar_clicked()
     barrasProduto = ui->Ledit_Barras->text();
     nfProduto = ui->Check_Nf->isChecked();
 
-    // Substitua ',' por '.' se necessário
-    precoProduto.replace(',', '.');
-
     // Converta o texto para um número
     bool conversionOk;
     bool conversionOkQuant;
-    double price = precoProduto.toDouble(&conversionOk);
-    quantidadeProduto.toInt(&conversionOkQuant);
+    double price = portugues.toDouble(precoProduto, &conversionOk);
+    qDebug() << price;
+    // quantidade precisa ser transformada com ponto para ser armazenada no db
+    quantidadeProduto = QString::number(portugues.toInt(quantidadeProduto, &conversionOkQuant));
 
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
     if (conversionOk && price >= 0)
     {
         if (conversionOkQuant){
+            // guardar no banco de dados o valor notado em local da linguagem
+            precoProduto = QString::number(price, 'f', 2);
+            qDebug() << precoProduto;
             // verificar se o codigo de barras ja existe
             if (!verificarCodigoBarras()){
                 // adicionar ao banco de dados
@@ -211,9 +226,10 @@ void MainWindow::on_Btn_Enviar_clicked()
                 ui->Ledit_Barras->setFocus();
             }
         }
-        else{
-            QMessageBox::warning(this, "Erro", "Por favor, insira uma quantidade válida.");
-            ui->Ledit_Quantidade->clear();
+        else {
+            // a quantidade é invalida
+            QMessageBox::warning(this, "Erro", "Por favor, insira uma quantiade válida.");
+            ui->Ledit_Quantidade->setFocus();
         }
     }
     else
@@ -303,7 +319,7 @@ void MainWindow::on_Btn_Alterar_clicked()
     QString productId = idVariant.toString();
     QString productQuant = quantVariant.toString();
     QString productDesc = descVariant.toString();
-    QString productPreco = precoVariant.toString();
+    QString productPreco = portugues.toString(precoVariant.toFloat());
     QString productBarras = barrasVariant.toString();
     bool productNf = nfVariant.toBool();
     qDebug() << productId;

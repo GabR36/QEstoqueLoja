@@ -3,6 +3,8 @@
 #include "mainwindow.h"
 #include "QSqlQuery"
 #include <QMessageBox>
+#include <QDoubleValidator>
+#include <QIntValidator>
 
 AlterarProduto::AlterarProduto(QWidget *parent) :
     QDialog(parent),
@@ -10,6 +12,11 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    // validadores para os campos
+    QDoubleValidator *DoubleValidador = new QDoubleValidator();
+    QIntValidator *IntValidador = new QIntValidator();
+    ui->Ledit_AltPreco->setValidator(DoubleValidador);
+    ui->Ledit_AltQuant->setValidator(IntValidador);
 }
 
 AlterarProduto::~AlterarProduto()
@@ -38,14 +45,10 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
     QString barras = ui->Ledit_AltBarras->text();
     bool nf = ui->Check_AltNf->isChecked();
 
-    // Substitua ',' por '.' se necessário
-    preco.replace(',', '.');
-
     // Converta o texto para um número
-    bool conversionOk;
-    bool conversionOkQuant;
-    double price = preco.toDouble(&conversionOk);
-    quant.toInt(&conversionOkQuant);
+    bool conversionOk, conversionOkQuant;
+    double price = portugues.toDouble(preco, &conversionOk);
+    quant = QString::number(portugues.toInt(quant, &conversionOkQuant));
 
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
     if (conversionOk && price >= 0)
@@ -80,12 +83,12 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
                                      "Preço: " + precoAlt + "\n"
                                      "Código de Barras: " + barrasAlt + "\n"
                                       "NF: " + nfAltString  + "\n\n"
-                                      "Para: \n\n"
-                                      "Descrição: " + desc + "\n"
+                                        "Para: \n\n"
+                                        "Descrição: " + desc + "\n"
                                  "Quantidade: " + quant + "\n"
                                   "Preço: " + preco + "\n"
                                   "Código de Barras: " + barras + "\n"
-                                    "NF: " + nfString + "\n\n",
+                                   "NF: " + nfString + "\n\n",
                     QMessageBox::Yes | QMessageBox::No
                     );
                 // Verifica a resposta do usuário
@@ -95,7 +98,8 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
                         qDebug() << "erro ao abrir banco de dados. botao alterar->aceitar.";
                     }
                     QSqlQuery query;
-
+                    // precisa colocar o preco com ponto para decimal, no banco de dados
+                    preco = QString::number(price, 'f', 2);
                     query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4, codigo_barras = :valor5, nf = :valor6 WHERE id = :valor1");
                     query.bindValue(":valor1", idAlt);
                     query.bindValue(":valor2", quant);
@@ -122,8 +126,11 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
             }
         }
         else {
-            QMessageBox::warning(this, "Erro", "Por favor, insira uma quantidade válida.");
+            // a quantidade é invalida
+            QMessageBox::warning(this, "Erro", "Por favor, insira uma quantiade válida.");
+            ui->Ledit_AltQuant->setFocus();
         }
+
     }
     else
     {

@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "venda.h"
+#include <QLocale>
 
 namespace Ui {
 class pagamento;
@@ -20,6 +21,7 @@ public:
     QString dataGlobal;
     QList<QList<QVariant>> rowDataList;
     QString totalGlobal;
+    QLocale portugues;
 
 private slots:
     void on_buttonBox_accepted();
@@ -30,8 +32,12 @@ private slots:
 
     void on_Ledit_Taxa_textChanged(const QString &arg1);
 
+    void on_Ledit_Desconto_textChanged(const QString &arg1);
+
 private:
     Ui::pagamento *ui;
+    float obterValorFinal(QString taxa, QString desconto);
+    void descontoTaxa();
 };
 
 #endif // PAGAMENTO_H

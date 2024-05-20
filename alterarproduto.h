@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "mainwindow.h"
+#include <QLocale>
 
 namespace Ui {
 class AlterarProduto;
@@ -23,6 +24,7 @@ public:
     explicit AlterarProduto(QWidget *parent = nullptr);
     ~AlterarProduto();
     void TrazerInfo(QString desc, QString quant, QString preco, QString barras, bool nf);
+    QLocale portugues;
 
 private slots:
     void on_Btn_AltAceitar_accepted();

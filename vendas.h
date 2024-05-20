@@ -6,6 +6,7 @@
 #include <QSqlQueryModel>
 #include <QItemSelection>
 #include "mainwindow.h"
+#include <QLocale>
 
 namespace Ui {
 class Vendas;
@@ -21,6 +22,7 @@ public:
     explicit Vendas(QWidget *parent = nullptr);
     ~Vendas();
     void atualizarTabelas();
+    QLocale portugues;
 
 private slots:
     void on_Btn_InserirVenda_clicked();

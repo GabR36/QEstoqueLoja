@@ -19,16 +19,22 @@ pagamento::pagamento(QString total, QString cliente, QString data, QWidget *pare
 
     ui->Ledit_Recebido->setFocus();
 
-    // esconder os campos nao relativos a forma dinheiro (taxa e valor apos taxa)
+    // esconder os campos nao relativos a forma dinheiro (taxa)
     ui->label_8->hide();
     ui->Ledit_Taxa->hide();
-    ui->label_10->hide();
-    ui->Lbl_TotalTaxa->hide();
+
+    // valores padrao
+    ui->Ledit_Recebido->setText(totalGlobal);
+    ui->Lbl_Troco->setText("0");
+    ui->Ledit_Desconto->setText("0");
+    ui->Ledit_Taxa->setText("0");
+    ui->Lbl_TotalTaxa->setText(totalGlobal);
 
     // validador
     QDoubleValidator *validador = new QDoubleValidator();
     ui->Ledit_Taxa->setValidator(validador);
     ui->Ledit_Recebido->setValidator(validador);
+    ui->Ledit_Desconto->setValidator(validador);
 }
 
 pagamento::~pagamento()
@@ -51,68 +57,75 @@ void pagamento::on_buttonBox_accepted()
     QString forma_pagamento = ui->CBox_FormaPagamento->currentText();
     QString taxa = ui->Ledit_Taxa->text();
     QString valor_final = ui->Lbl_TotalTaxa->text();
+    QString desconto = ui->Ledit_Desconto->text();
 
-    // se a forma de pagamento não for dinheiro atribua o valor total para
-    // o valor recebido e 0 para o troco
-    if (ui->CBox_FormaPagamento->currentIndex() != 0){
-        troco = "0";
-        recebido = totalGlobal;
+    // validar line edits
+
+    // desconto
+    bool conversionOkDesconto;
+    // tentar converter para float e ser menor ou igual ao valor final
+    qDebug() << "validar valor desconto";
+    qDebug() << desconto;
+    bool menorQueTotal = portugues.toFloat(desconto, &conversionOkDesconto) <= portugues.toFloat(totalGlobal);
+    qDebug() << conversionOkDesconto;
+    if (!menorQueTotal){
+        conversionOkDesconto = false;
     }
-    else {
-        // a forma é dinheiro e precisa verificar o input do valor recebido
-        qDebug() << "forma dinheiro, validar valor recebido";
-        recebido.replace(',', '.');
-        qDebug() << recebido;
-        bool conversionOkRecebido;
-        // testar se o recebido consegue ser converido em float e se é maior ou igual ao total
-        bool maiorQueTotal = recebido.toFloat(&conversionOkRecebido) >= totalGlobal.toFloat();
-        if (!maiorQueTotal){
-            // caso não seja maior ou igual que o total avalie como erro.
-            conversionOkRecebido = false;
-        }
-        qDebug() << conversionOkRecebido;
-        if (!conversionOkRecebido){
-            // algo deu errado na conversao, recebido nao validado
-            // inserir mensagem de erro e impedir insersao de venda
-            QMessageBox::warning(this, "Erro", "Por favor, insira um valor recebido válido.");
-            return;
-        }
+    qDebug() << conversionOkDesconto;
+    if (!conversionOkDesconto){
+        // algo deu errado na conversao, desconto nao validado
+        // inserir mensagem de erro e impedir insersao de venda
+        QMessageBox::warning(this, "Erro", "Por favor, insira um desconto válido.");
+        return;
     }
 
-    // se a forma de pagamento não for credito ou débito atribua o valor da taxa para
-    // zero e o valor final para o total dos produtos
-    if (ui->CBox_FormaPagamento->currentIndex() != 2 && ui->CBox_FormaPagamento->currentIndex() != 3){
-        taxa = "0";
-        valor_final = totalGlobal;
+    // recebido
+    qDebug() << "validar valor recebido";
+    qDebug() << recebido;
+    bool conversionOkRecebido;
+    // testar se o recebido consegue ser convertido em float e se é maior ou igual ao valor final
+    bool maiorQueTotal = portugues.toFloat(recebido, &conversionOkRecebido) >= portugues.toFloat(valor_final);
+    qDebug() << conversionOkRecebido;
+    if (!maiorQueTotal){
+        // caso não seja maior ou igual que o total avalie como erro.
+        conversionOkRecebido = false;
     }
-    else{
-        // a forma de pagamento é crédito ou débito
-        qDebug() << "forma crédito/débito, validar taxa";
-        taxa.replace(',', '.');
-        qDebug() << recebido;
-        bool conversionOkTaxa;
-        // testar se a taxa consegue ser converido em float
-        taxa.toFloat(&conversionOkTaxa);
-        qDebug() << conversionOkTaxa;
-        if (!conversionOkTaxa){
-            // algo deu errado na conversao, troco nao validado
-            // inserir mensagem de erro e impedir insersao de venda
-            QMessageBox::warning(this, "Erro", "Por favor, insira uma taxa válida.");
-            return;
-        }
+    qDebug() << conversionOkRecebido;
+    if (!conversionOkRecebido){
+        // algo deu errado na conversao, recebido nao validado
+        // inserir mensagem de erro e impedir insersao de venda
+        QMessageBox::warning(this, "Erro", "Por favor, insira um valor recebido válido.");
+        return;
     }
 
-    query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco, taxa, valor_final) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, :valor8)");
+    // taxa
+    qDebug() << "validar taxa";
+    qDebug() << recebido;
+    bool conversionOkTaxa;
+    // testar se a taxa consegue ser converido em float
+    portugues.toFloat(taxa, &conversionOkTaxa);
+    qDebug() << conversionOkTaxa;
+    if (!conversionOkTaxa){
+        // algo deu errado na conversao, troco nao validado
+        // inserir mensagem de erro e impedir insersao de venda
+        QMessageBox::warning(this, "Erro", "Por favor, insira uma taxa válida.");
+        return;
+    }
+
+    query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco, taxa, valor_final, desconto) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, :valor8, :valor9)");
     query.bindValue(":valor1", clienteGlobal);
-    query.bindValue(":valor2", totalGlobal);
+    // precisa converter para notacao usa para inserir no banco de dados
+    query.bindValue(":valor2", QString::number(portugues.toFloat(totalGlobal)));
     // inserir a data do dateedit
     query.bindValue(":valor3", dataGlobal);
     //
     query.bindValue(":valor4", forma_pagamento);
-    query.bindValue(":valor5", recebido);
-    query.bindValue(":valor6", troco);
-    query.bindValue(":valor7", taxa);
-    query.bindValue(":valor8", valor_final);
+    // precisa converter para notacao usa para inserir no banco de dados
+    query.bindValue(":valor5", QString::number(portugues.toFloat(recebido), 'f', 2));
+    query.bindValue(":valor6", QString::number(portugues.toFloat(troco), 'f', 2));
+    query.bindValue(":valor7", QString::number(portugues.toFloat(taxa), 'f', 2));
+    query.bindValue(":valor8", QString::number(portugues.toFloat(valor_final), 'f', 2));
+    query.bindValue(":valor9", QString::number(portugues.toFloat(desconto), 'f', 2));
 
     QString idVenda;
     if (query.exec()) {
@@ -127,8 +140,9 @@ void pagamento::on_buttonBox_accepted()
     for (const QList<QVariant> &rowdata : rowDataList) {
         query.prepare("INSERT INTO produtos_vendidos (id_produto, quantidade, preco_vendido, id_venda) VALUES (:valor1, :valor2, :valor3, :valor4)");
         query.bindValue(":valor1", rowdata[0]);
-        query.bindValue(":valor2", rowdata[1]);
-        query.bindValue(":valor3", rowdata[3]);
+        // precisa converter para notacao usa para inserir no banco de dados
+        query.bindValue(":valor2", QString::number(portugues.toInt(rowdata[1].toString())));
+        query.bindValue(":valor3", QString::number(portugues.toFloat(rowdata[3].toString()), 'f', 2));
         query.bindValue(":valor4", idVenda);
         if (query.exec()) {
             qDebug() << "Inserção prod_vendidos bem-sucedida!";
@@ -137,7 +151,8 @@ void pagamento::on_buttonBox_accepted()
         }
         query.prepare("UPDATE produtos SET quantidade = quantidade - :valor2 WHERE id = :valor1");
         query.bindValue(":valor1", rowdata[0]);
-        query.bindValue(":valor2", rowdata[1]);
+        // precisa converter para notacao usa para inserir no banco de dados
+        query.bindValue(":valor2", QString::number(portugues.toInt(rowdata[1].toString())));
         if (query.exec()) {
             qDebug() << "update quantidade bem-sucedida!";
         } else {
@@ -157,10 +172,10 @@ void pagamento::on_buttonBox_accepted()
 void pagamento::on_Ledit_Recebido_textChanged(const QString &arg1)
 {
     QString dinRecebido = ui->Ledit_Recebido->text();
-    dinRecebido.replace(',', '.');
-    float troco = dinRecebido.toFloat() - totalGlobal.toFloat();
+    QString valorFinal = ui->Lbl_TotalTaxa->text();
+    float troco = portugues.toFloat(dinRecebido) - portugues.toFloat(valorFinal);
 
-    ui->Lbl_Troco->setText(QString::number(troco, 'f', 2));
+    ui->Lbl_Troco->setText(portugues.toString(troco, 'f', 2));
 
 }
 
@@ -171,7 +186,6 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
     // a depender da forma dinheiro ser selecionada
     QString taxaDebito  = "3";
     QString taxaCredito = "4";
-    float totalTaxa;
     switch (index) {
     case 0:
         // dinheiro
@@ -181,8 +195,13 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Recebido->show();
         ui->label_8->hide();
         ui->Ledit_Taxa->hide();
-        ui->label_10->hide();
-        ui->Lbl_TotalTaxa->hide();
+
+        // valores padrao
+        ui->Ledit_Recebido->setText(totalGlobal);
+        ui->Lbl_Troco->setText("0");
+        ui->Ledit_Desconto->setText("0");
+        ui->Ledit_Taxa->setText("0");
+        ui->Lbl_TotalTaxa->setText(totalGlobal);
         break;
     case 2:
         // credito
@@ -192,12 +211,13 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Recebido->hide();
         ui->label_8->show();
         ui->Ledit_Taxa->show();
-        ui->label_10->show();
-        ui->Lbl_TotalTaxa->show();
 
+        // valores padrao
+        ui->Ledit_Recebido->setText(totalGlobal);
+        ui->Lbl_Troco->setText("0");
+        ui->Ledit_Desconto->setText("0");
         ui->Ledit_Taxa->setText(taxaCredito);
-        totalTaxa = totalGlobal.toFloat() * (1 + taxaCredito.toFloat()/100);
-        ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa, 'f', 2));
+        ui->Lbl_TotalTaxa->setText(portugues.toString(obterValorFinal(taxaCredito, "0"), 'f', 2));
         break;
     case 3:
         // debito
@@ -207,12 +227,13 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Recebido->hide();
         ui->label_8->show();
         ui->Ledit_Taxa->show();
-        ui->label_10->show();
-        ui->Lbl_TotalTaxa->show();
 
+        // valores padrao
+        ui->Ledit_Recebido->setText(totalGlobal);
+        ui->Lbl_Troco->setText("0");
+        ui->Ledit_Desconto->setText("0");
         ui->Ledit_Taxa->setText(taxaDebito);
-        totalTaxa = totalGlobal.toFloat() * (1 + taxaDebito.toFloat()/100);
-        ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa, 'f', 2));
+        ui->Lbl_TotalTaxa->setText(portugues.toString(obterValorFinal(taxaDebito, "0"), 'f', 2));
         break;
     default:
         ui->Lbl_Troco->hide();
@@ -221,8 +242,13 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Recebido->hide();
         ui->label_8->hide();
         ui->Ledit_Taxa->hide();
-        ui->label_10->hide();
-        ui->Lbl_TotalTaxa->hide();
+
+        // valores padrao
+        ui->Ledit_Recebido->setText(totalGlobal);
+        ui->Lbl_Troco->setText("0");
+        ui->Ledit_Desconto->setText("0");
+        ui->Ledit_Taxa->setText("0");
+        ui->Lbl_TotalTaxa->setText(totalGlobal);
         break;
     }
 }
@@ -230,11 +256,32 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
 
 void pagamento::on_Ledit_Taxa_textChanged(const QString &arg1)
 {
-    // calcular e mostrar valor a pagar apos as taxas conforme
-    // digita a taxa
+    descontoTaxa();
+}
+
+float pagamento::obterValorFinal(QString taxa, QString desconto){
+    float valorFinal = (portugues.toFloat(totalGlobal) - portugues.toFloat(desconto)) * (1 + portugues.toFloat(taxa)/100);
+    return valorFinal;
+}
+
+void pagamento::on_Ledit_Desconto_textChanged(const QString &arg1)
+{
+    descontoTaxa();
+}
+
+void pagamento::descontoTaxa(){
     QString novaTaxa = ui->Ledit_Taxa->text();
-    novaTaxa.replace(',', '.');
-    float totalTaxa = totalGlobal.toFloat() * (1 + novaTaxa.toFloat()/100);
-    ui->Lbl_TotalTaxa->setText(QString::number(totalTaxa, 'f', 2));
+    QString desconto = ui->Ledit_Desconto->text();
+    QString valorFinal = portugues.toString(obterValorFinal(novaTaxa, desconto), 'f', 2);
+    ui->Lbl_TotalTaxa->setText(valorFinal);
+    // o valor final influencia os campos recebido, portanto modificacoes nele devem afetar
+    // os campos influenciados por ele
+
+    // o valor recebido deve ser o mesmo que o valor final, pois ao alterar o valor final
+    // o dinheiro recebido não será mais o mesmo do valor final anterior
+    ui->Ledit_Recebido->setText(valorFinal);
+
+    // o troco será zero portanto
+    ui->Lbl_Troco->setText("0");
 }
 

@@ -6,6 +6,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QSqlQueryModel>
+#include "customdelegate.h"
 #include "alterarproduto.h"
 #include "QItemSelectionModel"
 #include <qsqltablemodel.h>
@@ -130,6 +131,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
     atualizarTableview();
+    ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(43, 132, 191)");
     QSqlDatabase::database().close();
     //
     ui->Ledit_Barras->setFocus();
@@ -161,12 +163,16 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
 void MainWindow::atualizarTableview(){
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. atualizarTableView";
     }
+    CustomDelegate *delegate = new CustomDelegate(this);
+    ui->Tview_Produtos->setItemDelegate(delegate);
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC");
     ui->Tview_Produtos->setModel(model);
+    ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: red;"); // n funcionando
     db.close();
 }
 

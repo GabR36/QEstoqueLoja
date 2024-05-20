@@ -129,6 +129,12 @@ background-color:rgb(170, 170, 170);
      <height>161</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">background-color:rgb(170, 170, 170);
+font: 700 9pt &quot;Segoe UI&quot;;
+font-size: 15px;
+</string>
+   </property>
    <property name="frameShape">
     <enum>QFrame::StyledPanel</enum>
    </property>
@@ -153,7 +159,7 @@ background-color:rgb(170, 170, 170);
      <rect>
       <x>20</x>
       <y>50</y>
-      <width>161</width>
+      <width>191</width>
       <height>74</height>
      </rect>
     </property>

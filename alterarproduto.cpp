@@ -99,7 +99,7 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
                     }
                     QSqlQuery query;
                     // precisa colocar o preco com ponto para decimal, no banco de dados
-                    preco = QString::number(price);
+                    preco = QString::number(price, 'f', 2);
                     query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4, codigo_barras = :valor5, nf = :valor6 WHERE id = :valor1");
                     query.bindValue(":valor1", idAlt);
                     query.bindValue(":valor2", quant);

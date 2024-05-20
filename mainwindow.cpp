@@ -193,7 +193,7 @@ void MainWindow::on_Btn_Enviar_clicked()
     {
         if (conversionOkQuant){
             // guardar no banco de dados o valor notado em local da linguagem
-            precoProduto = QString::number(price);
+            precoProduto = QString::number(price, 'f', 2);
             qDebug() << precoProduto;
             // verificar se o codigo de barras ja existe
             if (!verificarCodigoBarras()){

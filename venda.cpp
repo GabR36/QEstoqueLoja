@@ -274,5 +274,5 @@ QString venda::Total(){
         totalValue += quantidade * preco;
     }
     // total notacao br
-    return portugues.toString(totalValue);
+    return portugues.toString(totalValue, 'f', 2);
 }

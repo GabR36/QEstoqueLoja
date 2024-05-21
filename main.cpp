@@ -3,14 +3,14 @@
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
-#include <qguiapplication.h>
+// #include <qguiapplication.h>
 #include <qicon.h>
 
 int main(int argc, char *argv[])
 {
 
-    QGuiApplication app(argc, argv);
-    QGuiApplication::setWindowIcon(QIcon(":/QEstoqueLOja/QeLogo.png"));
+    // QGuiApplication app(argc, argv);
+    // QGuiApplication::setWindowIcon(QIcon(":/QEstoqueLOja/QeLogo.png"));
 
 
     QApplication a(argc, argv);

@@ -1,4 +1,4 @@
-#include "CustomDelegate.h"
+#include "customdelegate.h"
 #include <QPainter>
 
 CustomDelegate::CustomDelegate(QObject *parent) : QStyledItemDelegate(parent) {}

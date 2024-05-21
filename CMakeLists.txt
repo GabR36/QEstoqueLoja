@@ -25,14 +25,19 @@ set(PROJECT_SOURCES
         ${TS_FILES}
 )
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+if(WIN32)
     set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Imagens/QEstoqueLOja/AppIcon.rc")
+       list(APPEND PROJECT_SOURCES ${APP_ICON_RESOURCE_WINDOWS})
+endif()
+
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    #set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Imagens/QEstoqueLOja/AppIcon.rc")
 
 
     qt_add_executable(QEstoqueLoja
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        ${APP_ICON_RESOURCE_WINDOWS}
+        #${APP_ICON_RESOURCE_WINDOWS}
         alterarproduto.h alterarproduto.cpp alterarproduto.ui
 
         vendas.h vendas.cpp vendas.ui
@@ -51,17 +56,19 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
     qt_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 else()
+
     if(ANDROID)
         add_library(QEstoqueLoja SHARED
             ${PROJECT_SOURCES}
         )
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+
     else()
-        set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Imagens/QEstoqueLOja/AppIcon.rc")
+        #set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Imagens/QEstoqueLOja/AppIcon.rc")
         add_executable(QEstoqueLoja
             ${PROJECT_SOURCES}
-            ${APP_ICON_RESOURCE_WINDOWS}
+            #${APP_ICON_RESOURCE_WINDOWS}
         )
     endif()
 

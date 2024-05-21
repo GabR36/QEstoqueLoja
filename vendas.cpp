@@ -12,6 +12,9 @@ Vendas::Vendas(QWidget *parent) :
 {
     ui->setupUi(this);
     atualizarTabelas();
+    ui->Tview_Vendas2->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
+    ui->Tview_ProdutosVendidos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
+
     // Selecionar a primeira linha das tabelas
     QModelIndex firstIndex = modeloVendas2->index(0, 0);
     ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);

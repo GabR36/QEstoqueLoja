@@ -130,8 +130,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
+    ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     atualizarTableview();
-    ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(43, 132, 191)");
     QSqlDatabase::database().close();
     //
     ui->Ledit_Barras->setFocus();
@@ -172,7 +172,6 @@ void MainWindow::atualizarTableview(){
     ui->Tview_Produtos->setItemDelegate(delegate);
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC");
     ui->Tview_Produtos->setModel(model);
-    ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: red;"); // n funcionando
     db.close();
 }
 

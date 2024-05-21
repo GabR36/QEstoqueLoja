@@ -1,5 +1,6 @@
 #include "venda.h"
 #include "ui_venda.h"
+#include "customdelegate.h"
 #include <QSqlQueryModel>
 #include <QSqlQuery>
 #include <QStandardItemModel>
@@ -20,6 +21,9 @@ venda::venda(QWidget *parent) :
     }
     modeloProdutos->setQuery("SELECT * FROM produtos");
     ui->Tview_Produtos->setModel(modeloProdutos);
+    CustomDelegate *delegate = new CustomDelegate(this);
+    ui->Tview_Produtos->setItemDelegate(delegate);
+    ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     db.close();
     modeloSelecionados.setHorizontalHeaderItem(0, new QStandardItem("ID_Produto"));
     modeloSelecionados.setHorizontalHeaderItem(1, new QStandardItem("Quantidade_Vendida"));
@@ -110,6 +114,8 @@ void venda::on_Btn_Pesquisa_clicked()
         qDebug() << "erro ao abrir banco de dados. botao pesquisar.";
     }
     modeloProdutos->setQuery("SELECT * FROM produtos WHERE descricao LIKE '%" + pesquisa + "%'");
+    CustomDelegate *delegate = new CustomDelegate(this);
+    ui->Tview_Produtos->setItemDelegate(delegate);
     ui->Tview_Produtos->setModel(modeloProdutos);
     QSqlDatabase::database().close();
 }

@@ -146,7 +146,7 @@ font-size: 15px;
      <rect>
       <x>110</x>
       <y>10</y>
-      <width>58</width>
+      <width>71</width>
       <height>18</height>
      </rect>
     </property>
@@ -348,6 +348,25 @@ font-size: 15px;
      <widget class="QLineEdit" name="Ledit_Desconto"/>
     </item>
    </layout>
+  </widget>
+  <widget class="QCheckBox" name="CheckImprimirCNF">
+   <property name="geometry">
+    <rect>
+     <x>420</x>
+     <y>420</y>
+     <width>121</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Imprimir cupom </string>
+   </property>
+   <property name="tristate">
+    <bool>false</bool>
+   </property>
   </widget>
  </widget>
  <resources/>

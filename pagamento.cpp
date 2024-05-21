@@ -1,5 +1,8 @@
 #include "pagamento.h"
 #include "ui_pagamento.h"
+#include <QPainter>
+#include <QPrinter>
+#include <QPrintDialog>
 #include <QSqlQuery>
 #include <QMessageBox>
 #include <QDoubleValidator>
@@ -158,10 +161,34 @@ void pagamento::on_buttonBox_accepted()
         } else {
             qDebug() << "Erro na update quantidade: ";
         }
+
     }
+    if(ui->CheckImprimirCNF->isChecked()){
+        QPrinter printer;
+        printer.setPageOrientation(QPageLayout::Portrait);
+        printer.setPageSize(QPageSize::A4); // Tamanho do papel
+        printer.setFullPage(true); // Utilizar toda a página
+        QPrintDialog dialog(&printer, this);
+        if(dialog.exec() == QDialog::Rejected) return;
+
+        QPainter painter;
+        painter.begin(&printer);
+        painter.drawText(printer.pageLayout().paintRectPixels(printer.resolution()), Qt::AlignCenter,
+                         "Cupom Venda\n\nLoja:\nCliente:");
+        // painter.drawText(printer.pageLayout().paintRectPixels(printer.resolution()), Qt::AlignCenter,
+        //                  valor4);
+
+
+
+        //"Cliente: Cliente XYZ\n\nItem 1: Produto A - R$100,00\nItem 2: Produto B - R$50,00\n\nTotal: R$150,00\nImpostos: R$20,00");
+
+        //Desenhar o conteúdo da nota fiscal
+    }
+
     janelaVenda->db.close();
     janelaVenda->janelaVenda->atualizarTabelas();
     janelaVenda->janelaPrincipal->atualizarTableview();
+
 
     // fechar as janelas
     this->close();

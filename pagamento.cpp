@@ -173,16 +173,24 @@ void pagamento::on_buttonBox_accepted()
 
         QPainter painter;
         painter.begin(&printer);
-        painter.drawText(printer.pageLayout().paintRectPixels(printer.resolution()), Qt::AlignCenter,
-                         "Cupom Venda\n\nLoja:\nCliente:");
-        // painter.drawText(printer.pageLayout().paintRectPixels(printer.resolution()), Qt::AlignCenter,
-        //                  valor4);
+        int yPos = 100; // Posição inicial para começar a desenhar o texto
+        painter.drawText(20, yPos, "Cupom Compra Venda\n\nLoja:\n");
+        yPos += 50; // Avança a posição y
+        painter.drawText(20, yPos, "Data: " + dataGlobal);
+        yPos += 20;
+        painter.drawText(20, yPos, "Cliente: " + clienteGlobal + "\n\n");
+        yPos += 40;
+        painter.drawText(20, yPos, "Produtos vendidos:\n");
+        yPos += 20;
 
+        for (const QList<QVariant> &rowdata : rowDataList) {
+            QString idProduto = rowdata[0].toString();
+            QString valorProduto = rowdata[3].toString();
+            painter.drawText(20, yPos, "ID: " + idProduto + " - Valor: R$" + valorProduto);
+            yPos += 20; // Avança a posição y para a próxima linha
+        }
 
-
-        //"Cliente: Cliente XYZ\n\nItem 1: Produto A - R$100,00\nItem 2: Produto B - R$50,00\n\nTotal: R$150,00\nImpostos: R$20,00");
-
-        //Desenhar o conteúdo da nota fiscal
+        painter.end();
     }
 
     janelaVenda->db.close();

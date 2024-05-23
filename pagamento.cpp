@@ -227,7 +227,12 @@ void pagamento::on_buttonBox_accepted()
              QRect rectValor(700, yPos, pageWidth, lineHeight * 2);
             painter.drawText(rectValor, valorProduto,textOption);
             yPos += 30;
+
         }
+        xPos = 600;
+        painter.drawText(xPos,yPos, "Desconto: " + desconto);
+        yPos += 20;
+        painter.drawText(xPos,yPos, "Valor Total: " + totalGlobal);
 
         painter.end();
     }

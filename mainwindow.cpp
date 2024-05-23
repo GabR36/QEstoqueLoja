@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     // criar banco de dados e tabela se não foi ainda.
+
     db.setDatabaseName("estoque.db");
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";

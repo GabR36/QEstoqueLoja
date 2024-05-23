@@ -174,20 +174,59 @@ void pagamento::on_buttonBox_accepted()
         QPainter painter;
         painter.begin(&printer);
         int yPos = 100; // Posição inicial para começar a desenhar o texto
-        painter.drawText(20, yPos, "Cupom Compra Venda\n\nLoja:\n");
-        yPos += 50; // Avança a posição y
-        painter.drawText(20, yPos, "Data: " + dataGlobal);
+        int xPos = 80;
+        const int yPosPrm = 100; // Posição inicial para começar a desenhar o texto
+        const int xPosPrm = 80;
+        painter.setFont(QFont("Arial", 10, QFont::Bold));
+        painter.drawText(Qt::AlignCenter, yPos, "Cupom Compra Venda");
+        yPos += 100; // Avança a posição y
+        painter.drawText(xPos, yPos, "Loja: ");
+        yPos += 70;
+        painter.drawText(xPos, yPos, "Data/Hora: " + dataGlobal);
         yPos += 20;
-        painter.drawText(20, yPos, "Cliente: " + clienteGlobal + "\n\n");
-        yPos += 40;
-        painter.drawText(20, yPos, "Produtos vendidos:\n");
+        painter.drawText(xPos, yPos, "Cliente: " + clienteGlobal);
+        yPos += 20;
+        painter.drawText(xPos, yPos, "Quant:");
+        xPos = 150;
+        painter.drawText(xPos, yPos, "Produtos vendidos:");
+        xPos = 700;
+        painter.drawText(xPos, yPos, "Valor:(R$)");
         yPos += 20;
 
+
+        painter.setFont(QFont("Arial", 10));
+        int lineHeight = 20; // Altura da linha
+        int pageWidth = printer.pageLayout().paintRectPixels(printer.resolution()).width();
         for (const QList<QVariant> &rowdata : rowDataList) {
             QString idProduto = rowdata[0].toString();
             QString valorProduto = rowdata[3].toString();
-            painter.drawText(20, yPos, "ID: " + idProduto + " - Valor: R$" + valorProduto);
-            yPos += 20; // Avança a posição y para a próxima linha
+            QString quantidadProduto = rowdata[1].toString();
+
+            // Consultar a descrição do produto no banco de dados
+            QSqlQuery queryProduto;
+            queryProduto.prepare("SELECT descricao FROM produtos WHERE id = :idProduto");
+            queryProduto.bindValue(":idProduto", idProduto);
+            QString descricaoProduto = "Descrição não encontrada";
+            if (queryProduto.exec()) {
+                if (queryProduto.next()) {
+                    descricaoProduto = queryProduto.value(0).toString();
+                }
+            } else {
+                qDebug() << "Erro ao buscar descrição do produto: ";
+            }
+            QTextOption textOption;
+            QRect rectQuantProd(xPosPrm,yPos, 50 ,lineHeight * 2 );
+            painter.drawText(rectQuantProd, quantidadProduto, textOption);
+
+
+            QString descprod =descricaoProduto;
+            QRect rectDesc(150, yPos, pageWidth - 300, lineHeight * 2); // Definir um retângulo para o texto
+
+            textOption.setWrapMode(QTextOption::WordWrap);
+            painter.drawText(rectDesc, descprod, textOption);
+             QRect rectValor(700, yPos, pageWidth, lineHeight * 2);
+            painter.drawText(rectValor, valorProduto,textOption);
+            yPos += 30;
         }
 
         painter.end();

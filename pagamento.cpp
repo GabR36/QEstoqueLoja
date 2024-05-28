@@ -231,11 +231,11 @@ void pagamento::on_buttonBox_accepted()
             QRect rectQuantProd(xPosPrm,yPos, xPosProds ,lineHeight * 2 );
             painter.drawText(rectQuantProd, quantidadProduto, textOption);
 
-            QRect rectDesc(xPosProds, yPos, pageWidth - 200, lineHeight * 2); // Definir um retângulo para o texto
+            QRect rectDesc(xPosProds, yPos, pageWidth - 100, lineHeight * 2); // Definir um retângulo para o texto
 
             textOption.setWrapMode(QTextOption::WordWrap);
             painter.drawText(rectDesc, descricaoProduto, textOption);
-             QRect rectValor(xPosValor, yPos, pageWidth, lineHeight * 2);
+             QRect rectValor(xPosValor + 30, yPos, pageWidth, lineHeight * 2);
             painter.drawText(rectValor, valorProduto,textOption);
             yPos += 30;
 
@@ -252,18 +252,41 @@ void pagamento::on_buttonBox_accepted()
         xPos = 150;
         painter.drawText(xPos,yPos, "Desconto(R$): " + desconto);
         yPos += 20;
-        painter.drawText(xPos,yPos, "Valor Total(R$): " + totalGlobal);
+        painter.drawText(xPos,yPos, "Forma Pagamento: " + forma_pagamento);
         yPos += 20;
-        painter.drawText(xPos, yPos, "Valor Recebido(R$):" + recebido);
+        painter.drawText(xPos,yPos, "Valor Total Produtos(R$): " + totalGlobal);
         yPos += 20;
-        painter.drawText(xPos,yPos, "Troco(R$):" + troco);
+        switch (ui->CBox_FormaPagamento->currentIndex()){
+        case 0: //dinehiro
+            painter.drawText(xPos, yPos, "Valor Recebido(R$):" + recebido);
+            yPos += 20;
+            painter.drawText(xPos,yPos, "Troco(R$):" + troco);
+            break;
+        case 1: //nsei
+            break;
+        case 2: //credito
+            painter.drawText(xPos, yPos, "Taxa(%):" + taxa);
+            yPos += 20;
+            painter.drawText(xPos, yPos, "Valor Final(%):" + valor_final);
+            break;
+        case 3: //debito
+            painter.drawText(xPos, yPos, "Taxa(%):" + taxa);
+            yPos += 20;
+            painter.drawText(xPos, yPos, "Valor Final(%):" + valor_final);
+            break;
+        case 4: //pix
+            break;
+
+        default: break;
+        };
         yPos += 20;
         painter.drawText(xPosPrm, yPos, "Assinatura:" );
         yPos += 50;
-        for(int i=0; i < 200; i++){
-            posx += 3;
-            painter.drawText(posx,yPos, "-");
-        };
+         painter.drawText(xPosPrm, yPos, "Obrigado Pela Compra Volte Sempre!" );
+        yPos += 30;
+
+        painter.drawText(xPosPrm,yPos, "--");
+
 
         qDebug() << printer.pageLayout().pageSize();
         painter.end();

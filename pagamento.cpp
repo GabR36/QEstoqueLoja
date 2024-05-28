@@ -165,36 +165,49 @@ void pagamento::on_buttonBox_accepted()
     }
     if(ui->CheckImprimirCNF->isChecked()){
         QPrinter printer;
-        printer.setPageOrientation(QPageLayout::Portrait);
-        printer.setPageSize(QPageSize::A4); // Tamanho do papel
-        printer.setFullPage(true); // Utilizar toda a página
+        //printer.setPageOrientation(QPageLayout::Portrait);
+        QSizeF customSize(80,297); // 204x842pt
+
+        // customPageSize(customSize, QPageSize::Millimeter, "Customdasads");
+        printer.setPageSize(QPageSize(QSizeF(80, 2000), QPageSize::Millimeter));// Tamanho do papel
+       // printer.pageLayout().setPageSize(customPageSize);
+        printer.setFullPage(true); // Utilizar toda a página        QPrintDialog dialog(&printer, this);
+
         QPrintDialog dialog(&printer, this);
         if(dialog.exec() == QDialog::Rejected) return;
 
         QPainter painter;
         painter.begin(&printer);
+        QFont font = painter.font();
+        font.setPointSize(8);
+        font.setBold(true);
+        painter.setFont(font);
         int yPos = 100; // Posição inicial para começar a desenhar o texto
-        int xPos = 80;
-        const int yPosPrm = 100; // Posição inicial para começar a desenhar o texto
-        const int xPosPrm = 80;
-        painter.setFont(QFont("Arial", 10, QFont::Bold));
-        painter.drawText(Qt::AlignCenter, yPos, "Cupom Compra Venda");
-        yPos += 100; // Avança a posição y
+        int xPos = 0;
+        const int yPosPrm = 10; // Posição inicial para começar a desenhar o texto
+        const int xPosPrm = 10;
+      //  painter.setFont(QFont("Arial", 10, QFont::Bold));
+        painter.drawText(95, 20, "Cupom Compra Venda");
+        yPos += 20; // Avança a posição y
         painter.drawText(xPos, yPos, "Loja: ");
-        yPos += 70;
+        yPos += 50;
         painter.drawText(xPos, yPos, "Data/Hora: " + dataGlobal);
         yPos += 20;
         painter.drawText(xPos, yPos, "Cliente: " + clienteGlobal);
-        yPos += 20;
+        yPos += 30;
         painter.drawText(xPos, yPos, "Quant:");
-        xPos = 150;
+        int xPosProds = 45;
+        xPos = xPosProds;
         painter.drawText(xPos, yPos, "Produtos vendidos:");
-        xPos = 700;
-        painter.drawText(xPos, yPos, "Valor:(R$)");
+        int xPosValor = 202;
+        xPos = xPosValor;
+        painter.drawText(xPos, yPos, "ValorUn(R$):");
         yPos += 20;
 
-
-        painter.setFont(QFont("Arial", 10));
+        font.setPointSize(8);
+        font.setBold(false);
+        painter.setFont(font);
+        //painter.setFont(QFont("Arial", 10));
         int lineHeight = 20; // Altura da linha
         int pageWidth = printer.pageLayout().paintRectPixels(printer.resolution()).width();
         for (const QList<QVariant> &rowdata : rowDataList) {
@@ -215,25 +228,44 @@ void pagamento::on_buttonBox_accepted()
                 qDebug() << "Erro ao buscar descrição do produto: ";
             }
             QTextOption textOption;
-            QRect rectQuantProd(xPosPrm,yPos, 50 ,lineHeight * 2 );
+            QRect rectQuantProd(xPosPrm,yPos, xPosProds ,lineHeight * 2 );
             painter.drawText(rectQuantProd, quantidadProduto, textOption);
 
-
-            QString descprod =descricaoProduto;
-            QRect rectDesc(150, yPos, pageWidth - 300, lineHeight * 2); // Definir um retângulo para o texto
+            QRect rectDesc(xPosProds, yPos, pageWidth - 200, lineHeight * 2); // Definir um retângulo para o texto
 
             textOption.setWrapMode(QTextOption::WordWrap);
-            painter.drawText(rectDesc, descprod, textOption);
-             QRect rectValor(700, yPos, pageWidth, lineHeight * 2);
+            painter.drawText(rectDesc, descricaoProduto, textOption);
+             QRect rectValor(xPosValor, yPos, pageWidth, lineHeight * 2);
             painter.drawText(rectValor, valorProduto,textOption);
             yPos += 30;
 
         }
-        xPos = 600;
-        painter.drawText(xPos,yPos, "Desconto: " + desconto);
+        int posx = xPosPrm;
+        for(int i=0; i < pageWidth; i++){
+            posx += 3;
+        painter.drawText(posx,yPos, "=");
+        };
+        font.setBold(true);
+        painter.setFont(font);
+         yPos += 20;
+    //    painter.drawText(Qt::AlignCenter,yPos, "Pagamento");
+        xPos = 150;
+        painter.drawText(xPos,yPos, "Desconto(R$): " + desconto);
         yPos += 20;
-        painter.drawText(xPos,yPos, "Valor Total: " + totalGlobal);
+        painter.drawText(xPos,yPos, "Valor Total(R$): " + totalGlobal);
+        yPos += 20;
+        painter.drawText(xPos, yPos, "Valor Recebido(R$):" + recebido);
+        yPos += 20;
+        painter.drawText(xPos,yPos, "Troco(R$):" + troco);
+        yPos += 20;
+        painter.drawText(xPosPrm, yPos, "Assinatura:" );
+        yPos += 50;
+        for(int i=0; i < 200; i++){
+            posx += 3;
+            painter.drawText(posx,yPos, "-");
+        };
 
+        qDebug() << printer.pageLayout().pageSize();
         painter.end();
     }
 

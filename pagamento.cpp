@@ -249,7 +249,7 @@ void pagamento::on_buttonBox_accepted()
         painter.setFont(font);
          yPos += 20;
     //    painter.drawText(Qt::AlignCenter,yPos, "Pagamento");
-        xPos = 150;
+        xPos = 95;
         painter.drawText(xPos,yPos, "Desconto(R$): " + desconto);
         yPos += 20;
         painter.drawText(xPos,yPos, "Forma Pagamento: " + forma_pagamento);

@@ -26,21 +26,14 @@ public:
 
 private slots:
     void on_Btn_InserirVenda_clicked();
+
     void handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected);
-
-    void on_CBox_Mes_activated(int index);
-
-    void on_CBox_Dia_activated(int index);
-
-    void on_CBox_Ano_activated(int index);
 
     void on_Btn_DeletarVenda_clicked();
 
 private:
     void LabelLucro();
     void LabelLucro(QString whereQuery);
-    void queryCBox (int indexAno, int indexMes, int indexDia);
-    QMap<QString, int> mapaMeses;
     QSqlQueryModel *modeloProdVendidos = new QSqlQueryModel;
     QSqlQueryModel *modeloVendas2 = new QSqlQueryModel;
     Ui::Vendas *ui;

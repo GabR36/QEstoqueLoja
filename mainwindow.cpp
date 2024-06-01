@@ -32,7 +32,7 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "erro ao abrir banco de dados.";
     }
     QSqlQuery query;
-    query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2), codigo_barras VARCHAR(20) UNIQUE, nf BOOLEAN)");
+    query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2), codigo_barras VARCHAR(20), nf BOOLEAN)");
     if (query.isActive()) {
         qDebug() << "Tabela criada com sucesso!";
     } else {

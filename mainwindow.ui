@@ -84,7 +84,8 @@ background-color:rgb(170, 170, 170);
     </property>
     <property name="styleSheet">
      <string notr="true">
-  border: 2px solid;</string>
+
+</string>
     </property>
     <property name="selectionMode">
      <enum>QAbstractItemView::SingleSelection</enum>
@@ -405,7 +406,7 @@ background-color:rgb(03,75,119);
      <x>0</x>
      <y>0</y>
      <width>1069</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuGerarrelat_rios">

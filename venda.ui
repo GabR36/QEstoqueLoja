@@ -313,8 +313,7 @@ background-color:rgb(170, 170, 170);
       <item>
        <widget class="QLabel" name="label_6">
         <property name="styleSheet">
-         <string notr="true">
-color: rgb(237, 51, 59);</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>Código de barras:</string>

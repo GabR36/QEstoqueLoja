@@ -83,9 +83,7 @@ background-color:rgb(170, 170, 170);
      <bool>false</bool>
     </property>
     <property name="styleSheet">
-     <string notr="true">
-
-</string>
+     <string notr="true"/>
     </property>
     <property name="selectionMode">
      <enum>QAbstractItemView::SingleSelection</enum>
@@ -171,7 +169,7 @@ background-color:rgb(170, 170, 170);
         <item>
          <widget class="QLabel" name="label_2">
           <property name="text">
-           <string>descrição: </string>
+           <string>Descrição: </string>
           </property>
          </widget>
         </item>
@@ -185,7 +183,7 @@ background-color:rgb(170, 170, 170);
         <item>
          <widget class="QLabel" name="Lbl_Quantidade">
           <property name="text">
-           <string>quantidade:</string>
+           <string>Quantidade:</string>
           </property>
          </widget>
         </item>
@@ -406,7 +404,7 @@ background-color:rgb(03,75,119);
      <x>0</x>
      <y>0</y>
      <width>1069</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuGerarrelat_rios">
@@ -454,7 +452,7 @@ background-color:rgb(03,75,119);
     <string>Realizar Venda</string>
    </property>
    <property name="shortcut">
-    <string>F1</string>
+    <string>F5</string>
    </property>
   </action>
  </widget>

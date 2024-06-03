@@ -11,15 +11,15 @@ Vendas::Vendas(QWidget *parent) :
     ui(new Ui::Vendas)
 {
     ui->setupUi(this);
-    atualizarTabelas();
+
     ui->Tview_Vendas2->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     ui->Tview_ProdutosVendidos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
+    atualizarTabelas();
 
     // Selecionar a primeira linha das tabelas
     QModelIndex firstIndex = modeloVendas2->index(0, 0);
     ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
     QModelIndex firstIndex2 = modeloProdVendidos->index(0, 0);
-    ui->Tview_ProdutosVendidos->selectionModel()->select(firstIndex2, QItemSelectionModel::Select);
     // Obter o modelo de seleção da tabela
     QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
     // Conectar o sinal de seleção ao slot personalizado
@@ -72,7 +72,7 @@ Vendas::Vendas(QWidget *parent) :
     qDebug() << anos;
     qDebug() << dias;
     qDebug() << meses;
-
+    ui->Tview_Vendas2->setCurrentIndex(ui->Tview_Vendas2->model()->index(0,0));
     // adicionar meses ao seletor de mes combobox
     // transformar os numeros de mes em nomes de meses
     mapaMeses = {
@@ -109,7 +109,10 @@ Vendas::Vendas(QWidget *parent) :
     // colocar valores nos labels de lucro etc
     LabelLucro();
     //
+
     db.close();
+
+
 }
 
 Vendas::~Vendas()
@@ -132,9 +135,14 @@ void Vendas::atualizarTabelas(){
     }
     modeloVendas2->setQuery("SELECT * FROM vendas2 ORDER BY id DESC");
     ui->Tview_Vendas2->setModel(modeloVendas2);
+
+
     modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
     ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
+
     db.close();
+    ui->Tview_Vendas2->setCurrentIndex(ui->Tview_Vendas2->model()->index(1,0));
+
 }
 
 

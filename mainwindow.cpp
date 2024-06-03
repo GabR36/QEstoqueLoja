@@ -142,9 +142,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     // ajustar tamanho colunas
     // coluna descricao
-    ui->Tview_Produtos->setColumnWidth(2, 200);
+    ui->Tview_Produtos->setColumnWidth(2, 350);
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
+    ui->Tview_Produtos->setColumnWidth(4,110);
 
     ui->Btn_Venda->setIcon(QIcon(":/QEstoqueLOja/shopping.png"));
     ui->Btn_Alterar->setIcon(QIcon(":/QEstoqueLOja/rebase.png"));

@@ -27,97 +27,30 @@ MainWindow::MainWindow(QWidget *parent)
 
     // criar banco de dados e tabela se não foi ainda.
 
+    // verificar versao do esquema de banco de dados e aplicar as atualizacoes
+    // necessárias
+
     db.setDatabaseName("estoque.db");
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";
     }
+
+    // criar a versao 0 se o banco de dados estiver vazio
+
     QSqlQuery query;
+
     query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2), codigo_barras VARCHAR(20), nf BOOLEAN)");
     if (query.isActive()) {
-        qDebug() << "Tabela criada com sucesso!";
+        qDebug() << "Tabela produtos criada com sucesso!";
     } else {
-        qDebug() << "Erro ao criar tabela: ";
-        // colocar coluna do codigo de barras nao presente nas versoes anteriores
-        query.exec("ALTER TABLE produtos ADD COLUMN codigo_barras VARCHAR(20)");
-        if (query.isActive()){
-            qDebug() << "coluna codigo barras adicionada com sucesso!";
-        }
-        else {
-            qDebug() << "Erro ao adicionar coluna codigo barras";
-        }
-        // colocar coluna do nf nao presente nas versoes anteriores
-        query.exec("ALTER TABLE produtos ADD COLUMN nf BOOLEAN");
-        if (query.isActive()){
-            qDebug() << "coluna nf adicionada com sucesso!";
-        }
-        else {
-            qDebug() << "Erro ao adicionar coluna nf";
-        }
+        qDebug() << "Erro ao criar tabela produtos";
     }
-
-    query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2), forma_pagamento VARCHAR(20), valor_recebido DECIMAL(10,2), troco DECIMAL(10,2), taxa DECIMAL(10,2),valor_final DECIMAL(10,2), desconto DECIMAL(10,2))");
+    query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2))");
     if (query.isActive()) {
         qDebug() << "Tabela de vendas2 criada com sucesso!";
     } else {
         qDebug() << "Erro ao criar tabela de vendas2: ";
-        // colocar coluna forma_pagamento nao presente nas versoes anteriores
-        query.exec("ALTER TABLE vendas2 ADD COLUMN forma_pagamento VARCHAR(20)");
-        if (query.isActive()){
-            qDebug() << "coluna forma_pagamento adicionada com sucesso!";
-        }
-        else {
-            qDebug() << "Erro ao adicionar coluna forma_pagamento";
-        }
-        // colocar coluna valor_recebido nao presente nas versoes anteriores
-        query.exec("ALTER TABLE vendas2 ADD COLUMN valor_recebido DECIMAL(10,2)");
-        if (query.isActive()){
-            qDebug() << "coluna valor_recbido adicionada com sucesso!";
-        }
-        else {
-            qDebug() << "Erro ao adicionar coluna valor_recebido";
-        }
-        // colocar coluna forma_pagamento nao presente nas versoes anteriores
-        query.exec("ALTER TABLE vendas2 ADD COLUMN forma_pagamento VARCHAR(20)");
-        if (query.isActive()){
-            qDebug() << "coluna forma_pagamento adicionada com sucesso!";
-        }
-        else {
-            qDebug() << "Erro ao adicionar coluna forma_pagamento";
-        }
-        // colocar coluna troco nao presente nas versoes anteriores
-        query.exec("ALTER TABLE vendas2 ADD COLUMN troco DECIMAL(10,2)");
-        if (query.isActive()){
-            qDebug() << "coluna troco adicionada com sucesso!";
-        }
-        else {
-            qDebug() << "Erro ao adicionar coluna troco";
-        }
-        // colocar coluna taxa nao presente nas versoes anteriores
-        query.exec("ALTER TABLE vendas2 ADD COLUMN taxa DECIMAL(10,2)");
-        if (query.isActive()){
-            qDebug() << "coluna taxa adicionada com sucesso!";
-        }
-        else {
-            qDebug() << "Erro ao adicionar coluna taxa";
-        }
-        // colocar coluna valor_final nao presente nas versoes anteriores
-        query.exec("ALTER TABLE vendas2 ADD COLUMN valor_final DECIMAL(10,2)");
-        if (query.isActive()){
-            qDebug() << "coluna valor_final adicionada com sucesso!";
-        }
-        else {
-            qDebug() << "Erro ao adicionar coluna valor_final";
-        }
-        // colocar coluna desconto nao presente nas versoes anteriores
-        query.exec("ALTER TABLE vendas2 ADD COLUMN desconto DECIMAL(10,2)");
-        if (query.isActive()){
-            qDebug() << "coluna desconto adicionada com sucesso!";
-        }
-        else {
-            qDebug() << "Erro ao adicionar coluna desconto";
-        }
     }
-
     query.exec("CREATE TABLE produtos_vendidos (id INTEGER PRIMARY KEY AUTOINCREMENT, id_produto INTEGER, id_venda INTEGER, quantidade INTEGER, preco_vendido DECIMAL(10,2), FOREIGN KEY (id_produto) REFERENCES produtos(id), FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
     if (query.isActive()) {
         qDebug() << "Tabela de produtos_vendidos criada com sucesso!";
@@ -126,9 +59,55 @@ MainWindow::MainWindow(QWidget *parent)
     }
     qDebug() << db.tables();
 
+    // obter a versao do esquema do banco de dados
+    int dbSchemaVersion;
+    if (query.exec("PRAGMA user_version")) {
+        if (query.next()) {
+            dbSchemaVersion = query.value(0).toInt();
+        }
+    } else {
+        qDebug() << "Failed to execute PRAGMA user_version:";
+    }
+    query.finish();
+    qDebug() << dbSchemaVersion;
 
+    // a versão mais recente do esquema do banco de dados
+    int dbSchemaLastVersion = 1;
 
+    while (dbSchemaVersion < dbSchemaLastVersion){
+        // selecionar a atualizacao conforme a versao atual do banco de dados
+        switch (dbSchemaVersion) {
+        case 0:
+            // atualizar da versao 0 para a versao 1 do schema
 
+            // comecar transacao
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+            }
+
+            QSqlQuery query;
+
+            query.exec("ALTER TABLE vendas2 ADD COLUMN forma_pagamento VARCHAR(20)");
+            query.exec("ALTER TABLE vendas2 ADD COLUMN valor_recebido DECIMAL(10,2)");
+            query.exec("ALTER TABLE vendas2 ADD COLUMN troco DECIMAL(10,2)");
+            query.exec("ALTER TABLE vendas2 ADD COLUMN taxa DECIMAL(10,2)");
+            query.exec("ALTER TABLE vendas2 ADD COLUMN valor_final DECIMAL(10,2)");
+            query.exec("ALTER TABLE vendas2 ADD COLUMN desconto DECIMAL(10,2)");
+
+            // mudar a versao para 1
+            query.exec("PRAGMA user_version = 1");
+
+            // terminar transacao
+            if (!db.commit()) {
+                qDebug() << "Error: unable to commit transaction";
+                db.rollback(); // Desfaz a transação
+            }
+
+            dbSchemaVersion = 1;
+
+            break;
+        }
+    }
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");

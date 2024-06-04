@@ -56,6 +56,9 @@ Vendas::Vendas(QWidget *parent) :
     }
 
     qDebug() << dateRange;
+
+    ui->DateEdt_De->setDate(dateRange.first);
+    ui->DateEdt_Ate->setDate(dateRange.second);
 }
 
 Vendas::~Vendas()

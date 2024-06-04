@@ -6,6 +6,7 @@
 #include <QSqlQuery>
 #include <QMessageBox>
 #include <QDoubleValidator>
+#include <QDateTime>
 
 pagamento::pagamento(QString total, QString cliente, QString data, QWidget *parent)
     : QDialog(parent)
@@ -47,6 +48,7 @@ pagamento::~pagamento()
 
 void pagamento::on_buttonBox_accepted()
 {
+    QDateTime dataIngles = portugues.toDateTime(dataGlobal, "dd-MM-yyyy hh:mm:ss");
     // inserir a venda
 
     // adicionar ao banco de dados
@@ -120,7 +122,7 @@ void pagamento::on_buttonBox_accepted()
     // precisa converter para notacao usa para inserir no banco de dados
     query.bindValue(":valor2", QString::number(portugues.toFloat(totalGlobal)));
     // inserir a data do dateedit
-    query.bindValue(":valor3", dataGlobal);
+    query.bindValue(":valor3", dataIngles.toString("yyyy-MM-dd hh:mm:ss"));
     //
     query.bindValue(":valor4", forma_pagamento);
     // precisa converter para notacao usa para inserir no banco de dados

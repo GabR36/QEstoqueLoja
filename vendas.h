@@ -31,12 +31,17 @@ private slots:
 
     void on_Btn_DeletarVenda_clicked();
 
+    void on_DateEdt_De_dateChanged(const QDate &date);
+
+    void on_DateEdt_Ate_dateChanged(const QDate &date);
+
 private:
     void LabelLucro();
     void LabelLucro(QString whereQuery);
     QSqlQueryModel *modeloProdVendidos = new QSqlQueryModel;
     QSqlQueryModel *modeloVendas2 = new QSqlQueryModel;
     Ui::Vendas *ui;
+    void filtrarData(QString de, QString ate);
 };
 
 #endif // VENDAS_H

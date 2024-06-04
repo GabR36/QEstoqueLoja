@@ -54,11 +54,14 @@ Vendas::Vendas(QWidget *parent) :
     if (query.next()) {
         dateRange.second = query.value(0).toDate();
     }
+    query.finish();
 
     qDebug() << dateRange;
 
     ui->DateEdt_De->setDate(dateRange.first);
     ui->DateEdt_Ate->setDate(dateRange.second);
+
+    db.close();
 }
 
 Vendas::~Vendas()
@@ -112,7 +115,7 @@ void Vendas::LabelLucro(QString whereQuery){
     QSqlQuery query;
     float total = 0;
     int quantidadeVendas = 0;
-    if (query.exec("SELECT SUM(total) FROM vendas2 " + whereQuery)) {
+    if (query.exec("SELECT SUM(valor_final) FROM vendas2 " + whereQuery)) {
         while (query.next()) {
             total = query.value(0).toFloat();
         }
@@ -213,3 +216,35 @@ void Vendas::on_Btn_DeletarVenda_clicked()
         qDebug() << "A exclusão da venda foi cancelada.";
     }
 }
+
+void Vendas::on_DateEdt_De_dateChanged(const QDate &date)
+{
+    QString ate = ui->DateEdt_Ate->date().toString("yyyy-MM-dd");
+    // precisa adicionar um dia para ele contar o dia todo
+    QString de = date.addDays(1).toString("yyyy-MM-dd");
+    qDebug() << de;
+    qDebug() << ate;
+    filtrarData(de, ate);
+}
+
+
+void Vendas::on_DateEdt_Ate_dateChanged(const QDate &date)
+{
+    QString de = ui->DateEdt_De->date().toString("yyyy-MM-dd");
+    // precisa adicionar um dia para ele contar o dia todo
+    QString ate = date.addDays(1).toString("yyyy-MM-dd");
+    qDebug() << de;
+    qDebug() << ate;
+    filtrarData(de, ate);
+}
+
+void Vendas::filtrarData(QString de, QString ate){
+    QString whereQuery = QString("WHERE data_hora BETWEEN '%1' AND '%2'").arg(de, ate);
+    LabelLucro(whereQuery);
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. filtrarData";
+    }
+    modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery + " ORDER BY id DESC");
+    db.close();
+}
+

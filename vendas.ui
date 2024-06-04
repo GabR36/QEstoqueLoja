@@ -6,9 +6,30 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>653</width>
-    <height>465</height>
+    <width>650</width>
+    <height>456</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>650</width>
+    <height>456</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>650</width>
+    <height>456</height>
+   </size>
+  </property>
+  <property name="acceptDrops">
+   <bool>false</bool>
   </property>
   <property name="windowTitle">
    <string>Vendas - QEstoqueLoja</string>
@@ -245,8 +266,27 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
      <x>20</x>
      <y>383</y>
      <width>151</width>
-     <height>41</height>
+     <height>51</height>
     </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">#Btn_InserirVenda{
+background-color: rgb(33, 105, 149);
+}
+#Btn_InserirVenda:hover{
+background-color:rgb(03,75,119);
+}
+#Btn_InserirVenda:pressed{
+
+	background-color: rgb(153, 193, 241);
+
+}</string>
    </property>
    <property name="text">
     <string>Inserir Venda</string>

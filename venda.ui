@@ -2,18 +2,33 @@
 <ui version="4.0">
  <class>venda</class>
  <widget class="QDialog" name="venda">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>769</width>
+    <width>768</width>
     <height>574</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="minimumSize">
    <size>
-    <width>10</width>
-    <height>15</height>
+    <width>768</width>
+    <height>574</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>768</width>
+    <height>574</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -120,11 +135,24 @@ background-color:rgb(170, 170, 170);
   <widget class="QPushButton" name="Btn_Aceitar">
    <property name="geometry">
     <rect>
-     <x>570</x>
-     <y>530</y>
-     <width>161</width>
-     <height>26</height>
+     <x>550</x>
+     <y>525</y>
+     <width>191</width>
+     <height>41</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">#Btn_Aceitar{
+background-color: rgb(33, 105, 149);
+}
+#Btn_Aceitar:hover{
+background-color:rgb(03,75,119);
+}
+#Btn_Aceitar:pressed{
+
+	background-color: rgb(153, 193, 241);
+
+}</string>
    </property>
    <property name="text">
     <string>Próximo: Pagamento</string>
@@ -138,7 +166,7 @@ background-color:rgb(170, 170, 170);
     <rect>
      <x>30</x>
      <y>520</y>
-     <width>531</width>
+     <width>511</width>
      <height>39</height>
     </rect>
    </property>

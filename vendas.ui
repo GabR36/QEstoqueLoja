@@ -227,33 +227,55 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
     <rect>
      <x>20</x>
      <y>10</y>
-     <width>131</width>
+     <width>161</width>
      <height>131</height>
     </rect>
    </property>
    <property name="title">
     <string>Filtros</string>
    </property>
-   <widget class="QWidget" name="layoutWidget">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>111</width>
-      <height>94</height>
+      <width>132</width>
+      <height>88</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QComboBox" name="CBox_Ano"/>
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>Período considerado:</string>
+       </property>
+      </widget>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
-        <widget class="QComboBox" name="CBox_Mes"/>
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>De:</string>
+         </property>
+        </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="CBox_Dia"/>
+        <widget class="QDateEdit" name="DateEdt_De"/>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <item>
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Até:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDateEdit" name="DateEdt_Ate"/>
        </item>
       </layout>
      </item>

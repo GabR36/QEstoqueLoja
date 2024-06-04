@@ -256,7 +256,7 @@ void venda::on_Btn_Aceitar_clicked()
     if (!erro){
         // se nao tiver erro na validaçao, prossiga
         QString cliente = ui->Ledit_Cliente->text();
-        QString data = ui->DateEdt_Venda->dateTime().toString("dd-MM-yyyy HH:mm:ss");
+        QString data =  portugues.toString(ui->DateEdt_Venda->dateTime(), "dd-MM-yyyy hh:mm:ss");
 
         pagamento *JanelaPagamento = new pagamento(Total(), cliente, data);
         JanelaPagamento->janelaVenda = this;

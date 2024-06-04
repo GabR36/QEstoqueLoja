@@ -34,81 +34,31 @@ Vendas::Vendas(QWidget *parent) :
     // coluna quantidade
     ui->Tview_ProdutosVendidos->setColumnWidth(1, 85);
 
-    // adicionar items combobox com base nas datas disponiveis
-    QVector<QString> dias;
-    QVector<int> meses;
-    QVector<QString> anos;
+    // conectar banco de dados para consultar as datas mais antigas e mais novas das vendas
+    // para mostrar nos qdateedits
     if (!db.open()) {
-        qDebug() << "Erro ao abrir o banco de dados:";
+        qDebug() << "Error: Could not connect to database.";
     }
+
     QSqlQuery query;
-    if (query.exec("SELECT DISTINCT strftime('%d', data_hora) FROM vendas2")) {
-        // Iterar sobre os resultados
-        while (query.next()) {
-            QString dia = query.value(0).toString();
-            dias.push_back(dia);
-        }
-    } else {
-        qDebug() << "Erro ao executar a consulta:" << query.lastError().text();
-    }
-    if (query.exec("SELECT DISTINCT strftime('%m', data_hora) FROM vendas2")) {
-        // Iterar sobre os resultados
-        while (query.next()) {
-            int mes = query.value(0).toInt();
-            meses.push_back(mes);
-        }
-    } else {
-        qDebug() << "Erro ao executar a consulta:" << query.lastError().text();
-    }
-    if (query.exec("SELECT DISTINCT strftime('%Y', data_hora) FROM vendas2")) {
-        // Iterar sobre os resultados
-        while (query.next()) {
-            QString ano = query.value(0).toString();
-            anos.push_back(ano);
-        }
-    } else {
-        qDebug() << "Erro ao executar a consulta:" << query.lastError().text();
-    }
-    qDebug() << anos;
-    qDebug() << dias;
-    qDebug() << meses;
-    ui->Tview_Vendas2->setCurrentIndex(ui->Tview_Vendas2->model()->index(0,0));
-    // adicionar meses ao seletor de mes combobox
-    // transformar os numeros de mes em nomes de meses
-    mapaMeses = {
-        {"Janeiro", 1},
-        {"Fevereiro", 2},
-        {"Março", 3},
-        {"Abril", 4},
-        {"Maio", 5},
-        {"Junho", 6},
-        {"Julho", 7},
-        {"Agosto", 8},
-        {"Setembro", 9},
-        {"Outubro", 10},
-        {"Novembro", 11},
-        {"Dezembro", 12}
-    };
-    ui->CBox_Mes->addItem("Todos");
-    for(int mes : meses){
-            ui->CBox_Mes->addItem(mapaMeses.key(mes));
+    QPair<QDate, QDate> dateRange;
+    // data antiga
+    query.exec("SELECT MIN(data_hora) FROM vendas2");
+    if (query.next()) {
+        dateRange.first = query.value(0).toDate();
     }
 
-    // adicionar dias ao seletor de dias combobox
-    ui->CBox_Dia->addItem("Todos");
-    for(QString &dia : dias){
-        ui->CBox_Dia->addItem(dia);
+    // data nova
+    query.exec("SELECT MAX(data_hora) FROM vendas2");
+    if (query.next()) {
+        dateRange.second = query.value(0).toDate();
     }
+    query.finish();
 
-    // adicionar os anos ao seletor de anos combobox
-    ui->CBox_Ano->addItem("Todos");
-    for(QString &ano : anos){
-        ui->CBox_Ano->addItem(ano);
-    }
+    qDebug() << dateRange;
 
-    // colocar valores nos labels de lucro etc
-    LabelLucro();
-    //
+    ui->DateEdt_De->setDate(dateRange.first);
+    ui->DateEdt_Ate->setDate(dateRange.second);
 
     db.close();
 
@@ -163,102 +113,6 @@ void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSe
     db.close();
 }
 
-void Vendas::on_CBox_Mes_activated(int index)
-{
-    queryCBox(ui->CBox_Ano->currentIndex(), index, ui->CBox_Dia->currentIndex());
-}
-
-
-void Vendas::on_CBox_Dia_activated(int index)
-{
-    queryCBox(ui->CBox_Ano->currentIndex(), ui->CBox_Mes->currentIndex(), index);
-}
-
-
-void Vendas::on_CBox_Ano_activated(int index)
-{
-    queryCBox(index, ui->CBox_Mes->currentIndex(), ui->CBox_Dia->currentIndex());
-}
-
-void Vendas::queryCBox (int indexAno, int indexMes, int indexDia){
-    QString valorAno = ui->CBox_Ano->itemText(indexAno);
-    QString valorMes = QString::number(mapaMeses.value(ui->CBox_Mes->itemText(indexMes)));
-    QString valorDia = ui->CBox_Dia->itemText(indexDia);
-
-    qDebug() << "valores indexes ano, mes, dia";
-    qDebug() << valorAno;
-    qDebug() << valorMes;
-    qDebug() << valorDia;
-
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. cbox_activated";
-    }
-    QString whereQuery = "";
-    if (indexMes == 0 && indexDia == 0 && indexAno == 0){
-        // todos os seletores estao em 'todos'
-        modeloVendas2->setQuery("SELECT * FROM vendas2 ORDER BY id DESC");
-        LabelLucro();
-    }
-    else{
-        if (indexMes != 0 && indexDia != 0 && indexAno != 0){
-            // nenhum seletor esta em 'todos'
-            whereQuery = "WHERE strftime('%m', data_hora) = '" + valorMes + "' AND strftime('%d', data_hora) = '" + valorDia + "' AND strftime('%Y', data_hora) = '" + valorAno + "'";
-            modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery);
-            LabelLucro(whereQuery);
-        }
-        else{
-            if (indexMes == 0 && indexDia != 0 && indexAno != 0){
-                // so o mes esta com todos
-                whereQuery = "WHERE strftime('%d', data_hora) = '" + valorDia + "' AND strftime('%Y', data_hora) = '" + valorAno + "'";
-                modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery);
-                LabelLucro(whereQuery);
-            }
-            else {
-                if (indexMes == 0 && indexDia == 0 && indexAno != 0){
-                    // mes e dia estao com todos
-                    whereQuery = "WHERE strftime('%Y', data_hora) = '" + valorAno + "'";
-                    modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery);
-                    LabelLucro(whereQuery);
-                }
-                else{
-                    if (indexMes == 0 && indexDia != 0 && indexAno == 0){
-                        // mes e ano estao com todos
-                        whereQuery = "WHERE strftime('%d', data_hora) = '" + valorDia + "'";
-                        modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery);
-                        LabelLucro(whereQuery);
-                    }
-                    else{
-                        if (indexMes != 0 && indexDia == 0 && indexAno != 0){
-                            // apenas dia esta com todos
-                            whereQuery = "WHERE strftime('%m', data_hora) = '" + valorMes + "' AND strftime('%Y', data_hora) = '" + valorAno + "'";
-                            modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery);
-                            LabelLucro(whereQuery);
-                        }
-                        else{
-                            if (indexMes != 0 && indexDia == 0 && indexAno == 0){
-                                // dia e ano esta com todos
-                                whereQuery = "WHERE strftime('%m', data_hora) = '" + valorMes + "'";
-                                modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery);
-                                LabelLucro(whereQuery);
-                            }
-                            else {
-                                if (indexMes != 0 && indexDia != 0 && indexAno == 0){
-                                    // apenas ano esta com todos
-                                    whereQuery = "WHERE strftime('%m', data_hora) = '" + valorMes + "' AND strftime('%d', data_hora) = '" + valorDia + "'";
-                                    modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery);
-                                    LabelLucro(whereQuery);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    db.close();
-
-}
-
 void Vendas::LabelLucro(QString whereQuery){
     // colocar valores nos labels de lucro etc
     if(!db.open()){
@@ -267,7 +121,7 @@ void Vendas::LabelLucro(QString whereQuery){
     QSqlQuery query;
     float total = 0;
     int quantidadeVendas = 0;
-    if (query.exec("SELECT SUM(total) FROM vendas2 " + whereQuery)) {
+    if (query.exec("SELECT SUM(valor_final) FROM vendas2 " + whereQuery)) {
         while (query.next()) {
             total = query.value(0).toFloat();
         }
@@ -368,3 +222,35 @@ void Vendas::on_Btn_DeletarVenda_clicked()
         qDebug() << "A exclusão da venda foi cancelada.";
     }
 }
+
+void Vendas::on_DateEdt_De_dateChanged(const QDate &date)
+{
+    // precisa adicionar um dia para ele contar o dia todo
+    QString ate = ui->DateEdt_Ate->date().addDays(1).toString("yyyy-MM-dd");
+    QString de = date.toString("yyyy-MM-dd");
+    qDebug() << de;
+    qDebug() << ate;
+    filtrarData(de, ate);
+}
+
+
+void Vendas::on_DateEdt_Ate_dateChanged(const QDate &date)
+{
+    QString de = ui->DateEdt_De->date().toString("yyyy-MM-dd");
+    // precisa adicionar um dia para ele contar o dia todo
+    QString ate = date.addDays(1).toString("yyyy-MM-dd");
+    qDebug() << de;
+    qDebug() << ate;
+    filtrarData(de, ate);
+}
+
+void Vendas::filtrarData(QString de, QString ate){
+    QString whereQuery = QString("WHERE data_hora BETWEEN '%1' AND '%2'").arg(de, ate);
+    LabelLucro(whereQuery);
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. filtrarData";
+    }
+    modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery + " ORDER BY id DESC");
+    db.close();
+}
+

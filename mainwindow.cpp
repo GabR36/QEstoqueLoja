@@ -99,6 +99,13 @@ MainWindow::MainWindow(QWidget *parent)
                        "SET data_hora = strftime('%Y-%m-%d %H:%M:%S', substr(data_hora, 7, 4) || '-' || substr(data_hora, 4, 2) || '-' || substr(data_hora, 1, 2) || ' ' || substr(data_hora, 12, 8)) "
                        "WHERE substr(data_hora, 3, 1) = '-' AND substr(data_hora, 6, 1) = '-'");
 
+            // colocar valores nas novas colunas
+            query.exec("UPDATE vendas2 SET forma_pagamento = 'Não Sei', "
+                       "valor_recebido = total, "
+                       "troco = 0, taxa = 0, "
+                       "valor_final = total,"
+                       "desconto = 0");
+
             // mudar a versao para 1
             query.exec("PRAGMA user_version = 1");
 

@@ -94,6 +94,11 @@ MainWindow::MainWindow(QWidget *parent)
             query.exec("ALTER TABLE vendas2 ADD COLUMN valor_final DECIMAL(10,2)");
             query.exec("ALTER TABLE vendas2 ADD COLUMN desconto DECIMAL(10,2)");
 
+            // converter as datas no formato dd-MM-yyyy para yyyy-MM-dd
+            query.exec("UPDATE vendas2 "
+                       "SET data_hora = strftime('%Y-%m-%d %H:%M:%S', substr(data_hora, 7, 4) || '-' || substr(data_hora, 4, 2) || '-' || substr(data_hora, 1, 2) || ' ' || substr(data_hora, 12, 8)) "
+                       "WHERE substr(data_hora, 3, 1) = '-' AND substr(data_hora, 6, 1) = '-'");
+
             // mudar a versao para 1
             query.exec("PRAGMA user_version = 1");
 

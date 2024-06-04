@@ -219,9 +219,9 @@ void Vendas::on_Btn_DeletarVenda_clicked()
 
 void Vendas::on_DateEdt_De_dateChanged(const QDate &date)
 {
-    QString ate = ui->DateEdt_Ate->date().toString("yyyy-MM-dd");
     // precisa adicionar um dia para ele contar o dia todo
-    QString de = date.addDays(1).toString("yyyy-MM-dd");
+    QString ate = ui->DateEdt_Ate->date().addDays(1).toString("yyyy-MM-dd");
+    QString de = date.toString("yyyy-MM-dd");
     qDebug() << de;
     qDebug() << ate;
     filtrarData(de, ate);

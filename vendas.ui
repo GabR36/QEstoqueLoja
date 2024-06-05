@@ -137,7 +137,7 @@ background-color:rgb(170, 170, 170);
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Lucro:</string>
+         <string>Lucro (R$):</string>
         </property>
        </widget>
       </item>
@@ -155,7 +155,7 @@ background-color:rgb(170, 170, 170);
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Valor Total:</string>
+         <string>Valor Total (R$):</string>
         </property>
        </widget>
       </item>
@@ -234,12 +234,12 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
    <property name="title">
     <string>Filtros</string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>132</width>
+      <width>144</width>
       <height>88</height>
      </rect>
     </property>
@@ -261,7 +261,11 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
         </widget>
        </item>
        <item>
-        <widget class="QDateEdit" name="DateEdt_De"/>
+        <widget class="QDateEdit" name="DateEdt_De">
+         <property name="calendarPopup">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
@@ -275,7 +279,11 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
         </widget>
        </item>
        <item>
-        <widget class="QDateEdit" name="DateEdt_Ate"/>
+        <widget class="QDateEdit" name="DateEdt_Ate">
+         <property name="calendarPopup">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>

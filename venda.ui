@@ -99,7 +99,7 @@ background-color:rgb(170, 170, 170);
       <item>
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Preço: </string>
+         <string>Preço (R$): </string>
         </property>
        </widget>
       </item>
@@ -179,7 +179,7 @@ background-color:rgb(03,75,119);
        </font>
       </property>
       <property name="text">
-       <string>Total:</string>
+       <string>Total (R$):</string>
       </property>
      </widget>
     </item>

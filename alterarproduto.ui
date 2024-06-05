@@ -135,7 +135,7 @@ background-color:rgb(170, 170, 170);
      <item>
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>Preço: </string>
+        <string>Preço (R$): </string>
        </property>
       </widget>
      </item>

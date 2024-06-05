@@ -197,7 +197,7 @@ background-color:rgb(170, 170, 170);
         <item>
          <widget class="QLabel" name="label_4">
           <property name="text">
-           <string>Preço: </string>
+           <string>Preço (R$): </string>
           </property>
          </widget>
         </item>
@@ -404,7 +404,7 @@ background-color:rgb(03,75,119);
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>20</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuGerarrelat_rios">

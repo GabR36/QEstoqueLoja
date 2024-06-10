@@ -49,6 +49,8 @@ private slots:
 
     void on_actionRealizar_Venda_triggered();
 
+    void on_Btn_AddProd_clicked();
+
 private:
     Ui::MainWindow *ui;
     bool verificarCodigoBarras();

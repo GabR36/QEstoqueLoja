@@ -123,6 +123,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
+    ui->groupBox->setVisible(false);
     atualizarTableview();
     QSqlDatabase::database().close();
     //
@@ -133,7 +134,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // ajustar tamanho colunas
     // coluna descricao
-    ui->Tview_Produtos->setColumnWidth(2, 350);
+    ui->Tview_Produtos->setColumnWidth(2, 750);
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
     ui->Tview_Produtos->setColumnWidth(4,110);
@@ -541,5 +542,18 @@ void MainWindow::on_actionRealizar_Venda_triggered()
     inserirVenda->janelaPrincipal = this;
     inserirVenda->setWindowModality(Qt::ApplicationModal);
     inserirVenda->show();
+}
+
+
+void MainWindow::on_Btn_AddProd_clicked()
+{
+    ui->groupBox->setVisible(!ui->groupBox->isVisible());
+    if(!ui->groupBox->isVisible()){
+        ui->Tview_Produtos->setColumnWidth(2, 750);
+
+    }else{
+        ui->Tview_Produtos->setColumnWidth(2, 350);
+
+    }
 }
 

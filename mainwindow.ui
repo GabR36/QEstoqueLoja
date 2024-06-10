@@ -42,6 +42,7 @@
 
 #MainWindow{
 background-color: rgb(199, 199, 199);
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(199, 199, 199, 255), stop:1 rgba(170, 170, 170, 255));
 
 }
 QPushButton{
@@ -72,7 +73,7 @@ background-color:rgb(170, 170, 170);
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0" colspan="2">
-     <widget class="QFrame" name="frame">
+     <widget class="QFrame" name="frameHeaderBar">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
         <horstretch>0</horstretch>
@@ -93,7 +94,9 @@ background-color:rgb(170, 170, 170);
       </property>
       <property name="styleSheet">
        <string notr="true">QFrame{
-background-color:rgb(148, 148, 148);
+/*background-color:rgb(148, 148, 148);*/
+background-color: rgb(199, 199, 199);
+
 }
 
 QPushButton{
@@ -122,7 +125,7 @@ color: rgb(255, 255, 255);
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>0</x>
@@ -229,8 +232,7 @@ color: rgb(255, 255, 255);
                    </size>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">
-</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Alterar</string>
@@ -317,7 +319,7 @@ background-color: rgb(153, 193, 241);
 }</string>
                 </property>
                 <property name="text">
-                 <string>Venda</string>
+                 <string>Vendas</string>
                 </property>
                 <property name="iconSize">
                  <size>
@@ -621,19 +623,9 @@ font-size: 15px;</string>
      </layout>
     </item>
    </layout>
+   <zorder>frameHeaderBar</zorder>
+   <zorder></zorder>
    <zorder>groupBox</zorder>
-   <zorder>Tview_Produtos</zorder>
-   <zorder>label</zorder>
-   <zorder>frame</zorder>
-   <zorder>Btn_Pesquisa</zorder>
-   <zorder>Ledit_Pesquisa</zorder>
-   <zorder>Btn_Delete</zorder>
-   <zorder>Btn_Alterar</zorder>
-   <zorder></zorder>
-   <zorder>Btn_Relatorios</zorder>
-   <zorder>Btn_Venda</zorder>
-   <zorder></zorder>
-   <zorder>label_6</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menuBar">

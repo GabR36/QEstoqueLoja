@@ -54,6 +54,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
     bool verificarCodigoBarras();
+protected:
+     void keyPressEvent(QKeyEvent *event) override;
 
 
 

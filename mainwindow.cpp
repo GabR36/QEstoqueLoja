@@ -15,6 +15,7 @@
 #include "relatorios.h"
 #include "venda.h"
 #include <QIntValidator>
+#include <QKeyEvent>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -555,5 +556,14 @@ void MainWindow::on_Btn_AddProd_clicked()
         ui->Tview_Produtos->setColumnWidth(2, 350);
 
     }
+}
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    {
+        ui->Btn_Pesquisa->click();  // Simula um clique no botão
+    }
+
+    QMainWindow::keyPressEvent(event); // Chama o manipulador de eventos base
 }
 

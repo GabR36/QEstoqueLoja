@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1200</width>
+    <width>1210</width>
     <height>643</height>
    </rect>
   </property>
@@ -69,6 +69,12 @@ background-color:rgb(170, 170, 170);
 	font-size: 15px;
 }
 </string>
+  </property>
+  <property name="dockNestingEnabled">
+   <bool>true</bool>
+  </property>
+  <property name="unifiedTitleAndToolBarOnMac">
+   <bool>true</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
@@ -633,7 +639,7 @@ font-size: 15px;</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1200</width>
+     <width>1210</width>
      <height>21</height>
     </rect>
    </property>

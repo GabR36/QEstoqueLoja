@@ -22,5 +22,8 @@
         <file>QEstoqueLOja/simbolo-monetario-do-dolar.png</file>
         <file>QEstoqueLOja/tune.png</file>
         <file>QEstoqueLOja/AppIcon.rc</file>
+        <file>QEstoqueLOja/addblack.svg</file>
+        <file>QEstoqueLOja/settings.svg</file>
+        <file>QEstoqueLOja/mkaoyvblContraste.png</file>
     </qresource>
 </RCC>

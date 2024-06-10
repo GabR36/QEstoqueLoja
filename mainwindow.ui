@@ -67,8 +67,8 @@ background-color:rgb(170, 170, 170);
    <widget class="QTableView" name="Tview_Produtos">
     <property name="geometry">
      <rect>
-      <x>470</x>
-      <y>80</y>
+      <x>430</x>
+      <y>230</y>
       <width>701</width>
       <height>341</height>
      </rect>
@@ -107,29 +107,32 @@ background-color:rgb(170, 170, 170);
      <bool>false</bool>
     </attribute>
    </widget>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>470</x>
-      <y>422</y>
-      <width>701</width>
-      <height>65</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_7">
-     <item>
-      <widget class="QLineEdit" name="Ledit_Pesquisa"/>
-     </item>
-    </layout>
-   </widget>
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
       <x>60</x>
-      <y>70</y>
-      <width>341</width>
-      <height>271</height>
+      <y>110</y>
+      <width>350</width>
+      <height>300</height>
      </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>350</width>
+      <height>200</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>350</width>
+      <height>200</height>
+     </size>
     </property>
     <property name="styleSheet">
      <string notr="true"/>
@@ -143,7 +146,7 @@ background-color:rgb(170, 170, 170);
        <x>30</x>
        <y>30</y>
        <width>291</width>
-       <height>201</height>
+       <height>204</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -229,8 +232,8 @@ background-color:rgb(170, 170, 170);
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>490</x>
-      <y>50</y>
+      <x>440</x>
+      <y>200</y>
       <width>91</width>
       <height>16</height>
      </rect>
@@ -243,20 +246,249 @@ font-size: 15px;</string>
      <string>Produtos:</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="Btn_Venda">
+   <widget class="QFrame" name="frame">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>460</y>
-      <width>281</width>
-      <height>51</height>
+      <x>0</x>
+      <y>0</y>
+      <width>1500</width>
+      <height>70</height>
      </rect>
     </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>1500</width>
+      <height>70</height>
+     </size>
+    </property>
+    <property name="maximumSize">
+     <size>
+      <width>1000</width>
+      <height>70</height>
+     </size>
+    </property>
     <property name="styleSheet">
-     <string notr="true">#Btn_Venda{
-background-color: rgb(33, 105, 149);
+     <string notr="true">QFrame{
+background-color:rgb(148, 148, 148);
+}
+
+QPushButton{
+background-color:transparent;
+font: 700 12pt &quot;Segoe UI&quot;;
+color: black;
+border-bottom: 2px solid black;
+border-radius: 13px;
 
 }
+QPushButton:hover{
+	background-color: rgb(13, 92, 161);
+}
+QPushButton:pressed{
+	
+color: rgb(255, 255, 255);
+	background-color: rgb(153, 193, 241);
+
+}
+
+</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>1201</width>
+       <height>71</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_8">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <property name="spacing">
+         <number>6</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_10">
+          <item>
+           <widget class="QLabel" name="label_6">
+            <property name="minimumSize">
+             <size>
+              <width>160</width>
+              <height>40</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>170</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">border-right: 2px solid black;</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="pixmap">
+             <pixmap resource="Imagens/recursosImg.qrc">:/QEstoqueLOja/mkaoyvblContraste.png</pixmap>
+            </property>
+            <property name="scaledContents">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_7">
+              <item>
+               <widget class="QPushButton" name="Btn_AddProd">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>170</width>
+                  <height>60</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>170</width>
+                  <height>60</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Cadastrar Produto</string>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="Btn_Alterar">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>60</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>60</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">
+</string>
+                </property>
+                <property name="text">
+                 <string>Alterar</string>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="Btn_Delete">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>100</width>
+                  <height>60</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>100</width>
+                  <height>60</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">#Btn_Delete:hover{
+background-color:rgb(191, 61, 64);
+}
+#Btn_Delete:pressed{
+background-color:rgb(255, 96, 99)
+
+}</string>
+                </property>
+                <property name="text">
+                 <string>Deletar</string>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>30</width>
+                  <height>30</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QPushButton" name="Btn_Venda">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>150</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>150</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">
 
 #Btn_Venda:hover{
 	background-color:rgb(03,75,119);
@@ -265,107 +497,40 @@ background-color: rgb(33, 105, 149);
 #Btn_Venda:pressed{
 background-color: rgb(153, 193, 241);
 }</string>
-    </property>
-    <property name="text">
-     <string>Venda</string>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>18</width>
-      <height>18</height>
-     </size>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_5">
-    <property name="geometry">
-     <rect>
-      <x>60</x>
-      <y>0</y>
-      <width>341</width>
-      <height>61</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-    <property name="pixmap">
-     <pixmap resource="Imagens/recursosImg.qrc">:/QEstoqueLOja/mkaoyvbl.png</pixmap>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="Btn_Delete">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>390</y>
-      <width>281</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Deletar</string>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>18</width>
-      <height>18</height>
-     </size>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="Btn_Alterar">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>350</y>
-      <width>281</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">border-radius: 13px;
-</string>
-    </property>
-    <property name="text">
-     <string>Alterar</string>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>18</width>
-      <height>18</height>
-     </size>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="Btn_Pesquisa">
-    <property name="geometry">
-     <rect>
-      <x>470</x>
-      <y>482</y>
-      <width>701</width>
-      <height>31</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>pesquisar</string>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>18</width>
-      <height>18</height>
-     </size>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="Btn_Relatorios">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>530</y>
-      <width>281</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">#Btn_Relatorios{
-background-color: rgb(33, 105, 149);
-}
+              </property>
+              <property name="text">
+               <string>Venda</string>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="Btn_Relatorios">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>150</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>150</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">
 #Btn_Relatorios:hover{
 background-color:rgb(03,75,119);
 }
@@ -375,27 +540,81 @@ background-color:rgb(03,75,119);
 
 }
 </string>
+              </property>
+              <property name="text">
+               <string>Relatórios</string>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>430</x>
+      <y>160</y>
+      <width>701</width>
+      <height>26</height>
+     </rect>
     </property>
-    <property name="text">
-     <string>Relatórios</string>
-    </property>
-    <property name="iconSize">
-     <size>
-      <width>18</width>
-      <height>18</height>
-     </size>
-    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
+     <item>
+      <widget class="QLineEdit" name="Ledit_Pesquisa"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Btn_Pesquisa">
+       <property name="text">
+        <string>pesquisar</string>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>18</width>
+         <height>18</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
    <zorder>groupBox</zorder>
    <zorder>Tview_Produtos</zorder>
-   <zorder>layoutWidget</zorder>
    <zorder>label</zorder>
-   <zorder>Btn_Venda</zorder>
-   <zorder>label_5</zorder>
+   <zorder>frame</zorder>
+   <zorder>Btn_Pesquisa</zorder>
+   <zorder>Ledit_Pesquisa</zorder>
    <zorder>Btn_Delete</zorder>
    <zorder>Btn_Alterar</zorder>
-   <zorder>Btn_Pesquisa</zorder>
+   <zorder></zorder>
    <zorder>Btn_Relatorios</zorder>
+   <zorder>Btn_Venda</zorder>
+   <zorder></zorder>
+   <zorder>label_6</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menuBar">
@@ -404,7 +623,7 @@ background-color:rgb(03,75,119);
      <x>0</x>
      <y>0</y>
      <width>1200</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuGerarrelat_rios">

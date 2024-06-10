@@ -137,7 +137,7 @@ MainWindow::MainWindow(QWidget *parent)
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
     ui->Tview_Produtos->setColumnWidth(4,110);
-
+    ui->Btn_AddProd->setIcon(QIcon(":/QEstoqueLOja/addblack.svg"));
     ui->Btn_Venda->setIcon(QIcon(":/QEstoqueLOja/shopping.png"));
     ui->Btn_Alterar->setIcon(QIcon(":/QEstoqueLOja/rebase.png"));
     ui->Btn_Delete->setIcon(QIcon(":/QEstoqueLOja/delete.png"));

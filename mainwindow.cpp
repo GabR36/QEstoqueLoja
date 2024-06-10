@@ -15,7 +15,6 @@
 #include "relatorios.h"
 #include "venda.h"
 #include <QIntValidator>
-#include <QKeyEvent>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -125,6 +124,7 @@ MainWindow::MainWindow(QWidget *parent)
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     ui->groupBox->setVisible(false);
+     ui->Ledit_Pesquisa->installEventFilter(this);
     atualizarTableview();
     QSqlDatabase::database().close();
     //
@@ -557,13 +557,20 @@ void MainWindow::on_Btn_AddProd_clicked()
 
     }
 }
-void MainWindow::keyPressEvent(QKeyEvent *event)
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 {
-    if(event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    // Verificar se o evento é uma tecla pressionada no lineEdit
+    if (obj == ui->Ledit_Pesquisa && event->type() == QEvent::KeyPress)
     {
-        ui->Btn_Pesquisa->click();  // Simula um clique no botão
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter)
+        {
+            ui->Btn_Pesquisa->click(); // Simula um clique no botão
+            return true; // Evento tratado
+        }
     }
 
-    QMainWindow::keyPressEvent(event); // Chama o manipulador de eventos base
+    // Processar o evento padrão
+    return QMainWindow::eventFilter(obj, event);
 }
-

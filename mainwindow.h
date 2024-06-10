@@ -7,6 +7,8 @@
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
 #include <QLocale>
+#include <QKeyEvent>
+
 //#include "vendas.h"
 
 
@@ -55,8 +57,7 @@ private:
     Ui::MainWindow *ui;
     bool verificarCodigoBarras();
 protected:
-     void keyPressEvent(QKeyEvent *event) override;
-
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 
 

@@ -142,12 +142,12 @@ MainWindow::MainWindow(QWidget *parent)
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
     ui->Tview_Produtos->setColumnWidth(4,110);
-    ui->Btn_AddProd->setIcon(QIcon(":/QEstoqueLOja/addblack.svg"));
-    ui->Btn_Venda->setIcon(QIcon(":/QEstoqueLOja/shopping.png"));
-    ui->Btn_Alterar->setIcon(QIcon(":/QEstoqueLOja/rebase.png"));
-    ui->Btn_Delete->setIcon(QIcon(":/QEstoqueLOja/delete.png"));
-    ui->Btn_Pesquisa->setIcon(QIcon(":/QEstoqueLOja/search.png"));
-    ui->Btn_Relatorios->setIcon(QIcon(":/QEstoqueLOja/monitoring.svg"));
+    ui->Btn_AddProd->setIcon(QIcon(":/QEstoqueLOja/add-product.svg"));
+    ui->Btn_Venda->setIcon(QIcon(":/QEstoqueLOja/amarok-cart-view.svg"));
+    ui->Btn_Alterar->setIcon(QIcon(":/QEstoqueLOja/story-editor.svg"));
+    ui->Btn_Delete->setIcon(QIcon(":/QEstoqueLOja/amarok-cart-remove.svg"));
+    ui->Btn_Pesquisa->setIcon(QIcon(":/QEstoqueLOja/edit-find.svg"));
+    ui->Btn_Relatorios->setIcon(QIcon(":/QEstoqueLOja/labplot-xy-interpolation-curve.svg"));
 
     // validadores para os campos
     QDoubleValidator *DoubleValidador = new QDoubleValidator();
@@ -596,6 +596,17 @@ QString MainWindow::gerarNumero()
 
 void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
 {
+    QMenu contextMenu(this);
+    QAction *newAct = new QAction("New", this);
+    QAction *openAct = new QAction("Open", this);
+    QAction *quitAct = new QAction("Quit", this);
+
+    contextMenu.addAction(newAct);
+    contextMenu.addAction(openAct);
+    contextMenu.addSeparator();
+    contextMenu.addAction(quitAct);
+
+    contextMenu.exec(pos);
 
 }
 

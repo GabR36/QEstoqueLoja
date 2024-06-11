@@ -1,30 +1,37 @@
 <RCC>
     <qresource prefix="/icons"/>
     <qresource prefix="/">
-        <file>QEstoqueLOja/delete.png</file>
-        <file>QEstoqueLOja/dollarc.png</file>
         <file>QEstoqueLOja/mkaoyvbl.png</file>
-        <file>QEstoqueLOja/simbolo-monetario-do-dolar.png</file>
-        <file>QEstoqueLOja/icons8-dollar-50.png</file>
-        <file>QEstoqueLOja/gjuy11.ico</file>
         <file>QEstoqueLOja/ICONEjanela.ico</file>
         <file>QEstoqueLOja/ICONEjanela.png</file>
         <file>QEstoqueLOja/ICONEjanela2.png</file>
-        <file>QEstoqueLOja/icons8-dollar-50.png</file>
         <file>QEstoqueLOja/mkaoyvbl.png</file>
-        <file>QEstoqueLOja/monitoring.svg</file>
-        <file>QEstoqueLOja/payment.png</file>
         <file>QEstoqueLOja/QeLogo.png</file>
-        <file>QEstoqueLOja/rebase.png</file>
-        <file>QEstoqueLOja/search.png</file>
-        <file>QEstoqueLOja/sell.png</file>
-        <file>QEstoqueLOja/shopping.png</file>
-        <file>QEstoqueLOja/simbolo-monetario-do-dolar.png</file>
-        <file>QEstoqueLOja/tune.png</file>
         <file>QEstoqueLOja/AppIcon.rc</file>
         <file>QEstoqueLOja/addblack.svg</file>
         <file>QEstoqueLOja/settings.svg</file>
         <file>QEstoqueLOja/mkaoyvblContraste.png</file>
         <file>QEstoqueLOja/restart.svg</file>
+        <file>QEstoqueLOja/baobab.svg</file>
+        <file>QEstoqueLOja/edit-delete.svg</file>
+        <file>QEstoqueLOja/gtk-edit.svg</file>
+        <file>QEstoqueLOja/list-add.svg</file>
+        <file>QEstoqueLOja/amarok-cart-remove.svg</file>
+        <file>QEstoqueLOja/amarok-cart-view.svg</file>
+        <file>QEstoqueLOja/edit-find.svg</file>
+        <file>QEstoqueLOja/labplot-xy-interpolation-curve.svg</file>
+        <file>QEstoqueLOja/story-editor.svg</file>
+        <file>QEstoqueLOja/vcs-added.svg</file>
+        <file>QEstoqueLOja/view-financial-account-investment-security.svg</file>
+        <file>QEstoqueLOja/add-product.svg</file>
+        <file>QEstoqueLOja/dialog-cancel.svg</file>
+        <file>QEstoqueLOja/dialog-ok-apply.svg</file>
+        <file>QEstoqueLOja/view-barcode-add.svg</file>
+        <file>QEstoqueLOja/document-print.svg</file>
+        <file>QEstoqueLOja/view-financial-account-credit-card.svg</file>
+        <file>QEstoqueLOja/view-financial-account-liability.svg</file>
+        <file>QEstoqueLOja/question.svg</file>
+        <file>QEstoqueLOja/view-financial-transfer-reconciled.svg</file>
+        <file>QEstoqueLOja/taxes-finances.svg</file>
     </qresource>
 </RCC>

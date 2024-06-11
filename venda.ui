@@ -170,6 +170,10 @@ background-color:rgb(170, 170, 170);
        <property name="text">
         <string>Selecionar Produto</string>
        </property>
+       <property name="icon">
+        <iconset resource="Imagens/recursosImg.qrc">
+         <normaloff>:/QEstoqueLOja/dialog-ok-apply.svg</normaloff>:/QEstoqueLOja/dialog-ok-apply.svg</iconset>
+       </property>
        <property name="autoDefault">
         <bool>false</bool>
        </property>
@@ -232,6 +236,10 @@ background-color:rgb(170, 170, 170);
           <widget class="QPushButton" name="Btn_Pesquisa">
            <property name="text">
             <string>pesquisar</string>
+           </property>
+           <property name="icon">
+            <iconset resource="Imagens/recursosImg.qrc">
+             <normaloff>:/QEstoqueLOja/edit-find.svg</normaloff>:/QEstoqueLOja/edit-find.svg</iconset>
            </property>
            <property name="autoDefault">
             <bool>false</bool>
@@ -369,6 +377,8 @@ background-color:rgb(03,75,119);
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="Imagens/recursosImg.qrc"/>
+ </resources>
  <connections/>
 </ui>

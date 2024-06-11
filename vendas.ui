@@ -278,7 +278,7 @@ background-color:rgb(255, 96, 99)
        </property>
        <property name="icon">
         <iconset resource="Imagens/recursosImg.qrc">
-         <normaloff>:/QEstoqueLOja/delete.png</normaloff>:/QEstoqueLOja/delete.png</iconset>
+         <normaloff>:/QEstoqueLOja/amarok-cart-remove.svg</normaloff>:/QEstoqueLOja/amarok-cart-remove.svg</iconset>
        </property>
        <property name="iconSize">
         <size>
@@ -326,7 +326,7 @@ background-color:rgb(03,75,119);
        </property>
        <property name="icon">
         <iconset resource="Imagens/recursosImg.qrc">
-         <normaloff>:/QEstoqueLOja/addblack.svg</normaloff>:/QEstoqueLOja/addblack.svg</iconset>
+         <normaloff>:/QEstoqueLOja/add-product.svg</normaloff>:/QEstoqueLOja/add-product.svg</iconset>
        </property>
        <property name="iconSize">
         <size>

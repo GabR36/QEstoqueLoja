@@ -574,3 +574,21 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
     // Processar o evento padrão
     return QMainWindow::eventFilter(obj, event);
 }
+QString MainWindow::gerarNumero()
+{
+    QString number;
+    do {
+        number = QString("3562%1").arg(QRandomGenerator::global()->bounded(100000), 5, 10, QChar('0'));
+    } while (generatedNumbers.contains(number));
+
+    generatedNumbers.insert(number);
+    // saveGeneratedNumber(number);
+
+    return number;
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    ui->Ledit_Barras->setText(gerarNumero());
+}
+

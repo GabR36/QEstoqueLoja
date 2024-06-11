@@ -7,6 +7,8 @@
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
 #include <QLocale>
+#include <QSet>
+#include <QRandomGenerator>
 #include <QKeyEvent>
 
 //#include "vendas.h"
@@ -53,9 +55,14 @@ private slots:
 
     void on_Btn_AddProd_clicked();
 
+    QString gerarNumero();
+
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     bool verificarCodigoBarras();
+    QSet<QString> generatedNumbers;
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 

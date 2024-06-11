@@ -517,6 +517,31 @@ border: 2px solid black;
         </item>
        </layout>
       </widget>
+      <widget class="QPushButton" name="pushButton">
+       <property name="geometry">
+        <rect>
+         <x>322</x>
+         <y>36</y>
+         <width>21</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>-1</pointsize>
+        </font>
+       </property>
+       <property name="toolTip">
+        <string extracomment="Gerar Código Interno">Gerar Código Interno</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="Imagens/recursosImg.qrc">
+         <normaloff>:/QEstoqueLOja/restart.svg</normaloff>:/QEstoqueLOja/restart.svg</iconset>
+       </property>
+      </widget>
      </widget>
     </item>
     <item row="1" column="1">
@@ -629,9 +654,6 @@ font-size: 15px;</string>
      </layout>
     </item>
    </layout>
-   <zorder>frameHeaderBar</zorder>
-   <zorder></zorder>
-   <zorder>groupBox</zorder>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menuBar">

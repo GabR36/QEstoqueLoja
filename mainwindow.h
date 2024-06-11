@@ -57,11 +57,14 @@ private slots:
 
     QString gerarNumero();
 
-    void on_pushButton_clicked();
+    void on_Tview_Produtos_customContextMenuRequested(const QPoint &pos);
+
+    void on_Btn_GerarCodBarras_clicked();
 
 private:
     Ui::MainWindow *ui;
     bool verificarCodigoBarras();
+
     QSet<QString> generatedNumbers;
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;

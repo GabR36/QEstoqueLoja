@@ -517,22 +517,14 @@ border: 2px solid black;
         </item>
        </layout>
       </widget>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="Btn_GerarCodBarras">
        <property name="geometry">
         <rect>
          <x>322</x>
-         <y>36</y>
+         <y>37</y>
          <width>21</width>
          <height>24</height>
         </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>-1</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string extracomment="Gerar Código Interno">Gerar Código Interno</string>
        </property>
        <property name="text">
         <string/>
@@ -621,6 +613,9 @@ font-size: 15px;</string>
           <width>100</width>
           <height>200</height>
          </size>
+        </property>
+        <property name="contextMenuPolicy">
+         <enum>Qt::CustomContextMenu</enum>
         </property>
         <property name="autoFillBackground">
          <bool>false</bool>

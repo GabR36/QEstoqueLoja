@@ -15,6 +15,9 @@
 #include "relatorios.h"
 #include "venda.h"
 #include <QIntValidator>
+#include <QMenu>
+#include <QModelIndex>
+#include <QContextMenuEvent>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -151,6 +154,7 @@ MainWindow::MainWindow(QWidget *parent)
     QIntValidator *IntValidador = new QIntValidator();
     ui->Ledit_Preco->setValidator(DoubleValidador);
     ui->Ledit_Quantidade->setValidator(IntValidador);
+
 }
 
 MainWindow::~MainWindow()
@@ -587,8 +591,18 @@ QString MainWindow::gerarNumero()
     return number;
 }
 
-void MainWindow::on_pushButton_clicked()
+
+
+
+void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
+{
+
+}
+
+
+void MainWindow::on_Btn_GerarCodBarras_clicked()
 {
     ui->Ledit_Barras->setText(gerarNumero());
+
 }
 

@@ -68,6 +68,8 @@ private:
     bool verificarCodigoBarras();
     QSet<QString> generatedNumbers;
     QAction* actionMenuAlterarProd;
+    QAction* actionMenuDeletarProd;
+
     QModelIndex selected_index;
 
 protected:

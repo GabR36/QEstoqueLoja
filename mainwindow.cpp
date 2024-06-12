@@ -161,7 +161,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Ledit_Preco->setValidator(DoubleValidador);
     ui->Ledit_Quantidade->setValidator(IntValidador);
 
+
+    // ações para menu de contexto tabela produtos
     actionMenuAlterarProd = new QAction(this);
+    actionMenuDeletarProd = new QAction(this);
+    actionMenuDeletarProd->setText("Deletar Produto");
+    actionMenuDeletarProd->setIcon(iconDelete);
+    connect(actionMenuDeletarProd,SIGNAL(triggered(bool)),this,SLOT(on_Btn_Delete_clicked()));
 
     actionMenuAlterarProd->setText("Alterar Produto");
     actionMenuAlterarProd->setIcon(iconAlterarProduto);
@@ -615,6 +621,7 @@ void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
         return;
     QMenu menu;
     menu.addAction(actionMenuAlterarProd);
+    menu.addAction(actionMenuDeletarProd);
     menu.exec(ui->Tview_Produtos->viewport()->mapToGlobal(pos));
 }
 

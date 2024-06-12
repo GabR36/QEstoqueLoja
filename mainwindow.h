@@ -11,6 +11,7 @@
 #include <QRandomGenerator>
 #include <QKeyEvent>
 
+
 //#include "vendas.h"
 
 
@@ -24,6 +25,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+
 
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     QSqlQueryModel* model = new QSqlQueryModel;
@@ -64,8 +66,10 @@ private slots:
 private:
     Ui::MainWindow *ui;
     bool verificarCodigoBarras();
-
     QSet<QString> generatedNumbers;
+    QAction* actionMenuAlterarProd;
+    QModelIndex selected_index;
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
 

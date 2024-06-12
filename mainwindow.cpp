@@ -15,10 +15,8 @@
 #include "relatorios.h"
 #include "venda.h"
 #include <QIntValidator>
-#include <QMenu>
 #include <QModelIndex>
-#include <QContextMenuEvent>
-
+#include <QMenu>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -142,12 +140,20 @@ MainWindow::MainWindow(QWidget *parent)
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
     ui->Tview_Produtos->setColumnWidth(4,110);
-    ui->Btn_AddProd->setIcon(QIcon(":/QEstoqueLOja/add-product.svg"));
-    ui->Btn_Venda->setIcon(QIcon(":/QEstoqueLOja/amarok-cart-view.svg"));
-    ui->Btn_Alterar->setIcon(QIcon(":/QEstoqueLOja/story-editor.svg"));
-    ui->Btn_Delete->setIcon(QIcon(":/QEstoqueLOja/amarok-cart-remove.svg"));
-    ui->Btn_Pesquisa->setIcon(QIcon(":/QEstoqueLOja/edit-find.svg"));
-    ui->Btn_Relatorios->setIcon(QIcon(":/QEstoqueLOja/labplot-xy-interpolation-curve.svg"));
+    QIcon iconAlterarProduto, iconAddProduto, iconBtnVenda, iconDelete, iconPesquisa, iconBtnRelatorios;
+    iconAlterarProduto.addFile(":/QEstoqueLOja/story-editor.svg");
+    iconAddProduto.addFile(":/QEstoqueLOja/add-product.svg");
+    iconBtnVenda.addFile(":/QEstoqueLOja/amarok-cart-view.svg");
+    iconDelete.addFile(":/QEstoqueLOja/amarok-cart-remove.svg");
+    iconPesquisa.addFile(":/QEstoqueLOja/edit-find.svg");
+    iconBtnRelatorios.addFile(":/QEstoqueLOja/edit-find.svg");
+
+    ui->Btn_AddProd->setIcon(iconAddProduto);
+    ui->Btn_Venda->setIcon(iconBtnVenda);
+    ui->Btn_Alterar->setIcon(iconAlterarProduto);
+    ui->Btn_Delete->setIcon(iconDelete);
+    ui->Btn_Pesquisa->setIcon(iconPesquisa);
+    ui->Btn_Relatorios->setIcon(iconBtnRelatorios);
 
     // validadores para os campos
     QDoubleValidator *DoubleValidador = new QDoubleValidator();
@@ -155,13 +161,21 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Ledit_Preco->setValidator(DoubleValidador);
     ui->Ledit_Quantidade->setValidator(IntValidador);
 
+    actionMenuAlterarProd = new QAction(this);
+
+    actionMenuAlterarProd->setText("Alterar Produto");
+    actionMenuAlterarProd->setIcon(iconAlterarProduto);
+    connect(actionMenuAlterarProd,SIGNAL(triggered(bool)),this,SLOT(on_Btn_Alterar_clicked()));
+
+
+
+
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-
 
 void MainWindow::atualizarTableview(){
     if(!db.open()){
@@ -596,18 +610,12 @@ QString MainWindow::gerarNumero()
 
 void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
 {
-    QMenu contextMenu(this);
-    QAction *newAct = new QAction("New", this);
-    QAction *openAct = new QAction("Open", this);
-    QAction *quitAct = new QAction("Quit", this);
 
-    contextMenu.addAction(newAct);
-    contextMenu.addAction(openAct);
-    contextMenu.addSeparator();
-    contextMenu.addAction(quitAct);
-
-    contextMenu.exec(pos);
-
+    if(!ui->Tview_Produtos->currentIndex().isValid())
+        return;
+    QMenu menu;
+    menu.addAction(actionMenuAlterarProd);
+    menu.exec(ui->Tview_Produtos->viewport()->mapToGlobal(pos));
 }
 
 

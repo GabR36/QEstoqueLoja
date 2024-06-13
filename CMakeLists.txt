@@ -46,6 +46,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         relatorios.h relatorios.cpp relatorios.ui
         pagamento.h pagamento.cpp pagamento.ui
         customdelegate.h customdelegate.cpp
+        fnt/recursosFnt.qrc
 
 
     )

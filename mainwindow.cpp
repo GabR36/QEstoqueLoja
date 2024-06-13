@@ -17,6 +17,7 @@
 #include <QIntValidator>
 #include <QModelIndex>
 #include <QMenu>
+#include <QFontDatabase>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -629,8 +630,12 @@ void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
 void MainWindow::on_Btn_GerarCodBarras_clicked()
 {
     ui->Ledit_Barras->setText(gerarNumero());
-
-
+    int id = QFontDatabase::addApplicationFont(":/code128.ttf");
+        QFontDatabase::applicationFontFamilies(id).at(0);
+        QFont barcodefont = QFont("Code 128", 50, QFont::Normal);
+            barcodefont.setLetterSpacing(QFont::AbsoluteSpacing,0.0);
+        ui->labelTeste->setFont(barcodefont);
+            ui->labelTeste->setText(ui->Ledit_Barras->text());
 
 }
 

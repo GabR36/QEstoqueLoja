@@ -213,7 +213,7 @@ color: rgb(255, 255, 255);
                    <string>Cadastrar Produto</string>
                   </property>
                   <property name="icon">
-                   <iconset theme="audio-input-microphone"/>
+                   <iconset theme="address-book-new"/>
                   </property>
                   <property name="iconSize">
                    <size>
@@ -407,7 +407,7 @@ background-color:rgb(03,75,119);
       </widget>
      </widget>
     </item>
-    <item row="1" column="0">
+    <item row="3" column="0">
      <widget class="QGroupBox" name="groupBox">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -548,7 +548,7 @@ border: 2px solid black;
       </widget>
      </widget>
     </item>
-    <item row="1" column="1">
+    <item row="3" column="1">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
@@ -660,6 +660,13 @@ font-size: 15px;</string>
       </item>
      </layout>
     </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="labelTeste">
+      <property name="text">
+       <string>TextLabel</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -669,7 +676,7 @@ font-size: 15px;</string>
      <x>0</x>
      <y>0</y>
      <width>1210</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuGerarrelat_rios">

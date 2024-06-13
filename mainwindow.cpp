@@ -146,7 +146,7 @@ MainWindow::MainWindow(QWidget *parent)
     iconBtnVenda.addFile(":/QEstoqueLOja/amarok-cart-view.svg");
     iconDelete.addFile(":/QEstoqueLOja/amarok-cart-remove.svg");
     iconPesquisa.addFile(":/QEstoqueLOja/edit-find.svg");
-    iconBtnRelatorios.addFile(":/QEstoqueLOja/edit-find.svg");
+    iconBtnRelatorios.addFile(":/QEstoqueLOja/view-financial-account-investment-security.svg");
 
     ui->Btn_AddProd->setIcon(iconAddProduto);
     ui->Btn_Venda->setIcon(iconBtnVenda);
@@ -629,6 +629,8 @@ void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
 void MainWindow::on_Btn_GerarCodBarras_clicked()
 {
     ui->Ledit_Barras->setText(gerarNumero());
+
+
 
 }
 

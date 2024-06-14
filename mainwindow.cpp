@@ -11,7 +11,7 @@
 #include "QItemSelectionModel"
 #include <qsqltablemodel.h>
 #include <QPrintDialog>
-#include <Qprinter>
+#include <QtPrintSupport/QPrinter>
 #include "vendas.h"
 #include <QDoubleValidator>
 #include "relatorios.h"
@@ -20,6 +20,7 @@
 #include <QModelIndex>
 #include <QMenu>
 #include <QFontDatabase>
+#include <zint.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

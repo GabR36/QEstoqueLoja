@@ -143,13 +143,14 @@ MainWindow::MainWindow(QWidget *parent)
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
     ui->Tview_Produtos->setColumnWidth(4,110);
-    QIcon iconAlterarProduto, iconAddProduto, iconBtnVenda, iconDelete, iconPesquisa, iconBtnRelatorios;
     iconAlterarProduto.addFile(":/QEstoqueLOja/story-editor.svg");
     iconAddProduto.addFile(":/QEstoqueLOja/add-product.svg");
     iconBtnVenda.addFile(":/QEstoqueLOja/amarok-cart-view.svg");
     iconDelete.addFile(":/QEstoqueLOja/amarok-cart-remove.svg");
     iconPesquisa.addFile(":/QEstoqueLOja/edit-find.svg");
     iconBtnRelatorios.addFile(":/QEstoqueLOja/view-financial-account-investment-security.svg");
+    iconImpressora.addFile(":/QEstoqueLOja/document-print.svg");
+
 
     ui->Btn_AddProd->setIcon(iconAddProduto);
     ui->Btn_Venda->setIcon(iconBtnVenda);
@@ -176,6 +177,10 @@ MainWindow::MainWindow(QWidget *parent)
     actionMenuAlterarProd->setText("Alterar Produto");
     actionMenuAlterarProd->setIcon(iconAlterarProduto);
     connect(actionMenuAlterarProd,SIGNAL(triggered(bool)),this,SLOT(on_Btn_Alterar_clicked()));
+
+    actionMenuPrintBarCode1 = new QAction(this);
+    actionMenuPrintBarCode1->setText("1 Etiqueta");
+    connect(actionMenuPrintBarCode1,SIGNAL(triggered(bool)),this, SLOT(imprimirEtiqueta1()));
 
 
 
@@ -418,32 +423,39 @@ bool MainWindow::verificarCodigoBarras(){
         return false;
     }
 }
-void MainWindow::imprimirEtiqueta(){
+void MainWindow::imprimirEtiqueta1(){
+    //ui->Tview_Produtos->currentIndex().row();
 
+    //qDebug() <<  ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index());
+      //ui->Tview_Produtos->model()->data()
+
+}
+void MainWindow::imprimirEtiqueta(int quant, QString codBar){
     QPrinter printer;
 
     printer.setPageSize(QPageSize(QSizeF(80, 297), QPageSize::Millimeter));
 
     QPrintDialog dialog(&printer, this);
-    if(dialog.exec() == QDialog::Rejected) qDebug() << "dialog n abiru";
+    if(dialog.exec() == QDialog::Rejected) return;
 
-        QPainter painter;
-        painter.begin(&printer);
-        int id = QFontDatabase::addApplicationFont(":/code128.ttf");
-        QFontDatabase::applicationFontFamilies(id).at(0);
-        QFont barcodefont = QFont("Code 128", 30, QFont::Normal);
+    QPainter painter;
+    painter.begin(&printer);
+    int id = QFontDatabase::addApplicationFont(":/code128.ttf");
+    QFontDatabase::applicationFontFamilies(id).at(0);
+    QFont barcodefont = QFont("Code 128", 30, QFont::Normal);
 
 
-        painter.setFont(barcodefont);
-        int yPos = 100; // Posição inicial para começar a desenhar o texto
-        int xPos = 100;
+    painter.setFont(barcodefont);
+    int yPos = 100; // Posição inicial para começar a desenhar o texto
+    int xPos = 100;
 
-    for(int i = 0;i < 1; i++){
-            painter.drawText(xPos, yPos, ui->Ledit_Barras->text());
+    for(int i = 0;i < quant; i++){
+        painter.drawText(xPos, yPos, codBar);
 
     }
     painter.end();
-}
+
+    }
 
 
 void MainWindow::on_actionGerar_Relat_rio_PDF_triggered()
@@ -650,12 +662,10 @@ void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
         return;
     QMenu menu(this);
     QMenu *imprimirMenu = new QMenu("Imprimir Etiqueta Código de Barra", this);
+
     menu.addAction(actionMenuAlterarProd);
     menu.addAction(actionMenuDeletarProd);
-    actionMenuPrintBarCode1 = new QAction(this);
-    actionMenuPrintBarCode1->setText("1 Etiqueta");
-    connect(actionMenuPrintBarCode1,SIGNAL(triggered(bool)),this, SLOT(imprimirEtiqueta()));
-    //QAction *subAction1 = new QAction("Sub-ação 1", this);
+    imprimirMenu->setIcon(iconImpressora);
     imprimirMenu->addAction(actionMenuPrintBarCode1);
     menu.addMenu(imprimirMenu);
 

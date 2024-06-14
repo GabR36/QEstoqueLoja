@@ -30,9 +30,12 @@ public:
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     QSqlQueryModel* model = new QSqlQueryModel;
     void atualizarTableview();
+    void imprimirEtiqueta(int quant, QString codBar);
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     QLocale portugues;
+    QIcon iconAlterarProduto, iconAddProduto, iconBtnVenda, iconDelete, iconPesquisa, iconBtnRelatorios, iconImpressora;
+
 
 private slots:
     void on_Btn_Enviar_clicked();
@@ -63,7 +66,7 @@ private slots:
 
     void on_Btn_GerarCodBarras_clicked();
 
-    void imprimirEtiqueta();
+    void imprimirEtiqueta1();
 
 private:
     Ui::MainWindow *ui;
@@ -73,7 +76,7 @@ private:
     QAction* actionMenuDeletarProd;
     QAction* actionMenuPrintBarCode1;
 
-    QModelIndex selected_index;
+    //QModelIndex selected_index;
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;

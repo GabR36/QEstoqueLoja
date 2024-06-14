@@ -63,12 +63,15 @@ private slots:
 
     void on_Btn_GerarCodBarras_clicked();
 
+    void imprimirEtiqueta();
+
 private:
     Ui::MainWindow *ui;
     bool verificarCodigoBarras();
     QSet<QString> generatedNumbers;
     QAction* actionMenuAlterarProd;
     QAction* actionMenuDeletarProd;
+    QAction* actionMenuPrintBarCode1;
 
     QModelIndex selected_index;
 

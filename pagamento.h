@@ -34,6 +34,8 @@ private slots:
 
     void on_Ledit_Desconto_textChanged(const QString &arg1);
 
+
+
 private:
     Ui::pagamento *ui;
     float obterValorFinal(QString taxa, QString desconto);

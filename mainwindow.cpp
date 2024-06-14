@@ -10,6 +10,8 @@
 #include "alterarproduto.h"
 #include "QItemSelectionModel"
 #include <qsqltablemodel.h>
+#include <QPrintDialog>
+#include <Qprinter>
 #include "vendas.h"
 #include <QDoubleValidator>
 #include "relatorios.h"
@@ -166,6 +168,7 @@ MainWindow::MainWindow(QWidget *parent)
     // ações para menu de contexto tabela produtos
     actionMenuAlterarProd = new QAction(this);
     actionMenuDeletarProd = new QAction(this);
+
     actionMenuDeletarProd->setText("Deletar Produto");
     actionMenuDeletarProd->setIcon(iconDelete);
     connect(actionMenuDeletarProd,SIGNAL(triggered(bool)),this,SLOT(on_Btn_Delete_clicked()));
@@ -173,7 +176,6 @@ MainWindow::MainWindow(QWidget *parent)
     actionMenuAlterarProd->setText("Alterar Produto");
     actionMenuAlterarProd->setIcon(iconAlterarProduto);
     connect(actionMenuAlterarProd,SIGNAL(triggered(bool)),this,SLOT(on_Btn_Alterar_clicked()));
-
 
 
 
@@ -416,6 +418,32 @@ bool MainWindow::verificarCodigoBarras(){
         return false;
     }
 }
+void MainWindow::imprimirEtiqueta(){
+
+    QPrinter printer;
+
+    printer.setPageSize(QPageSize(QSizeF(80, 297), QPageSize::Millimeter));
+
+    QPrintDialog dialog(&printer, this);
+    if(dialog.exec() == QDialog::Rejected) qDebug() << "dialog n abiru";
+
+        QPainter painter;
+        painter.begin(&printer);
+        int id = QFontDatabase::addApplicationFont(":/code128.ttf");
+        QFontDatabase::applicationFontFamilies(id).at(0);
+        QFont barcodefont = QFont("Code 128", 30, QFont::Normal);
+
+
+        painter.setFont(barcodefont);
+        int yPos = 100; // Posição inicial para começar a desenhar o texto
+        int xPos = 100;
+
+    for(int i = 0;i < 1; i++){
+            painter.drawText(xPos, yPos, ui->Ledit_Barras->text());
+
+    }
+    painter.end();
+}
 
 
 void MainWindow::on_actionGerar_Relat_rio_PDF_triggered()
@@ -620,11 +648,20 @@ void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
 
     if(!ui->Tview_Produtos->currentIndex().isValid())
         return;
-    QMenu menu;
+    QMenu menu(this);
+    QMenu *imprimirMenu = new QMenu("Imprimir Etiqueta Código de Barra", this);
     menu.addAction(actionMenuAlterarProd);
     menu.addAction(actionMenuDeletarProd);
+    actionMenuPrintBarCode1 = new QAction(this);
+    actionMenuPrintBarCode1->setText("1 Etiqueta");
+    connect(actionMenuPrintBarCode1,SIGNAL(triggered(bool)),this, SLOT(imprimirEtiqueta()));
+    //QAction *subAction1 = new QAction("Sub-ação 1", this);
+    imprimirMenu->addAction(actionMenuPrintBarCode1);
+    menu.addMenu(imprimirMenu);
+
     menu.exec(ui->Tview_Produtos->viewport()->mapToGlobal(pos));
 }
+
 
 
 void MainWindow::on_Btn_GerarCodBarras_clicked()
@@ -632,7 +669,7 @@ void MainWindow::on_Btn_GerarCodBarras_clicked()
     ui->Ledit_Barras->setText(gerarNumero());
     int id = QFontDatabase::addApplicationFont(":/code128.ttf");
         QFontDatabase::applicationFontFamilies(id).at(0);
-        QFont barcodefont = QFont("Code 128", 50, QFont::Normal);
+        QFont barcodefont = QFont("Code 128", 30, QFont::Normal);
             barcodefont.setLetterSpacing(QFont::AbsoluteSpacing,0.0);
         ui->labelTeste->setFont(barcodefont);
             ui->labelTeste->setText(ui->Ledit_Barras->text());

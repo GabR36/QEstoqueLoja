@@ -427,11 +427,19 @@ bool MainWindow::verificarCodigoBarras(){
     }
 }
 void MainWindow::imprimirEtiqueta1(){
-    imprimirEtiqueta(3,ui->Ledit_Barras->text());
+    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+    QVariant barrasVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 4));
+    QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
+    QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
+
+
+    imprimirEtiqueta(1, barrasVariant.toString(), descVariant.toString(), precoVariant.toString());
 
 
 }
-void MainWindow::imprimirEtiqueta(int quant, QString codBar){
+void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QString preco){
+    // criar codigo de barras -----------
     QByteArray codBarBytes = codBar.toUtf8();
     const unsigned char* data = reinterpret_cast<const unsigned char*>(codBarBytes.constData());
 
@@ -460,22 +468,13 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar){
         return ;
     }
 
-    // Salvar o buffer como um arquivo PNG
-    // error = ZBarcode_Save(barcode, "barcode.png", 0);
-    // if (error != 0) {
-    //     qDebug() << "Erro ao salvar o código de barras: " << barcode->errtxt;
-    //     ZBarcode_Delete(barcode);
-    //     return ;
-    // }
-
     ZBarcode_Print(barcode, 0);
     // Limpar o objeto de código de barras
     ZBarcode_Delete(barcode);
 
-    qDebug() << "Código de barras gerado com sucesso e salvo como barcode.png";
+    qDebug() << "Código de barras gerado com sucesso e salvo como out.png/out.gif";
     QImage codimage("out.gif");
-    ui->labelTeste->setPixmap(QPixmap::fromImage(codimage));
-
+    //  impressão ---------
     QPrinter printer;
 
     printer.setPageSize(QPageSize(QSizeF(80, 2000), QPageSize::Millimeter));
@@ -486,7 +485,18 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar){
 
     QPainter painter;
     painter.begin(&printer);
-    painter.drawImage(10,10,codimage);
+    QRect descRect(5,5,65,13);
+    QFont fontePainter = painter.font();
+    fontePainter.setPointSize(4);
+    painter.setFont(fontePainter);
+    painter.drawText(descRect,Qt::TextWordWrap, desc);
+    fontePainter.setBold(true);
+    painter.setFont(fontePainter);
+    painter.drawText(20,21, "Preço: R$" + preco);
+
+    QRect codImageRect(5,24, 65,40);
+    painter.drawImage(codImageRect, codimage);
+
     painter.end();
 
 
@@ -718,13 +728,6 @@ void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
 void MainWindow::on_Btn_GerarCodBarras_clicked()
 {
     ui->Ledit_Barras->setText(gerarNumero());
-    // int id = QFontDatabase::addApplicationFont(":/code128.ttf");
-    //     QFontDatabase::applicationFontFamilies(id).at(0);
-    //     QFont barcodefont = QFont("Code 128", 30, QFont::Normal);
-    //         barcodefont.setLetterSpacing(QFont::AbsoluteSpacing,0.0);
-    //     ui->labelTeste->setFont(barcodefont);
-    //         ui->labelTeste->setText(ui->Ledit_Barras->text());
-
 
 }
 

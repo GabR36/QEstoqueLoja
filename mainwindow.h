@@ -30,7 +30,7 @@ public:
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     QSqlQueryModel* model = new QSqlQueryModel;
     void atualizarTableview();
-    void imprimirEtiqueta(int quant, QString codBar);
+    void imprimirEtiqueta(int quant, QString codBar, QString desc,  QString preco = "");
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     QLocale portugues;

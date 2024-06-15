@@ -473,7 +473,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
     ZBarcode_Delete(barcode);
 
     qDebug() << "Código de barras gerado com sucesso e salvo como out.png/out.gif";
-    QImage codimage("out.gif");
+    QImage codimage("out.png");
     //  impressão ---------
     QPrinter printer;
 
@@ -485,16 +485,16 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
 
     QPainter painter;
     painter.begin(&printer);
-    QRect descRect(30,5,140,36);
+    QRect descRect(40,5,140,33);
     QFont fontePainter = painter.font();
     fontePainter.setPointSize(10);
     painter.setFont(fontePainter);
     painter.drawText(descRect,Qt::TextWordWrap, desc);
     fontePainter.setBold(true);
     painter.setFont(fontePainter);
-    painter.drawText(40, 50, "Preço: R$" + preco);
+    painter.drawText(55, 50, "Preço: R$" + preco);
 
-    QRect codImageRect(30,61, 130,80);
+    QRect codImageRect(40,58, 105,65);
     painter.drawImage(codImageRect, codimage);
 
     painter.end();

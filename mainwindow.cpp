@@ -434,7 +434,7 @@ void MainWindow::imprimirEtiqueta1(){
     QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
 
 
-    imprimirEtiqueta(1, barrasVariant.toString(), descVariant.toString(), precoVariant.toString());
+    imprimirEtiqueta(1, barrasVariant.toString(), descVariant.toString(), portugues.toString(precoVariant.toFloat()));
 
 
 }
@@ -485,7 +485,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
 
     QPainter painter;
     painter.begin(&printer);
-    QRect descRect(0,5,145,33);
+    QRect descRect(0,5,145,30);
     QFont fontePainter = painter.font();
     fontePainter.setPointSize(10);
     painter.setFont(fontePainter);

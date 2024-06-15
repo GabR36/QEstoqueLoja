@@ -427,38 +427,14 @@ bool MainWindow::verificarCodigoBarras(){
     }
 }
 void MainWindow::imprimirEtiqueta1(){
-    //ui->Tview_Produtos->currentIndex().row();
-    imprimirEtiqueta(1,"dasda");
-    //qDebug() <<  ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index());
-      //ui->Tview_Produtos->model()->data()
+    imprimirEtiqueta(3,ui->Ledit_Barras->text());
+
 
 }
 void MainWindow::imprimirEtiqueta(int quant, QString codBar){
-    QPrinter printer;
+    QByteArray codBarBytes = codBar.toUtf8();
+    const unsigned char* data = reinterpret_cast<const unsigned char*>(codBarBytes.constData());
 
-    printer.setPageSize(QPageSize(QSizeF(80, 2000), QPageSize::Millimeter));
-
-    QPrintDialog dialog(&printer, this);
-    if(dialog.exec() == QDialog::Rejected) return;
-
-    QPainter painter;
-    painter.begin(&printer);
-
-    // int id = QFontDatabase::addApplicationFont(":/code128.ttf");
-    // QFontDatabase::applicationFontFamilies(id).at(0);
-    // QFont barcodefont = QFont("Code 128", 30, QFont::Normal);
-
-
-    // painter.setFont(barcodefont);
-    // int yPos = 100; // Posição inicial para começar a desenhar o texto
-    // int xPos = 100;
-
-    // for(int i = 0;i < quant; i++){
-    //     painter.drawText(xPos, yPos, codBar);
-
-    // }
-    // painter.end();
-    const char* data = "123";
     struct zint_symbol *barcode = ZBarcode_Create();
     if (!barcode) {
         qDebug() << "Erro ao criar o objeto de código de barras.";
@@ -497,8 +473,20 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar){
     ZBarcode_Delete(barcode);
 
     qDebug() << "Código de barras gerado com sucesso e salvo como barcode.png";
-    QImage cod("./out.png");
-    ui->labelTeste->setPixmap(QPixmap::fromImage(cod));
+    QImage codimage("out.gif");
+    ui->labelTeste->setPixmap(QPixmap::fromImage(codimage));
+
+    QPrinter printer;
+
+    printer.setPageSize(QPageSize(QSizeF(80, 2000), QPageSize::Millimeter));
+    printer.setCopyCount(quant);
+
+    QPrintDialog dialog(&printer, this);
+    if(dialog.exec() == QDialog::Rejected) return;
+
+    QPainter painter;
+    painter.begin(&printer);
+    painter.drawImage(10,10,codimage);
     painter.end();
 
 

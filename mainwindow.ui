@@ -663,7 +663,7 @@ font-size: 15px;</string>
     <item row="2" column="0">
      <widget class="QLabel" name="labelTeste">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>

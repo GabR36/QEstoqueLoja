@@ -21,6 +21,8 @@
 #include <QMenu>
 #include <QFontDatabase>
 #include <zint.h>
+#include <iostream>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -426,7 +428,7 @@ bool MainWindow::verificarCodigoBarras(){
 }
 void MainWindow::imprimirEtiqueta1(){
     //ui->Tview_Produtos->currentIndex().row();
-
+    imprimirEtiqueta(1,"dasda");
     //qDebug() <<  ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index());
       //ui->Tview_Produtos->model()->data()
 
@@ -434,29 +436,79 @@ void MainWindow::imprimirEtiqueta1(){
 void MainWindow::imprimirEtiqueta(int quant, QString codBar){
     QPrinter printer;
 
-    printer.setPageSize(QPageSize(QSizeF(80, 297), QPageSize::Millimeter));
+    printer.setPageSize(QPageSize(QSizeF(80, 2000), QPageSize::Millimeter));
 
     QPrintDialog dialog(&printer, this);
     if(dialog.exec() == QDialog::Rejected) return;
 
     QPainter painter;
     painter.begin(&printer);
-    int id = QFontDatabase::addApplicationFont(":/code128.ttf");
-    QFontDatabase::applicationFontFamilies(id).at(0);
-    QFont barcodefont = QFont("Code 128", 30, QFont::Normal);
+
+    // int id = QFontDatabase::addApplicationFont(":/code128.ttf");
+    // QFontDatabase::applicationFontFamilies(id).at(0);
+    // QFont barcodefont = QFont("Code 128", 30, QFont::Normal);
 
 
-    painter.setFont(barcodefont);
-    int yPos = 100; // Posição inicial para começar a desenhar o texto
-    int xPos = 100;
+    // painter.setFont(barcodefont);
+    // int yPos = 100; // Posição inicial para começar a desenhar o texto
+    // int xPos = 100;
 
-    for(int i = 0;i < quant; i++){
-        painter.drawText(xPos, yPos, codBar);
+    // for(int i = 0;i < quant; i++){
+    //     painter.drawText(xPos, yPos, codBar);
+
+    // }
+    // painter.end();
+    const char* data = "123";
+    struct zint_symbol *barcode = ZBarcode_Create();
+    if (!barcode) {
+        qDebug() << "Erro ao criar o objeto de código de barras.";
+        return;
+    }
+
+    // Definir o tipo de simbologia (Code128 neste caso)
+    barcode->symbology = BARCODE_CODE128;
+
+    // Definir os dados a serem codificados
+    int error = ZBarcode_Encode(barcode, (unsigned char*)data, 0);
+    if (error != 0) {
+        qDebug() << "Erro ao codificar os dados: " << barcode->errtxt;
+        ZBarcode_Delete(barcode);
 
     }
+
+    // Gerar a imagem do código de barras e salvar como arquivo PNG
+    error = ZBarcode_Buffer(barcode, 0);
+    if (error != 0) {
+        qDebug() << "Erro ao criar o buffer da imagem: " << barcode->errtxt;
+        ZBarcode_Delete(barcode);
+        return ;
+    }
+
+    // Salvar o buffer como um arquivo PNG
+    // error = ZBarcode_Save(barcode, "barcode.png", 0);
+    // if (error != 0) {
+    //     qDebug() << "Erro ao salvar o código de barras: " << barcode->errtxt;
+    //     ZBarcode_Delete(barcode);
+    //     return ;
+    // }
+
+    ZBarcode_Print(barcode, 0);
+    // Limpar o objeto de código de barras
+    ZBarcode_Delete(barcode);
+
+    qDebug() << "Código de barras gerado com sucesso e salvo como barcode.png";
+    QImage cod("./out.png");
+    ui->labelTeste->setPixmap(QPixmap::fromImage(cod));
     painter.end();
 
+
+
+
+
+
     }
+
+
 
 
 void MainWindow::on_actionGerar_Relat_rio_PDF_triggered()
@@ -678,12 +730,13 @@ void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
 void MainWindow::on_Btn_GerarCodBarras_clicked()
 {
     ui->Ledit_Barras->setText(gerarNumero());
-    int id = QFontDatabase::addApplicationFont(":/code128.ttf");
-        QFontDatabase::applicationFontFamilies(id).at(0);
-        QFont barcodefont = QFont("Code 128", 30, QFont::Normal);
-            barcodefont.setLetterSpacing(QFont::AbsoluteSpacing,0.0);
-        ui->labelTeste->setFont(barcodefont);
-            ui->labelTeste->setText(ui->Ledit_Barras->text());
+    // int id = QFontDatabase::addApplicationFont(":/code128.ttf");
+    //     QFontDatabase::applicationFontFamilies(id).at(0);
+    //     QFont barcodefont = QFont("Code 128", 30, QFont::Normal);
+    //         barcodefont.setLetterSpacing(QFont::AbsoluteSpacing,0.0);
+    //     ui->labelTeste->setFont(barcodefont);
+    //         ui->labelTeste->setText(ui->Ledit_Barras->text());
+
 
 }
 

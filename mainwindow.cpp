@@ -485,16 +485,16 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
 
     QPainter painter;
     painter.begin(&printer);
-    QRect descRect(40,5,140,33);
+    QRect descRect(0,5,145,33);
     QFont fontePainter = painter.font();
     fontePainter.setPointSize(10);
     painter.setFont(fontePainter);
     painter.drawText(descRect,Qt::TextWordWrap, desc);
     fontePainter.setBold(true);
     painter.setFont(fontePainter);
-    painter.drawText(55, 50, "Preço: R$" + preco);
+    painter.drawText(0, 50, "Preço: R$" + preco);
 
-    QRect codImageRect(40,58, 105,65);
+    QRect codImageRect(155,5, 90,45);
     painter.drawImage(codImageRect, codimage);
 
     painter.end();

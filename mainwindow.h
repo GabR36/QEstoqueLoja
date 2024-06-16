@@ -37,6 +37,10 @@ public:
     QIcon iconAlterarProduto, iconAddProduto, iconBtnVenda, iconDelete, iconPesquisa, iconBtnRelatorios, iconImpressora;
     QString gerarNumero();
 
+public slots:
+   void on_actionTodos_Produtos_triggered();
+
+
 
 private slots:
     void on_Btn_Enviar_clicked();
@@ -66,7 +70,6 @@ private slots:
     void imprimirEtiqueta1();
     void imprimirEtiqueta3();
 
-    void on_actionTodos_Produtos_triggered();
 
     void on_actionApenas_NF_triggered();
 

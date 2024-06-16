@@ -707,10 +707,11 @@ void MainWindow::on_actionTodos_Produtos_triggered()
 
         int row2 = 1;
         float sumData4 = 0.0;
+        QString data4;
         while(query.next()){
              QString data2 = query.value(1).toString(); // quant
 
-             QString data4 = query.value(3).toString(); // preco
+             data4 = query.value(3).toString(); // preco
 
             // double preco = portugues.toDouble(data4.toString());
              float valueData4 = data4.toDouble() * data2.toInt(); // Converte o valor para double
@@ -719,9 +720,8 @@ void MainWindow::on_actionTodos_Produtos_triggered()
 
             ++row2;
         };
-        // query.next();
-        //  QString data4 = query.value(3).toString(); // preco
-        // qDebug() <<  "DATA 4 =" + data4;
+        // float a = 107926.0 + 0.4;
+        // qDebug() << QString::number(a);
 
         painter.drawText(5000, 1000,"total R$:" + portugues.toString(sumData4));
         painter.drawText(8000, 1000,"total itens:" + QString::number( row2));

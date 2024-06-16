@@ -13,6 +13,8 @@
 #include <QSqlQuery>
 #include <QtSql>
 #include <QDesktopServices>
+#include <QLocale>
+
 namespace Ui {
 class relatorios;
 }
@@ -22,9 +24,12 @@ class relatorios : public QWidget
     Q_OBJECT
 
 public:
+
     explicit relatorios(QWidget *parent = nullptr);
     QSqlDatabase db = QSqlDatabase::database();
+
     ~relatorios();
+
 
 
 private slots:
@@ -34,6 +39,7 @@ private slots:
 
 private:
     Ui::relatorios *ui;
+    QLocale portugues;
 };
 
 #endif // RELATORIOS_H

@@ -10,12 +10,17 @@
 #include "alterarproduto.h"
 #include "QItemSelectionModel"
 #include <qsqltablemodel.h>
+#include <QPrintDialog>
+#include <QtPrintSupport/QPrinter>
 #include "vendas.h"
 #include <QDoubleValidator>
 #include "relatorios.h"
 #include "venda.h"
 #include <QIntValidator>
-
+#include <QModelIndex>
+#include <QMenu>
+#include <QFontDatabase>
+#include <zint.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -123,6 +128,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
+    ui->groupBox->setVisible(false);
+     ui->Ledit_Pesquisa->installEventFilter(this);
     atualizarTableview();
     QSqlDatabase::database().close();
     //
@@ -133,29 +140,61 @@ MainWindow::MainWindow(QWidget *parent)
 
     // ajustar tamanho colunas
     // coluna descricao
-    ui->Tview_Produtos->setColumnWidth(2, 350);
+    ui->Tview_Produtos->setColumnWidth(2, 750);
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
     ui->Tview_Produtos->setColumnWidth(4,110);
+    iconAlterarProduto.addFile(":/QEstoqueLOja/story-editor.svg");
+    iconAddProduto.addFile(":/QEstoqueLOja/add-product.svg");
+    iconBtnVenda.addFile(":/QEstoqueLOja/amarok-cart-view.svg");
+    iconDelete.addFile(":/QEstoqueLOja/amarok-cart-remove.svg");
+    iconPesquisa.addFile(":/QEstoqueLOja/edit-find.svg");
+    iconBtnRelatorios.addFile(":/QEstoqueLOja/view-financial-account-investment-security.svg");
+    iconImpressora.addFile(":/QEstoqueLOja/document-print.svg");
 
-    ui->Btn_Venda->setIcon(QIcon(":/QEstoqueLOja/shopping.png"));
-    ui->Btn_Alterar->setIcon(QIcon(":/QEstoqueLOja/rebase.png"));
-    ui->Btn_Delete->setIcon(QIcon(":/QEstoqueLOja/delete.png"));
-    ui->Btn_Pesquisa->setIcon(QIcon(":/QEstoqueLOja/search.png"));
-    ui->Btn_Relatorios->setIcon(QIcon(":/QEstoqueLOja/monitoring.svg"));
+
+    ui->Btn_AddProd->setIcon(iconAddProduto);
+    ui->Btn_Venda->setIcon(iconBtnVenda);
+    ui->Btn_Alterar->setIcon(iconAlterarProduto);
+    ui->Btn_Delete->setIcon(iconDelete);
+    ui->Btn_Pesquisa->setIcon(iconPesquisa);
+    ui->Btn_Relatorios->setIcon(iconBtnRelatorios);
 
     // validadores para os campos
     QDoubleValidator *DoubleValidador = new QDoubleValidator();
     QIntValidator *IntValidador = new QIntValidator();
     ui->Ledit_Preco->setValidator(DoubleValidador);
     ui->Ledit_Quantidade->setValidator(IntValidador);
+
+
+    // ações para menu de contexto tabela produtos
+    actionMenuAlterarProd = new QAction(this);
+    actionMenuDeletarProd = new QAction(this);
+
+    actionMenuDeletarProd->setText("Deletar Produto");
+    actionMenuDeletarProd->setIcon(iconDelete);
+    connect(actionMenuDeletarProd,SIGNAL(triggered(bool)),this,SLOT(on_Btn_Delete_clicked()));
+
+    actionMenuAlterarProd->setText("Alterar Produto");
+    actionMenuAlterarProd->setIcon(iconAlterarProduto);
+    connect(actionMenuAlterarProd,SIGNAL(triggered(bool)),this,SLOT(on_Btn_Alterar_clicked()));
+
+    actionMenuPrintBarCode1 = new QAction(this);
+    actionMenuPrintBarCode1->setText("1 Etiqueta");
+    connect(actionMenuPrintBarCode1,SIGNAL(triggered(bool)),this, SLOT(imprimirEtiqueta1()));
+
+    actionMenuPrintBarCode3 = new QAction(this);
+    actionMenuPrintBarCode3->setText("3 Etiquetas");
+    connect(actionMenuPrintBarCode3,SIGNAL(triggered(bool)),this, SLOT(imprimirEtiqueta3()));
+
+
+
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-
 
 void MainWindow::atualizarTableview(){
     if(!db.open()){
@@ -389,9 +428,357 @@ bool MainWindow::verificarCodigoBarras(){
         return false;
     }
 }
+void MainWindow::imprimirEtiqueta1(){
+    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+    QVariant barrasVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 4));
+    QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
+    QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
 
 
-void MainWindow::on_actionGerar_Relat_rio_PDF_triggered()
+    imprimirEtiqueta(1, barrasVariant.toString(), descVariant.toString(), portugues.toString(precoVariant.toFloat()));
+
+
+}
+void MainWindow::imprimirEtiqueta3(){
+    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+    QVariant barrasVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 4));
+    QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
+    QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
+
+
+    imprimirEtiqueta(3, barrasVariant.toString(), descVariant.toString(), portugues.toString(precoVariant.toFloat()));
+
+
+}
+void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QString preco){
+    // criar codigo de barras -----------
+    QByteArray codBarBytes = codBar.toUtf8();
+    const unsigned char* data = reinterpret_cast<const unsigned char*>(codBarBytes.constData());
+
+    struct zint_symbol *barcode = ZBarcode_Create();
+    if (!barcode) {
+        qDebug() << "Erro ao criar o objeto de código de barras.";
+        return;
+    }
+
+    // Definir o tipo de simbologia (Code128 neste caso)
+    barcode->symbology = BARCODE_CODE128;
+
+    // Definir os dados a serem codificados
+    int error = ZBarcode_Encode(barcode, (unsigned char*)data, 0);
+    if (error != 0) {
+        qDebug() << "Erro ao codificar os dados: " << barcode->errtxt;
+        ZBarcode_Delete(barcode);
+
+    }
+
+    // Gerar a imagem do código de barras e salvar como arquivo PNG ou GIF
+    error = ZBarcode_Buffer(barcode, 0);
+    if (error != 0) {
+        qDebug() << "Erro ao criar o buffer da imagem: " << barcode->errtxt;
+        ZBarcode_Delete(barcode);
+        return ;
+    }
+
+    ZBarcode_Print(barcode, 0);
+    // Limpar o objeto de código de barras
+    ZBarcode_Delete(barcode);
+
+    qDebug() << "Código de barras gerado com sucesso e salvo como out.png/out.gif";
+    QImage codimage("out.gif");
+    //  impressão ---------
+    QPrinter printer;
+
+    printer.setPageSize(QPageSize(QSizeF(80, 2000), QPageSize::Millimeter));
+    printer.setCopyCount(quant);
+
+    QPrintDialog dialog(&printer, this);
+    if(dialog.exec() == QDialog::Rejected) return;
+
+    QPainter painter;
+    painter.begin(&printer);
+
+    // QByteArray cutCommand;
+    // cutCommand.append(0x1D);
+    // cutCommand.append('V');
+
+    int ypos[2] = {5, 50};
+
+    for(int i =0; i<quant; i++){
+
+
+        if(i > 0){
+            for(int j = 0; j < 2; j ++){
+                ypos[j] = ypos[j] + 51;
+            };
+        }
+
+        QRect descRect(0,ypos[0],145,32);
+        QFont fontePainter = painter.font();
+        fontePainter.setPointSize(10);
+        painter.setFont(fontePainter);
+        painter.drawText(descRect,Qt::TextWordWrap, desc);
+        fontePainter.setBold(true);
+        painter.setFont(fontePainter);
+        painter.drawText(0, ypos[1], "Preço: R$" + preco);
+        fontePainter.setBold(false);
+        painter.setFont(fontePainter);
+
+        QRect codImageRect(155,ypos[0], 90,45);
+        painter.drawImage(codImageRect, codimage);
+
+
+    }
+    painter.end();
+
+
+
+
+
+
+    }
+
+
+
+
+
+
+void MainWindow::on_actionGerar_Relat_rio_CSV_triggered()
+{
+    QString fileName = QFileDialog::getSaveFileName(nullptr, "Salvar Arquivo CSV", "", "Arquivos CSV (*.csv)");
+
+    if (fileName.isEmpty()) {
+        // Se o usuário cancelar a seleção do arquivo, saia da função
+        return;
+    }
+
+    // Abrindo o arquivo CSV para escrita
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        qDebug() << "Erro ao abrir o arquivo para escrita.";
+        return;
+    }
+    QTextStream out(&file);
+
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir o banco de dados botao csv.";
+        return;
+    }
+
+    // Executando a consulta para recuperar os itens da tabela
+    QSqlQuery query("SELECT * FROM produtos");
+    out << "ID;Quant;Desc;Preço;CodBarra;NF\n";
+    while (query.next()) {
+        // Escrevendo os dados no arquivo CSV
+        for (int i = 0; i < query.record().count(); ++i) {
+            out << query.value(i).toString();
+            if (i != query.record().count() - 1)
+                out << ";"; // Adicionando ponto e vírgula para separar os campos
+        }
+        out << "\n"; // Adicionando uma nova linha após cada registro
+    }
+
+    // Fechando o arquivo e desconectando do banco de dados
+    file.close();
+    db.close();
+}
+
+
+void MainWindow::on_actionRealizar_Venda_triggered()
+{
+    Vendas *janelaVenda = new Vendas;
+   // MainWindow *janelaPrincipal;
+   // QSqlDatabase db = QSqlDatabase::database();
+    //explicit venda(QWidget *parent = nullptr);
+    venda *inserirVenda = new venda;
+    inserirVenda->janelaVenda = janelaVenda;
+    inserirVenda->janelaPrincipal = this;
+    inserirVenda->setWindowModality(Qt::ApplicationModal);
+    inserirVenda->show();
+}
+
+
+void MainWindow::on_Btn_AddProd_clicked()
+{
+    ui->groupBox->setVisible(!ui->groupBox->isVisible());
+    if(!ui->groupBox->isVisible()){
+        ui->Tview_Produtos->setColumnWidth(2, 750);
+
+    }else{
+        ui->Tview_Produtos->setColumnWidth(2, 350);
+
+    }
+}
+
+bool MainWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    // Verificar se o evento é uma tecla pressionada no lineEdit
+    if (obj == ui->Ledit_Pesquisa && event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter)
+        {
+            ui->Btn_Pesquisa->click(); // Simula um clique no botão
+            return true; // Evento tratado
+        }
+    }
+
+    // Processar o evento padrão
+    return QMainWindow::eventFilter(obj, event);
+}
+QString MainWindow::gerarNumero()
+{
+    QString number;
+    do {
+        number = QString("3562%1").arg(QRandomGenerator::global()->bounded(100000), 5, 10, QChar('0'));
+    } while (generatedNumbers.contains(number));
+
+    generatedNumbers.insert(number);
+    // saveGeneratedNumber(number);
+
+    return number;
+}
+
+
+
+
+void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
+{
+
+    if(!ui->Tview_Produtos->currentIndex().isValid())
+        return;
+    QMenu menu(this);
+    QMenu *imprimirMenu = new QMenu("Imprimir Etiqueta Código de Barra", this);
+
+    menu.addAction(actionMenuAlterarProd);
+    menu.addAction(actionMenuDeletarProd);
+    imprimirMenu->setIcon(iconImpressora);
+    imprimirMenu->addAction(actionMenuPrintBarCode1);
+    imprimirMenu->addAction(actionMenuPrintBarCode3);
+    menu.addMenu(imprimirMenu);
+
+    menu.exec(ui->Tview_Produtos->viewport()->mapToGlobal(pos));
+}
+
+
+
+void MainWindow::on_Btn_GerarCodBarras_clicked()
+{
+    ui->Ledit_Barras->setText(gerarNumero());
+
+}
+
+
+void MainWindow::on_actionTodos_Produtos_triggered()
+{
+
+        // salva o arquivo
+        QString fileName = QFileDialog::getSaveFileName(this, "Salvar PDF", QString(), "*.pdf");
+        if (fileName.isEmpty())
+            return;
+
+        if (!db.open()) {
+            qDebug() << "nao abriu bd";
+            return;
+        }
+
+        QPdfWriter writer(fileName);
+        writer.setPageSize(QPageSize(QPageSize::A4));
+        QPainter painter(&writer);
+        painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+        painter.setFont(QFont("Arial", 10, QFont::Bold));
+
+        // Determinar a altura de uma linha e o espaço disponível na página
+        int lineHeight = 300; // Altura de uma linha
+        int availableHeight = writer.height(); // Altura disponível na página
+        int startY = 1500; // Define a coordenada Y inicial
+
+        // Desenha os dados da tabela no PDF
+        QImage logo(":/QEstoqueLOja/mkaoyvbl.png");
+        painter.drawImage(QRect(100, 100, 2000, 400), logo);
+        painter.drawText(500, 1000,       "Dados da Tabela Produtos:");
+        painter.drawText(1000, 1500,       "ID");
+        painter.drawText(1600, 1500, "Quantidade");
+        painter.drawText(3000, 1500, "Descrição");
+        painter.drawText(8500, 1500, "Preço R$");
+
+        QSqlQuery query("SELECT * FROM produtos");
+
+        int row2 = 1;
+        float sumData4 = 0.0;
+        QString data4;
+        while(query.next()){
+             QString data2 = query.value(1).toString(); // quant
+
+             data4 = query.value(3).toString(); // preco
+
+            // double preco = portugues.toDouble(data4.toString());
+             float valueData4 = data4.toDouble() * data2.toInt(); // Converte o valor para double
+             sumData4 += valueData4; // Adiciona o valor à soma total
+
+
+            ++row2;
+        };
+        // float a = 107926.0 + 0.4;
+        // qDebug() << QString::number(a);
+
+        painter.drawText(5000, 1000,"total R$:" + portugues.toString(sumData4));
+        painter.drawText(8000, 1000,"total itens:" + QString::number( row2));
+
+        QSqlQuery query2("SELECT * FROM produtos");
+
+
+
+
+        int row = 1;
+        //  double sumData4 = 0.0;
+
+        QFontMetrics metrics(painter.font());
+        while (query2.next()) {
+            QString data1 = query2.value(0).toString(); // id
+            QString data2 = query2.value(1).toString(); // quant
+            QString data3 = query2.value(2).toString(); // desc
+            QString data4 = query2.value(3).toString(); // preco
+            QRect rect = metrics.boundingRect(QRect(0, 0, 4000, lineHeight), Qt::TextWordWrap, data3);
+            int textHeight = rect.height();
+
+            // Verifica se há espaço suficiente na página atual para desenhar outra linha
+            if (startY + lineHeight * row > availableHeight) {
+                // Se não houver, inicie uma nova página
+                writer.newPage();
+                startY = 100; // Reinicie a coordenada Y inicial
+                row = 1; // Reinicie o contador de linha
+            }
+
+            // Desenhe os dados na página atual
+            painter.drawText(QRect(1000, startY + lineHeight * row, 4000, textHeight), data1); //stary = 1500
+            painter.drawText(QRect(1600, startY + lineHeight * row, 4000, textHeight), data2);
+            painter.drawText(QRect(3000, startY + lineHeight * row, 4000, textHeight), Qt::TextWordWrap, data3); // data3 com quebra de linha
+            painter.drawText(QRect(8500, startY + lineHeight * row, 4000, textHeight), portugues.toString(data4.toDouble()));
+
+            startY += textHeight;
+
+            ++row;
+        }
+
+        // // Desenha a quantidade de itens e a soma dos preços apenas na primeira página
+        // painter.drawText(4000, 1000, "Quantidade de Itens: " + QString::number(totalItems));
+        // painter.drawText(4000, 1100, "Soma dos preços: R$ " + QString::number(sumData4));
+
+        painter.end();
+
+        db.close();
+
+        // Abre o PDF após a criação
+        QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
+
+
+ }
+
+
+void MainWindow::on_actionApenas_NF_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this, "Salvar PDF", QString(), "*.pdf");
     if (fileName.isEmpty())
@@ -425,20 +812,29 @@ void MainWindow::on_actionGerar_Relat_rio_PDF_triggered()
     QSqlQuery query("SELECT * FROM produtos");
 
     int row2 = 1;
-    double sumData4 = 0.0;
+    int rowNF = 1;
+    float sumData4 = 0.0;
     while(query.next()){
         QString data2 = query.value(1).toString(); // quant
-
         QString data4 = query.value(3).toString(); // preco
-        double valueData4 = data4.toDouble() * data2.toInt(); // Converte o valor para double
-        sumData4 += valueData4; // Adiciona o valor à soma total
+        int variantNf = query.value(5).toInt();
 
+        if(variantNf == 1){
+
+
+
+        // double preco = portugues.toDouble(data4.toString());
+        float valueData4 = data4.toDouble() * data2.toInt(); // Converte o valor para double
+        sumData4 += valueData4; // Adiciona o valor à soma total
+        ++rowNF;
+
+        }
 
         ++row2;
     };
 
-    painter.drawText(5000, 1000,"total R$:" + QString::number( sumData4));
-    painter.drawText(8000, 1000,"total itens:" + QString::number( row2));
+    painter.drawText(5000, 1000,"total R$:" + portugues.toString(sumData4));
+    painter.drawText(8000, 1000,"total itens:" + QString::number( rowNF));
 
     QSqlQuery query2("SELECT * FROM produtos");
 
@@ -448,36 +844,42 @@ void MainWindow::on_actionGerar_Relat_rio_PDF_triggered()
     int row = 1;
     //  double sumData4 = 0.0;
 
-
+    QFontMetrics metrics(painter.font());
     while (query2.next()) {
         QString data1 = query2.value(0).toString(); // id
         QString data2 = query2.value(1).toString(); // quant
         QString data3 = query2.value(2).toString(); // desc
         QString data4 = query2.value(3).toString(); // preco
+        QString nf = query2.value(5).toString();
 
-        // Verifica se há espaço suficiente na página atual para desenhar outra linha
-        if (startY + lineHeight * row > availableHeight) {
-            // Se não houver, inicie uma nova página
-            writer.newPage();
-            startY = 100; // Reinicie a coordenada Y inicial
-            row = 1; // Reinicie o contador de linha
-        }
 
-        // Desenhe os dados na página atual
-        painter.drawText(1000, startY + lineHeight * row, data1);
-        painter.drawText(1600, startY + lineHeight * row, data2);
-        painter.drawText(3000, startY + lineHeight * row, data3);
-        painter.drawText(8500, startY + lineHeight * row, data4);
 
-        double valueData4 = data4.toDouble(); // Converte o valor para double
-        sumData4 += valueData4; // Adiciona o valor à soma total
+            QRect rect = metrics.boundingRect(QRect(0, 0, 4000, lineHeight), Qt::TextWordWrap, data3);
+            int textHeight = rect.height();
 
-        ++row;
+            // Verifica se há espaço suficiente na página atual para desenhar outra linha
+            if (startY + lineHeight * row > availableHeight) {
+                // Se não houver, inicie uma nova página
+                writer.newPage();
+                startY = 100; // Reinicie a coordenada Y inicial
+                row = 1; // Reinicie o contador de linha
+            }
+
+             if(nf == "1"){
+
+            // Desenhe os dados na página atual
+            painter.drawText(QRect(1000, startY + lineHeight * row, 4000, textHeight), data1); //stary = 1500
+            painter.drawText(QRect(1600, startY + lineHeight * row, 4000, textHeight), data2);
+            painter.drawText(QRect(3000, startY + lineHeight * row, 4000, textHeight), Qt::TextWordWrap, data3); // data3 com quebra de linha
+            painter.drawText(QRect(8500, startY + lineHeight * row, 4000, textHeight), portugues.toString(data4.toDouble()));
+
+            startY += textHeight;
+
+            ++row;
+             }
+
     }
-
-    // // Desenha a quantidade de itens e a soma dos preços apenas na primeira página
-    // painter.drawText(4000, 1000, "Quantidade de Itens: " + QString::number(totalItems));
-    // painter.drawText(4000, 1100, "Soma dos preços: R$ " + QString::number(sumData4));
+    qDebug() << "row = " + row;
 
     painter.end();
 
@@ -486,60 +888,7 @@ void MainWindow::on_actionGerar_Relat_rio_PDF_triggered()
     // Abre o PDF após a criação
     QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
 
-}
 
 
-void MainWindow::on_actionGerar_Relat_rio_CSV_triggered()
-{
-    QString fileName = QFileDialog::getSaveFileName(nullptr, "Salvar Arquivo CSV", "", "Arquivos CSV (*.csv)");
-
-    if (fileName.isEmpty()) {
-        // Se o usuário cancelar a seleção do arquivo, saia da função
-        return;
-    }
-
-    // Abrindo o arquivo CSV para escrita
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qDebug() << "Erro ao abrir o arquivo para escrita.";
-        return;
-    }
-    QTextStream out(&file);
-
-    if (!db.open()) {
-        qDebug() << "Erro ao abrir o banco de dados botao csv.";
-        return;
-    }
-
-    // Executando a consulta para recuperar os itens da tabela
-    QSqlQuery query("SELECT * FROM produtos");
-    out << "ID;Quant;Desc;Preço;CodBarra;NF\n";
-    while (query.next()) {
-        // Escrevendo os dados no arquivo CSV
-        for (int i = 0; i < query.record().count(); ++i) {
-            out << query.value(i).toString();
-            if (i != query.record().count() - 1)
-                out << ";"; // Adicionando vírgula para separar os campos
-        }
-        out << "\n"; // Adicionando uma nova linha após cada registro
-    }
-
-    // Fechando o arquivo e desconectando do banco de dados
-    file.close();
-    db.close();
-}
-
-
-void MainWindow::on_actionRealizar_Venda_triggered()
-{
-    Vendas *janelaVenda = new Vendas;
-   // MainWindow *janelaPrincipal;
-   // QSqlDatabase db = QSqlDatabase::database();
-    //explicit venda(QWidget *parent = nullptr);
-    venda *inserirVenda = new venda;
-    inserirVenda->janelaVenda = janelaVenda;
-    inserirVenda->janelaPrincipal = this;
-    inserirVenda->setWindowModality(Qt::ApplicationModal);
-    inserirVenda->show();
 }
 

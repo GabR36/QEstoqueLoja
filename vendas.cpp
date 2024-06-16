@@ -30,7 +30,7 @@ Vendas::Vendas(QWidget *parent) :
     // coluna cliente
     ui->Tview_Vendas2->setColumnWidth(1, 100);
     // coluna descricao
-    ui->Tview_ProdutosVendidos->setColumnWidth(0, 200);
+    ui->Tview_ProdutosVendidos->setColumnWidth(0, 400);
     // coluna quantidade
     ui->Tview_ProdutosVendidos->setColumnWidth(1, 85);
 

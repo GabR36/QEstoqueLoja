@@ -95,25 +95,45 @@ background-color:rgb(170, 170, 170);
        <property name="text">
         <string>Dinheiro</string>
        </property>
+       <property name="icon">
+        <iconset resource="Imagens/recursosImg.qrc">
+         <normaloff>:/QEstoqueLOja/taxes-finances.svg</normaloff>:/QEstoqueLOja/taxes-finances.svg</iconset>
+       </property>
       </item>
       <item>
        <property name="text">
         <string>Não Sei</string>
+       </property>
+       <property name="icon">
+        <iconset resource="Imagens/recursosImg.qrc">
+         <normaloff>:/QEstoqueLOja/question.svg</normaloff>:/QEstoqueLOja/question.svg</iconset>
        </property>
       </item>
       <item>
        <property name="text">
         <string>Crédito</string>
        </property>
+       <property name="icon">
+        <iconset resource="Imagens/recursosImg.qrc">
+         <normaloff>:/QEstoqueLOja/view-financial-account-credit-card.svg</normaloff>:/QEstoqueLOja/view-financial-account-credit-card.svg</iconset>
+       </property>
       </item>
       <item>
        <property name="text">
         <string>Débito</string>
        </property>
+       <property name="icon">
+        <iconset resource="Imagens/recursosImg.qrc">
+         <normaloff>:/QEstoqueLOja/view-financial-transfer-reconciled.svg</normaloff>:/QEstoqueLOja/view-financial-transfer-reconciled.svg</iconset>
+       </property>
       </item>
       <item>
        <property name="text">
         <string>Pix</string>
+       </property>
+       <property name="icon">
+        <iconset resource="Imagens/recursosImg.qrc">
+         <normaloff>:/QEstoqueLOja/view-financial-account-liability.svg</normaloff>:/QEstoqueLOja/view-financial-account-liability.svg</iconset>
        </property>
       </item>
      </widget>
@@ -396,9 +416,9 @@ font-size: 15px;
   <widget class="QCheckBox" name="CheckImprimirCNF">
    <property name="geometry">
     <rect>
-     <x>420</x>
+     <x>410</x>
      <y>420</y>
-     <width>121</width>
+     <width>131</width>
      <height>31</height>
     </rect>
    </property>
@@ -408,12 +428,18 @@ font-size: 15px;
    <property name="text">
     <string>Imprimir cupom </string>
    </property>
+   <property name="icon">
+    <iconset resource="Imagens/recursosImg.qrc">
+     <normaloff>:/QEstoqueLOja/document-print.svg</normaloff>:/QEstoqueLOja/document-print.svg</iconset>
+   </property>
    <property name="tristate">
     <bool>false</bool>
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="Imagens/recursosImg.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

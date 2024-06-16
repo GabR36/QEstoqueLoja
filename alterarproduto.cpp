@@ -17,6 +17,8 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
     QIntValidator *IntValidador = new QIntValidator();
     ui->Ledit_AltPreco->setValidator(DoubleValidador);
     ui->Ledit_AltQuant->setValidator(IntValidador);
+    ui->Btn_GerarCod->setIcon(QIcon(":/QEstoqueLOja/restart.svg"));
+
 }
 
 AlterarProduto::~AlterarProduto()
@@ -137,5 +139,11 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
         // Exiba uma mensagem de erro se o preço não for válido
         QMessageBox::warning(this, "Erro", "Por favor, insira um preço válido.");
     }
+}
+
+
+void AlterarProduto::on_Btn_GerarCod_clicked()
+{
+    ui->Ledit_AltBarras->setText(janelaPrincipal->gerarNumero());
 }
 

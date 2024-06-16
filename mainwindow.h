@@ -53,8 +53,6 @@ private slots:
     
     void on_Ledit_Barras_returnPressed();
 
-    void on_actionGerar_Relat_rio_PDF_triggered();
-
     void on_actionGerar_Relat_rio_CSV_triggered();
 
     void on_actionRealizar_Venda_triggered();
@@ -69,6 +67,8 @@ private slots:
     void imprimirEtiqueta3();
 
     void on_actionTodos_Produtos_triggered();
+
+    void on_actionApenas_NF_triggered();
 
 private:
     Ui::MainWindow *ui;

@@ -434,7 +434,7 @@ void MainWindow::imprimirEtiqueta1(){
     QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
 
 
-    imprimirEtiqueta(1, barrasVariant.toString(), descVariant.toString(), portugues.toString(precoVariant.toFloat()));
+    imprimirEtiqueta(3, barrasVariant.toString(), descVariant.toString(), portugues.toString(precoVariant.toFloat()));
 
 
 }
@@ -473,7 +473,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
     ZBarcode_Delete(barcode);
 
     qDebug() << "Código de barras gerado com sucesso e salvo como out.png/out.gif";
-    QImage codimage("out.png");
+    QImage codimage("out.gif");
     //  impressão ---------
     QPrinter printer;
 
@@ -485,18 +485,38 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
 
     QPainter painter;
     painter.begin(&printer);
-    QRect descRect(0,5,145,30);
-    QFont fontePainter = painter.font();
-    fontePainter.setPointSize(10);
-    painter.setFont(fontePainter);
-    painter.drawText(descRect,Qt::TextWordWrap, desc);
-    fontePainter.setBold(true);
-    painter.setFont(fontePainter);
-    painter.drawText(0, 50, "Preço: R$" + preco);
 
-    QRect codImageRect(155,5, 90,45);
-    painter.drawImage(codImageRect, codimage);
+    // QByteArray cutCommand;
+    // cutCommand.append(0x1D);
+    // cutCommand.append('V');
 
+    int ypos[2] = {5, 50};
+
+    for(int i =0; i<quant; i++){
+
+
+        if(i > 0){
+            for(int j = 0; j < 2; j ++){
+                ypos[j] = ypos[j] + 51;
+            };
+        }
+
+        QRect descRect(0,ypos[0],145,32);
+        QFont fontePainter = painter.font();
+        fontePainter.setPointSize(10);
+        painter.setFont(fontePainter);
+        painter.drawText(descRect,Qt::TextWordWrap, desc);
+        fontePainter.setBold(true);
+        painter.setFont(fontePainter);
+        painter.drawText(0, ypos[1], "Preço: R$" + preco);
+        fontePainter.setBold(false);
+        painter.setFont(fontePainter);
+
+        QRect codImageRect(155,ypos[0], 90,45);
+        painter.drawImage(codImageRect, codimage);
+
+
+    }
     painter.end();
 
 

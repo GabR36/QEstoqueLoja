@@ -21,8 +21,6 @@
 #include <QMenu>
 #include <QFontDatabase>
 #include <zint.h>
-#include <iostream>
-
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -184,6 +182,10 @@ MainWindow::MainWindow(QWidget *parent)
     actionMenuPrintBarCode1 = new QAction(this);
     actionMenuPrintBarCode1->setText("1 Etiqueta");
     connect(actionMenuPrintBarCode1,SIGNAL(triggered(bool)),this, SLOT(imprimirEtiqueta1()));
+
+    actionMenuPrintBarCode3 = new QAction(this);
+    actionMenuPrintBarCode3->setText("3 Etiquetas");
+    connect(actionMenuPrintBarCode3,SIGNAL(triggered(bool)),this, SLOT(imprimirEtiqueta3()));
 
 
 
@@ -434,6 +436,18 @@ void MainWindow::imprimirEtiqueta1(){
     QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
 
 
+    imprimirEtiqueta(1, barrasVariant.toString(), descVariant.toString(), portugues.toString(precoVariant.toFloat()));
+
+
+}
+void MainWindow::imprimirEtiqueta3(){
+    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+    QVariant barrasVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 4));
+    QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
+    QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
+
+
     imprimirEtiqueta(3, barrasVariant.toString(), descVariant.toString(), portugues.toString(precoVariant.toFloat()));
 
 
@@ -460,7 +474,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
 
     }
 
-    // Gerar a imagem do código de barras e salvar como arquivo PNG
+    // Gerar a imagem do código de barras e salvar como arquivo PNG ou GIF
     error = ZBarcode_Buffer(barcode, 0);
     if (error != 0) {
         qDebug() << "Erro ao criar o buffer da imagem: " << barcode->errtxt;
@@ -738,6 +752,7 @@ void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
     menu.addAction(actionMenuDeletarProd);
     imprimirMenu->setIcon(iconImpressora);
     imprimirMenu->addAction(actionMenuPrintBarCode1);
+    imprimirMenu->addAction(actionMenuPrintBarCode3);
     menu.addMenu(imprimirMenu);
 
     menu.exec(ui->Tview_Produtos->viewport()->mapToGlobal(pos));

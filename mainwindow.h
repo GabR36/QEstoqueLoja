@@ -67,6 +67,7 @@ private slots:
     void on_Btn_GerarCodBarras_clicked();
 
     void imprimirEtiqueta1();
+    void imprimirEtiqueta3();
 
 private:
     Ui::MainWindow *ui;
@@ -75,6 +76,7 @@ private:
     QAction* actionMenuAlterarProd;
     QAction* actionMenuDeletarProd;
     QAction* actionMenuPrintBarCode1;
+    QAction* actionMenuPrintBarCode3;
 
     //QModelIndex selected_index;
 

@@ -4,6 +4,7 @@
 #include <QDialog>
 #include "mainwindow.h"
 #include <QLocale>
+#include <QSet>
 
 namespace Ui {
 class AlterarProduto;
@@ -29,8 +30,11 @@ public:
 private slots:
     void on_Btn_AltAceitar_accepted();
 
+    void on_Btn_GerarCod_clicked();
+
 private:
     Ui::AlterarProduto *ui;
+    QSet<QString> generatedNumbers;
 };
 
 #endif // ALTERARPRODUTO_H

@@ -35,6 +35,7 @@ public:
     ~MainWindow();
     QLocale portugues;
     QIcon iconAlterarProduto, iconAddProduto, iconBtnVenda, iconDelete, iconPesquisa, iconBtnRelatorios, iconImpressora;
+    QString gerarNumero();
 
 
 private slots:
@@ -59,8 +60,6 @@ private slots:
     void on_actionRealizar_Venda_triggered();
 
     void on_Btn_AddProd_clicked();
-
-    QString gerarNumero();
 
     void on_Tview_Produtos_customContextMenuRequested(const QPoint &pos);
 

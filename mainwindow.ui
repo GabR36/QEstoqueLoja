@@ -131,6 +131,41 @@ border: 2px solid black;
           <item>
            <widget class="QLineEdit" name="Ledit_Barras"/>
           </item>
+          <item>
+           <widget class="QPushButton" name="Btn_GerarCodBarras">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>30</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>30</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string extracomment="Gerar código de barra pessoal">Gerar código de barra pessoal</string>
+            </property>
+            <property name="accessibleDescription">
+             <string extracomment="Gerar código de barra pessoal"/>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="Imagens/recursosImg.qrc">
+              <normaloff>:/QEstoqueLOja/restart.svg</normaloff>:/QEstoqueLOja/restart.svg</iconset>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -193,29 +228,6 @@ border: 2px solid black;
          </widget>
         </item>
        </layout>
-      </widget>
-      <widget class="QPushButton" name="Btn_GerarCodBarras">
-       <property name="geometry">
-        <rect>
-         <x>313</x>
-         <y>33</y>
-         <width>31</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="toolTip">
-        <string extracomment="Gerar código de barra pessoal">Gerar código de barra pessoal</string>
-       </property>
-       <property name="accessibleDescription">
-        <string extracomment="Gerar código de barra pessoal"/>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="Imagens/recursosImg.qrc">
-         <normaloff>:/QEstoqueLOja/addblack.svg</normaloff>:/QEstoqueLOja/addblack.svg</iconset>
-       </property>
       </widget>
      </widget>
     </item>
@@ -676,7 +688,15 @@ font-size: 15px;</string>
     <property name="title">
      <string>Relatórios</string>
     </property>
-    <addaction name="actionGerar_Relat_rio_PDF"/>
+    <widget class="QMenu" name="menuGerar_lista_Produtos_PDF">
+     <property name="title">
+      <string>Gerar lista Produtos PDF</string>
+     </property>
+     <addaction name="actionTodos_Produtos"/>
+     <addaction name="actionApenas_NF"/>
+     <addaction name="actionSem_NF"/>
+    </widget>
+    <addaction name="menuGerar_lista_Produtos_PDF"/>
     <addaction name="actionGerar_Relat_rio_CSV"/>
    </widget>
    <widget class="QMenu" name="menuVendas">
@@ -691,14 +711,6 @@ font-size: 15px;</string>
   <action name="actionteste">
    <property name="text">
     <string>teste</string>
-   </property>
-  </action>
-  <action name="actionGerar_Relat_rio_PDF">
-   <property name="text">
-    <string>Gerar lista Produtos PDF</string>
-   </property>
-   <property name="shortcut">
-    <string>F8</string>
    </property>
   </action>
   <action name="actionGerar_Relat_rio_CSV">
@@ -718,6 +730,21 @@ font-size: 15px;</string>
    </property>
    <property name="shortcut">
     <string>F5</string>
+   </property>
+  </action>
+  <action name="actionTodos_Produtos">
+   <property name="text">
+    <string>Todos Produtos</string>
+   </property>
+  </action>
+  <action name="actionApenas_NF">
+   <property name="text">
+    <string>Apenas NF</string>
+   </property>
+  </action>
+  <action name="actionSem_NF">
+   <property name="text">
+    <string>Sem NF</string>
    </property>
   </action>
  </widget>

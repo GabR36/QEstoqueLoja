@@ -68,6 +68,8 @@ private slots:
     void imprimirEtiqueta1();
     void imprimirEtiqueta3();
 
+    void on_actionTodos_Produtos_triggered();
+
 private:
     Ui::MainWindow *ui;
     bool verificarCodigoBarras();

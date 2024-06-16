@@ -543,102 +543,10 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
 
 
 
-void MainWindow::on_actionGerar_Relat_rio_PDF_triggered()
-{
-    QString fileName = QFileDialog::getSaveFileName(this, "Salvar PDF", QString(), "*.pdf");
-    if (fileName.isEmpty())
-        return;
+    void MainWindow::on_actionGerar_Relat_rio_PDF_triggered()
+    {
 
-    if (!db.open()) {
-        qDebug() << "nao abriu bd";
-        return;
     }
-
-    QPdfWriter writer(fileName);
-    writer.setPageSize(QPageSize(QPageSize::A4));
-    QPainter painter(&writer);
-    painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-    painter.setFont(QFont("Arial", 10, QFont::Bold));
-
-    // Determinar a altura de uma linha e o espaço disponível na página
-    int lineHeight = 300; // Altura de uma linha
-    int availableHeight = writer.height(); // Altura disponível na página
-    int startY = 1500; // Define a coordenada Y inicial
-
-    // Desenha os dados da tabela no PDF
-    QImage logo(":/QEstoqueLOja/mkaoyvbl.png");
-    painter.drawImage(QRect(100, 100, 2000, 400), logo);
-    painter.drawText(500, 1000,       "Dados da Tabela Produtos:");
-    painter.drawText(1000, 1500,       "ID");
-    painter.drawText(1600, 1500, "Quantidade");
-    painter.drawText(3000, 1500, "Descrição");
-    painter.drawText(8500, 1500, "Preço R$");
-
-    QSqlQuery query("SELECT * FROM produtos");
-
-    int row2 = 1;
-    double sumData4 = 0.0;
-    while(query.next()){
-        QString data2 = query.value(1).toString(); // quant
-
-        QString data4 = query.value(3).toString(); // preco
-        double valueData4 = data4.toDouble() * data2.toInt(); // Converte o valor para double
-        sumData4 += valueData4; // Adiciona o valor à soma total
-
-
-        ++row2;
-    };
-
-    painter.drawText(5000, 1000,"total R$:" + QString::number( sumData4));
-    painter.drawText(8000, 1000,"total itens:" + QString::number( row2));
-
-    QSqlQuery query2("SELECT * FROM produtos");
-
-
-
-
-    int row = 1;
-    //  double sumData4 = 0.0;
-
-
-    while (query2.next()) {
-        QString data1 = query2.value(0).toString(); // id
-        QString data2 = query2.value(1).toString(); // quant
-        QString data3 = query2.value(2).toString(); // desc
-        QString data4 = query2.value(3).toString(); // preco
-
-        // Verifica se há espaço suficiente na página atual para desenhar outra linha
-        if (startY + lineHeight * row > availableHeight) {
-            // Se não houver, inicie uma nova página
-            writer.newPage();
-            startY = 100; // Reinicie a coordenada Y inicial
-            row = 1; // Reinicie o contador de linha
-        }
-
-        // Desenhe os dados na página atual
-        painter.drawText(1000, startY + lineHeight * row, data1);
-        painter.drawText(1600, startY + lineHeight * row, data2);
-        painter.drawText(3000, startY + lineHeight * row, data3);
-        painter.drawText(8500, startY + lineHeight * row, data4);
-
-        double valueData4 = data4.toDouble(); // Converte o valor para double
-        sumData4 += valueData4; // Adiciona o valor à soma total
-
-        ++row;
-    }
-
-    // // Desenha a quantidade de itens e a soma dos preços apenas na primeira página
-    // painter.drawText(4000, 1000, "Quantidade de Itens: " + QString::number(totalItems));
-    // painter.drawText(4000, 1100, "Soma dos preços: R$ " + QString::number(sumData4));
-
-    painter.end();
-
-    db.close();
-
-    // Abre o PDF após a criação
-    QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
-
-}
 
 
 void MainWindow::on_actionGerar_Relat_rio_CSV_triggered()
@@ -765,4 +673,105 @@ void MainWindow::on_Btn_GerarCodBarras_clicked()
     ui->Ledit_Barras->setText(gerarNumero());
 
 }
+
+
+void MainWindow::on_actionTodos_Produtos_triggered()
+{
+
+        QString fileName = QFileDialog::getSaveFileName(this, "Salvar PDF", QString(), "*.pdf");
+        if (fileName.isEmpty())
+            return;
+
+        if (!db.open()) {
+            qDebug() << "nao abriu bd";
+            return;
+        }
+
+        QPdfWriter writer(fileName);
+        writer.setPageSize(QPageSize(QPageSize::A4));
+        QPainter painter(&writer);
+        painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
+        painter.setFont(QFont("Arial", 10, QFont::Bold));
+
+        // Determinar a altura de uma linha e o espaço disponível na página
+        int lineHeight = 300; // Altura de uma linha
+        int availableHeight = writer.height(); // Altura disponível na página
+        int startY = 1500; // Define a coordenada Y inicial
+
+        // Desenha os dados da tabela no PDF
+        QImage logo(":/QEstoqueLOja/mkaoyvbl.png");
+        painter.drawImage(QRect(100, 100, 2000, 400), logo);
+        painter.drawText(500, 1000,       "Dados da Tabela Produtos:");
+        painter.drawText(1000, 1500,       "ID");
+        painter.drawText(1600, 1500, "Quantidade");
+        painter.drawText(3000, 1500, "Descrição");
+        painter.drawText(8500, 1500, "Preço R$");
+
+        QSqlQuery query("SELECT * FROM produtos");
+
+        int row2 = 1;
+        double sumData4 = 0;
+        while(query.next()){
+            QString data2 = query.value(1).toString(); // quant
+
+            QString data4 = query.value(3).toString(); // preco
+            double valueData4 = data4.toDouble() * data2.toInt(); // Converte o valor para double
+            sumData4 += valueData4; // Adiciona o valor à soma total
+
+
+            ++row2;
+        };
+
+        painter.drawText(5000, 1000,"total R$:" + QString::number( sumData4));
+        painter.drawText(8000, 1000,"total itens:" + QString::number( row2));
+
+        QSqlQuery query2("SELECT * FROM produtos");
+
+
+
+
+        int row = 1;
+        //  double sumData4 = 0.0;
+
+        QFontMetrics metrics(painter.font());
+        while (query2.next()) {
+            QString data1 = query2.value(0).toString(); // id
+            QString data2 = query2.value(1).toString(); // quant
+            QString data3 = query2.value(2).toString(); // desc
+            QString data4 = query2.value(3).toString(); // preco
+            QRect rect = metrics.boundingRect(QRect(0, 0, 4000, lineHeight), Qt::TextWordWrap, data3);
+            int textHeight = rect.height();
+
+            // Verifica se há espaço suficiente na página atual para desenhar outra linha
+            if (startY + lineHeight * row > availableHeight) {
+                // Se não houver, inicie uma nova página
+                writer.newPage();
+                startY = 100; // Reinicie a coordenada Y inicial
+                row = 1; // Reinicie o contador de linha
+            }
+
+            // Desenhe os dados na página atual
+            painter.drawText(QRect(1000, startY + lineHeight * row, 4000, textHeight), data1); //stary = 1500
+            painter.drawText(QRect(1600, startY + lineHeight * row, 4000, textHeight), data2);
+            painter.drawText(QRect(3000, startY + lineHeight * row, 4000, textHeight), Qt::TextWordWrap, data3); // data3 com quebra de linha
+            painter.drawText(QRect(8500, startY + lineHeight * row, 4000, textHeight), data4);
+
+            startY += textHeight;
+
+            ++row;
+        }
+
+        // // Desenha a quantidade de itens e a soma dos preços apenas na primeira página
+        // painter.drawText(4000, 1000, "Quantidade de Itens: " + QString::number(totalItems));
+        // painter.drawText(4000, 1100, "Soma dos preços: R$ " + QString::number(sumData4));
+
+        painter.end();
+
+        db.close();
+
+        // Abre o PDF após a criação
+        QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
+
+
+ }
 

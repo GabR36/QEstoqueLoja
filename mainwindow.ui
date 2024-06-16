@@ -694,7 +694,6 @@ font-size: 15px;</string>
      </property>
      <addaction name="actionTodos_Produtos"/>
      <addaction name="actionApenas_NF"/>
-     <addaction name="actionSem_NF"/>
     </widget>
     <addaction name="menuGerar_lista_Produtos_PDF"/>
     <addaction name="actionGerar_Relat_rio_CSV"/>

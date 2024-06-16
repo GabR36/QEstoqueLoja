@@ -579,7 +579,7 @@ void MainWindow::on_actionGerar_Relat_rio_CSV_triggered()
         for (int i = 0; i < query.record().count(); ++i) {
             out << query.value(i).toString();
             if (i != query.record().count() - 1)
-                out << ";"; // Adicionando vírgula para separar os campos
+                out << ";"; // Adicionando ponto e vírgula para separar os campos
         }
         out << "\n"; // Adicionando uma nova linha após cada registro
     }
@@ -710,19 +710,24 @@ void MainWindow::on_actionTodos_Produtos_triggered()
         QSqlQuery query("SELECT * FROM produtos");
 
         int row2 = 1;
-        double sumData4 = 0;
+        float sumData4 = 0.0;
         while(query.next()){
-            QString data2 = query.value(1).toString(); // quant
+             QString data2 = query.value(1).toString(); // quant
 
-            QString data4 = query.value(3).toString(); // preco
-            double valueData4 = data4.toDouble() * data2.toInt(); // Converte o valor para double
-            sumData4 += valueData4; // Adiciona o valor à soma total
+             QString data4 = query.value(3).toString(); // preco
+
+            // double preco = portugues.toDouble(data4.toString());
+             float valueData4 = data4.toDouble() * data2.toInt(); // Converte o valor para double
+             sumData4 += valueData4; // Adiciona o valor à soma total
 
 
             ++row2;
         };
+        // query.next();
+        //  QString data4 = query.value(3).toString(); // preco
+        // qDebug() <<  "DATA 4 =" + data4;
 
-        painter.drawText(5000, 1000,"total R$:" + QString::number( sumData4));
+        painter.drawText(5000, 1000,"total R$:" + portugues.toString(sumData4));
         painter.drawText(8000, 1000,"total itens:" + QString::number( row2));
 
         QSqlQuery query2("SELECT * FROM produtos");
@@ -754,7 +759,7 @@ void MainWindow::on_actionTodos_Produtos_triggered()
             painter.drawText(QRect(1000, startY + lineHeight * row, 4000, textHeight), data1); //stary = 1500
             painter.drawText(QRect(1600, startY + lineHeight * row, 4000, textHeight), data2);
             painter.drawText(QRect(3000, startY + lineHeight * row, 4000, textHeight), Qt::TextWordWrap, data3); // data3 com quebra de linha
-            painter.drawText(QRect(8500, startY + lineHeight * row, 4000, textHeight), data4);
+            painter.drawText(QRect(8500, startY + lineHeight * row, 4000, textHeight), portugues.toString(data4.toDouble()));
 
             startY += textHeight;
 

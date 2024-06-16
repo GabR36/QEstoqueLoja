@@ -674,6 +674,7 @@ void MainWindow::on_Btn_GerarCodBarras_clicked()
 void MainWindow::on_actionTodos_Produtos_triggered()
 {
 
+        // salva o arquivo
         QString fileName = QFileDialog::getSaveFileName(this, "Salvar PDF", QString(), "*.pdf");
         if (fileName.isEmpty())
             return;

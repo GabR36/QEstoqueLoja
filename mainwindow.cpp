@@ -77,12 +77,13 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug() << dbSchemaVersion;
 
     // a versão mais recente do esquema do banco de dados
-    int dbSchemaLastVersion = 1;
+    int dbSchemaLastVersion = 2;
 
     while (dbSchemaVersion < dbSchemaLastVersion){
         // selecionar a atualizacao conforme a versao atual do banco de dados
         switch (dbSchemaVersion) {
         case 0:
+        {
             // atualizar da versao 0 para a versao 1 do schema
 
             // comecar transacao
@@ -123,6 +124,34 @@ MainWindow::MainWindow(QWidget *parent)
             dbSchemaVersion = 1;
 
             break;
+        }
+        case 1:
+        {
+            // schema versao 1 atualizar para a versao 2
+
+            // comecar transacao
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+            }
+            QSqlQuery query;
+
+            query.exec("CREATE TABLE config (id INT AUTO_INCREMENT PRIMARY KEY, "
+                       "key VARCHAR(255) NOT NULL UNIQUE, "
+                       "value TEXT");
+
+            // mudar a versao para 2
+            query.exec("PRAGMA user_version = 2");
+
+            // terminar transacao
+            if (!db.commit()) {
+                qDebug() << "Error: unable to commit transaction";
+                db.rollback(); // Desfaz a transação
+            }
+
+            dbSchemaVersion = 2;
+
+            break;
+        }
         }
     }
 
@@ -890,5 +919,12 @@ void MainWindow::on_actionApenas_NF_triggered()
 
 
 
+}
+
+
+void MainWindow::on_actionConfig_triggered()
+{
+    Config *configuracao = new Config();
+    configuracao->show();
 }
 

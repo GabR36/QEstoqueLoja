@@ -681,7 +681,7 @@ font-size: 15px;</string>
      <x>0</x>
      <y>0</y>
      <width>1210</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuGerarrelat_rios">
@@ -704,6 +704,13 @@ font-size: 15px;</string>
     </property>
     <addaction name="actionRealizar_Venda"/>
    </widget>
+   <widget class="QMenu" name="menuEditar">
+    <property name="title">
+     <string>Editar</string>
+    </property>
+    <addaction name="actionConfig"/>
+   </widget>
+   <addaction name="menuEditar"/>
    <addaction name="menuVendas"/>
    <addaction name="menuGerarrelat_rios"/>
   </widget>
@@ -744,6 +751,11 @@ font-size: 15px;</string>
   <action name="actionSem_NF">
    <property name="text">
     <string>Sem NF</string>
+   </property>
+  </action>
+  <action name="actionConfig">
+   <property name="text">
+    <string>Configurações</string>
    </property>
   </action>
  </widget>

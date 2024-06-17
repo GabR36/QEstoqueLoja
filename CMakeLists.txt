@@ -58,6 +58,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         pagamento.h pagamento.cpp pagamento.ui
         customdelegate.h customdelegate.cpp
         fnt/recursosFnt.qrc
+        config.h config.cpp config.ui
 
 
     )

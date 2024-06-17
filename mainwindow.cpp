@@ -492,7 +492,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
     QPrinter printer;
 
     printer.setPageSize(QPageSize(QSizeF(80, 2000), QPageSize::Millimeter));
-    printer.setCopyCount(quant);
+    // printer.setCopyCount(quant);
 
     QPrintDialog dialog(&printer, this);
     if(dialog.exec() == QDialog::Rejected) return;

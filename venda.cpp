@@ -39,13 +39,18 @@ venda::venda(QWidget *parent) :
     connect(selectionModel, &QItemSelectionModel::selectionChanged,this, &venda::handleSelectionChange);
     // ajustar tamanho colunas
     // coluna descricao
-    ui->Tview_Produtos->setColumnWidth(2, 200);
+    ui->Tview_Produtos->setColumnWidth(2, 260);
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
     // coluna quantidade vendida
     ui->Tview_ProdutosSelecionados->setColumnWidth(1, 180);
     // coluna descricao
     ui->Tview_ProdutosSelecionados->setColumnWidth(2, 250);
+
+    ui->Tview_ProdutosSelecionados->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+
+    //ui->Tview_Produtos->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     // colocar a data atual no dateEdit
     ui->DateEdt_Venda->setDateTime(QDateTime::currentDateTime());
@@ -108,16 +113,6 @@ void venda::handleSelectionChange(const QItemSelection &selected, const QItemSel
 
 void venda::on_Btn_Pesquisa_clicked()
 {
-    // QString pesquisa = ui->Ledit_Pesquisa->text();
-    // // mostrar na tableview a consulta
-    // if(!db.open()){
-    //     qDebug() << "erro ao abrir banco de dados. botao pesquisar.";
-    // }
-    // modeloProdutos->setQuery("SELECT * FROM produtos WHERE descricao LIKE '%" + pesquisa + "%'");
-    // CustomDelegate *delegate = new CustomDelegate(this);
-    // ui->Tview_Produtos->setItemDelegate(delegate);
-    // ui->Tview_Produtos->setModel(modeloProdutos);
-    // QSqlDatabase::database().close();
 
     QString inputText = ui->Ledit_Pesquisa->text();
     QString normalizadoPesquisa = janelaPrincipal->normalizeText(inputText);
@@ -126,10 +121,10 @@ void venda::on_Btn_Pesquisa_clicked()
     QStringList palavras = normalizadoPesquisa.split(" ", Qt::SkipEmptyParts);
 
     // Exibir as palavras separadas no console (opcional)
-    qDebug() << "Palavras separadas:";
-    for (const QString& palavra : palavras) {
-        qDebug() << palavra;
-    }
+    // qDebug() << "Palavras separadas:";
+    // for (const QString& palavra : palavras) {
+    //     qDebug() << palavra;
+    // }
 
     if (!db.open()) {
         qDebug() << "Erro ao abrir banco de dados. Botão Pesquisar.";
@@ -328,3 +323,9 @@ QString venda::Total(){
     // total notacao br
     return portugues.toString(totalValue, 'f', 2);
 }
+
+void venda::on_Ledit_Pesquisa_textChanged(const QString &arg1)
+{
+    ui->Btn_Pesquisa->click();
+}
+

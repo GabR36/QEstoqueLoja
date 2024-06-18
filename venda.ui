@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>768</width>
-    <height>574</height>
+    <width>956</width>
+    <height>616</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -90,14 +90,14 @@ background-color:rgb(170, 170, 170);
          <item>
           <widget class="QLineEdit" name="Ledit_Cliente">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
            <property name="minimumSize">
             <size>
-             <width>200</width>
+             <width>300</width>
              <height>0</height>
             </size>
            </property>
@@ -120,10 +120,16 @@ background-color:rgb(170, 170, 170);
          <item>
           <widget class="QLineEdit" name="Ledit_Barras">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>250</width>
+             <height>0</height>
+            </size>
            </property>
           </widget>
          </item>
@@ -147,10 +153,16 @@ background-color:rgb(170, 170, 170);
            <item>
             <widget class="QLineEdit" name="Ledit_QuantVendido">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>250</width>
+               <height>0</height>
+              </size>
              </property>
             </widget>
            </item>
@@ -170,10 +182,16 @@ background-color:rgb(170, 170, 170);
          <item>
           <widget class="QLineEdit" name="Ledit_Preco">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>0</height>
+            </size>
            </property>
           </widget>
          </item>

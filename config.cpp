@@ -6,6 +6,7 @@ Config::Config(QWidget *parent)
     , ui(new Ui::Config)
 {
     ui->setupUi(this);
+
     // colocar os valores do banco de dados nos line edits
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";
@@ -26,6 +27,8 @@ Config::Config(QWidget *parent)
     ui->Ledt_LucroEmpresa->setText(configValues.value("porcent_lucro", ""));
     ui->Ledt_NomeEmpresa->setText(configValues.value("nome_empresa", ""));
     ui->Ledt_TelEmpresa->setText(configValues.value("telefone_empresa", ""));
+    ui->Ledt_debito->setText(configValues.value("taxa_debito", ""));
+    ui->Ledt_credito->setText(configValues.value("taxa_credito", ""));
 
     db.close();
 }
@@ -38,13 +41,15 @@ Config::~Config()
 
 void Config::on_Btn_Aplicar_clicked()
 {
-    QString nomeEmpresa, enderecoEmpresa, emailEmpresa, cnpjEmpresa, telEmpresa, lucro;
+    QString nomeEmpresa, enderecoEmpresa, emailEmpresa, cnpjEmpresa, telEmpresa, lucro, debito, credito;
     nomeEmpresa = ui->Ledt_NomeEmpresa->text();
     enderecoEmpresa = ui->Ledt_EnderecoEmpresa->text();
-    emailEmpresa = ui->Ledt_EnderecoEmpresa->text();
+    emailEmpresa = ui->Ledt_EmailEmpresa->text();
     cnpjEmpresa = ui->Ledt_CnpjEmpresa->text();
     telEmpresa = ui->Ledt_TelEmpresa->text();
     lucro = ui->Ledt_LucroEmpresa->text();
+    debito = ui->Ledt_debito->text();
+    credito = ui->Ledt_credito->text();
 
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";
@@ -70,6 +75,18 @@ void Config::on_Btn_Aplicar_clicked()
     query.prepare("UPDATE config set value = :value WHERE key = :key");
     query.bindValue(":value", lucro);
     query.bindValue(":key", "porcent_lucro");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", emailEmpresa);
+    query.bindValue(":key", "email_empresa");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", debito);
+    query.bindValue(":key", "taxa_debito");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", credito);
+    query.bindValue(":key", "taxa_credito");
     query.exec();
 
     db.close();

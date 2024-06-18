@@ -21,6 +21,8 @@
 #include <QMenu>
 #include <QFontDatabase>
 #include <zint.h>
+#include <QRegularExpression>
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -212,7 +214,7 @@ void MainWindow::on_Btn_Enviar_clicked()
     QString quantidadeProduto, descProduto, precoProduto, barrasProduto;
     bool nfProduto;
     quantidadeProduto = ui->Ledit_Quantidade->text();
-    descProduto = ui->Ledit_Desc->text();
+    descProduto = normalizeText(ui->Ledit_Desc->text());
     precoProduto = ui->Ledit_Preco->text();
     barrasProduto = ui->Ledit_Barras->text();
     nfProduto = ui->Check_Nf->isChecked();
@@ -325,18 +327,71 @@ void MainWindow::on_Btn_Delete_clicked()
         qDebug() << "A exclusão do produto foi cancelada.";
     }
 }
+QString MainWindow::normalizeText(const QString &text) {
+    QString normalized = text.normalized(QString::NormalizationForm_D);
+    QString result;
+    for (const QChar &c : normalized) {
+        if (!c.isMark()) {
+            result.append(c.toLower());
+        }
+    }
+    return result;
 
+
+}
+QStringList tokenizeText(QString input) {
+
+
+
+    // Dividir a string em palavras usando split por espaços em branco
+    QStringList palavras = input.split(" ", Qt::SkipEmptyParts);
+
+    // Exibir as palavras separadas no console (opcional)
+
+    return palavras;
+}
 
 void MainWindow::on_Btn_Pesquisa_clicked()
 {
-    QString pesquisa = ui->Ledit_Pesquisa->text();
-    // mostrar na tableview a consulta
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao pesquisar.";
+    QString inputText = ui->Ledit_Pesquisa->text();
+    QString normalizadoPesquisa = normalizeText(inputText);
+
+    // Dividir a string em palavras usando split por espaços em branco
+    QStringList palavras = normalizadoPesquisa.split(" ", Qt::SkipEmptyParts);
+
+    // Exibir as palavras separadas no console (opcional)
+    qDebug() << "Palavras separadas:";
+    for (const QString& palavra : palavras) {
+        qDebug() << palavra;
     }
-    model->setQuery("SELECT * FROM produtos WHERE descricao LIKE '%" + pesquisa + "%' ORDER BY id DESC");
+
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir banco de dados. Botão Pesquisar.";
+        return;
+    }
+
+
+
+    // Construir consulta SQL dinâmica
+    QString sql = "SELECT * FROM produtos WHERE ";
+    QStringList conditions;
+    for (const QString &palavra : palavras) {
+        conditions << QString("descricao LIKE '%%1%'").arg(palavra);
+    }
+    sql += conditions.join(" AND ");
+    sql += " ORDER BY id DESC";
+
+    // Executar a consulta
+    QSqlQueryModel *model = new QSqlQueryModel;
+    model->setQuery(sql, db);
+    if (model->lastError().isValid()) {
+        qDebug() << "Erro ao executar consulta:" << model->lastError().text();
+    }
+
+    // Mostrar na tableview a consulta
     ui->Tview_Produtos->setModel(model);
-    QSqlDatabase::database().close();
+
+    db.close();
 }
 
 

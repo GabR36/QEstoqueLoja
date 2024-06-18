@@ -339,17 +339,6 @@ QString MainWindow::normalizeText(const QString &text) {
 
 
 }
-QStringList tokenizeText(QString input) {
-
-
-
-    // Dividir a string em palavras usando split por espaços em branco
-    QStringList palavras = input.split(" ", Qt::SkipEmptyParts);
-
-    // Exibir as palavras separadas no console (opcional)
-
-    return palavras;
-}
 
 void MainWindow::on_Btn_Pesquisa_clicked()
 {
@@ -375,14 +364,19 @@ void MainWindow::on_Btn_Pesquisa_clicked()
     // Construir consulta SQL dinâmica
     QString sql = "SELECT * FROM produtos WHERE ";
     QStringList conditions;
-    for (const QString &palavra : palavras) {
-        conditions << QString("descricao LIKE '%%1%'").arg(palavra);
-    }
+    if (palavras.length() > 1){
+        for (const QString &palavra : palavras) {
+            conditions << QString("descricao LIKE '%%1%'").arg(palavra);
+        }
+
     sql += conditions.join(" AND ");
+
+    }else{
+        sql += "descricao LIKE '%" + normalizadoPesquisa + "%'";
+    }
     sql += " ORDER BY id DESC";
 
     // Executar a consulta
-    QSqlQueryModel *model = new QSqlQueryModel;
     model->setQuery(sql, db);
     if (model->lastError().isValid()) {
         qDebug() << "Erro ao executar consulta:" << model->lastError().text();

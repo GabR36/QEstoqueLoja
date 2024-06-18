@@ -37,7 +37,6 @@ public:
     QIcon iconAlterarProduto, iconAddProduto, iconBtnVenda, iconDelete, iconPesquisa, iconBtnRelatorios, iconImpressora;
     QString gerarNumero();
     QString normalizeText(const QString &text);
-    QStringList tokenizeText( QString input);
 
 
 public slots:

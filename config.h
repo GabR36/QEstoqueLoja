@@ -2,6 +2,8 @@
 #define CONFIG_H
 
 #include <QWidget>
+#include <QSqlDatabase>
+#include <QSqlQuery>
 
 namespace Ui {
 class Config;
@@ -15,8 +17,15 @@ public:
     explicit Config(QWidget *parent = nullptr);
     ~Config();
 
+private slots:
+
+    void on_Btn_Aplicar_clicked();
+
+    void on_Btn_Cancelar_clicked();
+
 private:
     Ui::Config *ui;
+    QSqlDatabase db = QSqlDatabase::database();
 };
 
 #endif // CONFIG_H

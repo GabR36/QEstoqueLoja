@@ -115,6 +115,8 @@ MainWindow::MainWindow(QWidget *parent)
             // mudar a versao para 1
             query.exec("PRAGMA user_version = 1");
 
+            query.finish();
+
             // terminar transacao
             if (!db.commit()) {
                 qDebug() << "Error: unable to commit transaction";
@@ -137,7 +139,13 @@ MainWindow::MainWindow(QWidget *parent)
 
             query.exec("CREATE TABLE config (id INT AUTO_INCREMENT PRIMARY KEY, "
                        "key VARCHAR(255) NOT NULL UNIQUE, "
-                       "value TEXT");
+                       "value TEXT)");
+            query.exec("INSERT INTO config (key, value) VALUES ('nome_empresa', '')");
+            query.exec("INSERT INTO config (key, value) VALUES ('endereco_empresa', '')");
+            query.exec("INSERT INTO config (key, value) VALUES ('telefone_empresa', '')");
+            query.exec("INSERT INTO config (key, value) VALUES ('cnpj_empresa', '')");
+            query.exec("INSERT INTO config (key, value) VALUES ('email_empresa', '')");
+            query.exec("INSERT INTO config (key, value) VALUES ('porcent_lucro', '40')");
 
             // mudar a versao para 2
             query.exec("PRAGMA user_version = 2");
@@ -154,6 +162,8 @@ MainWindow::MainWindow(QWidget *parent)
         }
         }
     }
+    qDebug() << dbSchemaVersion;
+    qDebug() << db.tables();
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");

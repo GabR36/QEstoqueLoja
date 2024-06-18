@@ -31,6 +31,12 @@ Config::Config(QWidget *parent)
     ui->Ledt_credito->setText(configValues.value("taxa_credito", ""));
 
     db.close();
+
+    // validador
+    QDoubleValidator *validador = new QDoubleValidator();
+    ui->Ledt_LucroEmpresa->setValidator(validador);
+    ui->Ledt_credito->setValidator(validador);
+    ui->Ledt_debito->setValidator(validador);
 }
 
 Config::~Config()

@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QSqlDatabase>
 #include <QSqlQuery>
+#include <QDoubleValidator>
 
 namespace Ui {
 class Config;

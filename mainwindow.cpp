@@ -376,7 +376,7 @@ void MainWindow::on_Btn_Pesquisa_clicked()
 
         }
 
-    sql += conditions.join(" AND ");
+        sql += conditions.join(" AND ");
 
     }else{
         sql += "descricao LIKE '%" + normalizadoPesquisa + "%'  OR codigo_barras LIKE '%" + normalizadoPesquisa + "%'";

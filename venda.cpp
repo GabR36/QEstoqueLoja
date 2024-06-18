@@ -108,16 +108,62 @@ void venda::handleSelectionChange(const QItemSelection &selected, const QItemSel
 
 void venda::on_Btn_Pesquisa_clicked()
 {
-    QString pesquisa = ui->Ledit_Pesquisa->text();
-    // mostrar na tableview a consulta
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao pesquisar.";
+    // QString pesquisa = ui->Ledit_Pesquisa->text();
+    // // mostrar na tableview a consulta
+    // if(!db.open()){
+    //     qDebug() << "erro ao abrir banco de dados. botao pesquisar.";
+    // }
+    // modeloProdutos->setQuery("SELECT * FROM produtos WHERE descricao LIKE '%" + pesquisa + "%'");
+    // CustomDelegate *delegate = new CustomDelegate(this);
+    // ui->Tview_Produtos->setItemDelegate(delegate);
+    // ui->Tview_Produtos->setModel(modeloProdutos);
+    // QSqlDatabase::database().close();
+
+    QString inputText = ui->Ledit_Pesquisa->text();
+    QString normalizadoPesquisa = janelaPrincipal->normalizeText(inputText);
+
+    // Dividir a string em palavras usando split por espaços em branco
+    QStringList palavras = normalizadoPesquisa.split(" ", Qt::SkipEmptyParts);
+
+    // Exibir as palavras separadas no console (opcional)
+    qDebug() << "Palavras separadas:";
+    for (const QString& palavra : palavras) {
+        qDebug() << palavra;
     }
-    modeloProdutos->setQuery("SELECT * FROM produtos WHERE descricao LIKE '%" + pesquisa + "%'");
-    CustomDelegate *delegate = new CustomDelegate(this);
-    ui->Tview_Produtos->setItemDelegate(delegate);
+
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir banco de dados. Botão Pesquisar.";
+        return;
+    }
+
+
+
+    // Construir consulta SQL dinâmica
+    QString sql = "SELECT * FROM produtos WHERE ";
+    QStringList conditions;
+    if (palavras.length() > 1){
+        for (const QString &palavra : palavras) {
+            conditions << QString("descricao LIKE '%%1%' OR codigo_barras LIKE '%%1%'").arg(palavra);
+
+        }
+
+        sql += conditions.join(" AND ");
+
+    }else{
+        sql += "descricao LIKE '%" + normalizadoPesquisa + "%'  OR codigo_barras LIKE '%" + normalizadoPesquisa + "%'";
+    }
+    sql += " ORDER BY id DESC";
+
+    // Executar a consulta
+    modeloProdutos->setQuery(sql, db);
+
+
+    // Mostrar na tableview a consulta
+    // CustomDelegate *delegate = new CustomDelegate(this);
+    // ui->Tview_Produtos->setItemDelegate(delegate);
     ui->Tview_Produtos->setModel(modeloProdutos);
-    QSqlDatabase::database().close();
+
+    db.close();
 }
 
 

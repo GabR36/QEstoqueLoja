@@ -21,8 +21,7 @@
 #include <QMenu>
 #include <QFontDatabase>
 #include <zint.h>
-#include <QRegularExpression>
-#include <iostream>
+//#include <QRegularExpression>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -42,8 +41,15 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "erro ao abrir banco de dados.";
     }
 
-    // criar a versao 0 se o banco de dados estiver vazio
 
+    //teste float maior que 10000
+
+    // QString a = "21320.3";
+    // QString b = "7";
+    // double all = a.toDouble() * b.toInt();
+
+    // qDebug() << portugues.toString(all);
+    // criar a versao 0 se o banco de dados estiver vazio
     QSqlQuery query;
 
     query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2), codigo_barras VARCHAR(20), nf BOOLEAN)");
@@ -366,13 +372,14 @@ void MainWindow::on_Btn_Pesquisa_clicked()
     QStringList conditions;
     if (palavras.length() > 1){
         for (const QString &palavra : palavras) {
-            conditions << QString("descricao LIKE '%%1%'").arg(palavra);
+            conditions << QString("descricao LIKE '%%1%' OR codigo_barras LIKE '%%1%'").arg(palavra);
+
         }
 
     sql += conditions.join(" AND ");
 
     }else{
-        sql += "descricao LIKE '%" + normalizadoPesquisa + "%'";
+        sql += "descricao LIKE '%" + normalizadoPesquisa + "%'  OR codigo_barras LIKE '%" + normalizadoPesquisa + "%'";
     }
     sql += " ORDER BY id DESC";
 
@@ -755,18 +762,17 @@ void MainWindow::on_actionTodos_Produtos_triggered()
 
         QSqlQuery query("SELECT * FROM produtos");
 
-        int row2 = 1;
+        int row2 = 0;
         float sumData4 = 0.0;
-        QString data4;
+
         while(query.next()){
              QString data2 = query.value(1).toString(); // quant
 
-             data4 = query.value(3).toString(); // preco
+              QString data4 = query.value(3).toString(); // preco
 
             // double preco = portugues.toDouble(data4.toString());
-             float valueData4 = data4.toDouble() * data2.toInt(); // Converte o valor para double
+             float valueData4 = data4.toFloat() * data2.toInt(); // Converte o valor para double
              sumData4 += valueData4; // Adiciona o valor à soma total
-
 
             ++row2;
         };
@@ -774,7 +780,7 @@ void MainWindow::on_actionTodos_Produtos_triggered()
         // qDebug() << QString::number(a);
 
         painter.drawText(5000, 1000,"total R$:" + portugues.toString(sumData4));
-        painter.drawText(8000, 1000,"total itens:" + QString::number( row2));
+        painter.drawText(8000, 1000,"total itens:" + QString::number(row2));
 
         QSqlQuery query2("SELECT * FROM produtos");
 

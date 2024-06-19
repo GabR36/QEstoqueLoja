@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>768</width>
-    <height>574</height>
+    <width>956</width>
+    <height>616</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -88,7 +88,20 @@ background-color:rgb(170, 170, 170);
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledit_Cliente"/>
+          <widget class="QLineEdit" name="Ledit_Cliente">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -105,7 +118,20 @@ background-color:rgb(170, 170, 170);
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledit_Barras"/>
+          <widget class="QLineEdit" name="Ledit_Barras">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>250</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -125,7 +151,20 @@ background-color:rgb(170, 170, 170);
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="Ledit_QuantVendido"/>
+            <widget class="QLineEdit" name="Ledit_QuantVendido">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>250</width>
+               <height>0</height>
+              </size>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -141,7 +180,20 @@ background-color:rgb(170, 170, 170);
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledit_Preco"/>
+          <widget class="QLineEdit" name="Ledit_Preco">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -174,6 +226,12 @@ background-color:rgb(170, 170, 170);
         <iconset resource="Imagens/recursosImg.qrc">
          <normaloff>:/QEstoqueLOja/dialog-ok-apply.svg</normaloff>:/QEstoqueLOja/dialog-ok-apply.svg</iconset>
        </property>
+       <property name="iconSize">
+        <size>
+         <width>20</width>
+         <height>20</height>
+        </size>
+       </property>
        <property name="autoDefault">
         <bool>false</bool>
        </property>
@@ -196,6 +254,12 @@ background-color:rgb(170, 170, 170);
      </item>
      <item>
       <widget class="QTableView" name="Tview_Produtos">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+         <horstretch>2</horstretch>
+         <verstretch>2</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>300</width>
@@ -278,6 +342,9 @@ background-color:rgb(170, 170, 170);
          <width>16777215</width>
          <height>250</height>
         </size>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::CustomContextMenu</enum>
        </property>
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>

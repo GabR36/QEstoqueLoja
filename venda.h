@@ -26,6 +26,7 @@ public:
     ~venda();
     QString Total();
     QLocale portugues;
+    QIcon deletar;
 
 
 private slots:
@@ -43,10 +44,19 @@ private slots:
 
     void on_Btn_Aceitar_clicked();
 
+    void on_Ledit_Pesquisa_textChanged(const QString &arg1);
+
+    void on_Tview_ProdutosSelecionados_customContextMenuRequested(const QPoint &pos);
+
+    void deletarProd();
+
 private:
     QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
     QStandardItemModel modeloSelecionados;
     Ui::venda *ui;
+    QAction *actionMenuDeletarProd;
+
+
 };
 
 #endif // VENDA_H

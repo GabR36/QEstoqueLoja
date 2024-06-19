@@ -68,7 +68,7 @@ void relatorios::on_Btn_PdfGen_clicked()
     //  QString data4 = query.value(3).toString(); // preco
     // qDebug() <<  "DATA 4 =" + data4;
 
-    painter.drawText(5000, 1000,"total R$:" + portugues.toString(sumData4));
+    painter.drawText(5000, 1000,"total R$:" + portugues.toString(sumData4,'f',2));
     painter.drawText(8000, 1000,"total itens:" + QString::number( row2));
 
     QSqlQuery query2("SELECT * FROM produtos");

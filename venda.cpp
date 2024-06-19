@@ -9,6 +9,8 @@
 #include "pagamento.h"
 #include <QDoubleValidator>
 #include <QIntValidator>
+#include <QMenu>
+
 
 
 venda::venda(QWidget *parent) :
@@ -39,13 +41,18 @@ venda::venda(QWidget *parent) :
     connect(selectionModel, &QItemSelectionModel::selectionChanged,this, &venda::handleSelectionChange);
     // ajustar tamanho colunas
     // coluna descricao
-    ui->Tview_Produtos->setColumnWidth(2, 200);
+    ui->Tview_Produtos->setColumnWidth(2, 260);
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
     // coluna quantidade vendida
     ui->Tview_ProdutosSelecionados->setColumnWidth(1, 180);
     // coluna descricao
     ui->Tview_ProdutosSelecionados->setColumnWidth(2, 250);
+
+   // ui->Tview_ProdutosSelecionados->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+
+    //ui->Tview_Produtos->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     // colocar a data atual no dateEdit
     ui->DateEdt_Venda->setDateTime(QDateTime::currentDateTime());
@@ -58,12 +65,22 @@ venda::venda(QWidget *parent) :
     QIntValidator *IntValidador = new QIntValidator();
     ui->Ledit_Preco->setValidator(DoubleValidador);
     ui->Ledit_QuantVendido->setValidator(IntValidador);
+
+    //actionMenu contextMenu
+    actionMenuDeletarProd = new QAction(this);
+    actionMenuDeletarProd->setText("Deletar Produto");
+    deletar.addFile(":/QEstoqueLOja/amarok-cart-remove.svg");
+    actionMenuDeletarProd->setIcon(deletar);
+    connect(actionMenuDeletarProd,SIGNAL(triggered(bool)),this,SLOT(deletarProd()));
+
+   // actionMenuDeletarProd->setIcon(janelaPrincipal->iconDelete);
 }
 
 venda::~venda()
 {
     delete ui;
 }
+
 
 void venda::on_Btn_SelecionarProduto_clicked()
 {
@@ -82,6 +99,7 @@ void venda::on_Btn_SelecionarProduto_clicked()
     // mostrar total
     ui->Lbl_Total->setText(Total());
 }
+
 
 void venda::handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
     // Este slot é chamado sempre que a seleção na tabela muda
@@ -106,18 +124,55 @@ void venda::handleSelectionChange(const QItemSelection &selected, const QItemSel
 }
 
 
+
 void venda::on_Btn_Pesquisa_clicked()
 {
-    QString pesquisa = ui->Ledit_Pesquisa->text();
-    // mostrar na tableview a consulta
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao pesquisar.";
+
+    QString inputText = ui->Ledit_Pesquisa->text();
+    QString normalizadoPesquisa = janelaPrincipal->normalizeText(inputText);
+
+    // Dividir a string em palavras usando split por espaços em branco
+    QStringList palavras = normalizadoPesquisa.split(" ", Qt::SkipEmptyParts);
+
+    // Exibir as palavras separadas no console (opcional)
+    // qDebug() << "Palavras separadas:";
+    // for (const QString& palavra : palavras) {
+    //     qDebug() << palavra;
+    // }
+
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir banco de dados. Botão Pesquisar.";
+        return;
     }
-    modeloProdutos->setQuery("SELECT * FROM produtos WHERE descricao LIKE '%" + pesquisa + "%'");
-    CustomDelegate *delegate = new CustomDelegate(this);
-    ui->Tview_Produtos->setItemDelegate(delegate);
+
+
+
+    // Construir consulta SQL dinâmica
+    QString sql = "SELECT * FROM produtos WHERE ";
+    QStringList conditions;
+    if (palavras.length() > 1){
+        for (const QString &palavra : palavras) {
+            conditions << QString("descricao LIKE '%%1%' OR codigo_barras LIKE '%%1%'").arg(palavra);
+
+        }
+
+        sql += conditions.join(" AND ");
+
+    }else{
+        sql += "descricao LIKE '%" + normalizadoPesquisa + "%'  OR codigo_barras LIKE '%" + normalizadoPesquisa + "%'";
+    }
+    sql += " ORDER BY id DESC";
+
+    // Executar a consulta
+    modeloProdutos->setQuery(sql, db);
+
+
+    // Mostrar na tableview a consulta
+    // CustomDelegate *delegate = new CustomDelegate(this);
+    // ui->Tview_Produtos->setItemDelegate(delegate);
     ui->Tview_Produtos->setModel(modeloProdutos);
-    QSqlDatabase::database().close();
+
+    db.close();
 }
 
 
@@ -282,3 +337,33 @@ QString venda::Total(){
     // total notacao br
     return portugues.toString(totalValue, 'f', 2);
 }
+
+void venda::on_Ledit_Pesquisa_textChanged(const QString &arg1)
+{
+    ui->Btn_Pesquisa->click();
+}
+
+
+void venda::on_Tview_ProdutosSelecionados_customContextMenuRequested(const QPoint &pos)
+{
+    if(!ui->Tview_ProdutosSelecionados->currentIndex().isValid())
+        return;
+    QMenu menu(this);
+
+    menu.addAction(actionMenuDeletarProd);
+
+
+
+    menu.exec(ui->Tview_ProdutosSelecionados->viewport()->mapToGlobal(pos));
+}
+void venda::deletarProd(){
+
+    modeloSelecionados.removeRow(ui->Tview_ProdutosSelecionados->currentIndex().row());
+    ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+
+
+
+
+
+}
+

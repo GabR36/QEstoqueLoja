@@ -30,15 +30,18 @@ public:
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     QSqlQueryModel* model = new QSqlQueryModel;
     void atualizarTableview();
-    void imprimirEtiqueta(int quant, QString codBar = "null", QString desc = "null",  QString preco = "");
+    void imprimirEtiqueta(int quant, QString codBar = "1", QString desc = "null",  QString preco = "");
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     QLocale portugues;
     QIcon iconAlterarProduto, iconAddProduto, iconBtnVenda, iconDelete, iconPesquisa, iconBtnRelatorios, iconImpressora;
     QString gerarNumero();
+    QString normalizeText(const QString &text);
+
 
 public slots:
    void on_actionTodos_Produtos_triggered();
+
 
 
 

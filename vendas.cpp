@@ -30,9 +30,13 @@ Vendas::Vendas(QWidget *parent) :
     // coluna cliente
     ui->Tview_Vendas2->setColumnWidth(1, 100);
     // coluna descricao
+    ui->Tview_Vendas2->setColumnWidth(4, 110);
+    ui->Tview_Vendas2->setColumnWidth(5, 100);
+    ui->Tview_Vendas2->setColumnWidth(8, 80);
     ui->Tview_ProdutosVendidos->setColumnWidth(0, 400);
     // coluna quantidade
     ui->Tview_ProdutosVendidos->setColumnWidth(1, 85);
+
 
     // conectar banco de dados para consultar as datas mais antigas e mais novas das vendas
     // para mostrar nos qdateedits
@@ -146,6 +150,7 @@ void Vendas::LabelLucro(){
 
 void Vendas::on_Btn_DeletarVenda_clicked()
 {
+    if(ui->Tview_Vendas2->currentIndex().isValid()){
     // obter id selecionado
     QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
@@ -220,6 +225,9 @@ void Vendas::on_Btn_DeletarVenda_clicked()
     else {
         // O usuário escolheu não deletar o produto
         qDebug() << "A exclusão da venda foi cancelada.";
+    }
+    }else{
+        QMessageBox::warning(this,"Erro","Selecione uma venda antes de tentar deletar!");
     }
 }
 

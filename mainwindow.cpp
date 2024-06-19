@@ -21,6 +21,7 @@
 #include <QMenu>
 #include <QFontDatabase>
 #include <zint.h>
+//#include <QRegularExpression>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -40,8 +41,15 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "erro ao abrir banco de dados.";
     }
 
-    // criar a versao 0 se o banco de dados estiver vazio
 
+    //teste float maior que 10000
+
+    // QString a = "21320.3";
+    // QString b = "7";
+    // double all = a.toDouble() * b.toInt();
+
+    // qDebug() << portugues.toString(all);
+    // criar a versao 0 se o banco de dados estiver vazio
     QSqlQuery query;
 
     query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2), codigo_barras VARCHAR(20), nf BOOLEAN)");
@@ -212,7 +220,7 @@ void MainWindow::on_Btn_Enviar_clicked()
     QString quantidadeProduto, descProduto, precoProduto, barrasProduto;
     bool nfProduto;
     quantidadeProduto = ui->Ledit_Quantidade->text();
-    descProduto = ui->Ledit_Desc->text();
+    descProduto = normalizeText(ui->Ledit_Desc->text());
     precoProduto = ui->Ledit_Preco->text();
     barrasProduto = ui->Ledit_Barras->text();
     nfProduto = ui->Check_Nf->isChecked();
@@ -283,6 +291,7 @@ void MainWindow::on_Btn_Enviar_clicked()
 
 void MainWindow::on_Btn_Delete_clicked()
 {
+    if(ui->Tview_Produtos->currentIndex().isValid()){
     // obter id selecionado
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
@@ -324,19 +333,71 @@ void MainWindow::on_Btn_Delete_clicked()
         // O usuário escolheu não deletar o produto
         qDebug() << "A exclusão do produto foi cancelada.";
     }
+    }else{
+        QMessageBox::warning(this,"Erro","Selecione um produto antes de tentar deletar!");
+    }
 }
+QString MainWindow::normalizeText(const QString &text) {
+    QString normalized = text.normalized(QString::NormalizationForm_D);
+    QString result;
+    for (const QChar &c : normalized) {
+        if (!c.isMark()) {
+            result.append(c.toLower());
+        }
+    }
+    return result;
 
+
+
+}
 
 void MainWindow::on_Btn_Pesquisa_clicked()
 {
-    QString pesquisa = ui->Ledit_Pesquisa->text();
-    // mostrar na tableview a consulta
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao pesquisar.";
+    QString inputText = ui->Ledit_Pesquisa->text();
+    QString normalizadoPesquisa = normalizeText(inputText);
+
+    // Dividir a string em palavras usando split por espaços em branco
+    QStringList palavras = normalizadoPesquisa.split(" ", Qt::SkipEmptyParts);
+
+    // Exibir as palavras separadas no console (opcional)
+    qDebug() << "Palavras separadas:";
+    for (const QString& palavra : palavras) {
+        qDebug() << palavra;
     }
-    model->setQuery("SELECT * FROM produtos WHERE descricao LIKE '%" + pesquisa + "%' ORDER BY id DESC");
+
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir banco de dados. Botão Pesquisar.";
+        return;
+    }
+
+
+
+    // Construir consulta SQL dinâmica
+    QString sql = "SELECT * FROM produtos WHERE ";
+    QStringList conditions;
+    if (palavras.length() > 1){
+        for (const QString &palavra : palavras) {
+            conditions << QString("descricao LIKE '%%1%' OR codigo_barras LIKE '%%1%'").arg(palavra);
+
+        }
+
+        sql += conditions.join(" AND ");
+
+    }else{
+        sql += "descricao LIKE '%" + normalizadoPesquisa + "%'  OR codigo_barras LIKE '%" + normalizadoPesquisa + "%'";
+    }
+    sql += " ORDER BY id DESC";
+
+    // Executar a consulta
+    model->setQuery(sql, db);
+    if (model->lastError().isValid()) {
+        qDebug() << "Erro ao executar consulta:" << model->lastError().text();
+    }
+
+    // Mostrar na tableview a consulta
     ui->Tview_Produtos->setModel(model);
-    QSqlDatabase::database().close();
+
+    db.close();
 }
 
 
@@ -344,6 +405,7 @@ void MainWindow::on_Btn_Pesquisa_clicked()
 
 void MainWindow::on_Btn_Alterar_clicked()
 {
+    if(ui->Tview_Produtos->currentIndex().isValid()){
     // obter id selecionado
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
@@ -368,6 +430,10 @@ void MainWindow::on_Btn_Alterar_clicked()
     alterar->TrazerInfo(productDesc, productQuant, productPreco, productBarras, productNf);
     alterar->setWindowModality(Qt::ApplicationModal);
     alterar->show();
+    }else{
+        QMessageBox::warning(this,"Erro","Selecione um produto antes de alterar!");
+    }
+
 }
 
 
@@ -492,7 +558,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
     QPrinter printer;
 
     printer.setPageSize(QPageSize(QSizeF(80, 2000), QPageSize::Millimeter));
-    printer.setCopyCount(quant);
+    // printer.setCopyCount(quant);
 
     QPrintDialog dialog(&printer, this);
     if(dialog.exec() == QDialog::Rejected) return;
@@ -706,26 +772,25 @@ void MainWindow::on_actionTodos_Produtos_triggered()
 
         QSqlQuery query("SELECT * FROM produtos");
 
-        int row2 = 1;
-        float sumData4 = 0.0;
-        QString data4;
+        int row2 = 0;
+        double sumData4 = 0.0;
+
         while(query.next()){
              QString data2 = query.value(1).toString(); // quant
 
-             data4 = query.value(3).toString(); // preco
+              QString data4 = query.value(3).toString(); // preco
 
             // double preco = portugues.toDouble(data4.toString());
-             float valueData4 = data4.toDouble() * data2.toInt(); // Converte o valor para double
+             double valueData4 = data4.toDouble() * data2.toInt(); // Converte o valor para double
              sumData4 += valueData4; // Adiciona o valor à soma total
-
 
             ++row2;
         };
         // float a = 107926.0 + 0.4;
         // qDebug() << QString::number(a);
 
-        painter.drawText(5000, 1000,"total R$:" + portugues.toString(sumData4));
-        painter.drawText(8000, 1000,"total itens:" + QString::number( row2));
+        painter.drawText(5000, 1000,"total R$:" + portugues.toString(sumData4,'f',2) );
+        painter.drawText(8000, 1000,"total itens:" + QString::number(row2));
 
         QSqlQuery query2("SELECT * FROM produtos");
 
@@ -833,7 +898,7 @@ void MainWindow::on_actionApenas_NF_triggered()
         ++row2;
     };
 
-    painter.drawText(5000, 1000,"total R$:" + portugues.toString(sumData4));
+    painter.drawText(5000, 1000,"total R$:" + portugues.toString(sumData4,'f',2));
     painter.drawText(8000, 1000,"total itens:" + QString::number( rowNF));
 
     QSqlQuery query2("SELECT * FROM produtos");

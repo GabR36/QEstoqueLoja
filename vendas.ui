@@ -193,6 +193,9 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QLabel" name="label">
+         <property name="styleSheet">
+          <string notr="true">font: 700 9pt &quot;Segoe UI&quot;;</string>
+         </property>
          <property name="text">
           <string>Lucro (R$):</string>
          </property>
@@ -211,6 +214,9 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
         <widget class="QLabel" name="label_2">
+         <property name="styleSheet">
+          <string notr="true">font: 700 9pt &quot;Segoe UI&quot;;</string>
+         </property>
          <property name="text">
           <string>Valor Total (R$):</string>
          </property>
@@ -229,6 +235,9 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
       <layout class="QHBoxLayout" name="horizontalLayout_3">
        <item>
         <widget class="QLabel" name="label_5">
+         <property name="styleSheet">
+          <string notr="true">font: 700 9pt &quot;Segoe UI&quot;;</string>
+         </property>
          <property name="text">
           <string>Quantidade Vendas: </string>
          </property>

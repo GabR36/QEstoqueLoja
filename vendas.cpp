@@ -37,6 +37,7 @@ Vendas::Vendas(QWidget *parent) :
     // coluna quantidade
     ui->Tview_ProdutosVendidos->setColumnWidth(1, 85);
 
+
     // conectar banco de dados para consultar as datas mais antigas e mais novas das vendas
     // para mostrar nos qdateedits
     if (!db.open()) {

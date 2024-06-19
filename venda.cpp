@@ -9,6 +9,8 @@
 #include "pagamento.h"
 #include <QDoubleValidator>
 #include <QIntValidator>
+#include <QMenu>
+
 
 
 venda::venda(QWidget *parent) :
@@ -47,7 +49,7 @@ venda::venda(QWidget *parent) :
     // coluna descricao
     ui->Tview_ProdutosSelecionados->setColumnWidth(2, 250);
 
-    ui->Tview_ProdutosSelecionados->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+   // ui->Tview_ProdutosSelecionados->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
 
     //ui->Tview_Produtos->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -63,12 +65,22 @@ venda::venda(QWidget *parent) :
     QIntValidator *IntValidador = new QIntValidator();
     ui->Ledit_Preco->setValidator(DoubleValidador);
     ui->Ledit_QuantVendido->setValidator(IntValidador);
+
+    //actionMenu contextMenu
+    actionMenuDeletarProd = new QAction(this);
+    actionMenuDeletarProd->setText("Deletar Produto");
+    deletar.addFile(":/QEstoqueLOja/amarok-cart-remove.svg");
+    actionMenuDeletarProd->setIcon(deletar);
+    connect(actionMenuDeletarProd,SIGNAL(triggered(bool)),this,SLOT(deletarProd()));
+
+   // actionMenuDeletarProd->setIcon(janelaPrincipal->iconDelete);
 }
 
 venda::~venda()
 {
     delete ui;
 }
+
 
 void venda::on_Btn_SelecionarProduto_clicked()
 {
@@ -87,6 +99,7 @@ void venda::on_Btn_SelecionarProduto_clicked()
     // mostrar total
     ui->Lbl_Total->setText(Total());
 }
+
 
 void venda::handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
     // Este slot é chamado sempre que a seleção na tabela muda
@@ -109,6 +122,7 @@ void venda::handleSelectionChange(const QItemSelection &selected, const QItemSel
     qDebug() << productId;
     db.close();
 }
+
 
 
 void venda::on_Btn_Pesquisa_clicked()
@@ -327,5 +341,29 @@ QString venda::Total(){
 void venda::on_Ledit_Pesquisa_textChanged(const QString &arg1)
 {
     ui->Btn_Pesquisa->click();
+}
+
+
+void venda::on_Tview_ProdutosSelecionados_customContextMenuRequested(const QPoint &pos)
+{
+    if(!ui->Tview_ProdutosSelecionados->currentIndex().isValid())
+        return;
+    QMenu menu(this);
+
+    menu.addAction(actionMenuDeletarProd);
+
+
+
+    menu.exec(ui->Tview_ProdutosSelecionados->viewport()->mapToGlobal(pos));
+}
+void venda::deletarProd(){
+
+    modeloSelecionados.removeRow(ui->Tview_ProdutosSelecionados->currentIndex().row());
+    ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+
+
+
+
+
 }
 

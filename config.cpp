@@ -24,11 +24,12 @@ Config::Config(QWidget *parent)
     ui->Ledt_CnpjEmpresa->setText(configValues.value("cnpj_empresa", ""));
     ui->Ledt_EmailEmpresa->setText(configValues.value("email_empresa", ""));
     ui->Ledt_EnderecoEmpresa->setText(configValues.value("endereco_empresa", ""));
-    ui->Ledt_LucroEmpresa->setText(configValues.value("porcent_lucro", ""));
     ui->Ledt_NomeEmpresa->setText(configValues.value("nome_empresa", ""));
     ui->Ledt_TelEmpresa->setText(configValues.value("telefone_empresa", ""));
-    ui->Ledt_debito->setText(configValues.value("taxa_debito", ""));
-    ui->Ledt_credito->setText(configValues.value("taxa_credito", ""));
+    // converter notacao americana em ptbr
+    ui->Ledt_LucroEmpresa->setText(portugues.toString(configValues.value("porcent_lucro", "").toFloat()));
+    ui->Ledt_debito->setText(portugues.toString(configValues.value("taxa_debito", "").toFloat()));
+    ui->Ledt_credito->setText(portugues.toString(configValues.value("taxa_credito", "").toFloat()));
 
     db.close();
 
@@ -48,14 +49,15 @@ Config::~Config()
 void Config::on_Btn_Aplicar_clicked()
 {
     QString nomeEmpresa, enderecoEmpresa, emailEmpresa, cnpjEmpresa, telEmpresa, lucro, debito, credito;
+    // converter para notacao americana para armazenar no banco de dados
     nomeEmpresa = ui->Ledt_NomeEmpresa->text();
     enderecoEmpresa = ui->Ledt_EnderecoEmpresa->text();
     emailEmpresa = ui->Ledt_EmailEmpresa->text();
     cnpjEmpresa = ui->Ledt_CnpjEmpresa->text();
     telEmpresa = ui->Ledt_TelEmpresa->text();
-    lucro = ui->Ledt_LucroEmpresa->text();
-    debito = ui->Ledt_debito->text();
-    credito = ui->Ledt_credito->text();
+    lucro = QString::number(portugues.toFloat(ui->Ledt_LucroEmpresa->text()));
+    debito = QString::number(portugues.toFloat(ui->Ledt_debito->text()));
+    credito = QString::number(portugues.toFloat(ui->Ledt_credito->text()));
 
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";

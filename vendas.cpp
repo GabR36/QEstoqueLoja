@@ -131,9 +131,21 @@ void Vendas::LabelLucro(QString whereQuery){
             quantidadeVendas = query.value(0).toInt();
         }
     }
-    float lucro = total*0.28; // assumindo que o lucro é 40% do preco de venda
-    ui->Lbl_Total->setText(portugues.toString(total));
-    ui->Lbl_Lucro->setText(portugues.toString(lucro));
+    query.finish();
+    // pegar a porcentagem de lucro das configuracoes
+    float porcentLucro = 0;
+    if (query.exec("SELECT value FROM config WHERE key = 'porcent_lucro'")){
+        while (query.next()) {
+            qDebug() << query.value(0).toString();
+            porcentLucro = query.value(0).toFloat()/100;
+        }
+    }
+
+    qDebug() << porcentLucro;
+    // formula lucro em funcao de total, porcentagem de lucro e quantidade de vendas
+    float lucro = total*porcentLucro/(1 + porcentLucro);
+    ui->Lbl_Total->setText(portugues.toString(total, 'f', 2));
+    ui->Lbl_Lucro->setText(portugues.toString(lucro, 'f', 2));
     ui->Lbl_Quantidade->setText(portugues.toString(quantidadeVendas));
     db.close();
 }

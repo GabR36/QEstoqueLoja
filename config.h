@@ -5,6 +5,7 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QDoubleValidator>
+#include <QLocale>
 
 namespace Ui {
 class Config;
@@ -27,6 +28,7 @@ private slots:
 private:
     Ui::Config *ui;
     QSqlDatabase db = QSqlDatabase::database();
+    QLocale portugues;
 };
 
 #endif // CONFIG_H

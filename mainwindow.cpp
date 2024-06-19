@@ -291,6 +291,7 @@ void MainWindow::on_Btn_Enviar_clicked()
 
 void MainWindow::on_Btn_Delete_clicked()
 {
+    if(ui->Tview_Produtos->currentIndex().isValid()){
     // obter id selecionado
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
@@ -332,6 +333,9 @@ void MainWindow::on_Btn_Delete_clicked()
         // O usuário escolheu não deletar o produto
         qDebug() << "A exclusão do produto foi cancelada.";
     }
+    }else{
+        QMessageBox::warning(this,"Erro","Selecione um produto antes de tentar deletar!");
+    }
 }
 QString MainWindow::normalizeText(const QString &text) {
     QString normalized = text.normalized(QString::NormalizationForm_D);
@@ -342,6 +346,7 @@ QString MainWindow::normalizeText(const QString &text) {
         }
     }
     return result;
+
 
 
 }

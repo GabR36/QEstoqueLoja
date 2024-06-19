@@ -149,6 +149,7 @@ void Vendas::LabelLucro(){
 
 void Vendas::on_Btn_DeletarVenda_clicked()
 {
+    if(ui->Tview_Vendas2->currentIndex().isValid()){
     // obter id selecionado
     QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
@@ -223,6 +224,9 @@ void Vendas::on_Btn_DeletarVenda_clicked()
     else {
         // O usuário escolheu não deletar o produto
         qDebug() << "A exclusão da venda foi cancelada.";
+    }
+    }else{
+        QMessageBox::warning(this,"Erro","Selecione uma venda antes de tentar deletar!");
     }
 }
 

@@ -400,6 +400,7 @@ void MainWindow::on_Btn_Pesquisa_clicked()
 
 void MainWindow::on_Btn_Alterar_clicked()
 {
+    if(ui->Tview_Produtos->currentIndex().isValid()){
     // obter id selecionado
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
@@ -424,6 +425,10 @@ void MainWindow::on_Btn_Alterar_clicked()
     alterar->TrazerInfo(productDesc, productQuant, productPreco, productBarras, productNf);
     alterar->setWindowModality(Qt::ApplicationModal);
     alterar->show();
+    }else{
+        QMessageBox::warning(this,"Erro","Selecione um produto antes de alterar!");
+    }
+
 }
 
 

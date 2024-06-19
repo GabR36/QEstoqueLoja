@@ -85,12 +85,13 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug() << dbSchemaVersion;
 
     // a versão mais recente do esquema do banco de dados
-    int dbSchemaLastVersion = 1;
+    int dbSchemaLastVersion = 2;
 
     while (dbSchemaVersion < dbSchemaLastVersion){
         // selecionar a atualizacao conforme a versao atual do banco de dados
         switch (dbSchemaVersion) {
         case 0:
+        {
             // atualizar da versao 0 para a versao 1 do schema
 
             // comecar transacao
@@ -122,6 +123,8 @@ MainWindow::MainWindow(QWidget *parent)
             // mudar a versao para 1
             query.exec("PRAGMA user_version = 1");
 
+            query.finish();
+
             // terminar transacao
             if (!db.commit()) {
                 qDebug() << "Error: unable to commit transaction";
@@ -132,7 +135,45 @@ MainWindow::MainWindow(QWidget *parent)
 
             break;
         }
+        case 1:
+        {
+            // schema versao 1 atualizar para a versao 2
+
+            // comecar transacao
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+            }
+            QSqlQuery query;
+
+            query.exec("CREATE TABLE config (id INT AUTO_INCREMENT PRIMARY KEY, "
+                       "key VARCHAR(255) NOT NULL UNIQUE, "
+                       "value TEXT)");
+            query.exec("INSERT INTO config (key, value) VALUES ('nome_empresa', '')");
+            query.exec("INSERT INTO config (key, value) VALUES ('endereco_empresa', '')");
+            query.exec("INSERT INTO config (key, value) VALUES ('telefone_empresa', '')");
+            query.exec("INSERT INTO config (key, value) VALUES ('cnpj_empresa', '')");
+            query.exec("INSERT INTO config (key, value) VALUES ('email_empresa', '')");
+            query.exec("INSERT INTO config (key, value) VALUES ('porcent_lucro', '40')");
+            query.exec("INSERT INTO config (key, value) VALUES ('taxa_debito', '')");
+            query.exec("INSERT INTO config (key, value) VALUES ('taxa_credito', '')");
+
+            // mudar a versao para 2
+            query.exec("PRAGMA user_version = 2");
+
+            // terminar transacao
+            if (!db.commit()) {
+                qDebug() << "Error: unable to commit transaction";
+                db.rollback(); // Desfaz a transação
+            }
+
+            dbSchemaVersion = 2;
+
+            break;
+        }
+        }
     }
+    qDebug() << dbSchemaVersion;
+    qDebug() << db.tables();
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
@@ -955,5 +996,12 @@ void MainWindow::on_actionApenas_NF_triggered()
 
 
 
+}
+
+
+void MainWindow::on_actionConfig_triggered()
+{
+    Config *configuracao = new Config();
+    configuracao->show();
 }
 

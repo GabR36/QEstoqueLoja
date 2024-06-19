@@ -10,6 +10,7 @@
 #include <QSet>
 #include <QRandomGenerator>
 #include <QKeyEvent>
+#include "config.h"
 
 
 //#include "vendas.h"
@@ -75,6 +76,8 @@ private slots:
 
 
     void on_actionApenas_NF_triggered();
+
+    void on_actionConfig_triggered();
 
 private:
     Ui::MainWindow *ui;

@@ -418,7 +418,7 @@ void MainWindow::on_Btn_Pesquisa_clicked()
     QStringList conditions;
     if (palavras.length() > 1){
         for (const QString &palavra : palavras) {
-            conditions << QString("descricao LIKE '%%1%' OR codigo_barras LIKE '%%1%'").arg(palavra);
+            conditions << QString("descricao LIKE '%%1%'").arg(palavra);
 
         }
 

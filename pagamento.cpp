@@ -168,7 +168,7 @@ void pagamento::on_buttonBox_accepted()
     if(ui->CheckImprimirCNF->isChecked()){
         QPrinter printer;
         //printer.setPageOrientation(QPageLayout::Portrait);
-        QSizeF customSize(80,297); // 204x842pt
+        //QSizeF customSize(80,297); // 204x842pt
 
         // customPageSize(customSize, QPageSize::Millimeter, "Customdasads");
         printer.setPageSize(QPageSize(QSizeF(80, 2000), QPageSize::Millimeter));// Tamanho do papel
@@ -184,15 +184,47 @@ void pagamento::on_buttonBox_accepted()
         font.setPointSize(8);
         font.setBold(true);
         painter.setFont(font);
-        int yPos = 100; // Posição inicial para começar a desenhar o texto
+        QString nomeEmpresa = "Padrão";
+        QString enderecoEmpresa = "Padrão";
+        QString cnpjEmpresa = "";
+        QString telEmpresa = "";
+        if (query.exec("SELECT value FROM config WHERE key = 'nome_empresa'")){
+            while (query.next()) {
+                nomeEmpresa = query.value(0).toString();
+            }
+        };
+        if (query.exec("SELECT value FROM config WHERE key = 'endereco_empresa'")){
+            while (query.next()) {
+                enderecoEmpresa = query.value(0).toString();
+            }
+        };
+        if (query.exec("SELECT value FROM config WHERE key = 'cnpj_empresa'")){
+            while (query.next()) {
+                cnpjEmpresa = query.value(0).toString();
+            }
+        };
+        if (query.exec("SELECT value FROM config WHERE key = 'telefone_empresa'")){
+            while (query.next()) {
+                telEmpresa = query.value(0).toString();
+            }
+        };
+
+
+        int yPos = 30; // Posição inicial para começar a desenhar o texto
         int xPos = 0;
         const int yPosPrm = 10; // Posição inicial para começar a desenhar o texto
         const int xPosPrm = 10;
       //  painter.setFont(QFont("Arial", 10, QFont::Bold));
-        painter.drawText(95, 20, "Cupom Compra Venda");
+        painter.drawText(100, 5, "Cupom Compra Venda");
         yPos += 20; // Avança a posição y
-        painter.drawText(xPos, yPos, "Loja: ");
-        yPos += 50;
+        painter.drawText(xPos, yPos, nomeEmpresa);
+        yPos += 20;
+        painter.drawText(xPos, yPos, enderecoEmpresa);
+        yPos += 20;
+        painter.drawText(xPos, yPos, "CNPJ: " + cnpjEmpresa);
+        yPos += 20;
+        painter.drawText(xPos, yPos, "Telefone: " + telEmpresa);
+        yPos += 20;
         painter.drawText(xPos, yPos, "Data/Hora: " + dataGlobal);
         yPos += 20;
         painter.drawText(xPos, yPos, "Cliente: " + clienteGlobal);

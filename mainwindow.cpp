@@ -21,7 +21,6 @@
 #include <QMenu>
 #include <QFontDatabase>
 #include <zint.h>
-//#include <QRegularExpression>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

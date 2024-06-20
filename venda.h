@@ -52,7 +52,7 @@ private slots:
 
 private:
     QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
-    QStandardItemModel modeloSelecionados;
+    QStandardItemModel *modeloSelecionados = new QStandardItemModel;
     Ui::venda *ui;
     QAction *actionMenuDeletarProd;
 

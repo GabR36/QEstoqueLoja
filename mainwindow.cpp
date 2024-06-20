@@ -186,6 +186,7 @@ MainWindow::MainWindow(QWidget *parent)
     QModelIndex firstIndex = model->index(0, 0);
     ui->Tview_Produtos->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
 
+
     // ajustar tamanho colunas
     // coluna descricao
     ui->Tview_Produtos->setColumnWidth(2, 750);
@@ -331,7 +332,7 @@ void MainWindow::on_Btn_Enviar_clicked()
 
 void MainWindow::on_Btn_Delete_clicked()
 {
-    if(ui->Tview_Produtos->currentIndex().isValid()){
+    if(ui->Tview_Produtos->selectionModel()->isSelected(ui->Tview_Produtos->currentIndex())){
     // obter id selecionado
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
@@ -445,7 +446,9 @@ void MainWindow::on_Btn_Pesquisa_clicked()
 
 void MainWindow::on_Btn_Alterar_clicked()
 {
-    if(ui->Tview_Produtos->currentIndex().isValid()){
+
+
+    if(ui->Tview_Produtos->selectionModel()->isSelected(ui->Tview_Produtos->currentIndex())){
     // obter id selecionado
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
@@ -593,7 +596,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
     ZBarcode_Delete(barcode);
 
     qDebug() << "Código de barras gerado com sucesso e salvo como out.png/out.gif";
-    QImage codimage("out.gif");
+    QImage codimage("out.png");
     //  impressão ---------
     QPrinter printer;
 

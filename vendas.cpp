@@ -65,6 +65,7 @@ Vendas::Vendas(QWidget *parent) :
     ui->DateEdt_Ate->setDate(dateRange.second);
 
     db.close();
+    ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
 
 
 }
@@ -95,7 +96,7 @@ void Vendas::atualizarTabelas(){
     ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
 
     db.close();
-    ui->Tview_Vendas2->setCurrentIndex(ui->Tview_Vendas2->model()->index(1,0));
+    ui->Tview_Vendas2->selectionModel()->select(QModelIndex(modeloVendas2->index(0, 0)), QItemSelectionModel::Select);
 
 }
 
@@ -115,6 +116,7 @@ void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSe
     modeloProdVendidos->setQuery("SELECT produtos.descricao, produtos_vendidos.quantidade, produtos_vendidos.preco_vendido FROM produtos_vendidos JOIN produtos ON produtos_vendidos.id_produto = produtos.id WHERE id_venda = " + productId);
     ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
     db.close();
+
 }
 
 void Vendas::LabelLucro(QString whereQuery){
@@ -272,5 +274,7 @@ void Vendas::filtrarData(QString de, QString ate){
     }
     modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery + " ORDER BY id DESC");
     db.close();
+    ui->Tview_Vendas2->selectionModel()->select(QModelIndex(modeloVendas2->index(0, 0)), QItemSelectionModel::Select);
+
 }
 

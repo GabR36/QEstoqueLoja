@@ -154,8 +154,8 @@ MainWindow::MainWindow(QWidget *parent)
             query.exec("INSERT INTO config (key, value) VALUES ('cnpj_empresa', '')");
             query.exec("INSERT INTO config (key, value) VALUES ('email_empresa', '')");
             query.exec("INSERT INTO config (key, value) VALUES ('porcent_lucro', '40')");
-            query.exec("INSERT INTO config (key, value) VALUES ('taxa_debito', '')");
-            query.exec("INSERT INTO config (key, value) VALUES ('taxa_credito', '')");
+            query.exec("INSERT INTO config (key, value) VALUES ('taxa_debito', '2')");
+            query.exec("INSERT INTO config (key, value) VALUES ('taxa_credito', '3')");
 
             // mudar a versao para 2
             query.exec("PRAGMA user_version = 2");

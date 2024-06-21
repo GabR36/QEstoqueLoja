@@ -96,7 +96,14 @@ void Vendas::atualizarTabelas(){
     ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
 
     db.close();
-    ui->Tview_Vendas2->selectionModel()->select(QModelIndex(modeloVendas2->index(0, 0)), QItemSelectionModel::Select);
+
+    QModelIndex firstIndex = modeloVendas2->index(0, 0);
+
+
+    ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
+
+    // Definir a primeira linha como a linha atual
+//    selectionModel->setCurrentIndex(topLeft, QItemSelectionModel::NoUpdate);
 
 }
 

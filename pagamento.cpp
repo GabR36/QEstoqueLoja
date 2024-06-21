@@ -215,15 +215,15 @@ void pagamento::on_buttonBox_accepted()
         const int yPosPrm = 10; // Posição inicial para começar a desenhar o texto
         const int xPosPrm = 10;
       //  painter.setFont(QFont("Arial", 10, QFont::Bold));
-        painter.drawText(100, 5, "Cupom Compra Venda");
+        painter.drawText(100, 10, "Cupom Compra Venda");
         yPos += 20; // Avança a posição y
         painter.drawText(xPos, yPos, nomeEmpresa);
         yPos += 20;
         painter.drawText(xPos, yPos, enderecoEmpresa);
         yPos += 20;
-        painter.drawText(xPos, yPos, "CNPJ: " + cnpjEmpresa);
+        painter.drawText(xPos, yPos, cnpjEmpresa);
         yPos += 20;
-        painter.drawText(xPos, yPos, "Telefone: " + telEmpresa);
+        painter.drawText(xPos, yPos, telEmpresa);
         yPos += 20;
         painter.drawText(xPos, yPos, "Data/Hora: " + dataGlobal);
         yPos += 20;

@@ -260,13 +260,6 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
    <item row="2" column="0">
     <layout class="QVBoxLayout" name="verticalLayout_5">
      <item>
-      <widget class="QPushButton" name="testebutton">
-       <property name="text">
-        <string>PushButton</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="Btn_DeletarVenda">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">

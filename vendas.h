@@ -32,7 +32,11 @@ public:
     QList<QList<QVariant>> rowDataList;
     QStringList getDescricoesProdutos(const QList<ProdutoVendido> &produtosVendidos);
     QList<ProdutoVendido> getIdProdutosVendidos(QString idVenda);
-    bool imprimirEtiquetaVenda(QString idVenda);
+    bool imprimirReciboVenda(QString idVenda);
+
+
+public slots:
+    void imprimirReciboVendaSelec(QString id); //precisa ser slot :(
 
 private slots:
     void on_Btn_InserirVenda_clicked();

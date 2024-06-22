@@ -3,11 +3,13 @@
 
 #include <QDialog>
 #include "venda.h"
+#include "vendas.h"
 #include <QLocale>
 
 namespace Ui {
 class pagamento;
 }
+
 
 class pagamento : public QDialog
 {
@@ -40,6 +42,8 @@ private:
     Ui::pagamento *ui;
     float obterValorFinal(QString taxa, QString desconto);
     void descontoTaxa();
+    Vendas *janelaVendas1;
+
 };
 
 #endif // PAGAMENTO_H

@@ -9,7 +9,7 @@
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QPainter>
-#include <QList>
+
 
 Vendas::Vendas(QWidget *parent) :
     QWidget(parent),
@@ -331,6 +331,24 @@ QList<ProdutoVendido> Vendas::getIdProdutosVendidos(QString idVenda) {
 void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
 {    if(!ui->Tview_Vendas2->currentIndex().isValid())
         return;
+    QModelIndexList selectedRows = ui->Tview_Vendas2->selectionModel()->selectedRows();
+    QString cellValue;
+    if (!selectedRows.isEmpty()) {
+        // Pega o primeiro índice selecionado (caso múltiplas linhas possam ser selecionadas)
+        QModelIndex selectedIndex = selectedRows.first();
+
+        // Obtém o índice da célula na coluna 0 da linha selecionada
+        QModelIndex columnIndex = ui->Tview_Vendas2->model()->index(selectedIndex.row(), 0);
+
+        // Obtém o valor da célula como uma QString
+         cellValue = ui->Tview_Vendas2->model()->data(columnIndex).toString();
+
+        // Mostra o valor em uma mensagem
+
+    } else {
+        QMessageBox::warning(this, "Aviso", "Nenhuma linha selecionada.");
+    }
+
     QMenu menu(this);
 
     actionMenuDeletarVenda = new QAction();
@@ -341,8 +359,13 @@ void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
     actionImprimirRecibo = new QAction();
     actionImprimirRecibo->setText("Imprimir Recibo da Venda");
     actionImprimirRecibo->setIcon(janelaPrincipal->iconImpressora);
+    QObject::connect(actionImprimirRecibo, &QAction::triggered, [&]() {
+        imprimirReciboVenda(cellValue); // Chama nossa função com o parâmetro
+    });
+
 
     menu.addAction(actionMenuDeletarVenda);
+    menu.addAction(actionImprimirRecibo);
 
 
 
@@ -371,7 +394,7 @@ QStringList Vendas::getDescricoesProdutos(const QList<ProdutoVendido> &produtosV
     db.close();
     return descricoes;
 }
-bool Vendas::imprimirEtiquetaVenda(QString idVenda){
+bool Vendas::imprimirReciboVenda(QString idVenda){
 
     if(!db.open()){
         qDebug() << "erro bancodedados";
@@ -384,7 +407,7 @@ bool Vendas::imprimirEtiquetaVenda(QString idVenda){
     printer.setFullPage(true); // Utilizar toda a página        QPrintDialog dialog(&printer, this);
 
     QPrintDialog dialog(&printer, this);
-    if(dialog.exec() == QDialog::Rejected) return -1;
+   if(dialog.exec() == QDialog::Rejected) return 0;
 
     QPainter painter;
     painter.begin(&printer);
@@ -552,11 +575,14 @@ bool Vendas::imprimirEtiquetaVenda(QString idVenda){
     db.close();
 
 }
+void Vendas::imprimirReciboVendaSelec(QString id){
+    imprimirReciboVenda(id);
+}
 
 
 void Vendas::on_testebutton_clicked()
 {
-    imprimirEtiquetaVenda(ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->selectionModel()->selectedIndexes().first()).toString());
+    //imprimirEtiquetaVenda(ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->selectionModel()->selectedIndexes().first()).toString());
     // QList<ProdutoVendido> produtos = getProdutosVendidos("85");
     // for (const ProdutoVendido &produto : produtos) {
     //     qDebug() << "ID Produto:" << produto.id_produto

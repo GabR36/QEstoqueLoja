@@ -5,13 +5,18 @@
 #include <QDate>
 #include <QtSql>
 #include <QMessageBox>
+#include <QMenu>
+#include <QPrintDialog>
+#include <QPrinter>
+#include <QPainter>
+#include <QList>
 
 Vendas::Vendas(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::Vendas)
 {
     ui->setupUi(this);
-
+    //Teste();
     ui->Tview_Vendas2->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     ui->Tview_ProdutosVendidos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     atualizarTabelas();
@@ -123,6 +128,7 @@ void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSe
     modeloProdVendidos->setQuery("SELECT produtos.descricao, produtos_vendidos.quantidade, produtos_vendidos.preco_vendido FROM produtos_vendidos JOIN produtos ON produtos_vendidos.id_produto = produtos.id WHERE id_venda = " + productId);
     ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
     db.close();
+
 
 }
 
@@ -250,6 +256,8 @@ void Vendas::on_Btn_DeletarVenda_clicked()
     }else{
         QMessageBox::warning(this,"Erro","Selecione uma venda antes de tentar deletar!");
     }
+
+
 }
 
 void Vendas::on_DateEdt_De_dateChanged(const QDate &date)
@@ -283,5 +291,283 @@ void Vendas::filtrarData(QString de, QString ate){
     db.close();
     ui->Tview_Vendas2->selectionModel()->select(QModelIndex(modeloVendas2->index(0, 0)), QItemSelectionModel::Select);
 
+}
+
+QList<ProdutoVendido> Vendas::getIdProdutosVendidos(QString idVenda) {
+    QList<ProdutoVendido> produtosVendidos;
+
+    // Configurar o banco de dados SQLite
+
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir o banco de dados.";
+        return produtosVendidos;
+    }
+
+    // Preparar a consulta SQL
+    QSqlQuery query;
+    query.prepare("SELECT id_produto, quantidade, preco_vendido FROM produtos_vendidos WHERE id_venda = :idVenda");
+    query.bindValue(":idVenda", idVenda);
+
+    // Executar a consulta
+    if (!query.exec()) {
+        qDebug() << "Erro ao executar a consulta:" << query.lastError();
+        return produtosVendidos;
+    }
+
+    // Processar os resultados
+    while (query.next()) {
+        ProdutoVendido produtoVendido;
+        produtoVendido.id_produto = query.value(0).toString();
+        produtoVendido.quantidade = query.value(1).toString();
+        produtoVendido.preco_vendido = query.value(2).toString();
+
+        produtosVendidos.append(produtoVendido);
+    }
+
+    db.close();
+    return produtosVendidos;
+}
+
+void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
+{    if(!ui->Tview_Vendas2->currentIndex().isValid())
+        return;
+    QMenu menu(this);
+
+    actionMenuDeletarVenda = new QAction();
+    actionMenuDeletarVenda->setText("Deletar Venda");
+    actionMenuDeletarVenda->setIcon(janelaPrincipal->iconDelete);
+    connect(actionMenuDeletarVenda,SIGNAL(triggered(bool)),this,SLOT(on_Btn_DeletarVenda_clicked()));
+
+    actionImprimirRecibo = new QAction();
+    actionImprimirRecibo->setText("Imprimir Recibo da Venda");
+    actionImprimirRecibo->setIcon(janelaPrincipal->iconImpressora);
+
+    menu.addAction(actionMenuDeletarVenda);
+
+
+
+    menu.exec(ui->Tview_Vendas2->viewport()->mapToGlobal(pos));
+}
+QStringList Vendas::getDescricoesProdutos(const QList<ProdutoVendido> &produtosVendidos) {
+    QStringList descricoes;
+
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir o banco de dados.";
+        return descricoes;
+    }
+
+    QSqlQuery query;
+    foreach (const ProdutoVendido &produto, produtosVendidos) {
+        query.prepare("SELECT descricao FROM produtos WHERE id = :id_produto");
+        query.bindValue(":id_produto", produto.id_produto);
+
+        if (query.exec() && query.next()) {
+            descricoes.append(query.value(0).toString());
+        } else {
+            qDebug() << "Erro ao buscar descrição do produto ID:" << produto.id_produto << query.lastError();
+        }
+    }
+
+    db.close();
+    return descricoes;
+}
+bool Vendas::imprimirEtiquetaVenda(QString idVenda){
+
+    if(!db.open()){
+        qDebug() << "erro bancodedados";
+    }
+    QSqlQuery query;
+    QPrinter printer;
+
+    printer.setPageSize(QPageSize(QSizeF(80, 2000), QPageSize::Millimeter));// Tamanho do papel
+    // printer.pageLayout().setPageSize(customPageSize);
+    printer.setFullPage(true); // Utilizar toda a página        QPrintDialog dialog(&printer, this);
+
+    QPrintDialog dialog(&printer, this);
+    if(dialog.exec() == QDialog::Rejected) return -1;
+
+    QPainter painter;
+    painter.begin(&printer);
+    QFont font = painter.font();
+    font.setPointSize(8);
+    font.setBold(true);
+    painter.setFont(font);
+
+    QString nomeEmpresa = "Padrão"; // pega os dados da configuração;
+    QString enderecoEmpresa = "Padrão";
+    QString cnpjEmpresa = "";
+    QString telEmpresa = "";
+    QString cliente,dataVenda,total,forma_pagamento,valor_recebido,troco,taxa,valor_final,desconto;
+    if (query.exec("SELECT value FROM config WHERE key = 'nome_empresa'")){
+        while (query.next()) {
+            nomeEmpresa = query.value(0).toString();
+        }
+    };
+    if (query.exec("SELECT value FROM config WHERE key = 'endereco_empresa'")){
+        while (query.next()) {
+            enderecoEmpresa = query.value(0).toString();
+        }
+    };
+    if (query.exec("SELECT value FROM config WHERE key = 'cnpj_empresa'")){
+        while (query.next()) {
+            cnpjEmpresa = query.value(0).toString();
+        }
+    };
+    if (query.exec("SELECT value FROM config WHERE key = 'telefone_empresa'")){
+        while (query.next()) {
+            telEmpresa = query.value(0).toString();
+        }// dataglobal , clienteglobal, totalglobal, desconte, forma de pagamento,recebido, taca e valorfinal?
+    };
+    query.prepare("SELECT cliente, data_hora,total,forma_pagamento,valor_recebido,troco,taxa,valor_final,desconto FROM vendas2 WHERE id = :id_venda");
+    query.bindValue(":id_venda", idVenda);
+    if(query.exec()){
+        while (query.next()) {
+                cliente = query.value("cliente").toString();
+                dataVenda = query.value("data_hora").toString();
+                total = query.value("total").toString();
+                forma_pagamento = query.value("forma_pagamento").toString();
+                valor_recebido = query.value("valor_recebido").toString();
+                troco = query.value("troco").toString();
+                taxa = query.value("taxa").toString();
+                valor_final = query.value("valor_final").toString();
+                desconto = query.value("desconto").toString();
+
+            }
+    }else{qDebug() << "erro query venda2 imprimir";}
+
+
+
+
+
+    int yPos = 30; // Posição inicial para começar a desenhar o texto
+    int xPos = 0;
+    const int yPosPrm = 10; // Posição inicial para começar a desenhar o texto
+    const int xPosPrm = 10;
+    //  painter.setFont(QFont("Arial", 10, QFont::Bold));
+    painter.drawText(95, 10, "Cupom Compra Venda");
+    yPos += 20; // Avança a posição y
+    painter.drawText(xPos, yPos, nomeEmpresa);
+    yPos += 20;
+    painter.drawText(xPos, yPos, enderecoEmpresa);
+    yPos += 20;
+    painter.drawText(xPos, yPos, cnpjEmpresa);
+    yPos += 20;
+    painter.drawText(xPos, yPos, telEmpresa);
+    yPos += 20;
+    painter.drawText(xPos, yPos, "Data/Hora: " + dataVenda);
+    yPos += 20;
+    painter.drawText(xPos, yPos, "Cliente: " + cliente);
+    yPos += 30;
+    painter.drawText(xPos, yPos, "Quant:");
+    int xPosProds = 45;
+    xPos = xPosProds;
+    painter.drawText(xPos, yPos, "Produtos vendidos:");
+    int xPosValor = 202;
+    xPos = xPosValor;
+    painter.drawText(xPos, yPos, "ValorUn(R$):");
+    yPos += 20;
+
+    font.setPointSize(8);
+    font.setBold(false);
+    painter.setFont(font);
+    //painter.setFont(QFont("Arial", 10));
+    int lineHeight = 20; // Altura da linha
+    int pageWidth = printer.pageLayout().paintRectPixels(printer.resolution()).width();
+
+    QList<ProdutoVendido> produtos = getIdProdutosVendidos(idVenda);
+    QStringList descricoes = getDescricoesProdutos(produtos);
+
+    int index = 0;  // Índice para acessar as descrições
+
+    for (const ProdutoVendido &produto : produtos) {
+        QString valorProduto = portugues.toString(produto.preco_vendido.toDouble(),'f',2);
+        QString quantidadProduto = produto.quantidade;
+
+        // Use o índice para obter a descrição correta
+        QString descricaoProduto = descricoes.at(index);
+
+        QTextOption textOption;
+        QRect rectQuantProd(xPosPrm, yPos, xPosProds, lineHeight * 2);
+        painter.drawText(rectQuantProd, quantidadProduto, textOption);
+
+        QRect rectDesc(xPosProds, yPos, pageWidth - 100, lineHeight * 2); // Definir um retângulo para o texto
+        textOption.setWrapMode(QTextOption::WordWrap);
+        painter.drawText(rectDesc, descricaoProduto, textOption);
+
+        QRect rectValor(xPosValor + 30, yPos, pageWidth, lineHeight * 2);
+        painter.drawText(rectValor, valorProduto, textOption);
+
+        yPos += 30;
+
+        index++;  // Incrementa o índice para a próxima iteração
+    }
+    int posx = xPosPrm;
+    for(int i=0; i < pageWidth; i++){
+        posx += 3;
+        painter.drawText(posx,yPos, "=");
+    };
+    font.setBold(true);
+    painter.setFont(font);
+    yPos += 20;
+    //    painter.drawText(Qt::AlignCenter,yPos, "Pagamento");
+    xPos = 95;
+    painter.drawText(xPos,yPos, "Desconto(R$): " + portugues.toString(desconto.toFloat(),'f',2));
+    yPos += 20;
+    painter.drawText(xPos,yPos, "Forma Pagamento: " + forma_pagamento);
+    yPos += 20;
+    painter.drawText(xPos,yPos, "Valor Total Produtos(R$): " + portugues.toString(total.toFloat(),'f',2));
+    yPos += 20;
+    if(forma_pagamento == "Dinheiro" ){
+        painter.drawText(xPos, yPos, "Valor Recebido(R$):" + portugues.toString(valor_recebido.toFloat(),'f',2));
+        yPos += 20;
+        painter.drawText(xPos,yPos, "Troco(R$):" + portugues.toString(troco.toFloat(),'f',2));
+    }else if(forma_pagamento == "Não Sei"){
+    }else if(forma_pagamento == "Crédito"){
+        painter.drawText(xPos, yPos, "Taxa(%):" + portugues.toString(taxa.toFloat(),'f',2));
+        yPos += 20;
+        painter.drawText(xPos, yPos, "Valor Final(R$):" + portugues.toString(valor_final.toFloat(), 'f', 2 ));
+
+    }else if(forma_pagamento == "Débito"){
+        painter.drawText(xPos, yPos, "Taxa(%):" + portugues.toString(taxa.toFloat(),'f',2));
+        yPos += 20;
+        painter.drawText(xPos, yPos, "Valor Final(R$):" + portugues.toString(valor_final.toFloat(), 'f', 2 ));
+
+    }else if(forma_pagamento == "Pix"){
+    }
+    else{
+        qDebug() << "forma de pagamento deu erro";
+    }
+
+    yPos += 20;
+    painter.drawText(xPosPrm, yPos, "Assinatura:" );
+    yPos += 50;
+    painter.drawText(xPosPrm, yPos, "Obrigado Pela Compra Volte Sempre!" );
+    yPos += 30;
+
+    painter.drawText(xPosPrm,yPos, "--");
+
+
+    qDebug() << printer.pageLayout().pageSize();
+    painter.end();
+    db.close();
+
+}
+
+
+void Vendas::on_testebutton_clicked()
+{
+    imprimirEtiquetaVenda(ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->selectionModel()->selectedIndexes().first()).toString());
+    // QList<ProdutoVendido> produtos = getProdutosVendidos("85");
+    // for (const ProdutoVendido &produto : produtos) {
+    //     qDebug() << "ID Produto:" << produto.id_produto
+    //              << "Quantidade:" << produto.quantidade
+    //              << "Preço Vendido:" << produto.preco_vendido;
+    // }
+    // QStringList descricoes = getDescricoesProdutos(produtos);
+
+    // // Exibir as descrições dos produtos
+    // for (const QString &descricao : descricoes) {
+    //     qDebug() << "Descrição do Produto:" << descricao;
+    // }
 }
 

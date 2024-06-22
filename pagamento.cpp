@@ -184,7 +184,8 @@ void pagamento::on_buttonBox_accepted()
         font.setPointSize(8);
         font.setBold(true);
         painter.setFont(font);
-        QString nomeEmpresa = "Padrão";
+
+        QString nomeEmpresa = "Padrão"; // pega os dados da configuração;
         QString enderecoEmpresa = "Padrão";
         QString cnpjEmpresa = "";
         QString telEmpresa = "";
@@ -206,8 +207,10 @@ void pagamento::on_buttonBox_accepted()
         if (query.exec("SELECT value FROM config WHERE key = 'telefone_empresa'")){
             while (query.next()) {
                 telEmpresa = query.value(0).toString();
-            }
+            }// dataglobal , clienteglobal, totalglobal, desconte, forma de pagamento,recebido, taca e valorfinal?
         };
+
+
 
 
         int yPos = 30; // Posição inicial para começar a desenhar o texto
@@ -215,7 +218,7 @@ void pagamento::on_buttonBox_accepted()
         const int yPosPrm = 10; // Posição inicial para começar a desenhar o texto
         const int xPosPrm = 10;
       //  painter.setFont(QFont("Arial", 10, QFont::Bold));
-        painter.drawText(100, 10, "Cupom Compra Venda");
+        painter.drawText(95, 10, "Cupom Compra Venda");
         yPos += 20; // Avança a posição y
         painter.drawText(xPos, yPos, nomeEmpresa);
         yPos += 20;

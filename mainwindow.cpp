@@ -574,6 +574,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
 
     // Definir o tipo de simbologia (Code128 neste caso)
     barcode->symbology = BARCODE_CODE128;
+    barcode->output_options = BOLD_TEXT;
 
     // Definir os dados a serem codificados
     int error = ZBarcode_Encode(barcode, (unsigned char*)data, 0);
@@ -591,12 +592,13 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
         return ;
     }
 
+
     ZBarcode_Print(barcode, 0);
     // Limpar o objeto de código de barras
     ZBarcode_Delete(barcode);
 
     qDebug() << "Código de barras gerado com sucesso e salvo como out.png/out.gif";
-    QImage codimage("out.png");
+    QImage codimage("out.gif");
     //  impressão ---------
     QPrinter printer;
 
@@ -613,7 +615,8 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
     // cutCommand.append(0x1D);
     // cutCommand.append('V');
 
-    int ypos[2] = {5, 50};
+    int ypos[2] = {5, 53};
+    const int espacoEntreItens = 20;
 
     for(int i =0; i<quant; i++){
 
@@ -624,7 +627,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
             };
         }
 
-        QRect descRect(0,ypos[0],145,32);
+        QRect descRect(0,ypos[0],145,34);
         QFont fontePainter = painter.font();
         fontePainter.setPointSize(10);
         painter.setFont(fontePainter);
@@ -635,8 +638,11 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
         fontePainter.setBold(false);
         painter.setFont(fontePainter);
 
-        QRect codImageRect(155,ypos[0], 90,45);
+        QRect codImageRect(155,ypos[0], 115,55);
         painter.drawImage(codImageRect, codimage);
+        for(int j = 0; j < 2; j++) {
+            ypos[j] = ypos[j] + espacoEntreItens;
+        }
 
 
     }

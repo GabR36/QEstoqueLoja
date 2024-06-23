@@ -383,7 +383,27 @@ QString MainWindow::normalizeText(const QString &text) {
     QString result;
     for (const QChar &c : normalized) {
         if (!c.isMark()) {
-            result.append(c.toLower());
+            QChar replacement;
+            switch (c.unicode()) {
+            case ';':
+            case '\'':
+            case '\"':
+                // Remover os caracteres ; ' "
+                continue;
+            case '<':
+                replacement = '(';
+                break;
+            case '>':
+                replacement = ')';
+                break;
+            case '&':
+                replacement = 'e';
+                break;
+            default:
+                result.append(c.toLower());
+                continue;
+            }
+            result.append(replacement);
         }
     }
     return result;

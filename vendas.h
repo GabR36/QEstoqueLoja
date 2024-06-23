@@ -8,13 +8,19 @@
 #include "mainwindow.h"
 #include <QLocale>
 
+
 namespace Ui {
 class Vendas;
 }
-
+struct ProdutoVendido {
+    QString id_produto;
+    QString quantidade;
+    QString preco_vendido;
+};
 class Vendas : public QWidget
 {
     Q_OBJECT
+
 
 public:
     MainWindow *janelaPrincipal;
@@ -23,6 +29,13 @@ public:
     ~Vendas();
     void atualizarTabelas();
     QLocale portugues;
+    QList<QList<QVariant>> rowDataList;
+    static bool imprimirReciboVenda( QString idVenda);
+    static QStringList getProdutosVendidos( QString idVenda);
+
+
+public slots:
+    void imprimirReciboVendaSelec(QString id); //precisa ser slot :(
 
 private slots:
     void on_Btn_InserirVenda_clicked();
@@ -35,6 +48,10 @@ private slots:
 
     void on_DateEdt_Ate_dateChanged(const QDate &date);
 
+    void on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos);
+
+    void on_testebutton_clicked();
+
 private:
     void LabelLucro();
     void LabelLucro(QString whereQuery);
@@ -42,6 +59,11 @@ private:
     QSqlQueryModel *modeloVendas2 = new QSqlQueryModel;
     Ui::Vendas *ui;
     void filtrarData(QString de, QString ate);
+    QAction *actionMenuDeletarVenda;
+    QAction *actionImprimirRecibo;
+    void Teste();
+
+
 };
 
 #endif // VENDAS_H

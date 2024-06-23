@@ -168,6 +168,9 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
          <height>300</height>
         </size>
        </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::CustomContextMenu</enum>
+       </property>
        <property name="selectionMode">
         <enum>QAbstractItemView::SingleSelection</enum>
        </property>

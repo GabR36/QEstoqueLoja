@@ -21,7 +21,6 @@
 #include <QMenu>
 #include <QFontDatabase>
 #include <zint.h>
-//#include <QRegularExpression>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -186,6 +185,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = model->index(0, 0);
     ui->Tview_Produtos->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
+     ui->Ledit_Desc->setMaxLength(120);
 
     // ajustar tamanho colunas
     // coluna descricao
@@ -332,7 +332,7 @@ void MainWindow::on_Btn_Enviar_clicked()
 
 void MainWindow::on_Btn_Delete_clicked()
 {
-    if(ui->Tview_Produtos->currentIndex().isValid()){
+    if(ui->Tview_Produtos->selectionModel()->isSelected(ui->Tview_Produtos->currentIndex())){
     // obter id selecionado
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
@@ -383,7 +383,27 @@ QString MainWindow::normalizeText(const QString &text) {
     QString result;
     for (const QChar &c : normalized) {
         if (!c.isMark()) {
-            result.append(c.toLower());
+            QChar replacement;
+            switch (c.unicode()) {
+            case ';':
+            case '\'':
+            case '\"':
+                // Remover os caracteres ; ' "
+                continue;
+            case '<':
+                replacement = '(';
+                break;
+            case '>':
+                replacement = ')';
+                break;
+            case '&':
+                replacement = 'e';
+                break;
+            default:
+                result.append(c.toLower());
+                continue;
+            }
+            result.append(replacement);
         }
     }
     return result;
@@ -418,7 +438,7 @@ void MainWindow::on_Btn_Pesquisa_clicked()
     QStringList conditions;
     if (palavras.length() > 1){
         for (const QString &palavra : palavras) {
-            conditions << QString("descricao LIKE '%%1%' OR codigo_barras LIKE '%%1%'").arg(palavra);
+            conditions << QString("descricao LIKE '%%1%'").arg(palavra);
 
         }
 
@@ -446,7 +466,9 @@ void MainWindow::on_Btn_Pesquisa_clicked()
 
 void MainWindow::on_Btn_Alterar_clicked()
 {
-    if(ui->Tview_Produtos->currentIndex().isValid()){
+
+
+    if(ui->Tview_Produtos->selectionModel()->isSelected(ui->Tview_Produtos->currentIndex())){
     // obter id selecionado
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
@@ -572,6 +594,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
 
     // Definir o tipo de simbologia (Code128 neste caso)
     barcode->symbology = BARCODE_CODE128;
+    barcode->output_options = BOLD_TEXT;
 
     // Definir os dados a serem codificados
     int error = ZBarcode_Encode(barcode, (unsigned char*)data, 0);
@@ -588,6 +611,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
         ZBarcode_Delete(barcode);
         return ;
     }
+
 
     ZBarcode_Print(barcode, 0);
     // Limpar o objeto de código de barras
@@ -611,7 +635,8 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
     // cutCommand.append(0x1D);
     // cutCommand.append('V');
 
-    int ypos[2] = {5, 50};
+    int ypos[2] = {5, 53};
+    const int espacoEntreItens = 20;
 
     for(int i =0; i<quant; i++){
 
@@ -622,7 +647,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
             };
         }
 
-        QRect descRect(0,ypos[0],145,32);
+        QRect descRect(0,ypos[0],145,34);
         QFont fontePainter = painter.font();
         fontePainter.setPointSize(10);
         painter.setFont(fontePainter);
@@ -633,8 +658,11 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
         fontePainter.setBold(false);
         painter.setFont(fontePainter);
 
-        QRect codImageRect(155,ypos[0], 90,45);
+        QRect codImageRect(155,ypos[0], 115,55);
         painter.drawImage(codImageRect, codimage);
+        for(int j = 0; j < 2; j++) {
+            ypos[j] = ypos[j] + espacoEntreItens;
+        }
 
 
     }

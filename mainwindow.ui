@@ -151,6 +151,9 @@ border: 2px solid black;
               <height>20</height>
              </size>
             </property>
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
+            </property>
             <property name="toolTip">
              <string extracomment="Gerar código de barra pessoal">Gerar código de barra pessoal</string>
             </property>
@@ -681,7 +684,7 @@ font-size: 15px;</string>
      <x>0</x>
      <y>0</y>
      <width>1210</width>
-     <height>23</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuGerarrelat_rios">

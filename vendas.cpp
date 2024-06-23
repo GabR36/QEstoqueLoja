@@ -477,7 +477,7 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
     font.setBold(false);
     painter.setFont(font);
     //painter.setFont(QFont("Arial", 10));
-    int lineHeight = 20; // Altura da linha
+    int lineHeight = 30; // Altura da linha
     int pageWidth = printer.pageLayout().paintRectPixels(printer.resolution()).width();
 
     QStringList produtos = getProdutosVendidos(idVenda);
@@ -503,6 +503,7 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
         yPos += lineHeight;
     }
     int posx = xPosPrm;
+    yPos += 5;
     for(int i=0; i < pageWidth; i++){
         posx += 3;
         painter.drawText(posx,yPos, "=");

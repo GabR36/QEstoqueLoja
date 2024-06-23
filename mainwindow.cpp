@@ -41,6 +41,15 @@ MainWindow::MainWindow(QWidget *parent)
         qDebug() << "erro ao abrir banco de dados.";
     }
 
+    // configuracao do modelo e view produtos
+    ui->Tview_Produtos->setModel(model);
+    model->setQuery("SELECT * FROM produtos ORDER BY id DESC");
+    model->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    model->setHeaderData(1, Qt::Horizontal, tr("Quantidade"));
+    model->setHeaderData(2, Qt::Horizontal, tr("Descrição"));
+    model->setHeaderData(3, Qt::Horizontal, tr("Preço"));
+    model->setHeaderData(4, Qt::Horizontal, tr("Código de Barras"));
+    model->setHeaderData(5, Qt::Horizontal, tr("NF"));
 
     //teste float maior que 10000
 
@@ -180,7 +189,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->groupBox->setVisible(false);
      ui->Ledit_Pesquisa->installEventFilter(this);
     atualizarTableview();
-    QSqlDatabase::database().close();
+    db.close();
     //
     ui->Ledit_Barras->setFocus();
     // Selecionar a primeira linha da tabela
@@ -252,7 +261,6 @@ void MainWindow::atualizarTableview(){
     CustomDelegate *delegate = new CustomDelegate(this);
     ui->Tview_Produtos->setItemDelegate(delegate);
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC");
-    ui->Tview_Produtos->setModel(model);
     db.close();
 }
 
@@ -301,7 +309,7 @@ void MainWindow::on_Btn_Enviar_clicked()
                     qDebug() << "Erro na inserção: ";
                 }
                 atualizarTableview();
-                QSqlDatabase::database().close();
+                db.close();
 
                 // limpar campos para nova inserçao
                 ui->Ledit_Desc->clear();
@@ -368,7 +376,7 @@ void MainWindow::on_Btn_Delete_clicked()
             qDebug() << "Erro no Delete: ";
         }
         atualizarTableview();
-        QSqlDatabase::database().close();
+        db.close();
     }
     else {
         // O usuário escolheu não deletar o produto
@@ -435,8 +443,6 @@ void MainWindow::on_Btn_Pesquisa_clicked()
         qDebug() << "Erro ao executar consulta:" << model->lastError().text();
     }
 
-    // Mostrar na tableview a consulta
-    ui->Tview_Produtos->setModel(model);
 
     db.close();
 }
@@ -527,7 +533,6 @@ bool MainWindow::verificarCodigoBarras(){
             qDebug() << "erro ao abrir banco de dados. codigo de barras existente";
         }
         model->setQuery("SELECT * FROM produtos WHERE codigo_barras = " + barrasProduto);
-        ui->Tview_Produtos->setModel(model);
         db.close();
         return true;
     }

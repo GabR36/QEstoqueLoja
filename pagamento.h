@@ -42,7 +42,6 @@ private:
     Ui::pagamento *ui;
     float obterValorFinal(QString taxa, QString desconto);
     void descontoTaxa();
-    Vendas *janelaVendas1;
 
 };
 

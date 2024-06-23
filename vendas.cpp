@@ -111,7 +111,43 @@ void Vendas::atualizarTabelas(){
 //    selectionModel->setCurrentIndex(topLeft, QItemSelectionModel::NoUpdate);
 
 }
+ QStringList Vendas::getProdutosVendidos( QString idVenda){
 
+    QStringList produtosVendidos;
+    QSqlDatabase db2 = QSqlDatabase::database();
+    QSqlQuery query;
+
+    if (!db2.open()) {
+        qDebug() << "Banco de dados db2 não abriu";
+        return produtosVendidos;
+    }
+
+    query.prepare("SELECT produtos.descricao, produtos_vendidos.quantidade, produtos_vendidos.preco_vendido "
+                  "FROM produtos_vendidos "
+                  "JOIN produtos ON produtos_vendidos.id_produto = produtos.id "
+                  "WHERE produtos_vendidos.id_venda = :id_venda");
+    query.bindValue(":id_venda", idVenda);
+
+    if (!query.exec()) {
+        qDebug() << "Erro ao executar a query:" << query.lastError().text();
+        return produtosVendidos;
+    }
+
+    while (query.next()) {
+        QString descricao = query.value(0).toString();
+        QString quantidade = QString::number(query.value(1).toInt());
+        QString precoVendido = QString::number(query.value(2).toDouble(), 'f', 2);
+
+        // Adiciona cada campo individualmente à lista
+        produtosVendidos.append(descricao);
+        produtosVendidos.append(quantidade);
+        produtosVendidos.append(precoVendido);
+    }
+    db2.close();
+
+
+    return produtosVendidos;
+}
 
 void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
     // Este slot é chamado sempre que a seleção na tabela muda
@@ -293,40 +329,7 @@ void Vendas::filtrarData(QString de, QString ate){
 
 }
 
-QList<ProdutoVendido> Vendas::getIdProdutosVendidos(QString idVenda) {
-    QList<ProdutoVendido> produtosVendidos;
 
-    // Configurar o banco de dados SQLite
-
-    if (!db.open()) {
-        qDebug() << "Erro ao abrir o banco de dados.";
-        return produtosVendidos;
-    }
-
-    // Preparar a consulta SQL
-    QSqlQuery query;
-    query.prepare("SELECT id_produto, quantidade, preco_vendido FROM produtos_vendidos WHERE id_venda = :idVenda");
-    query.bindValue(":idVenda", idVenda);
-
-    // Executar a consulta
-    if (!query.exec()) {
-        qDebug() << "Erro ao executar a consulta:" << query.lastError();
-        return produtosVendidos;
-    }
-
-    // Processar os resultados
-    while (query.next()) {
-        ProdutoVendido produtoVendido;
-        produtoVendido.id_produto = query.value(0).toString();
-        produtoVendido.quantidade = query.value(1).toString();
-        produtoVendido.preco_vendido = query.value(2).toString();
-
-        produtosVendidos.append(produtoVendido);
-    }
-
-    db.close();
-    return produtosVendidos;
-}
 
 void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
 {    if(!ui->Tview_Vendas2->currentIndex().isValid())
@@ -371,32 +374,12 @@ void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
 
     menu.exec(ui->Tview_Vendas2->viewport()->mapToGlobal(pos));
 }
-QStringList Vendas::getDescricoesProdutos(const QList<ProdutoVendido> &produtosVendidos) {
-    QStringList descricoes;
 
-    if (!db.open()) {
-        qDebug() << "Erro ao abrir o banco de dados.";
-        return descricoes;
-    }
-
-    QSqlQuery query;
-    foreach (const ProdutoVendido &produto, produtosVendidos) {
-        query.prepare("SELECT descricao FROM produtos WHERE id = :id_produto");
-        query.bindValue(":id_produto", produto.id_produto);
-
-        if (query.exec() && query.next()) {
-            descricoes.append(query.value(0).toString());
-        } else {
-            qDebug() << "Erro ao buscar descrição do produto ID:" << produto.id_produto << query.lastError();
-        }
-    }
-
-    db.close();
-    return descricoes;
-}
 bool Vendas::imprimirReciboVenda(QString idVenda){
+    QLocale portugues2;
 
-    if(!db.open()){
+    QSqlDatabase db2 = QSqlDatabase::database();
+    if(!db2.open()){
         qDebug() << "erro bancodedados";
     }
     QSqlQuery query;
@@ -406,7 +389,7 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
     // printer.pageLayout().setPageSize(customPageSize);
     printer.setFullPage(true); // Utilizar toda a página        QPrintDialog dialog(&printer, this);
 
-    QPrintDialog dialog(&printer, this);
+    QPrintDialog dialog(&printer);
    if(dialog.exec() == QDialog::Rejected) return 0;
 
     QPainter painter;
@@ -497,32 +480,27 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
     int lineHeight = 20; // Altura da linha
     int pageWidth = printer.pageLayout().paintRectPixels(printer.resolution()).width();
 
-    QList<ProdutoVendido> produtos = getIdProdutosVendidos(idVenda);
-    QStringList descricoes = getDescricoesProdutos(produtos);
+    QStringList produtos = getProdutosVendidos(idVenda);
+    //QStringList descricoes = getDescricoesProdutos(produtos);
+    //int index = 0;  // Índice para acessar as descrições
 
-    int index = 0;  // Índice para acessar as descrições
-
-    for (const ProdutoVendido &produto : produtos) {
-        QString valorProduto = portugues.toString(produto.preco_vendido.toDouble(),'f',2);
-        QString quantidadProduto = produto.quantidade;
-
-        // Use o índice para obter a descrição correta
-        QString descricaoProduto = descricoes.at(index);
+    for (int i = 0; i < produtos.size(); i += 3) {
+        QString descricaoProduto = produtos[i];
+        QString quantidadProduto = produtos[i + 1];
+        QString valorProduto = produtos[i + 2];
 
         QTextOption textOption;
-        QRect rectQuantProd(xPosPrm, yPos, xPosProds, lineHeight * 2);
+        QRect rectQuantProd(xPosPrm, yPos, xPosProds - xPosPrm, lineHeight);
         painter.drawText(rectQuantProd, quantidadProduto, textOption);
 
-        QRect rectDesc(xPosProds, yPos, pageWidth - 100, lineHeight * 2); // Definir um retângulo para o texto
+        QRect rectDesc(xPosProds, yPos, xPosValor - xPosProds - 30, lineHeight);
         textOption.setWrapMode(QTextOption::WordWrap);
         painter.drawText(rectDesc, descricaoProduto, textOption);
 
-        QRect rectValor(xPosValor + 30, yPos, pageWidth, lineHeight * 2);
+        QRect rectValor(xPosValor, yPos, pageWidth - xPosValor, lineHeight);
         painter.drawText(rectValor, valorProduto, textOption);
 
-        yPos += 30;
-
-        index++;  // Incrementa o índice para a próxima iteração
+        yPos += lineHeight;
     }
     int posx = xPosPrm;
     for(int i=0; i < pageWidth; i++){
@@ -534,26 +512,26 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
     yPos += 20;
     //    painter.drawText(Qt::AlignCenter,yPos, "Pagamento");
     xPos = 95;
-    painter.drawText(xPos,yPos, "Desconto(R$): " + portugues.toString(desconto.toFloat(),'f',2));
+    painter.drawText(xPos,yPos, "Desconto(R$): " + portugues2.toString(desconto.toFloat(),'f',2));
     yPos += 20;
     painter.drawText(xPos,yPos, "Forma Pagamento: " + forma_pagamento);
     yPos += 20;
-    painter.drawText(xPos,yPos, "Valor Total Produtos(R$): " + portugues.toString(total.toFloat(),'f',2));
+    painter.drawText(xPos,yPos, "Valor Total Produtos(R$): " + portugues2.toString(total.toFloat(),'f',2));
     yPos += 20;
     if(forma_pagamento == "Dinheiro" ){
-        painter.drawText(xPos, yPos, "Valor Recebido(R$):" + portugues.toString(valor_recebido.toFloat(),'f',2));
+        painter.drawText(xPos, yPos, "Valor Recebido(R$):" + portugues2.toString(valor_recebido.toFloat(),'f',2));
         yPos += 20;
-        painter.drawText(xPos,yPos, "Troco(R$):" + portugues.toString(troco.toFloat(),'f',2));
+        painter.drawText(xPos,yPos, "Troco(R$):" + portugues2.toString(troco.toFloat(),'f',2));
     }else if(forma_pagamento == "Não Sei"){
     }else if(forma_pagamento == "Crédito"){
-        painter.drawText(xPos, yPos, "Taxa(%):" + portugues.toString(taxa.toFloat(),'f',2));
+        painter.drawText(xPos, yPos, "Taxa(%):" + portugues2.toString(taxa.toFloat(),'f',2));
         yPos += 20;
-        painter.drawText(xPos, yPos, "Valor Final(R$):" + portugues.toString(valor_final.toFloat(), 'f', 2 ));
+        painter.drawText(xPos, yPos, "Valor Final(R$):" + portugues2.toString(valor_final.toFloat(), 'f', 2 ));
 
     }else if(forma_pagamento == "Débito"){
-        painter.drawText(xPos, yPos, "Taxa(%):" + portugues.toString(taxa.toFloat(),'f',2));
+        painter.drawText(xPos, yPos, "Taxa(%):" + portugues2.toString(taxa.toFloat(),'f',2));
         yPos += 20;
-        painter.drawText(xPos, yPos, "Valor Final(R$):" + portugues.toString(valor_final.toFloat(), 'f', 2 ));
+        painter.drawText(xPos, yPos, "Valor Final(R$):" + portugues2.toString(valor_final.toFloat(), 'f', 2 ));
 
     }else if(forma_pagamento == "Pix"){
     }
@@ -572,7 +550,7 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
 
     qDebug() << printer.pageLayout().pageSize();
     painter.end();
-    db.close();
+    db2.close();
 
 }
 void Vendas::imprimirReciboVendaSelec(QString id){

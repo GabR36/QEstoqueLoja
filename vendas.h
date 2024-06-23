@@ -30,9 +30,8 @@ public:
     void atualizarTabelas();
     QLocale portugues;
     QList<QList<QVariant>> rowDataList;
-    QStringList getDescricoesProdutos(const QList<ProdutoVendido> &produtosVendidos);
-    QList<ProdutoVendido> getIdProdutosVendidos(QString idVenda);
-    bool imprimirReciboVenda(QString idVenda);
+    static bool imprimirReciboVenda( QString idVenda);
+    static QStringList getProdutosVendidos( QString idVenda);
 
 
 public slots:

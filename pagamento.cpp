@@ -165,7 +165,7 @@ void pagamento::on_buttonBox_accepted()
 
     }
     if(ui->CheckImprimirCNF->isChecked()){
-
+        Vendas::imprimirReciboVenda(idVenda);
     }
 
     janelaVenda->db.close();

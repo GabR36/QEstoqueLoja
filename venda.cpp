@@ -23,14 +23,21 @@ venda::venda(QWidget *parent) :
     }
     modeloProdutos->setQuery("SELECT * FROM produtos");
     ui->Tview_Produtos->setModel(modeloProdutos);
+    modeloProdutos->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    modeloProdutos->setHeaderData(1, Qt::Horizontal, tr("Quantidade"));
+    modeloProdutos->setHeaderData(2, Qt::Horizontal, tr("Descrição"));
+    modeloProdutos->setHeaderData(3, Qt::Horizontal, tr("Preço"));
+    modeloProdutos->setHeaderData(4, Qt::Horizontal, tr("Código de Barras"));
+    modeloProdutos->setHeaderData(5, Qt::Horizontal, tr("NF"));
+
     CustomDelegate *delegate = new CustomDelegate(this);
     ui->Tview_Produtos->setItemDelegate(delegate);
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     db.close();
-    modeloSelecionados->setHorizontalHeaderItem(0, new QStandardItem("ID_Produto"));
-    modeloSelecionados->setHorizontalHeaderItem(1, new QStandardItem("Quantidade_Vendida"));
-    modeloSelecionados->setHorizontalHeaderItem(2, new QStandardItem("Descricao"));
-    modeloSelecionados->setHorizontalHeaderItem(3, new QStandardItem("Preço Vendido"));
+    modeloSelecionados->setHorizontalHeaderItem(0, new QStandardItem("ID Produto"));
+    modeloSelecionados->setHorizontalHeaderItem(1, new QStandardItem("Quantidade Vendida"));
+    modeloSelecionados->setHorizontalHeaderItem(2, new QStandardItem("Descrição"));
+    modeloSelecionados->setHorizontalHeaderItem(3, new QStandardItem("Preço Unitário Vendido"));
     ui->Tview_ProdutosSelecionados->setModel(modeloSelecionados);
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = modeloProdutos->index(0, 0);

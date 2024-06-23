@@ -16,7 +16,29 @@ Vendas::Vendas(QWidget *parent) :
     ui(new Ui::Vendas)
 {
     ui->setupUi(this);
-    //Teste();
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. botao venda.";
+    }
+    // configuracao modelos e views tabelas vendas e produtosvendidos
+    modeloVendas2->setQuery("SELECT * FROM vendas2 ORDER BY id DESC");
+    ui->Tview_Vendas2->setModel(modeloVendas2);
+    modeloVendas2->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    modeloVendas2->setHeaderData(1, Qt::Horizontal, tr("Cliente"));
+    modeloVendas2->setHeaderData(2, Qt::Horizontal, tr("Data e Hora"));
+    modeloVendas2->setHeaderData(3, Qt::Horizontal, tr("Total Produtos"));
+    modeloVendas2->setHeaderData(4, Qt::Horizontal, tr("Forma de Pagamento"));
+    modeloVendas2->setHeaderData(5, Qt::Horizontal, tr("Valor Recebido"));
+    modeloVendas2->setHeaderData(6, Qt::Horizontal, tr("Troco"));
+    modeloVendas2->setHeaderData(7, Qt::Horizontal, tr("Taxa"));
+    modeloVendas2->setHeaderData(8, Qt::Horizontal, tr("Valor Final"));
+    modeloVendas2->setHeaderData(9, Qt::Horizontal, tr("Desconto"));
+
+    modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
+    ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
+    modeloProdVendidos->setHeaderData(0, Qt::Horizontal, tr("Descrição"));
+    modeloProdVendidos->setHeaderData(1, Qt::Horizontal, tr("Quantidade"));
+    modeloProdVendidos->setHeaderData(2, Qt::Horizontal, tr("Preço Vendido"));
+    db.close();
     ui->Tview_Vendas2->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     ui->Tview_ProdutosVendidos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     atualizarTabelas();
@@ -94,11 +116,8 @@ void Vendas::atualizarTabelas(){
         qDebug() << "erro ao abrir banco de dados. botao venda.";
     }
     modeloVendas2->setQuery("SELECT * FROM vendas2 ORDER BY id DESC");
-    ui->Tview_Vendas2->setModel(modeloVendas2);
-
 
     modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
-    ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
 
     db.close();
 

@@ -185,7 +185,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = model->index(0, 0);
     ui->Tview_Produtos->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
-
+     ui->Ledit_Desc->setMaxLength(120);
 
     // ajustar tamanho colunas
     // coluna descricao

@@ -290,27 +290,42 @@ background-color:rgb(170, 170, 170);
       </widget>
      </item>
      <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_7">
+       <item>
+        <widget class="QLineEdit" name="Ledit_Pesquisa"/>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Btn_Pesquisa">
+         <property name="minimumSize">
+          <size>
+           <width>35</width>
+           <height>25</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>35</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="Imagens/recursosImg.qrc">
+           <normaloff>:/QEstoqueLOja/edit-find.svg</normaloff>:/QEstoqueLOja/edit-find.svg</iconset>
+         </property>
+         <property name="autoDefault">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_7">
-         <item>
-          <widget class="QLineEdit" name="Ledit_Pesquisa"/>
-         </item>
-         <item>
-          <widget class="QPushButton" name="Btn_Pesquisa">
-           <property name="text">
-            <string>pesquisar</string>
-           </property>
-           <property name="icon">
-            <iconset resource="Imagens/recursosImg.qrc">
-             <normaloff>:/QEstoqueLOja/edit-find.svg</normaloff>:/QEstoqueLOja/edit-find.svg</iconset>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <layout class="QVBoxLayout" name="verticalLayout_7"/>
        </item>
       </layout>
      </item>

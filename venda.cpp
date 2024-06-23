@@ -27,11 +27,11 @@ venda::venda(QWidget *parent) :
     ui->Tview_Produtos->setItemDelegate(delegate);
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     db.close();
-    modeloSelecionados.setHorizontalHeaderItem(0, new QStandardItem("ID_Produto"));
-    modeloSelecionados.setHorizontalHeaderItem(1, new QStandardItem("Quantidade_Vendida"));
-    modeloSelecionados.setHorizontalHeaderItem(2, new QStandardItem("Descricao"));
-    modeloSelecionados.setHorizontalHeaderItem(3, new QStandardItem("Preço Vendido"));
-    ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+    modeloSelecionados->setHorizontalHeaderItem(0, new QStandardItem("ID_Produto"));
+    modeloSelecionados->setHorizontalHeaderItem(1, new QStandardItem("Quantidade_Vendida"));
+    modeloSelecionados->setHorizontalHeaderItem(2, new QStandardItem("Descricao"));
+    modeloSelecionados->setHorizontalHeaderItem(3, new QStandardItem("Preço Vendido"));
+    ui->Tview_ProdutosSelecionados->setModel(modeloSelecionados);
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = modeloProdutos->index(0, 0);
     ui->Tview_Produtos->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
@@ -94,8 +94,7 @@ void venda::on_Btn_SelecionarProduto_clicked()
     // preco com notacao br
     QString precoProduto = portugues.toString(precoVariant.toFloat());
     // mostrar na tabela Selecionados
-    modeloSelecionados.appendRow({new QStandardItem(idProduto), new QStandardItem("1"), new QStandardItem(descProduto), new QStandardItem(precoProduto)});
-    ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+    modeloSelecionados->appendRow({new QStandardItem(idProduto), new QStandardItem("1"), new QStandardItem(descProduto), new QStandardItem(precoProduto)});
     // mostrar total
     ui->Lbl_Total->setText(Total());
 }
@@ -104,6 +103,12 @@ void venda::on_Btn_SelecionarProduto_clicked()
 void venda::handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
     // Este slot é chamado sempre que a seleção na tabela muda
     Q_UNUSED(deselected);
+
+    if (selected.indexes().isEmpty()) {
+        qDebug() << "Nenhum registro selecionado.";
+        db.close();
+        return;
+    }
 
     qDebug() << "Registro(s) selecionado(s):";
 
@@ -192,9 +197,8 @@ void venda::on_Ledit_QuantVendido_textChanged(const QString &arg1)
     // pegar o valor no line edit
     QString quantidade = ui->Ledit_QuantVendido->text();
     //
-    QModelIndex quantidadeIndice = modeloSelecionados.index(registroSelecionado, 1);
-    modeloSelecionados.setData(quantidadeIndice, quantidade);
-    ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+    QModelIndex quantidadeIndice = modeloSelecionados->index(registroSelecionado, 1);
+    modeloSelecionados->setData(quantidadeIndice, quantidade);
     // mostrar total
     ui->Lbl_Total->setText(Total());
 }
@@ -216,9 +220,8 @@ void venda::on_Ledit_Preco_textChanged(const QString &arg1)
     // pegar o valor no line edit
     QString preco = ui->Ledit_Preco->text();
     //
-    QModelIndex precoIndice = modeloSelecionados.index(registroSelecionado, 3);
-    modeloSelecionados.setData(precoIndice, preco);
-    ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+    QModelIndex precoIndice = modeloSelecionados->index(registroSelecionado, 3);
+    modeloSelecionados->setData(precoIndice, preco);
     // mostrar total
     ui->Lbl_Total->setText(Total());
 }
@@ -259,8 +262,7 @@ void venda::on_Ledit_Barras_returnPressed()
         qDebug() << idBarras;
 
         // mostrar na tabela Selecionados
-        modeloSelecionados.appendRow({new QStandardItem(idBarras), new QStandardItem("1"), new QStandardItem(descBarras), new QStandardItem(precoBarras)});
-        ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
+        modeloSelecionados->appendRow({new QStandardItem(idBarras), new QStandardItem("1"), new QStandardItem(descBarras), new QStandardItem(precoBarras)});
 
         ui->Ledit_Barras->clear();
 
@@ -279,11 +281,11 @@ void venda::on_Btn_Aceitar_clicked()
 {
     // pegar os valores da tabela dos produtos selecionados
     QList<QList<QVariant>> rowDataList;
-    for (int row = 0; row < modeloSelecionados.rowCount(); ++row){
+    for (int row = 0; row < modeloSelecionados->rowCount(); ++row){
         QList<QVariant> rowData;
-        for (int col = 0; col < modeloSelecionados.columnCount(); col++){
-            QModelIndex index = modeloSelecionados.index(row, col);
-            rowData.append(modeloSelecionados.data(index));
+        for (int col = 0; col < modeloSelecionados->columnCount(); col++){
+            QModelIndex index = modeloSelecionados->index(row, col);
+            rowData.append(modeloSelecionados->data(index));
         }
         rowDataList.append(rowData);
     }
@@ -329,9 +331,9 @@ void venda::on_Btn_Aceitar_clicked()
 QString venda::Total(){
     // Obtendo os dados da tabela e calculando o valor total da venda
     double totalValue = 0.0;
-    for (int row = 0; row < modeloSelecionados.rowCount(); ++row) {
-        int quantidade = portugues.toInt(modeloSelecionados.data(modeloSelecionados.index(row, 1)).toString());  // Coluna de quantidade
-        double preco = portugues.toDouble(modeloSelecionados.data(modeloSelecionados.index(row, 3)).toString());  // Coluna de preço
+    for (int row = 0; row < modeloSelecionados->rowCount(); ++row) {
+        int quantidade = portugues.toInt(modeloSelecionados->data(modeloSelecionados->index(row, 1)).toString());  // Coluna de quantidade
+        double preco = portugues.toDouble(modeloSelecionados->data(modeloSelecionados->index(row, 3)).toString());  // Coluna de preço
         totalValue += quantidade * preco;
     }
     // total notacao br
@@ -357,13 +359,7 @@ void venda::on_Tview_ProdutosSelecionados_customContextMenuRequested(const QPoin
     menu.exec(ui->Tview_ProdutosSelecionados->viewport()->mapToGlobal(pos));
 }
 void venda::deletarProd(){
-
-    modeloSelecionados.removeRow(ui->Tview_ProdutosSelecionados->currentIndex().row());
-    ui->Tview_ProdutosSelecionados->setModel(&modeloSelecionados);
-
-
-
-
-
+    modeloSelecionados->removeRow(ui->Tview_ProdutosSelecionados->currentIndex().row());
+    ui->Lbl_Total->setText(Total());
 }
 

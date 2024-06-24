@@ -165,6 +165,31 @@ MainWindow::MainWindow(QWidget *parent)
             query.exec("INSERT INTO config (key, value) VALUES ('taxa_debito', '2')");
             query.exec("INSERT INTO config (key, value) VALUES ('taxa_credito', '3')");
 
+            // normalizar dados existentes
+            if (!query.exec("SELECT id, descricao FROM produtos")) {
+                qDebug() << "Erro ao executar a consulta SQL:" << query.lastError().text();
+            }
+
+            // Iterar sobre os resultados da consulta
+            while (query.next()) {
+                int id = query.value(0).toInt();
+                QString descricao = query.value(1).toString();
+
+                // Normalizar a descrição
+                QString descricaoNormalizada = normalizeText(descricao);
+
+                // Atualizar a tabela produtos com a descrição normalizada
+                QSqlQuery updateQuery;
+                updateQuery.prepare("UPDATE produtos SET descricao = :descricao WHERE id = :id");
+                updateQuery.bindValue(":descricao", descricaoNormalizada);
+                updateQuery.bindValue(":id", id);
+
+                if (!updateQuery.exec()) {
+                    qDebug() << "Erro ao atualizar a descrição do produto:" << updateQuery.lastError().text();
+                    db.rollback();
+                }
+            }
+
             // mudar a versao para 2
             query.exec("PRAGMA user_version = 2");
 

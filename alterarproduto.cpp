@@ -19,6 +19,9 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
     ui->Ledit_AltQuant->setValidator(IntValidador);
     ui->Btn_GerarCod->setIcon(QIcon(":/QEstoqueLOja/restart.svg"));
 
+    //
+    ui->Ledit_AltDesc->setMaxLength(120);
+
 }
 
 AlterarProduto::~AlterarProduto()
@@ -105,7 +108,7 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
                     query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4, codigo_barras = :valor5, nf = :valor6 WHERE id = :valor1");
                     query.bindValue(":valor1", idAlt);
                     query.bindValue(":valor2", quant);
-                    query.bindValue(":valor3", janelaPrincipal->normalizeText(desc));
+                    query.bindValue(":valor3", MainWindow::normalizeText(desc));
                     query.bindValue(":valor4", preco);
                     query.bindValue(":valor5", barras);
                     query.bindValue(":valor6", nf);

@@ -37,7 +37,7 @@ public:
     QLocale portugues;
     QIcon iconAlterarProduto, iconAddProduto, iconBtnVenda, iconDelete, iconPesquisa, iconBtnRelatorios, iconImpressora;
     QString gerarNumero();
-    QString normalizeText(const QString &text);
+    static QString normalizeText(const QString &text);
 
 
 public slots:

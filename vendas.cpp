@@ -422,7 +422,8 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
     QString enderecoEmpresa = "Padrão";
     QString cnpjEmpresa = "";
     QString telEmpresa = "";
-    QString cliente,dataVenda,total,forma_pagamento,valor_recebido,troco,taxa,valor_final,desconto;
+    QString cliente,total,forma_pagamento,valor_recebido,troco,taxa,valor_final,desconto;
+    QDateTime dataVenda;
     if (query.exec("SELECT value FROM config WHERE key = 'nome_empresa'")){
         while (query.next()) {
             nomeEmpresa = query.value(0).toString();
@@ -448,7 +449,7 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
     if(query.exec()){
         while (query.next()) {
                 cliente = query.value("cliente").toString();
-                dataVenda = query.value("data_hora").toString();
+                dataVenda = query.value("data_hora").toDateTime();
                 total = query.value("total").toString();
                 forma_pagamento = query.value("forma_pagamento").toString();
                 valor_recebido = query.value("valor_recebido").toString();
@@ -479,7 +480,7 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
     yPos += 20;
     painter.drawText(xPos, yPos, telEmpresa);
     yPos += 20;
-    painter.drawText(xPos, yPos, "Data/Hora: " + dataVenda);
+    painter.drawText(xPos, yPos, "Data/Hora: " + portugues2.toString(dataVenda, "dd/MM/yyyy hh:mm:ss"));
     yPos += 20;
     painter.drawText(xPos, yPos, "Cliente: " + cliente);
     yPos += 30;
@@ -517,7 +518,7 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
         painter.drawText(rectDesc, descricaoProduto, textOption);
 
         QRect rectValor(xPosValor, yPos, pageWidth - xPosValor, lineHeight);
-        painter.drawText(rectValor, valorProduto, textOption);
+        painter.drawText(rectValor, portugues2.toString(valorProduto.toFloat(), 'f',2), textOption);
 
         yPos += lineHeight;
     }

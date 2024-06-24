@@ -27,3 +27,5 @@ se é algo bom é adicionado, o código pode ser melhorado com o tempo.
 ![Tela Vendas](/Imagens/capturaVendas.png)
 
 ![Tela Venda](/Imagens/capturaVenda.png)
+
+![Tela Venda](/Imagens/capturaPagamento.png)

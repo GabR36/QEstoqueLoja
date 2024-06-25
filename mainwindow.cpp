@@ -612,6 +612,10 @@ void MainWindow::imprimirEtiqueta3(){
 
 }
 void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QString preco){
+    if (codBar == ""){
+        QMessageBox::warning(this, "Erro", "código de barras inexistente");
+        return;
+    }
     // criar codigo de barras -----------
     QByteArray codBarBytes = codBar.toUtf8();
     const unsigned char* data = reinterpret_cast<const unsigned char*>(codBarBytes.constData());
@@ -684,7 +688,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
         painter.drawText(descRect,Qt::TextWordWrap, desc);
         fontePainter.setBold(true);
         painter.setFont(fontePainter);
-        painter.drawText(0, ypos[1], "Preço: R$" + preco);
+        painter.drawText(0, ypos[1], "Preço: R$" + portugues.toString(portugues.toFloat(preco), 'f', 2));
         fontePainter.setBold(false);
         painter.setFont(fontePainter);
 

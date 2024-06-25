@@ -573,6 +573,7 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
     painter.end();
     db2.close();
 
+    return 1;
 }
 void Vendas::imprimirReciboVendaSelec(QString id){
     imprimirReciboVenda(id);

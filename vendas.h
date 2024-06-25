@@ -12,11 +12,7 @@
 namespace Ui {
 class Vendas;
 }
-struct ProdutoVendido {
-    QString id_produto;
-    QString quantidade;
-    QString preco_vendido;
-};
+
 class Vendas : public QWidget
 {
     Q_OBJECT

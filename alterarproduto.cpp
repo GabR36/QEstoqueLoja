@@ -4,7 +4,6 @@
 #include "QSqlQuery"
 #include <QMessageBox>
 #include <QDoubleValidator>
-#include <QIntValidator>
 
 AlterarProduto::AlterarProduto(QWidget *parent) :
     QDialog(parent),
@@ -13,10 +12,9 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
     ui->setupUi(this);
 
     // validadores para os campos
-    QDoubleValidator *DoubleValidador = new QDoubleValidator();
-    QIntValidator *IntValidador = new QIntValidator();
+    QDoubleValidator *DoubleValidador = new QDoubleValidator();;
     ui->Ledit_AltPreco->setValidator(DoubleValidador);
-    ui->Ledit_AltQuant->setValidator(IntValidador);
+    ui->Ledit_AltQuant->setValidator(DoubleValidador);
     ui->Btn_GerarCod->setIcon(QIcon(":/QEstoqueLOja/restart.svg"));
 
     //
@@ -53,7 +51,7 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
     // Converta o texto para um número
     bool conversionOk, conversionOkQuant;
     double price = portugues.toDouble(preco, &conversionOk);
-    quant = QString::number(portugues.toInt(quant, &conversionOkQuant));
+    portugues.toFloat(quant, &conversionOkQuant);
 
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
     if (conversionOk && price >= 0)
@@ -103,13 +101,11 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
                         qDebug() << "erro ao abrir banco de dados. botao alterar->aceitar.";
                     }
                     QSqlQuery query;
-                    // precisa colocar o preco com ponto para decimal, no banco de dados
-                    preco = QString::number(price, 'f', 2);
                     query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4, codigo_barras = :valor5, nf = :valor6 WHERE id = :valor1");
                     query.bindValue(":valor1", idAlt);
-                    query.bindValue(":valor2", quant);
+                    query.bindValue(":valor2", QString::number(portugues.toFloat(quant)));
                     query.bindValue(":valor3", MainWindow::normalizeText(desc));
-                    query.bindValue(":valor4", preco);
+                    query.bindValue(":valor4", QString::number(portugues.toFloat(preco)));
                     query.bindValue(":valor5", barras);
                     query.bindValue(":valor6", nf);
                     if (query.exec()) {

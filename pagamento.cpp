@@ -34,7 +34,7 @@ pagamento::pagamento(QString total, QString cliente, QString data, QWidget *pare
     ui->Lbl_TotalTaxa->setText(totalGlobal);
 
     // validador
-    QDoubleValidator *validador = new QDoubleValidator();
+    QDoubleValidator *validador = new QDoubleValidator(0.0, 9999.99, 2);
     ui->Ledit_Taxa->setValidator(validador);
     ui->Ledit_Recebido->setValidator(validador);
     ui->Ledit_Desconto->setValidator(validador);
@@ -145,7 +145,7 @@ void pagamento::on_buttonBox_accepted()
         query.prepare("INSERT INTO produtos_vendidos (id_produto, quantidade, preco_vendido, id_venda) VALUES (:valor1, :valor2, :valor3, :valor4)");
         query.bindValue(":valor1", rowdata[0]);
         // precisa converter para notacao usa para inserir no banco de dados
-        query.bindValue(":valor2", QString::number(portugues.toInt(rowdata[1].toString())));
+        query.bindValue(":valor2", QString::number(portugues.toFloat(rowdata[1].toString())));
         query.bindValue(":valor3", QString::number(portugues.toFloat(rowdata[3].toString()), 'f', 2));
         query.bindValue(":valor4", idVenda);
         if (query.exec()) {
@@ -156,7 +156,7 @@ void pagamento::on_buttonBox_accepted()
         query.prepare("UPDATE produtos SET quantidade = quantidade - :valor2 WHERE id = :valor1");
         query.bindValue(":valor1", rowdata[0]);
         // precisa converter para notacao usa para inserir no banco de dados
-        query.bindValue(":valor2", QString::number(portugues.toInt(rowdata[1].toString())));
+        query.bindValue(":valor2", QString::number(portugues.toFloat(rowdata[1].toString())));
         if (query.exec()) {
             qDebug() << "update quantidade bem-sucedida!";
         } else {

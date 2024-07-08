@@ -8,7 +8,6 @@
 #include <QMessageBox>
 #include "pagamento.h"
 #include <QDoubleValidator>
-#include <QIntValidator>
 #include <QMenu>
 
 
@@ -68,10 +67,9 @@ venda::venda(QWidget *parent) :
     ui->Ledit_Barras->setFocus();
 
     // validadores para os campos
-    QDoubleValidator *DoubleValidador = new QDoubleValidator();
-    QIntValidator *IntValidador = new QIntValidator();
+    QDoubleValidator *DoubleValidador = new QDoubleValidator(0.0, 9999.99, 2);
     ui->Ledit_Preco->setValidator(DoubleValidador);
-    ui->Ledit_QuantVendido->setValidator(IntValidador);
+    ui->Ledit_QuantVendido->setValidator(DoubleValidador);
 
     //actionMenu contextMenu
     actionMenuDeletarProd = new QAction(this);
@@ -300,14 +298,13 @@ void venda::on_Btn_Aceitar_clicked()
     // validar preço e quantidade
     bool erro = false;
     for (const QList<QVariant> &rowdata : rowDataList) {
-        // Substitua ',' por '.' se necessário
         QString preco = rowdata[3].toString();
         QString quant = rowdata[1].toString();
 
         // Converta o texto para um número
         bool conversionOk, conversionOkQuant;
         double price = portugues.toDouble(preco, &conversionOk);
-        int quantINT = portugues.toInt(quant, &conversionOkQuant);
+        int quantINT = portugues.toFloat(quant, &conversionOkQuant);
 
         // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
         if (!(conversionOk && price >= 0) || !(conversionOkQuant && quantINT > 0))
@@ -339,7 +336,7 @@ QString venda::Total(){
     // Obtendo os dados da tabela e calculando o valor total da venda
     double totalValue = 0.0;
     for (int row = 0; row < modeloSelecionados->rowCount(); ++row) {
-        int quantidade = portugues.toInt(modeloSelecionados->data(modeloSelecionados->index(row, 1)).toString());  // Coluna de quantidade
+        float quantidade = portugues.toFloat(modeloSelecionados->data(modeloSelecionados->index(row, 1)).toString());  // Coluna de quantidade
         double preco = portugues.toDouble(modeloSelecionados->data(modeloSelecionados->index(row, 3)).toString());  // Coluna de preço
         totalValue += quantidade * preco;
     }

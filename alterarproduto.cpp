@@ -12,7 +12,7 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
     ui->setupUi(this);
 
     // validadores para os campos
-    QDoubleValidator *DoubleValidador = new QDoubleValidator();;
+    QDoubleValidator *DoubleValidador = new QDoubleValidator(0.0, 9999.99, 2);;
     ui->Ledit_AltPreco->setValidator(DoubleValidador);
     ui->Ledit_AltQuant->setValidator(DoubleValidador);
     ui->Btn_GerarCod->setIcon(QIcon(":/QEstoqueLOja/restart.svg"));

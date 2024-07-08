@@ -58,7 +58,7 @@ void relatorios::on_Btn_PdfGen_clicked()
         QString data4 = query.value(3).toString(); // preco
 
         // double preco = portugues.toDouble(data4.toString());
-        float valueData4 = data4.toDouble() * data2.toInt(); // Converte o valor para double
+        float valueData4 = data4.toDouble() * data2.toFloat(); // Converte o valor para double
         sumData4 += valueData4; // Adiciona o valor à soma total
 
 
@@ -98,7 +98,7 @@ void relatorios::on_Btn_PdfGen_clicked()
 
         // Desenhe os dados na página atual
         painter.drawText(QRect(1000, startY + lineHeight * row, 4000, textHeight), data1); //stary = 1500
-        painter.drawText(QRect(1600, startY + lineHeight * row, 4000, textHeight), data2);
+        painter.drawText(QRect(1600, startY + lineHeight * row, 4000, textHeight), portugues.toString(data2.toDouble()));
         painter.drawText(QRect(3000, startY + lineHeight * row, 4000, textHeight), Qt::TextWordWrap, data3); // data3 com quebra de linha
         painter.drawText(QRect(8500, startY + lineHeight * row, 4000, textHeight), portugues.toString(data4.toDouble()));
 

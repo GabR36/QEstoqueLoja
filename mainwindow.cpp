@@ -243,7 +243,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Btn_Relatorios->setIcon(iconBtnRelatorios);
 
     // validadores para os campos
-    QDoubleValidator *DoubleValidador = new QDoubleValidator();
+    QDoubleValidator *DoubleValidador = new QDoubleValidator(0.0, 9999.99, 2);
     ui->Ledit_Preco->setValidator(DoubleValidador);
     ui->Ledit_Quantidade->setValidator(DoubleValidador);
 

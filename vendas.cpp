@@ -154,8 +154,8 @@ void Vendas::atualizarTabelas(){
 
     while (query.next()) {
         QString descricao = query.value(0).toString();
-        QString quantidade = QString::number(query.value(1).toInt());
-        QString precoVendido = QString::number(query.value(2).toDouble(), 'f', 2);
+        QString quantidade = query.value(1).toString();
+        QString precoVendido = query.value(2).toString();
 
         // Adiciona cada campo individualmente à lista
         produtosVendidos.append(descricao);

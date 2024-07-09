@@ -29,7 +29,7 @@ public:
     QList<QList<QVariant>> rowDataList;
     static bool imprimirReciboVenda( QString idVenda);
     static QStringList getProdutosVendidos( QString idVenda);
-    void actionAbrirPagamentosVenda();
+    void actionAbrirPagamentosVenda(QString id_venda);
 
 
 public slots:

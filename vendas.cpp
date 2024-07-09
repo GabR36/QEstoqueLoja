@@ -347,8 +347,9 @@ void Vendas::filtrarData(QString de, QString ate){
     ui->Tview_Vendas2->selectionModel()->select(QModelIndex(modeloVendas2->index(0, 0)), QItemSelectionModel::Select);
 
 }
-void Vendas::actionAbrirPagamentosVenda(){
-    EntradasVendasPrazo *pagamentosVenda = new EntradasVendasPrazo;
+void Vendas::actionAbrirPagamentosVenda(QString id_venda){
+    EntradasVendasPrazo *pagamentosVenda = new EntradasVendasPrazo(this, id_venda);
+    pagamentosVenda->setWindowModality(Qt::ApplicationModal);
     pagamentosVenda->show();
 }
 
@@ -392,7 +393,7 @@ void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
     actionAbrirPagamentos = new QAction;
     actionAbrirPagamentos->setText("Abrir Pagamentos");
     QObject::connect(actionAbrirPagamentos, &QAction::triggered, [&]() {
-        actionAbrirPagamentosVenda(); // Chama nossa função com o parâmetro
+        actionAbrirPagamentosVenda(cellValue); // Chama nossa função com o parâmetro
     });
 
 

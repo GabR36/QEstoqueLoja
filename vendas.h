@@ -7,6 +7,7 @@
 #include <QItemSelection>
 #include "mainwindow.h"
 #include <QLocale>
+#include "entradasvendasprazo.h"
 
 
 namespace Ui {
@@ -28,6 +29,7 @@ public:
     QList<QList<QVariant>> rowDataList;
     static bool imprimirReciboVenda( QString idVenda);
     static QStringList getProdutosVendidos( QString idVenda);
+    void actionAbrirPagamentosVenda();
 
 
 public slots:
@@ -57,6 +59,7 @@ private:
     void filtrarData(QString de, QString ate);
     QAction *actionMenuDeletarVenda;
     QAction *actionImprimirRecibo;
+    QAction *actionAbrirPagamentos;
     void Teste();
 
 

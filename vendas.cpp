@@ -347,6 +347,10 @@ void Vendas::filtrarData(QString de, QString ate){
     ui->Tview_Vendas2->selectionModel()->select(QModelIndex(modeloVendas2->index(0, 0)), QItemSelectionModel::Select);
 
 }
+void Vendas::actionAbrirPagamentosVenda(){
+    EntradasVendasPrazo *pagamentosVenda = new EntradasVendasPrazo;
+    pagamentosVenda->show();
+}
 
 
 
@@ -385,9 +389,17 @@ void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
         imprimirReciboVenda(cellValue); // Chama nossa função com o parâmetro
     });
 
+    actionAbrirPagamentos = new QAction;
+    actionAbrirPagamentos->setText("Abrir Pagamentos");
+    QObject::connect(actionAbrirPagamentos, &QAction::triggered, [&]() {
+        actionAbrirPagamentosVenda(); // Chama nossa função com o parâmetro
+    });
+
+
 
     menu.addAction(actionMenuDeletarVenda);
     menu.addAction(actionImprimirRecibo);
+    menu.addAction(actionAbrirPagamentos);
 
 
 

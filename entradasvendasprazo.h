@@ -27,6 +27,8 @@ private:
     QSqlDatabase db = QSqlDatabase::database();
     QString idVenda, valorVenda, dataHoraVenda, clienteVenda;
     void atualizarTabelaPag();
+    void atualizarValorDevendo();
+    float valor_Venda;
 
 
 

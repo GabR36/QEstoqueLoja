@@ -22,7 +22,7 @@ EntradasVendasPrazo::EntradasVendasPrazo(QWidget *parent, QString id_venda)
     query.bindValue(":id_venda", idVenda);
     if (query.exec()) {
         while (query.next()) {
-            float valor_Venda = query.value("valor_final").toFloat();
+            valor_Venda = query.value("valor_final").toFloat();
             data_Venda = query.value("data_hora").toDateTime();
             QString cliente = query.value("cliente").toString();
 
@@ -71,19 +71,47 @@ void EntradasVendasPrazo::atualizarTabelaPag(){
 
     // Limpar a tabela antes de atualizar
     ui->tw_Entradas->setRowCount(0);
-
+     float valorDevido = valor_Venda;
     int row = 0;
     while (query.next()) {
-        QString valorRecebido = query.value("total").toString();
+        float valorRecebido = query.value("total").toFloat();
         QDateTime dataRecebido = query.value("data_hora").toDateTime();
 
+
+
+        if(valorDevido >= 0 ){
+             valorDevido -= valorRecebido;
+         }
+
         ui->tw_Entradas->insertRow(row);
-        ui->tw_Entradas->setItem(row, 0, new QTableWidgetItem(valorRecebido));
+         ui->tw_Entradas->setItem(row, 0, new QTableWidgetItem(QString::number(valorRecebido, 'f', 2)));
         ui->tw_Entradas->setItem(row, 1, new QTableWidgetItem(portugues.toString(dataRecebido, "dd/MM/yyyy hh:mm:ss")));
         row++;
     }
 
+    ui->label_5->setText("A Dever: R$" + portugues.toString(valorDevido, 'f', 2));
+    if(valorDevido > 0){
+        ui->label_5->setStyleSheet("color: red");
+    }else{
+        ui->label_5->setStyleSheet("color: green");
+
+    }
+
+
+
     db.close();
+}
+void EntradasVendasPrazo::atualizarValorDevendo(){
+
+
+    // float valorDevido = valor_Venda;
+    // for(int i=0; i< ui->tw_Entradas->rowSpan())
+
+
+
+
+    // ui->label_5->setText("A Dever: R$" + portugues.toString(valorDevido, 'f', 2));
+
 }
 
 void EntradasVendasPrazo::on_btn_AddValor_clicked()
@@ -104,6 +132,7 @@ void EntradasVendasPrazo::on_btn_AddValor_clicked()
         }
         qDebug() << "ibnserção entreada";
     }
+
 
 
     db.close();

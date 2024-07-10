@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>619</width>
-    <height>526</height>
+    <width>656</width>
+    <height>560</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>300</x>
+     <x>30</x>
      <y>10</y>
      <width>66</width>
      <height>18</height>
@@ -29,10 +29,10 @@
   <widget class="QTableWidget" name="tw_Entradas">
    <property name="geometry">
     <rect>
-     <x>130</x>
-     <y>40</y>
-     <width>461</width>
-     <height>431</height>
+     <x>180</x>
+     <y>70</y>
+     <width>441</width>
+     <height>441</height>
     </rect>
    </property>
    <property name="alternatingRowColors">
@@ -58,51 +58,40 @@
     </property>
    </column>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>20</y>
-     <width>121</width>
-     <height>18</height>
+     <x>230</x>
+     <y>17</y>
+     <width>201</width>
+     <height>31</height>
     </rect>
    </property>
-   <property name="text">
-    <string>Valor Venda: </string>
+   <property name="font">
+    <font>
+     <pointsize>14</pointsize>
+     <bold>true</bold>
+    </font>
    </property>
-  </widget>
-  <widget class="QLabel" name="label_3">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>50</y>
-     <width>101</width>
-     <height>18</height>
-    </rect>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
    </property>
-   <property name="text">
-    <string>DataVenda:</string>
+   <property name="autoFillBackground">
+    <bool>false</bool>
    </property>
-  </widget>
-  <widget class="QLabel" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>80</y>
-     <width>81</width>
-     <height>18</height>
-    </rect>
+   <property name="styleSheet">
+    <string notr="true">color: green;</string>
    </property>
    <property name="text">
-    <string>Cliente:</string>
+    <string>TextLabel</string>
    </property>
   </widget>
   <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>160</y>
-     <width>111</width>
+     <width>113</width>
      <height>61</height>
     </rect>
    </property>
@@ -117,7 +106,40 @@
     <item>
      <widget class="QPushButton" name="btn_AddValor">
       <property name="text">
-       <string>PushButton</string>
+       <string>Adicionar Valor</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>80</y>
+     <width>151</width>
+     <height>68</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Valor Venda: </string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>DataVenda:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Cliente:</string>
       </property>
      </widget>
     </item>

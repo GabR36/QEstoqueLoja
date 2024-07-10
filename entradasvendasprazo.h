@@ -2,6 +2,9 @@
 #define ENTRADASVENDASPRAZO_H
 
 #include <QDialog>
+#include <QSqlDatabase>
+#include <QSqlQueryModel>
+#include <QLocale>
 
 namespace Ui {
 class EntradasVendasPrazo;
@@ -15,8 +18,17 @@ public:
     explicit EntradasVendasPrazo(QWidget *parent = nullptr, QString id_venda = "1");
     ~EntradasVendasPrazo();
 
+private slots:
+    void on_btn_AddValor_clicked();
+
 private:
     Ui::EntradasVendasPrazo *ui;
+    QLocale portugues;
+    QSqlDatabase db = QSqlDatabase::database();
+    QString idVenda, valorVenda, dataHoraVenda, clienteVenda;
+    void atualizarTabelaPag();
+
+
 
 };
 

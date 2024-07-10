@@ -42,6 +42,7 @@ private slots:
 
     void on_Btn_DeletarVenda_clicked();
 
+
     void on_DateEdt_De_dateChanged(const QDate &date);
 
     void on_DateEdt_Ate_dateChanged(const QDate &date);

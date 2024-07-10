@@ -359,16 +359,18 @@ void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
 {    if(!ui->Tview_Vendas2->currentIndex().isValid())
         return;
     QModelIndexList selectedRows = ui->Tview_Vendas2->selectionModel()->selectedRows();
-    QString cellValue;
+    QString cellValue, formaPag;
     if (!selectedRows.isEmpty()) {
         // Pega o primeiro índice selecionado (caso múltiplas linhas possam ser selecionadas)
         QModelIndex selectedIndex = selectedRows.first();
 
         // Obtém o índice da célula na coluna 0 da linha selecionada
         QModelIndex columnIndex = ui->Tview_Vendas2->model()->index(selectedIndex.row(), 0);
+        QModelIndex columnIndex2 = ui->Tview_Vendas2->model()->index(selectedIndex.row(), 4);
 
         // Obtém o valor da célula como uma QString
          cellValue = ui->Tview_Vendas2->model()->data(columnIndex).toString();
+        formaPag = ui->Tview_Vendas2->model()->data(columnIndex2).toString();
 
         // Mostra o valor em uma mensagem
 
@@ -395,10 +397,15 @@ void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
     QObject::connect(actionAbrirPagamentos, &QAction::triggered, [&]() {
         actionAbrirPagamentosVenda(cellValue); // Chama nossa função com o parâmetro
     });
-
+    if(formaPag == "A Prazo"){
+        actionAbrirPagamentos->setEnabled(true);
+    }else{
+        actionAbrirPagamentos->setEnabled(false);
+    }
 
 
     menu.addAction(actionMenuDeletarVenda);
+
     menu.addAction(actionImprimirRecibo);
     menu.addAction(actionAbrirPagamentos);
 

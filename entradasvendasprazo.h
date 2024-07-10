@@ -17,6 +17,7 @@ class EntradasVendasPrazo : public QDialog
 public:
     explicit EntradasVendasPrazo(QWidget *parent = nullptr, QString id_venda = "1");
     ~EntradasVendasPrazo();
+    float valorDevidoGlobal;
 
 private slots:
     void on_btn_AddValor_clicked();
@@ -27,7 +28,6 @@ private:
     QSqlDatabase db = QSqlDatabase::database();
     QString idVenda, valorVenda, dataHoraVenda, clienteVenda;
     void atualizarTabelaPag();
-    void atualizarValorDevendo();
     float valor_Venda;
 
 

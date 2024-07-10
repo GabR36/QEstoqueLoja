@@ -3,6 +3,9 @@
 #include <QDebug>
 #include <QSqlQuery>
 #include <QDateTime>
+#include <QMessageBox>
+
+
 EntradasVendasPrazo::EntradasVendasPrazo(QWidget *parent, QString id_venda)
     : QDialog(parent)
     , ui(new Ui::EntradasVendasPrazo)
@@ -52,6 +55,7 @@ EntradasVendasPrazo::EntradasVendasPrazo(QWidget *parent, QString id_venda)
 EntradasVendasPrazo::~EntradasVendasPrazo()
 {
     delete ui;
+
 }
 void EntradasVendasPrazo::atualizarTabelaPag(){
     if (!db.open()) {
@@ -96,47 +100,43 @@ void EntradasVendasPrazo::atualizarTabelaPag(){
         ui->label_5->setStyleSheet("color: green");
 
     }
+    valorDevidoGlobal = valorDevido;
 
 
 
     db.close();
 }
-void EntradasVendasPrazo::atualizarValorDevendo(){
 
-
-    // float valorDevido = valor_Venda;
-    // for(int i=0; i< ui->tw_Entradas->rowSpan())
-
-
-
-
-    // ui->label_5->setText("A Dever: R$" + portugues.toString(valorDevido, 'f', 2));
-
-}
 
 void EntradasVendasPrazo::on_btn_AddValor_clicked()
 {
-    if(db.open()){
-        qDebug() << "banco de dados aberto botao add ";
-    }
-    QSqlQuery query;
-    QDateTime dataInglesAgora;
-    dataInglesAgora.currentDateTime();
-    query.prepare("INSERT INTO entradas_vendas(id_venda,data_hora,total) VALUES (:valoridvenda, :valordatahora, :valorrecebido)");
-    query.bindValue(":valoridvenda", idVenda);
-    query.bindValue(":valordatahora", portugues.toString(QDateTime::currentDateTime(), "yyyy-MM-dd hh:mm:ss"));
-    query.bindValue(":valorrecebido", ui->ledit_AddValor->text());
-    if(query.exec()){
-        while(query.next()){
-
+    if(valorDevidoGlobal > 0){
+        if(db.open()){
+            qDebug() << "banco de dados aberto botao add ";
         }
-        qDebug() << "ibnserção entreada";
-    }
+
+            QSqlQuery query;
+            QDateTime dataInglesAgora;
+            dataInglesAgora.currentDateTime();
+            query.prepare("INSERT INTO entradas_vendas(id_venda,data_hora,total) VALUES (:valoridvenda, :valordatahora, :valorrecebido)");
+            query.bindValue(":valoridvenda", idVenda);
+            query.bindValue(":valordatahora", portugues.toString(QDateTime::currentDateTime(), "yyyy-MM-dd hh:mm:ss"));
+            query.bindValue(":valorrecebido", ui->ledit_AddValor->text());
+            if(query.exec()){
+                while(query.next()){
+
+                }
+                qDebug() << "ibnserção entreada";
+                }
+        }else{
+            QMessageBox::warning(this,"Erro", "Valor Devido total dessa venda já descontado!");
 
 
 
-    db.close();
-    atualizarTabelaPag();
+        db.close();
+        }
+        atualizarTabelaPag();
+
 
 }
 

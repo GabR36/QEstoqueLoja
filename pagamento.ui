@@ -77,7 +77,7 @@ background-color:rgb(170, 170, 170);
     <rect>
      <x>40</x>
      <y>190</y>
-     <width>236</width>
+     <width>263</width>
      <height>28</height>
     </rect>
    </property>
@@ -134,6 +134,11 @@ background-color:rgb(170, 170, 170);
        <property name="icon">
         <iconset resource="Imagens/recursosImg.qrc">
          <normaloff>:/QEstoqueLOja/view-financial-account-liability.svg</normaloff>:/QEstoqueLOja/view-financial-account-liability.svg</iconset>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>A Prazo</string>
        </property>
       </item>
      </widget>

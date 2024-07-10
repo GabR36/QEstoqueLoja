@@ -79,6 +79,8 @@ private slots:
 
     void on_actionConfig_triggered();
 
+    void on_Ledit_Pesquisa_textChanged(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
     bool verificarCodigoBarras();

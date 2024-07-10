@@ -1073,3 +1073,9 @@ void MainWindow::on_actionConfig_triggered()
     configuracao->show();
 }
 
+
+void MainWindow::on_Ledit_Pesquisa_textChanged(const QString &arg1)
+{
+    ui->Btn_Pesquisa->click();
+}
+

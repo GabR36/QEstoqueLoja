@@ -33,5 +33,6 @@
         <file>QEstoqueLOja/question.svg</file>
         <file>QEstoqueLOja/view-financial-transfer-reconciled.svg</file>
         <file>QEstoqueLOja/taxes-finances.svg</file>
+        <file>QEstoqueLOja/appointment-soon-symbolic.svg</file>
     </qresource>
 </RCC>

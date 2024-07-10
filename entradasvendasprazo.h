@@ -29,6 +29,8 @@ private:
     QString idVenda, valorVenda, dataHoraVenda, clienteVenda;
     void atualizarTabelaPag();
     float valor_Venda;
+    QSqlQueryModel *modeloEntradas = new QSqlQueryModel;
+
 
 
 

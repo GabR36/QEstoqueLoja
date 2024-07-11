@@ -352,13 +352,13 @@ color: rgb(255, 255, 255);
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>170</width>
+                    <width>140</width>
                     <height>60</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>170</width>
+                    <width>140</width>
                     <height>60</height>
                    </size>
                   </property>
@@ -366,7 +366,8 @@ color: rgb(255, 255, 255);
                    <string notr="true"/>
                   </property>
                   <property name="text">
-                   <string>Cadastrar Produto</string>
+                   <string>Cadastrar 
+Produto</string>
                   </property>
                   <property name="icon">
                    <iconset theme="address-book-new"/>
@@ -465,13 +466,13 @@ background-color:rgb(255, 96, 99)
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>150</width>
+                  <width>140</width>
                   <height>60</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>150</width>
+                  <width>140</width>
                   <height>60</height>
                  </size>
                 </property>
@@ -507,13 +508,13 @@ background-color: rgb(153, 193, 241);
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>150</width>
+                  <width>140</width>
                   <height>60</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>150</width>
+                  <width>140</width>
                   <height>60</height>
                  </size>
                 </property>
@@ -574,6 +575,9 @@ background-color:rgb(03,75,119);
             <width>200</width>
             <height>30</height>
            </size>
+          </property>
+          <property name="placeholderText">
+           <string>Pesquisar por descrição ou código de barras</string>
           </property>
          </widget>
         </item>
@@ -650,6 +654,9 @@ font-size: 15px;</string>
         <property name="styleSheet">
          <string notr="true"/>
         </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
         <property name="selectionMode">
          <enum>QAbstractItemView::SingleSelection</enum>
         </property>
@@ -657,7 +664,7 @@ font-size: 15px;</string>
          <enum>QAbstractItemView::SelectRows</enum>
         </property>
         <property name="gridStyle">
-         <enum>Qt::DashLine</enum>
+         <enum>Qt::SolidLine</enum>
         </property>
         <attribute name="horizontalHeaderCascadingSectionResizes">
          <bool>false</bool>
@@ -684,7 +691,7 @@ font-size: 15px;</string>
      <x>0</x>
      <y>0</y>
      <width>1210</width>
-     <height>20</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuGerarrelat_rios">

@@ -77,6 +77,12 @@ MainWindow::MainWindow(QWidget *parent)
     } else {
         qDebug() << "Erro ao criar tabela de produtos_vendidos: ";
     }
+    query.exec("CREATE TABLE IF NOT EXISTS entradas_vendas (id INTEGER PRIMARY KEY AUTOINCREMENT, id_venda INTEGER, total DECIMAL(10,2),data_hora DATETIME DEFAULT CURRENT_TIMESTAMP , FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
+    if (query.isActive()) {
+        qDebug() << "Tabela de entradas criada com sucesso!";
+    } else {
+        qDebug() << "Erro ao criar tabela de entradas: ";
+    }
     qDebug() << db.tables();
 
     // obter a versao do esquema do banco de dados
@@ -1063,5 +1069,11 @@ void MainWindow::on_actionConfig_triggered()
 {
     Config *configuracao = new Config();
     configuracao->show();
+}
+
+
+void MainWindow::on_Ledit_Pesquisa_textChanged(const QString &arg1)
+{
+    ui->Btn_Pesquisa->click();
 }
 

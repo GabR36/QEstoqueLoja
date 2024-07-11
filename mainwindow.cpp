@@ -215,6 +215,30 @@ MainWindow::MainWindow(QWidget *parent)
 
             query.exec("CREATE TABLE entradas_vendas (id INTEGER PRIMARY KEY AUTOINCREMENT, id_venda INTEGER, total DECIMAL(10,2),data_hora DATETIME DEFAULT CURRENT_TIMESTAMP , FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
 
+            // normalizar dados existentes
+            if (!query.exec("SELECT id, descricao FROM produtos")) {
+                qDebug() << "Erro ao executar a consulta SQL:" << query.lastError().text();
+            }
+            // Iterar sobre os resultados da consulta
+            while (query.next()) {
+                int id = query.value(0).toInt();
+                QString descricao = query.value(1).toString();
+
+                // Normalizar a descrição
+                QString descricaoNormalizada = normalizeText(descricao);
+
+                // Atualizar a tabela produtos com a descrição normalizada
+                QSqlQuery updateQuery;
+                updateQuery.prepare("UPDATE produtos SET descricao = :descricao WHERE id = :id");
+                updateQuery.bindValue(":descricao", descricaoNormalizada);
+                updateQuery.bindValue(":id", id);
+
+                if (!updateQuery.exec()) {
+                    qDebug() << "Erro ao atualizar a descrição do produto:" << updateQuery.lastError().text();
+                    db.rollback();
+                }
+            }
+
             // mudar a versao para 3
             query.exec("PRAGMA user_version = 3");
 
@@ -457,7 +481,7 @@ QString MainWindow::normalizeText(const QString &text) {
                 replacement = 'e';
                 break;
             default:
-                result.append(c.toLower());
+                result.append(c.toUpper());
                 continue;
             }
             result.append(replacement);

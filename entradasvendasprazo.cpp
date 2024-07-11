@@ -98,6 +98,13 @@ void EntradasVendasPrazo::atualizarTabelaPag(){
 void EntradasVendasPrazo::on_btn_AddValor_clicked()
 {
     if (valorDevidoGlobal > 0) {
+
+        // venda *inserirVenda = new venda;
+        // inserirVenda->janelaVenda = this;
+        // inserirVenda->janelaPrincipal = janelaPrincipal;
+        // inserirVenda->setWindowModality(Qt::ApplicationModal);
+        // inserirVenda->show();
+
         if (db.open()) {
             QSqlQuery query;
             query.prepare("INSERT INTO entradas_vendas(id_venda, data_hora, total) VALUES (:valoridvenda, :valordatahora, :valorrecebido)");

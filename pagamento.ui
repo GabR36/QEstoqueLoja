@@ -138,7 +138,7 @@ background-color:rgb(170, 170, 170);
       </item>
       <item>
        <property name="text">
-        <string>A Prazo</string>
+        <string>Prazo</string>
        </property>
        <property name="icon">
         <iconset resource="Imagens/recursosImg.qrc">

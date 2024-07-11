@@ -51,17 +51,21 @@ private slots:
 
     void on_testebutton_clicked();
 
+    void on_cb_BuscaVendasPrazo_stateChanged(int arg1);
+
 private:
     void LabelLucro();
     void LabelLucro(QString whereQuery);
     QSqlQueryModel *modeloProdVendidos = new QSqlQueryModel;
     QSqlQueryModel *modeloVendas2 = new QSqlQueryModel;
     Ui::Vendas *ui;
-    void filtrarData(QString de, QString ate);
+    void filtrarData(QString de1, QString ate1);
     QAction *actionMenuDeletarVenda;
     QAction *actionImprimirRecibo;
     QAction *actionAbrirPagamentos;
+    QString de, ate;
     void Teste();
+
 
 
 };

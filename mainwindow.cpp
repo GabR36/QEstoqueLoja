@@ -77,12 +77,7 @@ MainWindow::MainWindow(QWidget *parent)
     } else {
         qDebug() << "Erro ao criar tabela de produtos_vendidos: ";
     }
-    query.exec("CREATE TABLE IF NOT EXISTS entradas_vendas (id INTEGER PRIMARY KEY AUTOINCREMENT, id_venda INTEGER, total DECIMAL(10,2),data_hora DATETIME DEFAULT CURRENT_TIMESTAMP , FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
-    if (query.isActive()) {
-        qDebug() << "Tabela de entradas criada com sucesso!";
-    } else {
-        qDebug() << "Erro ao criar tabela de entradas: ";
-    }
+
     qDebug() << db.tables();
 
     // obter a versao do esquema do banco de dados
@@ -98,7 +93,7 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug() << dbSchemaVersion;
 
     // a versão mais recente do esquema do banco de dados
-    int dbSchemaLastVersion = 2;
+    int dbSchemaLastVersion = 3;
 
     while (dbSchemaVersion < dbSchemaLastVersion){
         // selecionar a atualizacao conforme a versao atual do banco de dados
@@ -205,6 +200,31 @@ MainWindow::MainWindow(QWidget *parent)
             }
 
             dbSchemaVersion = 2;
+
+            break;
+        }
+        case 2:
+        {
+            // schema versao 2 atualizar para a versao 3
+
+            // comecar transacao
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+            }
+            QSqlQuery query;
+
+            query.exec("CREATE TABLE entradas_vendas (id INTEGER PRIMARY KEY AUTOINCREMENT, id_venda INTEGER, total DECIMAL(10,2),data_hora DATETIME DEFAULT CURRENT_TIMESTAMP , FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
+
+            // mudar a versao para 3
+            query.exec("PRAGMA user_version = 3");
+
+            // terminar transacao
+            if (!db.commit()) {
+                qDebug() << "Error: unable to commit transaction";
+                db.rollback(); // Desfaz a transação
+            }
+
+            dbSchemaVersion = 3;
 
             break;
         }

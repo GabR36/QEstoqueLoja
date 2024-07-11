@@ -398,6 +398,9 @@ background-color:rgb(03,75,119);
          <height>16777215</height>
         </size>
        </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
        <property name="selectionMode">
         <enum>QAbstractItemView::SingleSelection</enum>
        </property>

@@ -95,7 +95,7 @@ background-color:rgb(170, 170, 170);
        <rect>
         <x>10</x>
         <y>30</y>
-        <width>144</width>
+        <width>161</width>
         <height>88</height>
        </rect>
       </property>
@@ -170,6 +170,9 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
        </property>
        <property name="contextMenuPolicy">
         <enum>Qt::CustomContextMenu</enum>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
        </property>
        <property name="selectionMode">
         <enum>QAbstractItemView::SingleSelection</enum>
@@ -371,6 +374,9 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
      </item>
      <item>
       <widget class="QTableView" name="Tview_ProdutosVendidos">
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
        <property name="selectionMode">
         <enum>QAbstractItemView::SingleSelection</enum>
        </property>

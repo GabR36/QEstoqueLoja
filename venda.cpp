@@ -6,7 +6,7 @@
 #include <QStandardItemModel>
 #include <QVector>
 #include <QMessageBox>
-#include "pagamento.h"
+#include "pagamentovenda.h"
 #include <QDoubleValidator>
 #include <QMenu>
 
@@ -319,11 +319,9 @@ void venda::on_Btn_Aceitar_clicked()
         QString cliente = ui->Ledit_Cliente->text();
         QString data =  portugues.toString(ui->DateEdt_Venda->dateTime(), "dd-MM-yyyy hh:mm:ss");
 
-        pagamento *JanelaPagamento = new pagamento(Total(), cliente, data);
-        JanelaPagamento->janelaVenda = this;
-        JanelaPagamento->rowDataList = rowDataList;
-        JanelaPagamento->setWindowModality(Qt::ApplicationModal);
-        JanelaPagamento->show();    
+        pagamentoVenda *pagamento = new pagamentoVenda(rowDataList, this, Total(), cliente, data);
+        pagamento->setWindowModality(Qt::ApplicationModal);
+        pagamento->show();
     }
     else {
         // Exiba uma mensagem de erro se o preço ou a quantidade não for válido

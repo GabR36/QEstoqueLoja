@@ -8,8 +8,12 @@ class pagamentoVenda : public pagamento
 {
     Q_OBJECT
 public:
-    pagamentoVenda(venda *ptrVenda, QString total, QString cliente, QString data, QWidget *parent);
+    explicit pagamentoVenda(QList<QList<QVariant>> listaProdutos, venda *ptrVenda, QString total, QString cliente, QString data, QWidget *parent = nullptr);
     venda *janelaVenda;
+    QList<QList<QVariant>> rowDataList;
+
+private:
+    void terminarPagamento() override;
 };
 
 #endif // PAGAMENTOVENDA_H

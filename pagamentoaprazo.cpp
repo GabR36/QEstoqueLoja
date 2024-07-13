@@ -5,3 +5,8 @@ pagamentoAPrazo::pagamentoAPrazo(QString total, QString cliente, QString data, Q
 {
     ui->Ledit_Desconto->setText("teste");
 }
+
+void pagamentoAPrazo::terminarPagamento()
+{
+    qDebug() << "terminarPagamento pagamento a Prazo!";
+}

@@ -7,6 +7,8 @@
 #include <QLocale>
 #include "ui_pagamento.h"
 #include <QSqlDatabase>
+#include <QMessageBox>
+#include <QDateTime>
 
 namespace Ui {
 class pagamento;
@@ -20,10 +22,8 @@ class pagamento : public QDialog
 public:
     explicit pagamento(QString total, QString cliente, QString data, QWidget *parent = nullptr);
     ~pagamento();
-    venda *janelaVenda;
     QString clienteGlobal;
     QString dataGlobal;
-    QList<QList<QVariant>> rowDataList;
     QString totalGlobal;
     QLocale portugues;
     QSqlDatabase db = QSqlDatabase::database();
@@ -45,6 +45,7 @@ protected:
     float obterValorFinal(QString taxa, QString desconto);
     void descontoTaxa();
     Ui::pagamento *ui;
+    virtual void terminarPagamento();
 };
 
 #endif // PAGAMENTO_H

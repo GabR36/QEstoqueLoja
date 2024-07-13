@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>pagamento</class>
  <widget class="QDialog" name="pagamento">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -52,6 +55,9 @@ background-color:rgb(170, 170, 170);
 	font: 700 7pt &quot;Segoe UI&quot;;
 	font-size: 15px;
 }</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">

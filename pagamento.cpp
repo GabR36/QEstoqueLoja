@@ -51,7 +51,7 @@ void pagamento::on_buttonBox_accepted()
     // inserir a venda
 
     // adicionar ao banco de dados
-    if(!janelaVenda->db.open()){
+    if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao aceitar venda.";
     }
     QSqlQuery query;
@@ -168,7 +168,7 @@ void pagamento::on_buttonBox_accepted()
         Vendas::imprimirReciboVenda(idVenda);
     }
 
-    janelaVenda->db.close();
+    db.close();
     janelaVenda->janelaVenda->atualizarTabelas();
     janelaVenda->janelaPrincipal->atualizarTableview();
 
@@ -196,7 +196,7 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
     // a depender da forma dinheiro ser selecionada
 
     // pegar os valores de taxas padrao das configuracoes
-    if(!janelaVenda->db.open()){
+    if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. pagamento combobox";
     }
     QSqlQuery query;

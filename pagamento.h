@@ -5,6 +5,8 @@
 #include "venda.h"
 #include "vendas.h"
 #include <QLocale>
+#include "ui_pagamento.h"
+#include <QSqlDatabase>
 
 namespace Ui {
 class pagamento;
@@ -24,6 +26,7 @@ public:
     QList<QList<QVariant>> rowDataList;
     QString totalGlobal;
     QLocale portugues;
+    QSqlDatabase db = QSqlDatabase::database();
 
 private slots:
     void on_buttonBox_accepted();
@@ -38,11 +41,10 @@ private slots:
 
 
 
-private:
-    Ui::pagamento *ui;
+protected:
     float obterValorFinal(QString taxa, QString desconto);
     void descontoTaxa();
-
+    Ui::pagamento *ui;
 };
 
 #endif // PAGAMENTO_H

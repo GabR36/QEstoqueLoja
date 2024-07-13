@@ -4,6 +4,7 @@
 #include <QSqlQuery>
 #include <QDateTime>
 #include <QMessageBox>
+#include "pagamentoaprazo.h"
 
 
 EntradasVendasPrazo::EntradasVendasPrazo(QWidget *parent, QString id_venda)
@@ -99,11 +100,8 @@ void EntradasVendasPrazo::on_btn_AddValor_clicked()
 {
     if (valorDevidoGlobal > 0) {
 
-        // venda *inserirVenda = new venda;
-        // inserirVenda->janelaVenda = this;
-        // inserirVenda->janelaPrincipal = janelaPrincipal;
-        // inserirVenda->setWindowModality(Qt::ApplicationModal);
-        // inserirVenda->show();
+        pagamentoAPrazo *pgmntPrazo= new pagamentoAPrazo("100", "juliano", "10/10/2010");
+        pgmntPrazo->show();
 
         if (db.open()) {
             QSqlQuery query;

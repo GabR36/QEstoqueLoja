@@ -248,6 +248,27 @@ MainWindow::MainWindow(QWidget *parent)
                     db.rollback();
                 }
             }
+            if(!query.exec("ALTER TABLE vendas2 ADD COLUMN esta_pago BOOLEAN DEFAULT 1")){
+                qDebug() << "erro ao adicionar coluna estapago";
+            }
+
+            if (!query.exec("SELECT id FROM vendas2")) {
+                qDebug() << "Erro ao executar a consulta SQL:" << query.lastError().text();
+            }
+            // Iterar sobre os resultados da consulta
+            while (query.next()) {
+                int id = query.value(0).toInt();
+               // bool esta_pago = query.value(1).toInt();
+
+                QSqlQuery updateQuery;
+                updateQuery.prepare("UPDATE vendas2 SET esta_pago = 1 WHERE id = :id");
+                updateQuery.bindValue(":id", id);
+
+                if (!updateQuery.exec()) {
+                    qDebug() << "Erro ao atualizar estapago do venda:" << updateQuery.lastError().text();
+                    db.rollback();
+                }
+            }
 
             // mudar a versao para 3
             query.exec("PRAGMA user_version = 3");

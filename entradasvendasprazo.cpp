@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QMessageBox>
 #include "pagamentoaprazo.h"
+#include <QDoubleValidator>
 
 
 EntradasVendasPrazo::EntradasVendasPrazo(QWidget *parent, QString id_venda)
@@ -14,6 +15,10 @@ EntradasVendasPrazo::EntradasVendasPrazo(QWidget *parent, QString id_venda)
     ui->setupUi(this);
     idVenda = id_venda;
     ui->label->setText(idVenda);
+
+    // validador
+    QDoubleValidator *validador = new QDoubleValidator(0.0, 9999.99, 2);
+    ui->ledit_AddValor->setValidator(validador);
 
     // ui->tw_Entradas.setWindowTitle("Exemplo de QTableWidget");
     // ui->tw_Entradas.resize(400, 300);
@@ -94,7 +99,7 @@ void EntradasVendasPrazo::atualizarTabelaPag(){
     } else {
         ui->label_5->setStyleSheet("color: green");
     }
-    valorDevidoGlobal = valorDevido;
+    valorDevidoGlobal = portugues.toFloat(portugues.toString(valorDevido, 'f', 2));
 
     db.close();
 }
@@ -102,9 +107,11 @@ void EntradasVendasPrazo::atualizarTabelaPag(){
 
 void EntradasVendasPrazo::on_btn_AddValor_clicked()
 {
-    if (valorDevidoGlobal > 0) {
+    float valorInserido = portugues.toFloat(ui->ledit_AddValor->text());
+    // se tiver algo a dever e o valor informado for menor ou igual ao valor devido
+    if ((valorDevidoGlobal > 0) && (valorInserido <= valorDevidoGlobal)) {
 
-        pagamentoAPrazo *pgmntPrazo= new pagamentoAPrazo(idVenda, ui->ledit_AddValor->text(), clienteVenda, portugues.toString(QDateTime::currentDateTime(), "yyyy-MM-dd hh:mm:ss"));
+        pagamentoAPrazo *pgmntPrazo= new pagamentoAPrazo(idVenda, portugues.toString(valorInserido, 'f', 2), clienteVenda, portugues.toString(QDateTime::currentDateTime(), "yyyy-MM-dd hh:mm:ss"));
         connect(pgmntPrazo, &QObject::destroyed, this, &EntradasVendasPrazo::onPgmntFechado);
         pgmntPrazo->show();
     }
@@ -118,6 +125,7 @@ void EntradasVendasPrazo::onPgmntFechado(){
     if(valorDevidoGlobal <= 0) {
         ui->btn_AddValor->setEnabled(false);
     }
+    ui->ledit_AddValor->clear();
 
 }
 

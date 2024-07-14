@@ -4,6 +4,8 @@ pagamentoAPrazo::pagamentoAPrazo(QString id_venda, QString total, QString client
     : pagamento(total, cliente, data, parent)
 {
     idVenda = id_venda;
+    //deixar a forma de pagamento a prazo inacessivel
+    ui->CBox_FormaPagamento->removeItem(5);
 }
 
 pagamentoAPrazo::~pagamentoAPrazo()

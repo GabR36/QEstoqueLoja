@@ -36,6 +36,10 @@ void pagamentoVenda::terminarPagamento(){
     if (!menorQueTotal){
         conversionOkDesconto = false;
     }
+    if(forma_pagamento == "Prazo" && clienteGlobal.isEmpty()){
+        QMessageBox::warning(this,"Erro", "Especifique um cliente para vender à prazo!");
+        return;
+    };
     qDebug() << conversionOkDesconto;
     if (!conversionOkDesconto){
         // algo deu errado na conversao, desconto nao validado

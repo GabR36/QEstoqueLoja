@@ -93,10 +93,10 @@ void EntradasVendasPrazo::atualizarTabelaPag(){
         valorDevido -= valorRecebido;
     }
 
-    ui->label_5->setText("A Dever: R$" + portugues.toString(valorDevido, 'f', 2));
+    ui->label_5->setText("Devendo: R$" + portugues.toString(valorDevido, 'f', 2));
     if (valorDevido > 0) {
         ui->label_5->setStyleSheet("color: red");
-    } else {
+    } if(valorDevido <= 0){
         ui->label_5->setStyleSheet("color: green");
     }
     valorDevidoGlobal = portugues.toFloat(portugues.toString(valorDevido, 'f', 2));

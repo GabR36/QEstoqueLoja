@@ -35,10 +35,19 @@ EntradasVendasPrazo::EntradasVendasPrazo(QWidget *parent, QString id_venda)
             clienteVenda = cliente;
         }
     }
+    atualizarTabelaPag();
+    ui->tview_Entradas->setModel(modeloEntradas);  // Atualize o widget para tableView
     modeloEntradas->setHeaderData(0, Qt::Horizontal, tr("Total"));
     modeloEntradas->setHeaderData(1, Qt::Horizontal, tr("Data e Hora"));
-
-    ui->tview_Entradas->setModel(modeloEntradas);  // Atualize o widget para tableView
+    modeloEntradas->setHeaderData(2, Qt::Horizontal, tr("Forma de Pagamento"));
+    modeloEntradas->setHeaderData(3, Qt::Horizontal, tr("Valor Final"));
+    modeloEntradas->setHeaderData(4, Qt::Horizontal, tr("Troco"));
+    modeloEntradas->setHeaderData(5, Qt::Horizontal, tr("Taxa"));
+    modeloEntradas->setHeaderData(6, Qt::Horizontal, tr("Valor Recebido"));
+    modeloEntradas->setHeaderData(7, Qt::Horizontal, tr("Desconto"));
+    ui->tview_Entradas->setColumnWidth(0,100);
+    ui->tview_Entradas->setColumnWidth(1,150);
+    ui->tview_Entradas->setColumnWidth(2,160);
 
     ui->label_2->setText("O valor da venda é: " + valorVenda);
     ui->label_3->setText("Data: "+ dataHoraVenda);
@@ -46,11 +55,6 @@ EntradasVendasPrazo::EntradasVendasPrazo(QWidget *parent, QString id_venda)
 
 
     db.close();
-    ui->tview_Entradas->setColumnWidth(0,400);
-    ui->tview_Entradas->setColumnWidth(1,200);
-
-    atualizarTabelaPag();
-
 }
 
 EntradasVendasPrazo::~EntradasVendasPrazo()
@@ -65,7 +69,7 @@ void EntradasVendasPrazo::atualizarTabelaPag(){
     }
 
     QSqlQuery query;
-    query.prepare("SELECT total, data_hora FROM entradas_vendas WHERE id_venda = :valoridvenda");
+    query.prepare("SELECT total, data_hora, forma_pagamento, valor_final, troco, taxa, valor_recebido, desconto FROM entradas_vendas WHERE id_venda = :valoridvenda");
     query.bindValue(":valoridvenda", idVenda);
 
     if (!query.exec()) {
@@ -100,26 +104,19 @@ void EntradasVendasPrazo::on_btn_AddValor_clicked()
 {
     if (valorDevidoGlobal > 0) {
 
-        pagamentoAPrazo *pgmntPrazo= new pagamentoAPrazo("100", "juliano", "10/10/2010");
+        pagamentoAPrazo *pgmntPrazo= new pagamentoAPrazo(idVenda, ui->ledit_AddValor->text(), clienteVenda, portugues.toString(QDateTime::currentDateTime(), "yyyy-MM-dd hh:mm:ss"));
+        connect(pgmntPrazo, &QObject::destroyed, this, &EntradasVendasPrazo::onPgmntFechado);
         pgmntPrazo->show();
+    }
 
-        if (db.open()) {
-            QSqlQuery query;
-            query.prepare("INSERT INTO entradas_vendas(id_venda, data_hora, total) VALUES (:valoridvenda, :valordatahora, :valorrecebido)");
-            query.bindValue(":valoridvenda", idVenda);
-            query.bindValue(":valordatahora", portugues.toString(QDateTime::currentDateTime(), "yyyy-MM-dd hh:mm:ss"));
-            query.bindValue(":valorrecebido", ui->ledit_AddValor->text());
+}
 
-            if (query.exec()) {
-                qDebug() << "Inserção realizada com sucesso";
-                atualizarTabelaPag();
-            } else {
-                qDebug() << "Erro ao inserir valor:" ;
-            }
-        } if(valorDevidoGlobal <= 0) {
-            ui->btn_AddValor->setEnabled(false);
-        }
-        db.close();
+void EntradasVendasPrazo::onPgmntFechado(){
+    qDebug() << "atualizarTAbelaPag?";
+    atualizarTabelaPag();
+
+    if(valorDevidoGlobal <= 0) {
+        ui->btn_AddValor->setEnabled(false);
     }
 
 }

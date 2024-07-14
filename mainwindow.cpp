@@ -213,7 +213,17 @@ MainWindow::MainWindow(QWidget *parent)
             }
             QSqlQuery query;
 
-            query.exec("CREATE TABLE entradas_vendas (id INTEGER PRIMARY KEY AUTOINCREMENT, id_venda INTEGER, total DECIMAL(10,2),data_hora DATETIME DEFAULT CURRENT_TIMESTAMP , FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
+            query.exec("CREATE TABLE entradas_vendas (id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                       "id_venda INTEGER, "
+                       "total DECIMAL(10,2),"
+                       "data_hora DATETIME DEFAULT CURRENT_TIMESTAMP,"
+                       "forma_pagamento VARCHAR(20),"
+                       "valor_recebido DECIMAL(10,2),"
+                       "troco DECIMAL(10,2),"
+                       "taxa DECIMAL(10,2),"
+                       "valor_final DECIMAL(10,2),"
+                       "desconto DECIMAL(10,2),"
+                       "FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
 
             // normalizar dados existentes
             if (!query.exec("SELECT id, descricao FROM produtos")) {

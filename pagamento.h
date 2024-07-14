@@ -21,7 +21,7 @@ class pagamento : public QDialog
 
 public:
     explicit pagamento(QString total, QString cliente, QString data, QWidget *parent = nullptr);
-    ~pagamento();
+    virtual ~pagamento();
     QString clienteGlobal;
     QString dataGlobal;
     QString totalGlobal;

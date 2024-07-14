@@ -46,7 +46,7 @@ Vendas::Vendas(QWidget *parent) :
     // Selecionar a primeira linha das tabelas
     QModelIndex firstIndex = modeloVendas2->index(0, 0);
     ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
-    QModelIndex firstIndex2 = modeloProdVendidos->index(0, 0);
+  // QModelIndex firstIndex2 = modeloProdVendidos->index(0, 0);
     // Obter o modelo de seleção da tabela
     QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
     // Conectar o sinal de seleção ao slot personalizado
@@ -318,8 +318,8 @@ void Vendas::on_Btn_DeletarVenda_clicked()
 void Vendas::on_DateEdt_De_dateChanged(const QDate &date)
 {
     // precisa adicionar um dia para ele contar o dia todo
-    QString ate = ui->DateEdt_Ate->date().addDays(1).toString("yyyy-MM-dd");
-    QString de = date.toString("yyyy-MM-dd");
+     ate = ui->DateEdt_Ate->date().addDays(1).toString("yyyy-MM-dd");
+     de = date.toString("yyyy-MM-dd");
     qDebug() << de;
     qDebug() << ate;
     filtrarData(de, ate);
@@ -328,16 +328,21 @@ void Vendas::on_DateEdt_De_dateChanged(const QDate &date)
 
 void Vendas::on_DateEdt_Ate_dateChanged(const QDate &date)
 {
-    QString de = ui->DateEdt_De->date().toString("yyyy-MM-dd");
+     de = ui->DateEdt_De->date().toString("yyyy-MM-dd");
     // precisa adicionar um dia para ele contar o dia todo
-    QString ate = date.addDays(1).toString("yyyy-MM-dd");
+     ate = date.addDays(1).toString("yyyy-MM-dd");
     qDebug() << de;
     qDebug() << ate;
     filtrarData(de, ate);
 }
 
-void Vendas::filtrarData(QString de, QString ate){
-    QString whereQuery = QString("WHERE data_hora BETWEEN '%1' AND '%2'").arg(de, ate);
+void Vendas::filtrarData(QString de1, QString ate1){
+    QString whereQuery;
+    if(ui->cb_BuscaVendasPrazo->isChecked()){
+         whereQuery = QString("WHERE data_hora BETWEEN '%1' AND '%2' AND forma_pagamento = 'Prazo'").arg(de1, ate1);
+    }else{
+        whereQuery = QString("WHERE data_hora BETWEEN '%1' AND '%2'").arg(de1, ate1);
+    }
     LabelLucro(whereQuery);
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. filtrarData";
@@ -397,7 +402,7 @@ void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
     QObject::connect(actionAbrirPagamentos, &QAction::triggered, [&]() {
         actionAbrirPagamentosVenda(cellValue); // Chama nossa função com o parâmetro
     });
-    if(formaPag == "A Prazo"){
+    if(formaPag == "Prazo"){
         actionAbrirPagamentos->setEnabled(true);
     }else{
         actionAbrirPagamentos->setEnabled(false);
@@ -615,5 +620,13 @@ void Vendas::on_testebutton_clicked()
     // for (const QString &descricao : descricoes) {
     //     qDebug() << "Descrição do Produto:" << descricao;
     // }
+}
+
+
+void Vendas::on_cb_BuscaVendasPrazo_stateChanged(int arg1)
+
+{
+
+    filtrarData(de, ate);
 }
 

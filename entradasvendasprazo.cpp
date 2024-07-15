@@ -36,7 +36,7 @@ EntradasVendasPrazo::EntradasVendasPrazo(QWidget *parent, QString id_venda)
             QString cliente = query.value("cliente").toString();
 
             valorVenda = portugues.toString(valor_Venda, 'f', 2);
-            dataHoraVenda = portugues.toString(data_Venda, "dd/MM/yyyy hh:mm:ss");
+            dataHoraVenda = portugues.toString(data_Venda, "dd/MM/yyyy");
             clienteVenda = cliente;
         }
     }
@@ -54,9 +54,9 @@ EntradasVendasPrazo::EntradasVendasPrazo(QWidget *parent, QString id_venda)
     ui->tview_Entradas->setColumnWidth(1,150);
     ui->tview_Entradas->setColumnWidth(2,160);
 
-    ui->label_2->setText("O valor da venda é: " + valorVenda);
-    ui->label_3->setText("Data: "+ dataHoraVenda);
-    ui->label_4->setText("cliente: "+clienteVenda);
+    ui->label_2->setText("Valor Inicial da Venda: " + valorVenda);
+    ui->label_3->setText("Data Inicial da Venda: "+ dataHoraVenda);
+    ui->label_4->setText("Cliente: "+clienteVenda);
 
 
     db.close();

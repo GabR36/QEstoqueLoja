@@ -66,6 +66,7 @@ EntradasVendasPrazo::~EntradasVendasPrazo()
 {
     delete ui;
 
+
 }
 void EntradasVendasPrazo::atualizarTabelaPag(){
     if (!db.open()) {
@@ -93,11 +94,17 @@ void EntradasVendasPrazo::atualizarTabelaPag(){
         valorDevido -= valorRecebido;
     }
 
+
     ui->label_5->setText("Devendo: R$" + portugues.toString(valorDevido, 'f', 2));
     if (valorDevido > 0) {
         ui->label_5->setStyleSheet("color: red");
     } if(valorDevido <= 0){
         ui->label_5->setStyleSheet("color: green");
+        query.prepare("UPDATE vendas2 SET esta_pago = 1 WHERE id = :valoridvenda");
+        query.bindValue(":valoridvenda", idVenda);
+        if(query.exec()){
+            qDebug() << "venda a prazo paga";
+        }
     }
     valorDevidoGlobal = portugues.toFloat(portugues.toString(valorDevido, 'f', 2));
 

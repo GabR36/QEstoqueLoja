@@ -21,19 +21,19 @@ Vendas::Vendas(QWidget *parent) :
         qDebug() << "erro ao abrir banco de dados. botao venda.";
     }
     // configuracao modelos e views tabelas vendas e produtosvendidos
-    modeloVendas2->setQuery("SELECT * FROM vendas2 ORDER BY id DESC");
+    modeloVendas2->setQuery("SELECT id, valor_final,forma_pagamento, data_hora, cliente, esta_pago, total, desconto, taxa, valor_recebido, troco FROM vendas2 ORDER BY id DESC");
     ui->Tview_Vendas2->setModel(modeloVendas2);
     modeloVendas2->setHeaderData(0, Qt::Horizontal, tr("ID"));
-    modeloVendas2->setHeaderData(1, Qt::Horizontal, tr("Cliente"));
-    modeloVendas2->setHeaderData(2, Qt::Horizontal, tr("Data e Hora"));
-    modeloVendas2->setHeaderData(3, Qt::Horizontal, tr("Total Produtos"));
-    modeloVendas2->setHeaderData(4, Qt::Horizontal, tr("Forma de Pagamento"));
-    modeloVendas2->setHeaderData(5, Qt::Horizontal, tr("Valor Recebido"));
-    modeloVendas2->setHeaderData(6, Qt::Horizontal, tr("Troco"));
-    modeloVendas2->setHeaderData(7, Qt::Horizontal, tr("Taxa"));
-    modeloVendas2->setHeaderData(8, Qt::Horizontal, tr("Valor Final"));
-    modeloVendas2->setHeaderData(9, Qt::Horizontal, tr("Desconto"));
-    modeloVendas2->setHeaderData(10, Qt::Horizontal, tr("Pago?"));
+    modeloVendas2->setHeaderData(1, Qt::Horizontal, tr("Valor Final"));
+    modeloVendas2->setHeaderData(2, Qt::Horizontal, tr("Forma Pag"));
+    modeloVendas2->setHeaderData(3, Qt::Horizontal, tr("Data e Hora"));
+    modeloVendas2->setHeaderData(4, Qt::Horizontal, tr("Cliente"));
+    modeloVendas2->setHeaderData(5, Qt::Horizontal, tr("Pago?"));
+    modeloVendas2->setHeaderData(6, Qt::Horizontal, tr("Total"));
+    modeloVendas2->setHeaderData(7, Qt::Horizontal, tr("Desconto"));
+    modeloVendas2->setHeaderData(8, Qt::Horizontal, tr("Taxa"));
+    modeloVendas2->setHeaderData(9, Qt::Horizontal, tr("Recebido"));
+    modeloVendas2->setHeaderData(10, Qt::Horizontal, tr("Troco"));
 
 
     modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
@@ -56,13 +56,17 @@ Vendas::Vendas(QWidget *parent) :
     connect(selectionModel, &QItemSelectionModel::selectionChanged,this, &Vendas::handleSelectionChange);
     // ajustar tamanho colunas
     // coluna data
-    ui->Tview_Vendas2->setColumnWidth(2, 150);
+    ui->Tview_Vendas2->setColumnWidth(3, 150);
+    ui->Tview_Vendas2->setColumnWidth(1, 90);
+
     // coluna cliente
-    ui->Tview_Vendas2->setColumnWidth(1, 100);
-    // coluna descricao
-    ui->Tview_Vendas2->setColumnWidth(4, 110);
-    ui->Tview_Vendas2->setColumnWidth(5, 100);
+      ui->Tview_Vendas2->setColumnWidth(2, 100);
+    ui->Tview_Vendas2->setColumnWidth(4, 175);
+    ui->Tview_Vendas2->setColumnWidth(5, 75);
+    ui->Tview_Vendas2->setColumnWidth(7, 100);
+
     ui->Tview_Vendas2->setColumnWidth(8, 80);
+      ui->Tview_Vendas2->setColumnWidth(9, 100);
     ui->Tview_ProdutosVendidos->setColumnWidth(0, 400);
     // coluna quantidade
     ui->Tview_ProdutosVendidos->setColumnWidth(1, 85);
@@ -120,7 +124,7 @@ void Vendas::atualizarTabelas(){
     }
 
 
-    modeloVendas2->setQuery("SELECT * FROM vendas2 ORDER BY id DESC");
+    modeloVendas2->setQuery("SELECT id, valor_final,forma_pagamento, data_hora, cliente, esta_pago, total, desconto, taxa, valor_recebido, troco FROM vendas2 ORDER BY id DESC");
 
     modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
 
@@ -354,7 +358,7 @@ void Vendas::filtrarData(QString de1, QString ate1){
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. filtrarData";
     }
-    modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery + " ORDER BY id DESC");
+    modeloVendas2->setQuery("SELECT id, valor_final,forma_pagamento, data_hora, cliente, esta_pago, total, desconto, taxa, valor_recebido, troco FROM vendas2 " + whereQuery + " ORDER BY id DESC");
     db.close();
     ui->Tview_Vendas2->selectionModel()->select(QModelIndex(modeloVendas2->index(0, 0)), QItemSelectionModel::Select);
 

@@ -604,7 +604,7 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
         query.bindValue(":valoridvenda", idVenda);
         int rowEntrada = 1;
         float devendoEntrada = valor_final.toFloat();
-
+        int xPosParcela = xPosValor - 70;
         if(query.exec()){
             while(query.next()){
                 QString totalEntrada = query.value("total").toString();
@@ -617,73 +617,112 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
                // QString descontoEntrada = query.value("desconto").toString();
                 xPos = 60;
                 yPos += 30;
+                for(int i=0; i < pageWidth; i++){
+                    posx += 3;
+                    painter.drawText(posx,yPos, "=");
+                };
                 font.setBold(true);
+                font.setUnderline(true);
                 painter.setFont(font);
                 painter.drawText(xPos, yPos, "Parcela: " + QString::number(rowEntrada));
                 yPos += 20;
-                xPos=20;
+                xPos=xPosPrm;
+                font.setUnderline(false);
                 font.setBold(false);
                 painter.setFont(font);
 
                     if(forma_pagamentoEntrada == "Dinheiro" ){
-                        painter.drawText(xPos, yPos, "Descontado(R$):" + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        font.setBold(true);
+                        painter.setFont(font);
+                        painter.drawText(xPos, yPos, "Descontado(R$): " + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        font.setBold(false);
+                        painter.setFont(font);
+                        xPos = xPosParcela;
+                        painter.drawText(xPos, yPos, "Data: " + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm"));
                         yPos += 20;
-                        painter.drawText(xPos, yPos, "Data:" + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm:ss"));
+                        xPos = xPosPrm;
+                        painter.drawText(xPos, yPos, "Forma Pag: " + forma_pagamentoEntrada);
+                        xPos = xPosParcela;
+                        painter.drawText(xPos, yPos, "Valor Rec.(R$): " + portugues2.toString(valor_recebidoEntrada.toFloat(),'f',2));
                         yPos += 20;
-                        painter.drawText(xPos, yPos, "Forma Pag:" + forma_pagamentoEntrada);
-                        yPos += 20;
-                        painter.drawText(xPos, yPos, "Valor Recebido(R$):" + portugues2.toString(valor_recebidoEntrada.toFloat(),'f',2));
-                        yPos += 20;
-                        painter.drawText(xPos,yPos, "Troco(R$):" + portugues2.toString(trocoEntrada.toFloat(),'f',2));
+                        painter.drawText(xPos,yPos, "Troco(R$): " + portugues2.toString(trocoEntrada.toFloat(),'f',2));
                     }else if(forma_pagamentoEntrada == "Não Sei"){
-
-                        painter.drawText(xPos, yPos, "Descontado(R$):" + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        font.setBold(true);
+                        painter.setFont(font);
+                        painter.drawText(xPos, yPos, "Descontado(R$): " + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        font.setBold(false);
+                        painter.setFont(font);
+                        xPos = xPosParcela;
+                        painter.drawText(xPos, yPos, "Data: " + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm"));
                         yPos += 20;
-                        painter.drawText(xPos, yPos, "data:" + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm:ss"));
+                        painter.drawText(xPos, yPos, "Forma Pag: " + forma_pagamentoEntrada);
                         yPos += 20;
-                        painter.drawText(xPos, yPos, "Forma Pag:" + forma_pagamentoEntrada);
+                    }else if(forma_pagamentoEntrada == "Crédito "){
+                        font.setBold(true);
+                        painter.setFont(font);
+                        painter.drawText(xPos, yPos, "Descontado(R$): " + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        font.setBold(false);
+                        painter.setFont(font);
+                        xPos = xPosParcela;
+                        painter.drawText(xPos, yPos, "Data: " + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm"));
                         yPos += 20;
-                    }else if(forma_pagamentoEntrada == "Crédito"){
-                        painter.drawText(xPos, yPos, "Descontado(R$):" + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        xPos = xPosPrm;
+                        painter.drawText(xPos, yPos, "Forma Pag: " + forma_pagamentoEntrada);
+                        xPos = xPosParcela;
+                        painter.drawText(xPos, yPos, "Taxa(%): " + portugues2.toString(taxaEntrada.toFloat(),'f',2));
                         yPos += 20;
-                        painter.drawText(xPos, yPos, "data:" + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm:ss"));
-                        yPos += 20;
-                        painter.drawText(xPos, yPos, "Forma Pag:" + forma_pagamentoEntrada);
-                        yPos += 20;
-                        painter.drawText(xPos, yPos, "Taxa(%):" + portugues2.toString(taxaEntrada.toFloat(),'f',2));
-                        yPos += 20;
-                        painter.drawText(xPos, yPos, "Valor Final(R$):" + portugues2.toString(valorFinalEntrada.toFloat(), 'f', 2 ));
+                        painter.drawText(xPos, yPos, "Valor Final(R$): " + portugues2.toString(valorFinalEntrada.toFloat(), 'f', 2 ));
 
                     }else if(forma_pagamentoEntrada == "Débito"){
-                        painter.drawText(xPos, yPos, "Descontado(R$):" + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        font.setBold(true);
+                        painter.setFont(font);
+                        painter.drawText(xPos, yPos, "Descontado(R$): " + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        font.setBold(false);
+                        painter.setFont(font);
+                        xPos = xPosParcela;
+                        painter.drawText(xPos, yPos, "Data: " + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm"));
                         yPos += 20;
-                        painter.drawText(xPos, yPos, "data:" + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm:ss"));
+                        xPos = xPosPrm;
+                        painter.drawText(xPos, yPos, "Forma Pag: " + forma_pagamentoEntrada);
+                        xPos = xPosParcela;
+                        painter.drawText(xPos, yPos, "Taxa(%): " + portugues2.toString(taxaEntrada.toFloat(),'f',2));
                         yPos += 20;
-                        painter.drawText(xPos, yPos, "Taxa(%):" + portugues2.toString(taxaEntrada.toFloat(),'f',2));
-                        yPos += 20;
-                        painter.drawText(xPos, yPos, "Valor Final(R$):" + portugues2.toString(valorFinalEntrada.toFloat(), 'f', 2 ));
+                        painter.drawText(xPos, yPos, "Valor Final(R$): " + portugues2.toString(valorFinalEntrada.toFloat(), 'f', 2 ));
 
                     }else if(forma_pagamentoEntrada == "Pix"){
-                        painter.drawText(xPos, yPos, "Descontado(R$):" + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        font.setBold(true);
+                        painter.setFont(font);
+                        painter.drawText(xPos, yPos, "Descontado(R$): " + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        font.setBold(false);
+                        painter.setFont(font);
+                        xPos = xPosParcela;
+                        painter.drawText(xPos, yPos, "Data: " + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm"));
                         yPos += 20;
-                        painter.drawText(xPos, yPos, "data:" + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm:ss"));
-                        yPos += 20;
+                        xPos = xPosPrm;
+                        painter.drawText(xPos, yPos, "Forma Pag: " + forma_pagamentoEntrada);
+
                     }else{
                         qDebug() << "forma de pagamentro entrada nao encontrada";
                     }
+                    for(int i=0; i < pageWidth; i++){
+                        posx += 3;
+                        painter.drawText(posx,yPos, "=");
+                    };
 
-                    yPos += 20;
+
                 devendoEntrada -= totalEntrada.toFloat();
                 rowEntrada++;
 
             }
             font.setBold(true);
+            font.setUnderline(true);
             painter.setFont(font);
-            xPos = xPosValor;
+            xPos = xPosParcela;
             yPos += 20;
             painter.drawText(xPos, yPos, "Devendo(R$):" + portugues2.toString(devendoEntrada,'f',2));
             yPos += 20;
             font.setBold(false);
+            font.setUnderline(false);
             painter.setFont(font);
 
 

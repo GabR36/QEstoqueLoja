@@ -191,7 +191,16 @@ void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSe
     QString productId = idVariant.toString();
     modeloProdVendidos->setQuery("SELECT produtos.descricao, produtos_vendidos.quantidade, produtos_vendidos.preco_vendido FROM produtos_vendidos JOIN produtos ON produtos_vendidos.id_produto = produtos.id WHERE id_venda = " + productId);
     ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
+    QVariant idVariant2 = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 2));
+    idVendaSelec = idVariant.toString();
+    QString FormaPagSelec = idVariant2.toString();
+    if(FormaPagSelec == "Prazo"){
+        ui->Btn_AbrirPag->setEnabled(true);
+    }else{
+            ui->Btn_AbrirPag->setEnabled(false);
+        }
     db.close();
+
 
 
 }
@@ -383,7 +392,7 @@ void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
 
         // Obtém o índice da célula na coluna 0 da linha selecionada
         QModelIndex columnIndex = ui->Tview_Vendas2->model()->index(selectedIndex.row(), 0);
-        QModelIndex columnIndex2 = ui->Tview_Vendas2->model()->index(selectedIndex.row(), 4);
+        QModelIndex columnIndex2 = ui->Tview_Vendas2->model()->index(selectedIndex.row(), 2);
 
         // Obtém o valor da célula como uma QString
          cellValue = ui->Tview_Vendas2->model()->data(columnIndex).toString();
@@ -755,29 +764,21 @@ void Vendas::imprimirReciboVendaSelec(QString id){
     imprimirReciboVenda(id);
 }
 
-
-void Vendas::on_testebutton_clicked()
-{
-    //imprimirEtiquetaVenda(ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->selectionModel()->selectedIndexes().first()).toString());
-    // QList<ProdutoVendido> produtos = getProdutosVendidos("85");
-    // for (const ProdutoVendido &produto : produtos) {
-    //     qDebug() << "ID Produto:" << produto.id_produto
-    //              << "Quantidade:" << produto.quantidade
-    //              << "Preço Vendido:" << produto.preco_vendido;
-    // }
-    // QStringList descricoes = getDescricoesProdutos(produtos);
-
-    // // Exibir as descrições dos produtos
-    // for (const QString &descricao : descricoes) {
-    //     qDebug() << "Descrição do Produto:" << descricao;
-    // }
-}
-
-
 void Vendas::on_cb_BuscaVendasPrazo_stateChanged(int arg1)
 
 {
 
     filtrarData(de, ate);
+}
+void Vendas::on_testebutton_clicked(){
+    //nao tirar
+}
+
+
+void Vendas::on_Btn_AbrirPag_clicked()
+{
+
+
+    actionAbrirPagamentosVenda(idVendaSelec);
 }
 

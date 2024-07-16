@@ -36,6 +36,11 @@ font-size: 15px;
 border-radius: 13px;
 
 }
+QPushButton:disabled{
+	
+	
+	background-color: rgb(154, 153, 150);
+}
 
 QPushButton:hover{
 	background-color: rgb(13, 92, 161);
@@ -92,7 +97,7 @@ background-color:rgb(170, 170, 170);
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>10</x>

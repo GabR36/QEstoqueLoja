@@ -48,6 +48,11 @@ font-size: 15px;
 border-radius: 13px;
 
 }
+QPushButton:disabled{
+	
+	
+	background-color: rgb(154, 153, 150);
+}
 
 QPushButton:hover{
 	background-color: rgb(13, 92, 161);
@@ -228,6 +233,34 @@ background-color:rgb(03,75,119);
          <width>25</width>
          <height>25</height>
         </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Btn_AbrirPag">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>150</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>Somente em Vendas a Prazo</string>
+       </property>
+       <property name="text">
+        <string>Abrir Pagamentos</string>
        </property>
       </widget>
      </item>

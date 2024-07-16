@@ -53,6 +53,8 @@ private slots:
 
     void on_cb_BuscaVendasPrazo_stateChanged(int arg1);
 
+    void on_Btn_AbrirPag_clicked();
+
 private:
     void LabelLucro();
     void LabelLucro(QString whereQuery);
@@ -65,6 +67,7 @@ private:
     QAction *actionAbrirPagamentos;
     QString de, ate;
     void Teste();
+    QString idVendaSelec;
 
 
 

@@ -9,6 +9,7 @@
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QPainter>
+#include "customdelegatevendaprazo.h"
 
 
 Vendas::Vendas(QWidget *parent) :
@@ -32,6 +33,8 @@ Vendas::Vendas(QWidget *parent) :
     modeloVendas2->setHeaderData(7, Qt::Horizontal, tr("Taxa"));
     modeloVendas2->setHeaderData(8, Qt::Horizontal, tr("Valor Final"));
     modeloVendas2->setHeaderData(9, Qt::Horizontal, tr("Desconto"));
+    modeloVendas2->setHeaderData(10, Qt::Horizontal, tr("Pago?"));
+
 
     modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
     ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
@@ -115,6 +118,8 @@ void Vendas::atualizarTabelas(){
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao venda.";
     }
+
+
     modeloVendas2->setQuery("SELECT * FROM vendas2 ORDER BY id DESC");
 
     modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
@@ -340,6 +345,8 @@ void Vendas::filtrarData(QString de1, QString ate1){
     QString whereQuery;
     if(ui->cb_BuscaVendasPrazo->isChecked()){
          whereQuery = QString("WHERE data_hora BETWEEN '%1' AND '%2' AND forma_pagamento = 'Prazo'").arg(de1, ate1);
+
+
     }else{
         whereQuery = QString("WHERE data_hora BETWEEN '%1' AND '%2'").arg(de1, ate1);
     }
@@ -350,6 +357,7 @@ void Vendas::filtrarData(QString de1, QString ate1){
     modeloVendas2->setQuery("SELECT * FROM vendas2 " + whereQuery + " ORDER BY id DESC");
     db.close();
     ui->Tview_Vendas2->selectionModel()->select(QModelIndex(modeloVendas2->index(0, 0)), QItemSelectionModel::Select);
+
 
 }
 void Vendas::actionAbrirPagamentosVenda(QString id_venda){
@@ -490,6 +498,8 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
 
 
 
+
+
     int yPos = 30; // Posição inicial para começar a desenhar o texto
     int xPos = 0;
     const int yPosPrm = 10; // Posição inicial para começar a desenhar o texto
@@ -515,7 +525,7 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
     painter.drawText(xPos, yPos, "Produtos vendidos:");
     int xPosValor = 202;
     xPos = xPosValor;
-    painter.drawText(xPos, yPos, "ValorUn(R$):");
+    painter.drawText(xPos, yPos, "Valor(R$):");
     yPos += 20;
 
     font.setPointSize(8);
@@ -543,7 +553,7 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
         painter.drawText(rectDesc, descricaoProduto, textOption);
 
         QRect rectValor(xPosValor, yPos, pageWidth - xPosValor, lineHeight);
-        painter.drawText(rectValor, portugues2.toString(valorProduto.toFloat(), 'f',2), textOption);
+        painter.drawText(rectValor, portugues2.toString(valorProduto.toFloat() * quantidadProduto.toInt(), 'f',2), textOption);
 
         yPos += lineHeight;
     }
@@ -553,8 +563,8 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
         posx += 3;
         painter.drawText(posx,yPos, "=");
     };
-    font.setBold(true);
-    painter.setFont(font);
+    // font.setBold(true);
+    // painter.setFont(font);
     yPos += 20;
     //    painter.drawText(Qt::AlignCenter,yPos, "Pagamento");
     xPos = 95;
@@ -564,6 +574,7 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
     yPos += 20;
     painter.drawText(xPos,yPos, "Valor Total Produtos(R$): " + portugues2.toString(total.toFloat(),'f',2));
     yPos += 20;
+
     if(forma_pagamento == "Dinheiro" ){
         painter.drawText(xPos, yPos, "Valor Recebido(R$):" + portugues2.toString(valor_recebido.toFloat(),'f',2));
         yPos += 20;
@@ -580,8 +591,105 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
         painter.drawText(xPos, yPos, "Valor Final(R$):" + portugues2.toString(valor_final.toFloat(), 'f', 2 ));
 
     }else if(forma_pagamento == "Pix"){
-    }
-    else{
+    }else if(forma_pagamento == "Prazo"){
+        posx = 0;
+        for(int i=0; i < pageWidth; i++){
+            posx += 3;
+            painter.drawText(posx,yPos, "=");
+        };
+        if(!db2.open()){
+            qDebug() <<"erro ao abrir banco de dados prazom impresao";
+        }
+        query.prepare("SELECT total, data_hora, forma_pagamento, valor_recebido, troco, taxa, valor_final, desconto FROM entradas_vendas WHERE id_venda = :valoridvenda");
+        query.bindValue(":valoridvenda", idVenda);
+        int rowEntrada = 1;
+        float devendoEntrada = valor_final.toFloat();
+
+        if(query.exec()){
+            while(query.next()){
+                QString totalEntrada = query.value("total").toString();
+                QDateTime data_horaEntrada = query.value("data_hora").toDateTime();
+                QString forma_pagamentoEntrada = query.value("forma_pagamento").toString();
+                QString valor_recebidoEntrada = query.value("valor_recebido").toString();
+                QString trocoEntrada = query.value("troco").toString();
+                QString taxaEntrada = query.value("taxa").toString();
+                QString valorFinalEntrada = query.value("valor_final").toString();
+               // QString descontoEntrada = query.value("desconto").toString();
+                xPos = 60;
+                yPos += 30;
+                font.setBold(true);
+                painter.setFont(font);
+                painter.drawText(xPos, yPos, "Parcela: " + QString::number(rowEntrada));
+                yPos += 20;
+                xPos=20;
+                font.setBold(false);
+                painter.setFont(font);
+
+                    if(forma_pagamentoEntrada == "Dinheiro" ){
+                        painter.drawText(xPos, yPos, "Descontado(R$):" + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        yPos += 20;
+                        painter.drawText(xPos, yPos, "Data:" + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm:ss"));
+                        yPos += 20;
+                        painter.drawText(xPos, yPos, "Forma Pag:" + forma_pagamentoEntrada);
+                        yPos += 20;
+                        painter.drawText(xPos, yPos, "Valor Recebido(R$):" + portugues2.toString(valor_recebidoEntrada.toFloat(),'f',2));
+                        yPos += 20;
+                        painter.drawText(xPos,yPos, "Troco(R$):" + portugues2.toString(trocoEntrada.toFloat(),'f',2));
+                    }else if(forma_pagamentoEntrada == "Não Sei"){
+
+                        painter.drawText(xPos, yPos, "Descontado(R$):" + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        yPos += 20;
+                        painter.drawText(xPos, yPos, "data:" + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm:ss"));
+                        yPos += 20;
+                        painter.drawText(xPos, yPos, "Forma Pag:" + forma_pagamentoEntrada);
+                        yPos += 20;
+                    }else if(forma_pagamentoEntrada == "Crédito"){
+                        painter.drawText(xPos, yPos, "Descontado(R$):" + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        yPos += 20;
+                        painter.drawText(xPos, yPos, "data:" + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm:ss"));
+                        yPos += 20;
+                        painter.drawText(xPos, yPos, "Forma Pag:" + forma_pagamentoEntrada);
+                        yPos += 20;
+                        painter.drawText(xPos, yPos, "Taxa(%):" + portugues2.toString(taxaEntrada.toFloat(),'f',2));
+                        yPos += 20;
+                        painter.drawText(xPos, yPos, "Valor Final(R$):" + portugues2.toString(valorFinalEntrada.toFloat(), 'f', 2 ));
+
+                    }else if(forma_pagamentoEntrada == "Débito"){
+                        painter.drawText(xPos, yPos, "Descontado(R$):" + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        yPos += 20;
+                        painter.drawText(xPos, yPos, "data:" + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm:ss"));
+                        yPos += 20;
+                        painter.drawText(xPos, yPos, "Taxa(%):" + portugues2.toString(taxaEntrada.toFloat(),'f',2));
+                        yPos += 20;
+                        painter.drawText(xPos, yPos, "Valor Final(R$):" + portugues2.toString(valorFinalEntrada.toFloat(), 'f', 2 ));
+
+                    }else if(forma_pagamentoEntrada == "Pix"){
+                        painter.drawText(xPos, yPos, "Descontado(R$):" + portugues2.toString(totalEntrada.toFloat(),'f',2));
+                        yPos += 20;
+                        painter.drawText(xPos, yPos, "data:" + portugues2.toString(data_horaEntrada, "dd/MM/yyyy hh:mm:ss"));
+                        yPos += 20;
+                    }else{
+                        qDebug() << "forma de pagamentro entrada nao encontrada";
+                    }
+
+                    yPos += 20;
+                devendoEntrada -= totalEntrada.toFloat();
+                rowEntrada++;
+
+            }
+            font.setBold(true);
+            painter.setFont(font);
+            xPos = xPosValor;
+            yPos += 20;
+            painter.drawText(xPos, yPos, "Devendo(R$):" + portugues2.toString(devendoEntrada,'f',2));
+            yPos += 20;
+            font.setBold(false);
+            painter.setFont(font);
+
+
+        }
+
+    }else{
         qDebug() << "forma de pagamento deu erro";
     }
 

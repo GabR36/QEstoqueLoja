@@ -413,6 +413,9 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
        <property name="contextMenuPolicy">
         <enum>Qt::CustomContextMenu</enum>
        </property>
+       <property name="inputMethodHints">
+        <set>Qt::ImhNone</set>
+       </property>
        <property name="alternatingRowColors">
         <bool>true</bool>
        </property>

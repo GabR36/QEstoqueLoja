@@ -9,7 +9,7 @@
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QPainter>
-#include "customdelegatevendaprazo.h"
+#include "customdelegate.h"
 
 
 Vendas::Vendas(QWidget *parent) :
@@ -53,6 +53,8 @@ Vendas::Vendas(QWidget *parent) :
     // Obter o modelo de seleção da tabela
     QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
     // Conectar o sinal de seleção ao slot personalizado
+    CustomDelegate *delegateContorno = new CustomDelegate(this);
+    ui->Tview_Vendas2->setItemDelegateForColumn(5,delegateContorno);
     connect(selectionModel, &QItemSelectionModel::selectionChanged,this, &Vendas::handleSelectionChange);
     // ajustar tamanho colunas
     // coluna data
@@ -99,6 +101,7 @@ Vendas::Vendas(QWidget *parent) :
     ui->DateEdt_Ate->setDate(dateRange.second);
 
     db.close();
+
     ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
 
 

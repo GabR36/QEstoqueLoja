@@ -30,7 +30,7 @@ venda::venda(QWidget *parent) :
     modeloProdutos->setHeaderData(5, Qt::Horizontal, tr("NF"));
 
     CustomDelegate *delegate = new CustomDelegate(this);
-    ui->Tview_Produtos->setItemDelegate(delegate);
+    ui->Tview_Produtos->setItemDelegateForColumn(1,delegate);
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     db.close();
     modeloSelecionados->setHorizontalHeaderItem(0, new QStandardItem("ID Produto"));

@@ -363,7 +363,7 @@ void MainWindow::atualizarTableview(){
         qDebug() << "erro ao abrir banco de dados. atualizarTableView";
     }
     CustomDelegate *delegate = new CustomDelegate(this);
-    ui->Tview_Produtos->setItemDelegate(delegate);
+    ui->Tview_Produtos->setItemDelegateForColumn(1,delegate);
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC");
     db.close();
 }

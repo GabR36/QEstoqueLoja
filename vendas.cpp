@@ -304,6 +304,15 @@ void Vendas::on_Btn_DeletarVenda_clicked()
                 qDebug() << "Erro no query UPDATE: ";
             }
         }
+        query.prepare("DELETE FROM entradas_vendas WHERE id_venda = :valor1");
+        query.bindValue(":valor1", productId);
+        if (query.exec()) {
+            qDebug() << "query delete entrada bem-sucedido!";
+        } else {
+            qDebug() << "Erro no delete entrada ";
+        }
+
+
 
 
         // deletar a venda

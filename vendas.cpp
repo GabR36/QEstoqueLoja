@@ -104,6 +104,9 @@ Vendas::Vendas(QWidget *parent) :
 
     ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
 
+    // ------ icons ----
+    QIcon deletar();
+
 
 }
 

@@ -5,7 +5,7 @@
 #include <QDateTime>
 #include <QMessageBox>
 #include "pagamentoaprazo.h"
-#include <QDoubleValidator>
+#include "mainwindow.h"
 
 
 EntradasVendasPrazo::EntradasVendasPrazo(QWidget *parent, QString id_venda)
@@ -57,6 +57,11 @@ EntradasVendasPrazo::EntradasVendasPrazo(QWidget *parent, QString id_venda)
     ui->label_2->setText("Valor Inicial da Venda: " + valorVenda);
     ui->label_3->setText("Data Inicial da Venda: "+ dataHoraVenda);
     ui->label_4->setText("Cliente: "+clienteVenda);
+    QModelIndex firstIndex = modeloEntradas->index(0, 0);                        //selecionar primeiro index quando abre
+    ui->tview_Entradas->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
+    // --icons
+    QIcon deletar(":/QEstoqueLOja/amarok-cart-remove.svg");
+    ui->btn_DeletarEntrada->setIcon(deletar);
 
 
     db.close();
@@ -75,7 +80,7 @@ void EntradasVendasPrazo::atualizarTabelaPag(){
     }
 
     QSqlQuery query;
-    query.prepare("SELECT total, data_hora, forma_pagamento, valor_final, troco, taxa, valor_recebido, desconto FROM entradas_vendas WHERE id_venda = :valoridvenda");
+    query.prepare("SELECT total, data_hora, forma_pagamento, valor_final, troco, taxa, valor_recebido, desconto, id FROM entradas_vendas WHERE id_venda = :valoridvenda");
     query.bindValue(":valoridvenda", idVenda);
 
     if (!query.exec()) {
@@ -133,6 +138,63 @@ void EntradasVendasPrazo::onPgmntFechado(){
         ui->btn_AddValor->setEnabled(false);
     }
     ui->ledit_AddValor->clear();
+
+}
+
+
+void EntradasVendasPrazo::on_btn_DeletarEntrada_clicked()
+{
+        if(ui->tview_Entradas->currentIndex().isValid()){
+            // obter id selecionado
+            QItemSelectionModel *selectionModel = ui->tview_Entradas->selectionModel();
+            QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+            QVariant idVariant = ui->tview_Entradas->model()->data(ui->tview_Entradas->model()->index(selectedIndex.row(), 8));
+            QVariant valorVariant = ui->tview_Entradas->model()->data(ui->tview_Entradas->model()->index(selectedIndex.row(), 0));
+
+            idEntradaSelec = idVariant.toString();
+            QString valorEntradaSelec = valorVariant.toString();
+
+            // Cria uma mensagem de confirmação
+            QMessageBox::StandardButton resposta;
+            resposta = QMessageBox::question(
+                nullptr,
+                "Confirmação",
+                "Tem certeza que deseja excluir a entrada:\n\n"
+                "id: " + idEntradaSelec + "\n"
+                                  "Valor total: " + valorEntradaSelec,
+                QMessageBox::Yes | QMessageBox::No
+                );
+            // Verifica a resposta do usuário
+            if (resposta == QMessageBox::Yes) {
+
+                // remover registro do banco de dados
+                if(!db.open()){
+                    qDebug() << "erro ao abrir banco de dados. botao deletar.";
+                }
+                QSqlQuery query;
+
+                query.prepare("DELETE FROM entradas_vendas WHERE id = :valor1");
+                query.bindValue(":valor1", idEntradaSelec);
+                if (query.exec()) {
+                    qDebug() << "query delete entrada bem-sucedido!";
+                } else {
+                    qDebug() << "Erro no delete entrada ";
+                }
+
+
+
+
+
+                atualizarTabelaPag();
+                db.close();
+            }
+            else {
+                // O usuário escolheu não deletar o produto
+                qDebug() << "A exclusão da entrada foi cancelada.";
+            }
+        }else{
+            QMessageBox::warning(this,"Erro","Selecione uma entrada antes de tentar deletar!");
+    }
 
 }
 

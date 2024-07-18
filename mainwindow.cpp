@@ -771,7 +771,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
         fontePainter.setBold(false);
         painter.setFont(fontePainter);
 
-        QRect codImageRect(155,ypos[0], 115,55);
+        QRect codImageRect(140,ypos[0], 100,43);
         painter.drawImage(codImageRect, codimage);
         for(int j = 0; j < 2; j++) {
             ypos[j] = ypos[j] + espacoEntreItens;

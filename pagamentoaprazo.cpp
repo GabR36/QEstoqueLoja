@@ -1,4 +1,5 @@
 #include "pagamentoaprazo.h"
+#include "vendas.h"
 
 pagamentoAPrazo::pagamentoAPrazo(QString id_venda, QString total, QString cliente, QString data, QWidget *parent)
     : pagamento(total, cliente, data, parent)
@@ -107,9 +108,11 @@ void pagamentoAPrazo::terminarPagamento()
     }
     // inserir os produtos da venda
 
-    // if(ui->CheckImprimirCNF->isChecked()){
-    //     Vendas::imprimirReciboVenda(idVenda);
-    // }
+    if(ui->CheckImprimirCNF->isChecked()){
+        Vendas::imprimirReciboVenda(idVenda);
+
+
+    }
 
     db.close();
 

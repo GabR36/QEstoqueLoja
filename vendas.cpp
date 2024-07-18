@@ -603,11 +603,16 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
     painter.drawText(xPos,yPos, "Valor Total Produtos(R$): " + portugues2.toString(total.toFloat(),'f',2));
     yPos += 20;
 
+
     if(forma_pagamento == "Dinheiro" ){
+        painter.drawText(xPos,yPos, "Valor Final(R$): " + portugues2.toString(valor_final.toFloat(),'f',2));
+        yPos += 20;
         painter.drawText(xPos, yPos, "Valor Recebido(R$):" + portugues2.toString(valor_recebido.toFloat(),'f',2));
         yPos += 20;
         painter.drawText(xPos,yPos, "Troco(R$):" + portugues2.toString(troco.toFloat(),'f',2));
     }else if(forma_pagamento == "Não Sei"){
+        painter.drawText(xPos,yPos, "Valor Final(R$): " + portugues2.toString(valor_final.toFloat(),'f',2));
+        yPos += 20;
     }else if(forma_pagamento == "Crédito"){
         painter.drawText(xPos, yPos, "Taxa(%):" + portugues2.toString(taxa.toFloat(),'f',2));
         yPos += 20;
@@ -619,7 +624,11 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
         painter.drawText(xPos, yPos, "Valor Final(R$):" + portugues2.toString(valor_final.toFloat(), 'f', 2 ));
 
     }else if(forma_pagamento == "Pix"){
+        painter.drawText(xPos,yPos, "Valor Final(R$): " + portugues2.toString(valor_final.toFloat(),'f',2));
+        yPos += 20;
     }else if(forma_pagamento == "Prazo"){
+        painter.drawText(xPos,yPos, "Valor Final(R$): " + portugues2.toString(valor_final.toFloat(),'f',2));
+        yPos += 20;
         posx = 0;
         for(int i=0; i < pageWidth; i++){
             posx += 3;
@@ -685,7 +694,7 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
                         yPos += 20;
                         painter.drawText(xPos, yPos, "Forma Pag: " + forma_pagamentoEntrada);
                         yPos += 20;
-                    }else if(forma_pagamentoEntrada == "Crédito "){
+                    }else if(forma_pagamentoEntrada == "Crédito"){
                         font.setBold(true);
                         painter.setFont(font);
                         painter.drawText(xPos, yPos, "Descontado(R$): " + portugues2.toString(totalEntrada.toFloat(),'f',2));

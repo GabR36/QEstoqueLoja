@@ -5,6 +5,7 @@
 #include "entradasvendasprazo.h"
 
 
+
 class pagamentoAPrazo : public pagamento
 {
     Q_OBJECT

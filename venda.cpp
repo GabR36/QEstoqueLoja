@@ -1,6 +1,6 @@
 #include "venda.h"
 #include "ui_venda.h"
-#include "customdelegate.h"
+#include "delegates/customdelegate.h"
 #include <QSqlQueryModel>
 #include <QSqlQuery>
 #include <QStandardItemModel>

@@ -9,8 +9,8 @@
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QPainter>
-#include "customdelegate.h"
-#include "delegatehora.h"
+#include "delegates/customdelegate.h"
+#include "delegates/delegatehora.h"
 #include "delegates/delegateprecof2.h"
 
 

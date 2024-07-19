@@ -9,9 +9,9 @@
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QPainter>
-#include "delegates/customdelegate.h"
-#include "delegates/delegatehora.h"
-#include "delegates/delegateprecof2.h"
+#include "customdelegate.h"
+#include "delegatehora.h"
+#include "delegateprecof2.h"
 
 
 Vendas::Vendas(QWidget *parent) :

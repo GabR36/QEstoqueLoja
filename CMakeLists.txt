@@ -60,11 +60,15 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         config.h config.cpp config.ui
         entradasvendasprazo.h entradasvendasprazo.cpp entradasvendasprazo.ui
         pagamentoaprazo.h pagamentoaprazo.cpp
-        delegates/delegateprecof2.h delegates/delegateprecof2.cpp
-        delegates/customdelegate.h delegates/customdelegate.cpp
-        delegates/delegatehora.h delegates/delegatehora.cpp
+        delegateprecof2.h delegateprecof2.cpp
+        customdelegate.h customdelegate.cpp
+        delegatehora.h delegatehora.cpp
         pagamentovenda.cpp
         pagamentovenda.h
+        delegateprecof2.cpp delegateprecof2.h
+        delegateprecof2.cpp delegateprecof2.h
+        delegateprecof2.cpp delegateprecof2.h
+        delegateprecof2.cpp delegateprecof2.h
 
 
 

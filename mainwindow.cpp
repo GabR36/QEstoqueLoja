@@ -6,7 +6,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QSqlQueryModel>
-#include "delegates/customdelegate.h"
+#include "customdelegate.h"
 #include "alterarproduto.h"
 #include "QItemSelectionModel"
 #include <qsqltablemodel.h>
@@ -20,7 +20,7 @@
 #include <QMenu>
 #include <QFontDatabase>
 #include <zint.h>
-#include "delegates/delegateprecof2.h"
+#include "delegateprecof2.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

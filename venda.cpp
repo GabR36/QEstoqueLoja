@@ -1,6 +1,6 @@
 #include "venda.h"
 #include "ui_venda.h"
-#include "delegates/customdelegate.h"
+#include "customdelegate.h"
 #include <QSqlQueryModel>
 #include <QSqlQuery>
 #include <QStandardItemModel>
@@ -9,7 +9,7 @@
 #include "pagamentovenda.h"
 #include <QDoubleValidator>
 #include <QMenu>
-#include "delegates/delegateprecof2.h"
+#include "delegateprecof2.h"
 
 
 

@@ -62,6 +62,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         entradasvendasprazo.h entradasvendasprazo.cpp entradasvendasprazo.ui
         pagamentoaprazo.h pagamentoaprazo.cpp
         pagamentovenda.h pagamentovenda.cpp
+        delegatehora.h delegatehora.cpp
 
 
 

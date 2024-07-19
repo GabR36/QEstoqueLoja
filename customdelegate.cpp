@@ -3,8 +3,8 @@
 
 CustomDelegate::CustomDelegate(QObject *parent) : QStyledItemDelegate(parent) {}
 
-void CustomDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
+
+void CustomDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     // Chama o método base para manter a aparência padrão
     QStyledItemDelegate::paint(painter, option, index);
 

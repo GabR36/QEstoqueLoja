@@ -10,6 +10,7 @@
 #include <QPrinter>
 #include <QPainter>
 #include "customdelegate.h"
+#include "delegatehora.h"
 
 
 Vendas::Vendas(QWidget *parent) :
@@ -54,7 +55,10 @@ Vendas::Vendas(QWidget *parent) :
     QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
     // Conectar o sinal de seleção ao slot personalizado
     CustomDelegate *delegateContorno = new CustomDelegate(this);
+    DelegateHora *delegateHora = new DelegateHora(this);
+
     ui->Tview_Vendas2->setItemDelegateForColumn(5,delegateContorno);
+    ui->Tview_Vendas2->setItemDelegateForColumn(3,delegateHora);
     connect(selectionModel, &QItemSelectionModel::selectionChanged,this, &Vendas::handleSelectionChange);
     // ajustar tamanho colunas
     // coluna data
@@ -105,7 +109,6 @@ Vendas::Vendas(QWidget *parent) :
     ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
 
     // ------ icons ----
-    QIcon deletar();
 
 
 }

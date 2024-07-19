@@ -11,6 +11,7 @@
 #include <QPainter>
 #include "customdelegate.h"
 #include "delegatehora.h"
+#include "delegatepago.h"
 #include "delegateprecof2.h"
 
 
@@ -57,12 +58,13 @@ Vendas::Vendas(QWidget *parent) :
     // Conectar o sinal de seleção ao slot personalizado
 
     // -- delegates
-    CustomDelegate *delegateContorno = new CustomDelegate(this);
+    DelegatePago *delegatePago = new DelegatePago(this);
+ //   CustomDelegate *delegateContorno = new CustomDelegate(this);
     DelegateHora *delegateHora = new DelegateHora(this);
     DelegatePrecoF2 *delegatepreco = new DelegatePrecoF2(this);
 
     ui->Tview_Vendas2->setItemDelegateForColumn(1,delegatepreco);
-    ui->Tview_Vendas2->setItemDelegateForColumn(5,delegateContorno);
+    ui->Tview_Vendas2->setItemDelegateForColumn(5,delegatePago);
     ui->Tview_Vendas2->setItemDelegateForColumn(3,delegateHora);
     ui->Tview_ProdutosVendidos->setItemDelegateForColumn(2, delegatepreco);
     connect(selectionModel, &QItemSelectionModel::selectionChanged,this, &Vendas::handleSelectionChange);

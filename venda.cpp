@@ -9,6 +9,7 @@
 #include "pagamentovenda.h"
 #include <QDoubleValidator>
 #include <QMenu>
+#include "delegates/delegateprecof2.h"
 
 
 
@@ -29,8 +30,14 @@ venda::venda(QWidget *parent) :
     modeloProdutos->setHeaderData(4, Qt::Horizontal, tr("Código de Barras"));
     modeloProdutos->setHeaderData(5, Qt::Horizontal, tr("NF"));
 
-    CustomDelegate *delegate = new CustomDelegate(this);
-    ui->Tview_Produtos->setItemDelegateForColumn(1,delegate);
+    // -- delegates
+    DelegatePrecoF2 *delegatePreco = new DelegatePrecoF2(this);
+    CustomDelegate *delegateVermelho = new CustomDelegate(this);
+    ui->Tview_Produtos->setItemDelegateForColumn(1,delegateVermelho);
+    ui->Tview_Produtos->setItemDelegateForColumn(3, delegatePreco);
+   // ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(3, delegatePreco);
+    // --
+
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     db.close();
     modeloSelecionados->setHorizontalHeaderItem(0, new QStandardItem("ID Produto"));

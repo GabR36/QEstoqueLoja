@@ -766,7 +766,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
             };
         }
 
-        QRect descRect(0,ypos[0],145,34);
+        QRect descRect(0,ypos[0],145,32);
         QFont fontePainter = painter.font();
         fontePainter.setPointSize(10);
         painter.setFont(fontePainter);
@@ -777,7 +777,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
         fontePainter.setBold(false);
         painter.setFont(fontePainter);
 
-        QRect codImageRect(140,ypos[0], 100,43);
+        QRect codImageRect(140,ypos[0], 108,50);
         painter.drawImage(codImageRect, codimage);
         for(int j = 0; j < 2; j++) {
             ypos[j] = ypos[j] + espacoEntreItens;

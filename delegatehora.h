@@ -3,6 +3,7 @@
 #include <QStyledItemDelegate>
 #include <QDateTime>
 #include <QLocale>
+#include "delegates/delegateprecof2.h"
 
 class DelegateHora : public QStyledItemDelegate
 {

@@ -11,6 +11,7 @@
 #include <QPainter>
 #include "customdelegate.h"
 #include "delegatehora.h"
+#include "delegates/delegateprecof2.h"
 
 
 Vendas::Vendas(QWidget *parent) :
@@ -54,11 +55,16 @@ Vendas::Vendas(QWidget *parent) :
     // Obter o modelo de seleção da tabela
     QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
     // Conectar o sinal de seleção ao slot personalizado
+
+    // -- delegates
     CustomDelegate *delegateContorno = new CustomDelegate(this);
     DelegateHora *delegateHora = new DelegateHora(this);
+    DelegatePrecoF2 *delegatepreco = new DelegatePrecoF2(this);
 
+    ui->Tview_Vendas2->setItemDelegateForColumn(1,delegatepreco);
     ui->Tview_Vendas2->setItemDelegateForColumn(5,delegateContorno);
     ui->Tview_Vendas2->setItemDelegateForColumn(3,delegateHora);
+    ui->Tview_ProdutosVendidos->setItemDelegateForColumn(2, delegatepreco);
     connect(selectionModel, &QItemSelectionModel::selectionChanged,this, &Vendas::handleSelectionChange);
     // ajustar tamanho colunas
     // coluna data
@@ -264,9 +270,9 @@ void Vendas::on_Btn_DeletarVenda_clicked()
     QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
     QVariant idVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 0));
-    QVariant valorVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 3));
+    QVariant valorVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 1));
     QString productId = idVariant.toString();
-    QString productValor = valorVariant.toString();
+    QString productValor = portugues.toString(valorVariant.toFloat(), 'f', 2);
 
     // Cria uma mensagem de confirmação
     QMessageBox::StandardButton resposta;

@@ -20,6 +20,7 @@
 #include <QMenu>
 #include <QFontDatabase>
 #include <zint.h>
+#include "delegates/delegateprecof2.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -348,6 +349,13 @@ MainWindow::MainWindow(QWidget *parent)
     actionMenuPrintBarCode3 = new QAction(this);
     actionMenuPrintBarCode3->setText("3 Etiquetas");
     connect(actionMenuPrintBarCode3,SIGNAL(triggered(bool)),this, SLOT(imprimirEtiqueta3()));
+    // -- delegates --
+    DelegatePrecoF2 *delegatePreco = new DelegatePrecoF2(this);
+    ui->Tview_Produtos->setItemDelegateForColumn(3,delegatePreco);
+    CustomDelegate *delegateVermelho = new CustomDelegate(this);
+    ui->Tview_Produtos->setItemDelegateForColumn(1,delegateVermelho);
+
+
 
 
 
@@ -362,8 +370,6 @@ void MainWindow::atualizarTableview(){
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. atualizarTableView";
     }
-    CustomDelegate *delegate = new CustomDelegate(this);
-    ui->Tview_Produtos->setItemDelegateForColumn(1,delegate);
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC");
     db.close();
 }

@@ -63,6 +63,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         pagamentoaprazo.h pagamentoaprazo.cpp
         pagamentovenda.h pagamentovenda.cpp
         delegatehora.h delegatehora.cpp
+        delegates/delegateprecof2.h delegates/delegateprecof2.cpp
 
 
 

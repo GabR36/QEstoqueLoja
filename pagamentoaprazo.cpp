@@ -1,4 +1,5 @@
 #include "pagamentoaprazo.h"
+#include "vendas.h"
 
 pagamentoAPrazo::pagamentoAPrazo(QString id_venda, QString total, QString cliente, QString data, QWidget *parent)
     : pagamento(total, cliente, data, parent)
@@ -6,6 +7,8 @@ pagamentoAPrazo::pagamentoAPrazo(QString id_venda, QString total, QString client
     idVenda = id_venda;
     //deixar a forma de pagamento a prazo inacessivel
     ui->CBox_FormaPagamento->removeItem(5);
+    ui->Ledit_Desconto->setVisible(false);
+    ui->label_9->setVisible(false);
 }
 
 pagamentoAPrazo::~pagamentoAPrazo()
@@ -105,9 +108,11 @@ void pagamentoAPrazo::terminarPagamento()
     }
     // inserir os produtos da venda
 
-    // if(ui->CheckImprimirCNF->isChecked()){
-    //     Vendas::imprimirReciboVenda(idVenda);
-    // }
+    if(ui->CheckImprimirCNF->isChecked()){
+        Vendas::imprimirReciboVenda(idVenda);
+
+
+    }
 
     db.close();
 

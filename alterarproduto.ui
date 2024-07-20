@@ -51,6 +51,11 @@ font-size: 15px;
 border-radius: 13px;
 
 }
+QPushButton:disabled{
+	
+	
+	background-color: rgb(154, 153, 150);
+}
 
 QPushButton:hover{
 	background-color: rgb(13, 92, 161);

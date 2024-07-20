@@ -25,6 +25,8 @@ private slots:
 
     void onPgmntFechado();
 
+    void on_btn_DeletarEntrada_clicked();
+
 private:
     Ui::EntradasVendasPrazo *ui;
     QLocale portugues;
@@ -32,6 +34,7 @@ private:
     QString idVenda, valorVenda, dataHoraVenda, clienteVenda;
     float valor_Venda;
     QSqlQueryModel *modeloEntradas = new QSqlQueryModel;
+    QString idEntradaSelec; //id global da entrada selecionada da tabela
 
 
 

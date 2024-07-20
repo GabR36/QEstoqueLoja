@@ -36,6 +36,10 @@ void pagamentoVenda::terminarPagamento(){
     if (!menorQueTotal){
         conversionOkDesconto = false;
     }
+    if(forma_pagamento == "Prazo" && clienteGlobal.isEmpty()){
+        QMessageBox::warning(this,"Erro", "Especifique um cliente para vender à prazo!");
+        return;
+    };
     qDebug() << conversionOkDesconto;
     if (!conversionOkDesconto){
         // algo deu errado na conversao, desconto nao validado
@@ -76,8 +80,15 @@ void pagamentoVenda::terminarPagamento(){
         QMessageBox::warning(this, "Erro", "Por favor, insira uma taxa válida.");
         return;
     }
+    if(forma_pagamento == "Prazo"){
+        query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco, taxa, valor_final, desconto, esta_pago) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, :valor8, :valor9, 0)");
 
-    query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco, taxa, valor_final, desconto) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, :valor8, :valor9)");
+    }else{
+        query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco, taxa, valor_final, desconto, esta_pago) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, :valor8, :valor9, 1)");
+
+    }
+
+   // query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco, taxa, valor_final, desconto) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, :valor8, :valor9)");
     query.bindValue(":valor1", clienteGlobal);
     // precisa converter para notacao usa para inserir no banco de dados
     query.bindValue(":valor2", QString::number(portugues.toFloat(totalGlobal)));

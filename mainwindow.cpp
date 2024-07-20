@@ -20,6 +20,7 @@
 #include <QMenu>
 #include <QFontDatabase>
 #include <zint.h>
+#include "delegateprecof2.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -248,6 +249,27 @@ MainWindow::MainWindow(QWidget *parent)
                     db.rollback();
                 }
             }
+            if(!query.exec("ALTER TABLE vendas2 ADD COLUMN esta_pago BOOLEAN DEFAULT 1")){
+                qDebug() << "erro ao adicionar coluna estapago";
+            }
+
+            if (!query.exec("SELECT id FROM vendas2")) {
+                qDebug() << "Erro ao executar a consulta SQL:" << query.lastError().text();
+            }
+            // Iterar sobre os resultados da consulta
+            while (query.next()) {
+                int id = query.value(0).toInt();
+               // bool esta_pago = query.value(1).toInt();
+
+                QSqlQuery updateQuery;
+                updateQuery.prepare("UPDATE vendas2 SET esta_pago = 1 WHERE id = :id");
+                updateQuery.bindValue(":id", id);
+
+                if (!updateQuery.exec()) {
+                    qDebug() << "Erro ao atualizar estapago do venda:" << updateQuery.lastError().text();
+                    db.rollback();
+                }
+            }
 
             // mudar a versao para 3
             query.exec("PRAGMA user_version = 3");
@@ -327,6 +349,13 @@ MainWindow::MainWindow(QWidget *parent)
     actionMenuPrintBarCode3 = new QAction(this);
     actionMenuPrintBarCode3->setText("3 Etiquetas");
     connect(actionMenuPrintBarCode3,SIGNAL(triggered(bool)),this, SLOT(imprimirEtiqueta3()));
+    // -- delegates --
+    DelegatePrecoF2 *delegatePreco = new DelegatePrecoF2(this);
+    ui->Tview_Produtos->setItemDelegateForColumn(3,delegatePreco);
+    CustomDelegate *delegateVermelho = new CustomDelegate(this);
+    ui->Tview_Produtos->setItemDelegateForColumn(1,delegateVermelho);
+
+
 
 
 
@@ -341,8 +370,6 @@ void MainWindow::atualizarTableview(){
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. atualizarTableView";
     }
-    CustomDelegate *delegate = new CustomDelegate(this);
-    ui->Tview_Produtos->setItemDelegate(delegate);
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC");
     db.close();
 }
@@ -739,7 +766,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
             };
         }
 
-        QRect descRect(0,ypos[0],145,34);
+        QRect descRect(0,ypos[0],145,32);
         QFont fontePainter = painter.font();
         fontePainter.setPointSize(10);
         painter.setFont(fontePainter);
@@ -750,7 +777,7 @@ void MainWindow::imprimirEtiqueta(int quant, QString codBar, QString desc, QStri
         fontePainter.setBold(false);
         painter.setFont(fontePainter);
 
-        QRect codImageRect(155,ypos[0], 115,55);
+        QRect codImageRect(140,ypos[0], 108,50);
         painter.drawImage(codImageRect, codimage);
         for(int j = 0; j < 2; j++) {
             ypos[j] = ypos[j] + espacoEntreItens;

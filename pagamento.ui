@@ -144,7 +144,7 @@ background-color:rgb(170, 170, 170);
       </item>
       <item>
        <property name="text">
-        <string>A Prazo</string>
+        <string>Prazo</string>
        </property>
        <property name="icon">
         <iconset resource="Imagens/recursosImg.qrc">
@@ -431,17 +431,18 @@ font-size: 15px;
   <widget class="QCheckBox" name="CheckImprimirCNF">
    <property name="geometry">
     <rect>
-     <x>410</x>
-     <y>420</y>
+     <x>419</x>
+     <y>401</y>
      <width>131</width>
-     <height>31</height>
+     <height>41</height>
     </rect>
    </property>
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Imprimir cupom </string>
+    <string>Imprimir 
+cupom </string>
    </property>
    <property name="icon">
     <iconset resource="Imagens/recursosImg.qrc">

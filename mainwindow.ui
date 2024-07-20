@@ -577,7 +577,7 @@ background-color:rgb(03,75,119);
            </size>
           </property>
           <property name="placeholderText">
-           <string>Pesquisar por descrição ou código de barras</string>
+           <string>  Pesquisar por descrição ou código de barras</string>
           </property>
          </widget>
         </item>

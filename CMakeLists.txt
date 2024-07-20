@@ -56,12 +56,22 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Imagens/recursosImg.qrc
         relatorios.h relatorios.cpp relatorios.ui
         pagamento.h pagamento.cpp pagamento.ui
-        customdelegate.h customdelegate.cpp
 
         config.h config.cpp config.ui
         entradasvendasprazo.h entradasvendasprazo.cpp entradasvendasprazo.ui
         pagamentoaprazo.h pagamentoaprazo.cpp
-        pagamentovenda.h pagamentovenda.cpp
+        delegateprecof2.h delegateprecof2.cpp
+        customdelegate.h customdelegate.cpp
+        delegatehora.h delegatehora.cpp
+        pagamentovenda.cpp
+        pagamentovenda.h
+        delegateprecof2.cpp delegateprecof2.h
+        delegateprecof2.cpp delegateprecof2.h
+        delegateprecof2.cpp delegateprecof2.h
+        delegateprecof2.cpp delegateprecof2.h
+        delegatepago.h delegatepago.cpp
+
+
 
 
     )

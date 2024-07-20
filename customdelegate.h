@@ -2,6 +2,7 @@
 #define CUSTOMDELEGATE_H
 
 #include <QStyledItemDelegate>
+#include <QLocale>
 
 class CustomDelegate : public QStyledItemDelegate {
 public:

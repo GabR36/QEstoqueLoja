@@ -27,7 +27,8 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgb
 
 }
 QLabel{
-	font: 700 12pt &quot;DejaVu Sans Mono&quot;;
+	font: 700 10pt &quot;DejaVu Sans Mono&quot;;
+
 }
 QPushButton{
 background-color: rgb(43, 132, 191);
@@ -88,6 +89,8 @@ background-color:rgb(170, 170, 170);
      </property>
      <property name="styleSheet">
       <string notr="true">background-color: rgb(35, 125, 185);
+	font: 700 12pt &quot;DejaVu Sans Mono&quot;;
+
 
 </string>
      </property>
@@ -197,7 +200,7 @@ background-color:rgb(170, 170, 170);
          <property name="font">
           <font>
            <family>DejaVu Sans Mono</family>
-           <pointsize>12</pointsize>
+           <pointsize>10</pointsize>
            <italic>false</italic>
            <bold>true</bold>
           </font>

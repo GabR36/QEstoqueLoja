@@ -82,27 +82,29 @@ void EntradasVendasPrazo::atualizarTabelaPag(){
     QSqlQuery query;
     query.prepare("SELECT total, data_hora, forma_pagamento, valor_final, troco, taxa, valor_recebido, desconto, id FROM entradas_vendas WHERE id_venda = :valoridvenda");
     query.bindValue(":valoridvenda", idVenda);
-
+    float valorDevido = valor_Venda;
     if (!query.exec()) {
         qDebug() << "Erro ao executar consulta";
         db.close();
         return;
     }
+    while(query.next()){
+         valorDevido -= query.value("total").toFloat();
+    }
+
 
     // Atualizar o modelo para a QTableView
     modeloEntradas->setQuery(query);
 
 
-    float valorDevido = valor_Venda;
-    for (int i = 0; i < modeloEntradas->rowCount(); ++i) {
-        float valorRecebido = modeloEntradas->data(modeloEntradas->index(i, 0)).toFloat();
-        valorDevido -= valorRecebido;
-    }
-
-
     ui->label_5->setText("Devendo: R$" + portugues.toString(valorDevido, 'f', 2));
     if (valorDevido > 0) {
         ui->label_5->setStyleSheet("color: red");
+        query.prepare("UPDATE vendas2 SET esta_pago = 0 WHERE id = :valoridvenda");
+        query.bindValue(":valoridvenda", idVenda);
+        if(query.exec()){
+            qDebug() << "venda a prazo nao paga";
+        }
     } if(valorDevido <= 0){
         ui->label_5->setStyleSheet("color: green");
         query.prepare("UPDATE vendas2 SET esta_pago = 1 WHERE id = :valoridvenda");
@@ -111,17 +113,24 @@ void EntradasVendasPrazo::atualizarTabelaPag(){
             qDebug() << "venda a prazo paga";
         }
     }
-    valorDevidoGlobal = portugues.toFloat(portugues.toString(valorDevido, 'f', 2));
+    valorDevidoGlobal = valorDevido;
 
     db.close();
+    if(valorDevido <= 0) {
+        ui->btn_AddValor->setEnabled(false);
+    }else{
+         ui->btn_AddValor->setEnabled(true);
+    }
+
 }
 
 
 void EntradasVendasPrazo::on_btn_AddValor_clicked()
 {
+    float valorInseridoIngles = ui->ledit_AddValor->text().toFloat();
     float valorInserido = portugues.toFloat(ui->ledit_AddValor->text());
     // se tiver algo a dever e o valor informado for menor ou igual ao valor devido
-    if ((valorDevidoGlobal > 0) && (valorInserido <= valorDevidoGlobal)) {
+    if ((valorDevidoGlobal > 0) && (valorInseridoIngles <= valorDevidoGlobal)) {
 
         pagamentoAPrazo *pgmntPrazo= new pagamentoAPrazo(idVenda, portugues.toString(valorInserido, 'f', 2), clienteVenda, portugues.toString(QDateTime::currentDateTime(), "yyyy-MM-dd hh:mm:ss"));
         connect(pgmntPrazo, &QObject::destroyed, this, &EntradasVendasPrazo::onPgmntFechado);
@@ -134,9 +143,7 @@ void EntradasVendasPrazo::onPgmntFechado(){
     qDebug() << "atualizarTAbelaPag?";
     atualizarTabelaPag();
 
-    if(valorDevidoGlobal <= 0) {
-        ui->btn_AddValor->setEnabled(false);
-    }
+
     ui->ledit_AddValor->clear();
 
 }

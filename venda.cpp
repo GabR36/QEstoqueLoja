@@ -302,39 +302,13 @@ void venda::on_Btn_Aceitar_clicked()
         rowDataList.append(rowData);
     }
     qDebug() << rowDataList;
-    // validar preço e quantidade
-    bool erro = false;
-    for (const QList<QVariant> &rowdata : rowDataList) {
-        QString preco = rowdata[3].toString();
-        QString quant = rowdata[1].toString();
 
-        // Converta o texto para um número
-        bool conversionOk, conversionOkQuant;
-        double price = portugues.toDouble(preco, &conversionOk);
-        int quantINT = portugues.toFloat(quant, &conversionOkQuant);
+    QString cliente = ui->Ledit_Cliente->text();
+    QString data =  portugues.toString(ui->DateEdt_Venda->dateTime(), "dd-MM-yyyy hh:mm:ss");
 
-        // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
-        if (!(conversionOk && price >= 0) || !(conversionOkQuant && quantINT > 0))
-        {
-            erro = true;
-        }
-    }
-    qDebug() << "Erro = ";
-    qDebug() << erro;
-    if (!erro){
-        // se nao tiver erro na validaçao, prossiga
-        QString cliente = ui->Ledit_Cliente->text();
-        QString data =  portugues.toString(ui->DateEdt_Venda->dateTime(), "dd-MM-yyyy hh:mm:ss");
-
-        pagamentoVenda *pagamento = new pagamentoVenda(rowDataList, this, Total(), cliente, data);
-        pagamento->setWindowModality(Qt::ApplicationModal);
-        pagamento->show();
-    }
-    else {
-        // Exiba uma mensagem de erro se o preço ou a quantidade não for válido
-        QMessageBox::warning(this, "Erro", "Por favor, insira preços e/ou quantidades válidas.");
-    }
-
+    pagamentoVenda *pagamento = new pagamentoVenda(rowDataList, this, Total(), cliente, data);
+    pagamento->setWindowModality(Qt::ApplicationModal);
+    pagamento->show();
 }
 
 QString venda::Total(){

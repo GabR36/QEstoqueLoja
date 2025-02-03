@@ -58,8 +58,13 @@ void relatorios::on_Btn_PdfGen_clicked()
         QString data4 = query.value(3).toString(); // preco
 
         // double preco = portugues.toDouble(data4.toString());
-        float valueData4 = data4.toDouble() * data2.toFloat(); // Converte o valor para double
-        sumData4 += valueData4; // Adiciona o valor à soma total
+        float soma;
+        if(data2.toFloat() < 0){
+            soma = data4.toDouble() * 0;
+        }else{
+            soma = data4.toDouble() * data2.toFloat(); // Converte o valor para double
+        }
+        sumData4 += soma; // Adiciona o valor à soma total
 
 
         ++row2;

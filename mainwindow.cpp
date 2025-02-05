@@ -660,11 +660,11 @@ bool MainWindow::verificarCodigoBarras(){
     if (barrasExiste){
         // codigo de barras existe, mostrar mensagem e
         // mostrar registro na tabela
-        QMessageBox::warning(this, "Erro", "Esse código de barras já foi registrado.");
+        QMessageBox::warning(this, "Erro", "Esse código de barras já foi registrado.\n" + barrasProduto );
         if(!db.open()){
             qDebug() << "erro ao abrir banco de dados. codigo de barras existente";
         }
-        model->setQuery("SELECT * FROM produtos WHERE codigo_barras = " + barrasProduto);
+        model->setQuery("SELECT * FROM produtos WHERE codigo_barras = '" + barrasProduto + "'");
         db.close();
         return true;
     }

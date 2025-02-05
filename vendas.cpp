@@ -222,17 +222,30 @@ void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSe
 
 }
 
-void Vendas::LabelLucro(QString whereQuery){
+void Vendas::LabelLucro(QString whereQueryData, QString whereQueryPrazo){
     // colocar valores nos labels de lucro etc
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. labelLucro";
     }
+    QString whereQuery = whereQueryData + whereQueryPrazo;
     QSqlQuery query;
     float total = 0;
     int quantidadeVendas = 0;
-    if (query.exec("SELECT SUM(valor_final) FROM vendas2 " + whereQuery)) {
+    // SUM(total - desconto)
+    if (query.exec("SELECT id, total, desconto, forma_pagamento FROM vendas2 " + whereQuery)) {
         while (query.next()) {
-            total = query.value(0).toFloat();
+            if (query.value(3).toString() == "Prazo"){
+                // caso seja a prazo, somar as entradas da venda ao inves to total
+                QSqlQuery queryEntradas;
+                queryEntradas.exec("SELECT total, desconto FROM entradas_vendas " + whereQueryData + " AND id_venda = " + query.value(0).toString());
+                while(queryEntradas.next()){
+                    qDebug() << "debug cont: " + queryEntradas.value(0).toString() + " " + queryEntradas.value(1).toString();
+                    total += queryEntradas.value(0).toFloat() - queryEntradas.value(1).toFloat();
+                }
+            }
+            else{
+                total += query.value(1).toFloat() - query.value(2).toFloat();
+            }
         }
     }
     if (query.exec("SELECT COUNT(*) FROM vendas2 " + whereQuery)) {
@@ -259,10 +272,10 @@ void Vendas::LabelLucro(QString whereQuery){
     db.close();
 }
 
-void Vendas::LabelLucro(){
-    // para ser chamada sem argumentos
-    LabelLucro(QString());
-}
+// void Vendas::LabelLucro(){
+//     // para ser chamada sem argumentos
+//     LabelLucro(QString());
+// }
 
 
 void Vendas::on_Btn_DeletarVenda_clicked()
@@ -381,18 +394,19 @@ void Vendas::on_DateEdt_Ate_dateChanged(const QDate &date)
 }
 
 void Vendas::filtrarData(QString de1, QString ate1){
-    QString whereQuery;
+    QString whereQueryData;
+    QString whereQueryPrazo;
     if(ui->cb_BuscaVendasPrazo->isChecked()){
-         whereQuery = QString("WHERE data_hora BETWEEN '%1' AND '%2' AND forma_pagamento = 'Prazo'").arg(de1, ate1);
-
-
-    }else{
-        whereQuery = QString("WHERE data_hora BETWEEN '%1' AND '%2'").arg(de1, ate1);
+        whereQueryPrazo =  " AND forma_pagamento = 'Prazo'";
     }
-    LabelLucro(whereQuery);
+    whereQueryData = QString("WHERE data_hora BETWEEN '%1' AND '%2'").arg(de1, ate1);
+    QString whereQuery = whereQueryData + whereQueryPrazo;
+
+    LabelLucro(whereQueryData, whereQueryPrazo);
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. filtrarData";
     }
+    qDebug() << "wherequery2: >" + whereQuery;
     modeloVendas2->setQuery("SELECT id, valor_final,forma_pagamento, data_hora, cliente, esta_pago, total, desconto, taxa, valor_recebido, troco FROM vendas2 " + whereQuery + " ORDER BY id DESC");
     db.close();
     ui->Tview_Vendas2->selectionModel()->select(QModelIndex(modeloVendas2->index(0, 0)), QItemSelectionModel::Select);

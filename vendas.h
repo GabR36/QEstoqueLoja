@@ -55,6 +55,8 @@ private slots:
 
     void on_Btn_AbrirPag_clicked();
 
+    void on_Tview_ProdutosVendidos_customContextMenuRequested(const QPoint &pos);
+
 private:
     void LabelLucro();
     void LabelLucro(QString whereQuery);
@@ -65,12 +67,11 @@ private:
     QAction *actionMenuDeletarVenda;
     QAction *actionImprimirRecibo;
     QAction *actionAbrirPagamentos;
+    QAction *actionMenuDevolverProd;
     QString de, ate;
     void Teste();
     QString idVendaSelec;
-
-
-
+    void devolverProduto(QString id_venda, QString id_prod_vend);
 };
 
 #endif // VENDAS_H

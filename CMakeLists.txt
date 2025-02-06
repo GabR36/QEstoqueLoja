@@ -70,6 +70,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         delegateprecof2.cpp delegateprecof2.h
         delegateprecof2.cpp delegateprecof2.h
         delegatepago.h delegatepago.cpp
+        util/pdfexporter.h util/pdfexporter.cpp
 
 
 

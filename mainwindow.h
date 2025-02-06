@@ -90,6 +90,7 @@ private:
     QAction* actionMenuPrintBarCode1;
     QAction* actionMenuPrintBarCode3;
 
+    void setarIconesJanela();
     //QModelIndex selected_index;
 
 protected:

@@ -41,9 +41,12 @@ Vendas::Vendas(QWidget *parent) :
 
     modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
     ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
-    modeloProdVendidos->setHeaderData(0, Qt::Horizontal, tr("Descrição"));
-    modeloProdVendidos->setHeaderData(1, Qt::Horizontal, tr("Quantidade"));
-    modeloProdVendidos->setHeaderData(2, Qt::Horizontal, tr("Preço Vendido"));
+    // esconder id produto_vendido
+    ui->Tview_ProdutosVendidos->hideColumn(0);
+    modeloProdVendidos->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    modeloProdVendidos->setHeaderData(1, Qt::Horizontal, tr("Descrição"));
+    modeloProdVendidos->setHeaderData(2, Qt::Horizontal, tr("Quantidade"));
+    modeloProdVendidos->setHeaderData(3, Qt::Horizontal, tr("Preço Vendido"));
     db.close();
     ui->Tview_Vendas2->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     ui->Tview_ProdutosVendidos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
@@ -81,9 +84,9 @@ Vendas::Vendas(QWidget *parent) :
 
     ui->Tview_Vendas2->setColumnWidth(8, 80);
       ui->Tview_Vendas2->setColumnWidth(9, 100);
-    ui->Tview_ProdutosVendidos->setColumnWidth(0, 400);
+    ui->Tview_ProdutosVendidos->setColumnWidth(1, 400);
     // coluna quantidade
-    ui->Tview_ProdutosVendidos->setColumnWidth(1, 85);
+    ui->Tview_ProdutosVendidos->setColumnWidth(2, 85);
 
 
     // conectar banco de dados para consultar as datas mais antigas e mais novas das vendas
@@ -206,8 +209,12 @@ void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSe
     QModelIndex selectedIndex = selected.indexes().first();
     QVariant idVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 0));
     QString productId = idVariant.toString();
-    modeloProdVendidos->setQuery("SELECT produtos.descricao, produtos_vendidos.quantidade, produtos_vendidos.preco_vendido FROM produtos_vendidos JOIN produtos ON produtos_vendidos.id_produto = produtos.id WHERE id_venda = " + productId);
-    ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
+    modeloProdVendidos->setQuery("SELECT produtos_vendidos.id, produtos.descricao, "
+                                 "produtos_vendidos.quantidade, produtos_vendidos.preco_vendido "
+                                 "FROM produtos_vendidos JOIN produtos "
+                                 "ON produtos_vendidos.id_produto = produtos.id "
+                                 "WHERE id_venda = " + productId);
+    // ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
     QVariant idVariant2 = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 2));
     idVendaSelec = idVariant.toString();
     QString FormaPagSelec = idVariant2.toString();
@@ -404,65 +411,72 @@ void Vendas::devolverProduto(QString id_venda, QString id_prod_vend)
 {
     // devolver produto vendido, retornando valor e recalculando valores da venda
 
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. devolver produto.";
-    }
-    QSqlQuery query;
-
-    // obter id do produto vendido, quantidade e preço vendido para usar depois
-    query.prepare("SELECT id_produto, quantidade, preco_vendido FROM produtos_vendidos "
-                  "WHERE id = :valor1");
-    query.bindValue(":valor1", id_prod_vend);
-    QString id_produto, qntd, preco_vend;
-    if (query.exec()) {
-        while (query.next()) {
-            id_produto = query.value(0).toString();
-            qntd = query.value(1).toString();
-            preco_vend = query.value(2).toString();
+        if(!db.open()){
+            qDebug() << "erro ao abrir banco de dados. devolver produto.";
         }
-    }
+        QSqlQuery query;
 
-    // deletar registro do produto devolvido
-    query.prepare("DELETE FROM produtos_vendidos WHERE id = :valor1");
-    query.bindValue(":valor1", id_prod_vend);
-    if (query.exec()) {
-        qDebug() << "query bem-sucedido!";
-    } else {
-        qDebug() << "Erro no query: ";
-    }
-
-    // devolver produto ao estoque
-    query.prepare("UPDATE produtos SET quantidade = quantidade + :valor1 WHERE id = :valor2");
-    query.bindValue("valor1", qntd);
-    query.bindValue("valor2", id_produto);
-    query.exec();
-
-    // obter total, taxa, desconto e recebido antigos
-    query.prepare("SELECT total, taxa, desconto, valor_recebido FROM vendas2 WHERE id = :valor1");
-    query.bindValue(":valor1", id_venda);
-    float total, taxa, desconto, recebido;
-    if (query.exec()) {
-        while (query.next()) {
-            total = query.value(0).toFloat();
-            taxa = query.value(1).toFloat()/100;
-            desconto = query.value(2).toFloat();
-            recebido = query.value(3).toFloat();
+        // obter id do produto vendido, quantidade e preço vendido para usar depois
+        query.prepare("SELECT id_produto, quantidade, preco_vendido FROM produtos_vendidos "
+                      "WHERE id = :valor1");
+        query.bindValue(":valor1", id_prod_vend);
+        QString id_produto, qntd, preco_vend;
+        if (query.exec()) {
+            while (query.next()) {
+                id_produto = query.value(0).toString();
+                qntd = query.value(1).toString();
+                preco_vend = query.value(2).toString();
+            }
         }
-    }
+        qDebug() << "id_produto: " + id_produto;
+        qDebug() << "qntd: " + qntd;
+        qDebug() << "preco_vend: " + preco_vend;
 
-    // mudar o registro da venda para retirar o valor do produto devolvido
-    query.prepare("UPDATE vendas2 SET total = :valor1, troco = :valor2, valor_final = :valor3 "
-                  "WHERE id = :valor4");
-    float totalSub = QString::toFloat(qntd) * QString::toFloat(preco_vend);
-    float totalNovo = total - totalSub;
-    float valorFinalNovo = (totalNovo - desconto)*taxa;
-    query.bindValue("valor1", QString::number(totalNovo));
-    query.bindValue("valor2", QString::number(recebido - valorFinalNovo));
-    query.bindValue("valor3", QString::number(valorFinalNovo));
-    query.bindValue("valor4", id_venda);
-    query.exec();
+        // deletar registro do produto devolvido
+        query.prepare("DELETE FROM produtos_vendidos WHERE id = :valor1");
+        query.bindValue(":valor1", id_prod_vend);
+        if (query.exec()) {
+            qDebug() << "query bem-sucedido!";
+        } else {
+            qDebug() << "Erro no query: ";
+        }
 
-    db.close();
+        // devolver produto ao estoque
+        query.prepare("UPDATE produtos SET quantidade = quantidade + :valor1 WHERE id = :valor2");
+        query.bindValue(":valor1", qntd);
+        query.bindValue(":valor2", id_produto);
+        query.exec();
+
+        // obter total, taxa, desconto e recebido antigos
+        query.prepare("SELECT total, taxa, desconto, valor_recebido FROM vendas2 WHERE id = :valor1");
+        query.bindValue(":valor1", id_venda);
+        float total, taxa, desconto, recebido = 0;
+        if (query.exec()) {
+            while (query.next()) {
+                total = query.value(0).toFloat();
+                taxa = 1 + (query.value(1).toFloat()/100);
+                desconto = query.value(2).toFloat();
+                recebido = query.value(3).toFloat();
+            }
+        }
+        qDebug() << "total: " + QString::number(total);
+        qDebug() << "taxa: " + QString::number(taxa);
+        qDebug() << "desconto: " + QString::number(desconto);
+        qDebug() << "recebido: " + QString::number(recebido);
+
+        // mudar o registro da venda para retirar o valor do produto devolvido
+        query.prepare("UPDATE vendas2 SET total = :valor1, troco = :valor2, valor_final = :valor3 "
+                      "WHERE id = :valor4");
+        float totalSub = qntd.toFloat() * preco_vend.toFloat();
+        float totalNovo = total - totalSub;
+        float valorFinalNovo = (totalNovo - desconto)*taxa;
+        query.bindValue(":valor1", QString::number(totalNovo));
+        query.bindValue(":valor2", QString::number(recebido - valorFinalNovo));
+        query.bindValue(":valor3", QString::number(valorFinalNovo));
+        query.bindValue(":valor4", id_venda);
+        query.exec();
+
+        db.close();
 }
 
 void Vendas::actionAbrirPagamentosVenda(QString id_venda){
@@ -889,22 +903,17 @@ void Vendas::on_Tview_ProdutosVendidos_customContextMenuRequested(const QPoint &
     if(!ui->Tview_ProdutosVendidos->currentIndex().isValid())
         return;
     QModelIndexList selectedRows = ui->Tview_ProdutosVendidos->selectionModel()->selectedRows();
-    QString cellValue, formaPag;
+    QString idProdVend;
     if (!selectedRows.isEmpty()) {
-        qDebug() << "selectedRowsisempty";
         // Pega o primeiro índice selecionado (caso múltiplas linhas possam ser selecionadas)
         QModelIndex selectedIndex = selectedRows.first();
 
         // Obtém o índice da célula na coluna 0 da linha selecionada
         QModelIndex columnIndex = ui->Tview_ProdutosVendidos->model()->index(selectedIndex.row(), 0);
-        QModelIndex columnIndex2 = ui->Tview_ProdutosVendidos->model()->index(selectedIndex.row(), 2);
 
         // Obtém o valor da célula como uma QString
-        cellValue = ui->Tview_ProdutosVendidos->model()->data(columnIndex).toString();
-        formaPag = ui->Tview_ProdutosVendidos->model()->data(columnIndex2).toString();
-
-        // Mostra o valor em uma mensagem
-
+        idProdVend = ui->Tview_ProdutosVendidos->model()->data(columnIndex).toString();
+        qDebug() << "idprodvend: " + idProdVend + " idVendSElec: " + idVendaSelec;
     } else {
         QMessageBox::warning(this, "Aviso", "Nenhuma linha selecionada.");
     }
@@ -914,7 +923,22 @@ void Vendas::on_Tview_ProdutosVendidos_customContextMenuRequested(const QPoint &
     actionMenuDevolverProd = new QAction();
     actionMenuDevolverProd->setText("Devolver Produto");
     QObject::connect(actionMenuDevolverProd, &QAction::triggered, [&]() {
-        devolverProduto(); // Chama nossa função com o parâmetro
+        // Cria uma mensagem de confirmação
+        QMessageBox::StandardButton resposta;
+        resposta = QMessageBox::question(
+            nullptr,
+            "Confirmação",
+            "Tem certeza que deseja devolver esse produto?",
+            QMessageBox::Yes | QMessageBox::No
+            );
+        // Verifica a resposta do usuário
+        if (resposta == QMessageBox::Yes) {
+            devolverProduto(idVendaSelec, idProdVend); // Chama nossa função com o parâmetro
+            atualizarTabelas();
+        }
+        else {
+            qDebug() << "A devolução do produto foi cancelada.";
+        }
     });
 
     menu.addAction(actionMenuDevolverProd);

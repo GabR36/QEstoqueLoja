@@ -9,6 +9,7 @@ pagamentoAPrazo::pagamentoAPrazo(QString id_venda, QString total, QString client
     ui->CBox_FormaPagamento->removeItem(5);
     ui->Ledit_Desconto->setVisible(false);
     ui->label_9->setVisible(false);
+    ui->CheckPorcentagem->setVisible(false);
 }
 
 pagamentoAPrazo::~pagamentoAPrazo()
@@ -32,7 +33,14 @@ void pagamentoAPrazo::terminarPagamento()
     QString forma_pagamento = ui->CBox_FormaPagamento->currentText();
     QString taxa = ui->Ledit_Taxa->text();
     QString valor_final = ui->Lbl_TotalTaxa->text();
-    QString desconto = ui->Ledit_Desconto->text();
+    QString descontoInicial = ui->Ledit_Desconto->text();
+    QString desconto;
+    if (ui->CheckPorcentagem->isChecked()){
+        desconto = portugues.toString((portugues.toFloat(descontoInicial)/100)*portugues.toFloat(totalGlobal));
+    }
+    else{
+        desconto = descontoInicial;
+    }
 
     // validar line edits
 

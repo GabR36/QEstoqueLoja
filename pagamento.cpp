@@ -171,7 +171,14 @@ void pagamento::on_Ledit_Desconto_textChanged(const QString &arg1)
 
 void pagamento::descontoTaxa(){
     QString novaTaxa = ui->Ledit_Taxa->text();
-    QString desconto = ui->Ledit_Desconto->text();
+    QString descontoInicial = ui->Ledit_Desconto->text();
+    QString desconto;
+    if (ui->CheckPorcentagem->isChecked()){
+        desconto = portugues.toString((portugues.toFloat(descontoInicial)/100)*portugues.toFloat(totalGlobal));
+    }
+    else{
+        desconto = descontoInicial;
+    }
     QString valorFinal = portugues.toString(obterValorFinal(novaTaxa, desconto), 'f', 2);
     ui->Lbl_TotalTaxa->setText(valorFinal);
     // o valor final influencia os campos recebido, portanto modificacoes nele devem afetar
@@ -188,5 +195,11 @@ void pagamento::descontoTaxa(){
 void pagamento::terminarPagamento()
 {
 
+}
+
+
+void pagamento::on_CheckPorcentagem_stateChanged(int arg1)
+{
+    descontoTaxa();
 }
 

@@ -41,6 +41,8 @@ private slots:
 
 
 
+    void on_CheckPorcentagem_stateChanged(int arg1);
+
 protected:
     float obterValorFinal(QString taxa, QString desconto);
     void descontoTaxa();

@@ -11,6 +11,7 @@
 #include <QRandomGenerator>
 #include <QKeyEvent>
 #include "config.h"
+#include "subclass/customlineedit.h"
 
 
 //#include "vendas.h"

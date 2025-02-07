@@ -40,7 +40,7 @@ if(WIN32)
     set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Imagens/QEstoqueLOja/AppIcon.rc")
        list(APPEND PROJECT_SOURCES ${APP_ICON_RESOURCE_WINDOWS})
 endif()
-
+include_directories(${CMAKE_SOURCE_DIR}/subclass)
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     #set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Imagens/QEstoqueLOja/AppIcon.rc")
 
@@ -71,6 +71,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         delegateprecof2.cpp delegateprecof2.h
         delegatepago.h delegatepago.cpp
         util/pdfexporter.h util/pdfexporter.cpp
+        subclass/customlineedit.h subclass/customlineedit.cpp
 
 
 

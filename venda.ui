@@ -3,7 +3,7 @@
  <class>venda</class>
  <widget class="QDialog" name="venda">
   <property name="windowModality">
-   <enum>Qt::WindowModal</enum>
+   <enum>Qt::WindowModality::WindowModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -100,7 +100,7 @@ background-color:rgb(170, 170, 170);
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -169,16 +169,16 @@ background-color:rgb(03,75,119);
         </size>
        </property>
        <property name="contextMenuPolicy">
-        <enum>Qt::CustomContextMenu</enum>
+        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
        </property>
        <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
+        <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
        </property>
        <property name="selectionMode">
-        <enum>QAbstractItemView::SingleSelection</enum>
+        <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
        </property>
        <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectRows</enum>
+        <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
        </property>
        <attribute name="horizontalHeaderDefaultSectionSize">
         <number>100</number>
@@ -214,7 +214,7 @@ background-color:rgb(03,75,119);
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledit_Cliente">
+          <widget class="CustomLineEdit" name="Ledit_Cliente">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -244,7 +244,7 @@ background-color:rgb(03,75,119);
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledit_Barras">
+          <widget class="CustomLineEdit" name="Ledit_Barras">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -277,7 +277,7 @@ background-color:rgb(03,75,119);
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="Ledit_QuantVendido">
+            <widget class="CustomLineEdit" name="Ledit_QuantVendido">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -306,7 +306,7 @@ background-color:rgb(03,75,119);
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledit_Preco">
+          <widget class="CustomLineEdit" name="Ledit_Preco">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -402,10 +402,10 @@ background-color:rgb(03,75,119);
         <bool>true</bool>
        </property>
        <property name="selectionMode">
-        <enum>QAbstractItemView::SingleSelection</enum>
+        <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
        </property>
        <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectRows</enum>
+        <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
        </property>
        <attribute name="horizontalHeaderDefaultSectionSize">
         <number>50</number>
@@ -421,7 +421,7 @@ background-color:rgb(03,75,119);
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_7">
        <item>
-        <widget class="QLineEdit" name="Ledit_Pesquisa"/>
+        <widget class="CustomLineEdit" name="Ledit_Pesquisa"/>
        </item>
        <item>
         <widget class="QPushButton" name="Btn_Pesquisa">
@@ -462,6 +462,13 @@ background-color:rgb(03,75,119);
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>customlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="Imagens/recursosImg.qrc"/>
  </resources>

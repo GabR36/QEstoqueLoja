@@ -318,7 +318,7 @@ font-size: 15px;
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="Ledit_Recebido"/>
+     <widget class="CustomLineEdit" name="Ledit_Recebido"/>
     </item>
    </layout>
   </widget>
@@ -402,7 +402,7 @@ font-size: 15px;
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="Ledit_Taxa"/>
+     <widget class="CustomLineEdit" name="Ledit_Taxa"/>
     </item>
    </layout>
   </widget>
@@ -424,7 +424,7 @@ font-size: 15px;
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="Ledit_Desconto"/>
+     <widget class="CustomLineEdit" name="Ledit_Desconto"/>
     </item>
     <item>
      <widget class="QCheckBox" name="CheckPorcentagem">
@@ -460,6 +460,13 @@ cupom </string>
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>customlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="Imagens/recursosImg.qrc"/>
  </resources>

@@ -10,6 +10,7 @@
 #include <QDoubleValidator>
 #include <QMenu>
 #include "delegateprecof2.h"
+#include "delegateprecovalidate.h"
 
 
 
@@ -34,13 +35,15 @@ venda::venda(QWidget *parent) :
     DelegatePrecoF2 *delegatePreco = new DelegatePrecoF2(this);
     CustomDelegate *delegateVermelho = new CustomDelegate(this);
     ui->Tview_Produtos->setItemDelegateForColumn(1,delegateVermelho);
-    ui->Tview_Produtos->setItemDelegateForColumn(3, delegatePreco);
+    //ui->Tview_Produtos->setItemDelegateForColumn(3, delegatePreco);
    // ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(3, delegatePreco);
-    // --
+    DelegatePrecoValidate *validatePreco = new DelegatePrecoValidate(this);
+    ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(3,validatePreco);
 
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     db.close();
-    modeloSelecionados->setHorizontalHeaderItem(0, new QStandardItem("ID Produto"));
+
+    modeloSelecionados->setHorizontalHeaderItem(0, new QStandardItem("ID Produto");
     modeloSelecionados->setHorizontalHeaderItem(1, new QStandardItem("Quantidade Vendida"));
     modeloSelecionados->setHorizontalHeaderItem(2, new QStandardItem("Descrição"));
     modeloSelecionados->setHorizontalHeaderItem(3, new QStandardItem("Preço Unitário Vendido"));
@@ -86,6 +89,11 @@ venda::venda(QWidget *parent) :
     connect(actionMenuDeletarProd,SIGNAL(triggered(bool)),this,SLOT(deletarProd()));
 
    // actionMenuDeletarProd->setIcon(janelaPrincipal->iconDelete);
+    ui->Tview_ProdutosSelecionados->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked);
+    connect(modeloSelecionados, &QStandardItemModel::itemChanged, this, [=]() {
+        ui->Lbl_Total->setText(Total());
+    });
+
 }
 
 venda::~venda()
@@ -106,7 +114,13 @@ void venda::on_Btn_SelecionarProduto_clicked()
     // preco com notacao br
     QString precoProduto = portugues.toString(precoVariant.toFloat());
     // mostrar na tabela Selecionados
-    modeloSelecionados->appendRow({new QStandardItem(idProduto), new QStandardItem("1"), new QStandardItem(descProduto), new QStandardItem(precoProduto)});
+    QStandardItem *itemQuantidade = new QStandardItem("1");
+    //itemQuantidade->setEditable(true);
+
+    QStandardItem *itemPreco = new QStandardItem(precoProduto);
+   // itemPreco->setEditable(true);
+
+    modeloSelecionados->appendRow({new QStandardItem(idProduto), itemQuantidade, new QStandardItem(descProduto), itemPreco});
     // mostrar total
     ui->Lbl_Total->setText(Total());
 }

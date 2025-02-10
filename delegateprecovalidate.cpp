@@ -1,37 +1,48 @@
 #include "delegateprecovalidate.h"
+#include <QLineEdit>
+#include <QLocale>
 
 DelegatePrecoValidate::DelegatePrecoValidate(QObject *parent)
     : QStyledItemDelegate{parent}
 {}
 QWidget *DelegatePrecoValidate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    Q_UNUSED(option);
-
-    // Criando um editor numérico para o preço
-    QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
-    editor->setDecimals(2);  // Definir 2 casas decimais
-    editor->setMinimum(0.01); // Preço mínimo permitido
-    editor->setMaximum(99999.99); // Preço máximo permitido
-    editor->setSingleStep(1.00); // Incremento ao usar setas
-
+    QLineEdit *editor = new QLineEdit(parent);
+    QDoubleValidator *validator = new QDoubleValidator(0, 9999999, 2, editor);
+    validator->setNotation(QDoubleValidator::StandardNotation);
+    editor->setValidator(validator);
     return editor;
 }
 
 void DelegatePrecoValidate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    double value = index.model()->data(index, Qt::EditRole).toDouble();
-    QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>(editor);
-    if (spinBox)
-        spinBox->setValue(value);
+    QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor);
+    if (!lineEdit) return;
+
+    bool ok;
+    double preco = index.model()->data(index, Qt::EditRole).toDouble(&ok);
+    if (ok) {
+        lineEdit->setText(QLocale(QLocale::Portuguese, QLocale::Brazil).toString(preco, 'f', 2));
+    } else {
+        lineEdit->setText(index.model()->data(index, Qt::EditRole).toString());
+    }
 }
 
 void DelegatePrecoValidate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    QDoubleSpinBox *spinBox = qobject_cast<QDoubleSpinBox *>(editor);
-    if (spinBox) {
-        double value = spinBox->value();
-        model->setData(index, value, Qt::EditRole);
+    QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor);
+    if (!lineEdit) return;
+
+    QString texto = lineEdit->text();
+    bool ok;
+    double preco = QLocale(QLocale::Portuguese, QLocale::Brazil).toDouble(texto, &ok);
+
+    if (ok) {
+        model->setData(index, QLocale(QLocale::Portuguese, QLocale::Brazil).toString(preco, 'f', 2), Qt::EditRole);
+    } else {
+        model->setData(index, texto, Qt::EditRole);
     }
+
 }
 
 void DelegatePrecoValidate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const

@@ -2,7 +2,8 @@
 #define DELEGATEPRECOVALIDATE_H
 
 #include <QStyledItemDelegate>
-#include <QDoubleSpinBox>
+
+#include <QValidator>
 
 class DelegatePrecoValidate : public QStyledItemDelegate
 {

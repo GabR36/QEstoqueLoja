@@ -74,6 +74,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         subclass/customlineedit.h subclass/customlineedit.cpp
         delegateprecovalidate.h delegateprecovalidate.cpp
         delegatelockcol.h delegatelockcol.cpp
+        delegatequant.h delegatequant.cpp
 
 
 

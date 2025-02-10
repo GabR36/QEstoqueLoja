@@ -12,6 +12,7 @@
 #include "delegateprecof2.h"
 #include "delegateprecovalidate.h"
 #include "delegatelockcol.h"
+#include "delegatequant.h"
 
 
 
@@ -33,7 +34,6 @@ venda::venda(QWidget *parent) :
     modeloProdutos->setHeaderData(5, Qt::Horizontal, tr("NF"));
 
     // -- delegates
-    DelegatePrecoF2 *delegatePreco = new DelegatePrecoF2(this);
     CustomDelegate *delegateVermelho = new CustomDelegate(this);
     ui->Tview_Produtos->setItemDelegateForColumn(1,delegateVermelho);
     //ui->Tview_Produtos->setItemDelegateForColumn(3, delegatePreco);
@@ -43,7 +43,9 @@ venda::venda(QWidget *parent) :
     DelegateLockCol *delegateLockCol = new DelegateLockCol(0,this);
     ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(0,delegateLockCol);
     DelegateLockCol *delegateLockCol2 = new DelegateLockCol(2,this);
-    ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(2,delegateLockCol);
+    ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(2,delegateLockCol2);
+    DelegateQuant *delegateQuant = new DelegateQuant(this);
+    ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(1,delegateQuant);
 
 
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");

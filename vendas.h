@@ -71,7 +71,8 @@ private:
     QString de, ate;
     void Teste();
     QString idVendaSelec;
-    void devolverProduto(QString id_venda, QString id_prod_vend);
+    void devolverProdutoVenda(QString id_venda, QString id_prod_vend);
+    void devolverProduto(QString id_prod_vend, QString id_produto, QString qntd);
 };
 
 #endif // VENDAS_H

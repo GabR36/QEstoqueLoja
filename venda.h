@@ -50,6 +50,8 @@ private slots:
 
     void on_Ledit_Pesquisa_returnPressed();
 
+    void on_Btn_CancelarVenda_clicked();
+
 private:
     QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
     QStandardItemModel *modeloSelecionados = new QStandardItemModel;

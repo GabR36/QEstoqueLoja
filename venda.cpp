@@ -184,6 +184,8 @@ void venda::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_F4) {
         ui->Ledit_Pesquisa->setFocus();  // Foca no QLineEdit quando F4 é pressionado
         ui->Ledit_Pesquisa->selectAll();
+    }else if(event->key() == Qt::Key_Escape){
+        ui->Btn_CancelarVenda->click();
     }
     QWidget::keyPressEvent(event);
     // Chama a implementação base
@@ -351,4 +353,10 @@ void venda::on_Ledit_Pesquisa_returnPressed()
     }
 }
 
+
+
+void venda::on_Btn_CancelarVenda_clicked()
+{
+    this->close();
+}
 

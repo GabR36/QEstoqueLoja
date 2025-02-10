@@ -73,6 +73,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         util/pdfexporter.h util/pdfexporter.cpp
         subclass/customlineedit.h subclass/customlineedit.cpp
         delegateprecovalidate.h delegateprecovalidate.cpp
+        delegatelockcol.h delegatelockcol.cpp
 
 
 

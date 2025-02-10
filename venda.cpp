@@ -11,6 +11,7 @@
 #include <QMenu>
 #include "delegateprecof2.h"
 #include "delegateprecovalidate.h"
+#include "delegatelockcol.h"
 
 
 
@@ -39,11 +40,16 @@ venda::venda(QWidget *parent) :
    // ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(3, delegatePreco);
     DelegatePrecoValidate *validatePreco = new DelegatePrecoValidate(this);
     ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(3,validatePreco);
+    DelegateLockCol *delegateLockCol = new DelegateLockCol(0,this);
+    ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(0,delegateLockCol);
+    DelegateLockCol *delegateLockCol2 = new DelegateLockCol(2,this);
+    ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(2,delegateLockCol);
+
 
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     db.close();
 
-    modeloSelecionados->setHorizontalHeaderItem(0, new QStandardItem("ID Produto");
+    modeloSelecionados->setHorizontalHeaderItem(0, new QStandardItem("ID Produto"));
     modeloSelecionados->setHorizontalHeaderItem(1, new QStandardItem("Quantidade Vendida"));
     modeloSelecionados->setHorizontalHeaderItem(2, new QStandardItem("Descrição"));
     modeloSelecionados->setHorizontalHeaderItem(3, new QStandardItem("Preço Unitário Vendido"));
@@ -88,8 +94,13 @@ venda::venda(QWidget *parent) :
     actionMenuDeletarProd->setIcon(deletar);
     connect(actionMenuDeletarProd,SIGNAL(triggered(bool)),this,SLOT(deletarProd()));
 
-   // actionMenuDeletarProd->setIcon(janelaPrincipal->iconDelete);
+
+    //torna a tabela editavel
     ui->Tview_ProdutosSelecionados->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked);
+
+
+
+
     connect(modeloSelecionados, &QStandardItemModel::itemChanged, this, [=]() {
         ui->Lbl_Total->setText(Total());
     });

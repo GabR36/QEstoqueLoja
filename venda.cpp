@@ -63,6 +63,10 @@ venda::venda(QWidget *parent) :
     QItemSelectionModel *selectionModel = ui->Tview_ProdutosSelecionados->selectionModel();
     // Conectar o sinal de seleção ao slot personalizado
     connect(selectionModel, &QItemSelectionModel::selectionChanged,this, &venda::handleSelectionChange);
+    QItemSelectionModel *selectionModelProdutos = ui->Tview_Produtos->selectionModel();
+    connect(selectionModelProdutos, &QItemSelectionModel::selectionChanged, this,
+            &venda::handleSelectionChangeProdutos);
+
     // ajustar tamanho colunas
     // coluna descricao
     ui->Tview_Produtos->setColumnWidth(2, 260);
@@ -82,12 +86,9 @@ venda::venda(QWidget *parent) :
     ui->DateEdt_Venda->setDateTime(QDateTime::currentDateTime());
 
     // setar o foco no codigo de barras
-    ui->Ledit_Barras->setFocus();
 
-    // validadores para os campos
-    QDoubleValidator *DoubleValidador = new QDoubleValidator(0.0, 9999.99, 2);
-    ui->Ledit_Preco->setValidator(DoubleValidador);
-    ui->Ledit_QuantVendido->setValidator(DoubleValidador);
+
+
 
     //actionMenu contextMenu
     actionMenuDeletarProd = new QAction(this);
@@ -107,12 +108,15 @@ venda::venda(QWidget *parent) :
         ui->Lbl_Total->setText(Total());
     });
 
+    ui->Btn_SelecionarProduto->setEnabled(false);
+
 }
 
 venda::~venda()
 {
     delete ui;
 }
+
 
 
 void venda::on_Btn_SelecionarProduto_clicked()
@@ -143,28 +147,46 @@ void venda::handleSelectionChange(const QItemSelection &selected, const QItemSel
     // Este slot é chamado sempre que a seleção na tabela muda
     Q_UNUSED(deselected);
 
+
+    // if (selected.indexes().isEmpty()) {
+    //     qDebug() << "Nenhum registro selecionado.";
+    //     db.close();
+    //     return;
+    // }
+
+    // qDebug() << "Registro(s) selecionado(s):";
+
+    // if(!db.open()){
+    //     qDebug() << "erro ao abrir banco de dados. handleselectionchange Venda";
+    // }
+    // QModelIndex selectedIndex = selected.indexes().first();
+    // QVariant idVariant = ui->Tview_ProdutosSelecionados->model()->data(ui->Tview_ProdutosSelecionados->model()->index(selectedIndex.row(), 0));
+    // QString productId = idVariant.toString();
+
+
+    // qDebug() << productId;
+    // db.close();
+
+}
+void venda::handleSelectionChangeProdutos(const QItemSelection &selected, const QItemSelection &deselected){
     if (selected.indexes().isEmpty()) {
         qDebug() << "Nenhum registro selecionado.";
-        db.close();
+        ui->Btn_SelecionarProduto->setEnabled(false);
         return;
-    }
+    }else{
+        ui->Btn_SelecionarProduto->setEnabled(true);
 
-    qDebug() << "Registro(s) selecionado(s):";
-
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. handleselectionchange Venda";
     }
-    QModelIndex selectedIndex = selected.indexes().first();
-    QVariant idVariant = ui->Tview_ProdutosSelecionados->model()->data(ui->Tview_ProdutosSelecionados->model()->index(selectedIndex.row(), 0));
-    QVariant quantVariant = ui->Tview_ProdutosSelecionados->model()->data(ui->Tview_ProdutosSelecionados->model()->index(selectedIndex.row(), 1));
-    QVariant precoVariant = ui->Tview_ProdutosSelecionados->model()->data(ui->Tview_ProdutosSelecionados->model()->index(selectedIndex.row(), 3));
-    QString productId = idVariant.toString();
-    QString productQuant = quantVariant.toString();
-    QString productPreco = precoVariant.toString();
-    ui->Ledit_QuantVendido->setText(productQuant);
-    ui->Ledit_Preco->setText(productPreco);
-    qDebug() << productId;
-    db.close();
+}
+
+void venda::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_F4) {
+        ui->Ledit_Pesquisa->setFocus();  // Foca no QLineEdit quando F4 é pressionado
+        ui->Ledit_Pesquisa->selectAll();
+    }
+    QWidget::keyPressEvent(event);
+    // Chama a implementação base
 }
 
 
@@ -220,100 +242,6 @@ void venda::on_Btn_Pesquisa_clicked()
 }
 
 
-void venda::on_Ledit_QuantVendido_textChanged(const QString &arg1)
-{
-    // slot sempre que a quantidade for alterada, mudar o produto selecionado
-
-    // Verificar se há algum registro selecionado na tabela
-    if(ui->Tview_ProdutosSelecionados->selectionModel()->selectedIndexes().isEmpty()) {
-        // Se não houver nenhum registro selecionado, sair da função
-        return;
-    }
-    // pegar o produto selecionado
-    QItemSelectionModel *selectionModel = ui->Tview_ProdutosSelecionados->selectionModel();
-    QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
-    int registroSelecionado = selectedIndex.row();
-    // pegar o valor no line edit
-    QString quantidade = ui->Ledit_QuantVendido->text();
-    //
-    QModelIndex quantidadeIndice = modeloSelecionados->index(registroSelecionado, 1);
-    modeloSelecionados->setData(quantidadeIndice, quantidade);
-    // mostrar total
-    ui->Lbl_Total->setText(Total());
-}
-
-
-void venda::on_Ledit_Preco_textChanged(const QString &arg1)
-{
-    // slot sempre que o preço for alterado, mudar o produto selecionado
-
-    // Verificar se há algum registro selecionado na tabela
-    if(ui->Tview_ProdutosSelecionados->selectionModel()->selectedIndexes().isEmpty()) {
-        // Se não houver nenhum registro selecionado, sair da função
-        return;
-    }
-    // pegar o produto selecionado
-    QItemSelectionModel *selectionModel = ui->Tview_ProdutosSelecionados->selectionModel();
-    QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
-    int registroSelecionado = selectedIndex.row();
-    // pegar o valor no line edit
-    QString preco = ui->Ledit_Preco->text();
-    //
-    QModelIndex precoIndice = modeloSelecionados->index(registroSelecionado, 3);
-    modeloSelecionados->setData(precoIndice, preco);
-    // mostrar total
-    ui->Lbl_Total->setText(Total());
-}
-
-
-void venda::on_Ledit_Barras_returnPressed()
-{
-    // código de barras inserido
-    // verificar se o codigo de barras ja existe
-    QString barrasProduto = ui->Ledit_Barras->text();
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao enviar.";
-    }
-    QSqlQuery query;
-
-    query.prepare("SELECT COUNT(*) FROM produtos WHERE codigo_barras = :codigoBarras");
-    query.bindValue(":codigoBarras", barrasProduto);
-    if (!query.exec()) {
-        qDebug() << "Erro na consulta: contagem codigo barras";
-    }
-    query.next();
-    bool barrasExiste = query.value(0).toInt() > 0 && barrasProduto != "";
-    qDebug() << barrasProduto;
-    if(barrasExiste){
-        // o código existe
-        QSqlQuery query;
-
-        query.prepare("SELECT * FROM produtos WHERE codigo_barras = :codigoBarras");
-        query.bindValue(":codigoBarras", barrasProduto);
-        if (!query.exec()) {
-            qDebug() << "Erro na consulta: contagem codigo barras";
-        }
-        query.next();
-        QString idBarras = query.value(0).toString();
-        QString descBarras = query.value(2).toString();
-        // preco na notacao br
-        QString precoBarras = portugues.toString(query.value(3).toFloat());
-        qDebug() << idBarras;
-
-        // mostrar na tabela Selecionados
-        modeloSelecionados->appendRow({new QStandardItem(idBarras), new QStandardItem("1"), new QStandardItem(descBarras), new QStandardItem(precoBarras)});
-
-        ui->Ledit_Barras->clear();
-
-        // mostrar total
-        ui->Lbl_Total->setText(Total());
-
-    }
-    else{
-        // o código não existe
-        QMessageBox::warning(this, "Erro", "Esse código de barras não foi registrado ainda.");
-    }
-}
 
 
 void venda::on_Btn_Aceitar_clicked()
@@ -372,4 +300,55 @@ void venda::deletarProd(){
     modeloSelecionados->removeRow(ui->Tview_ProdutosSelecionados->currentIndex().row());
     ui->Lbl_Total->setText(Total());
 }
+
+
+void venda::on_Ledit_Pesquisa_returnPressed()
+{
+    // código de barras inserido
+    // verificar se o codigo de barras ja existe
+    QString barrasProduto = ui->Ledit_Pesquisa->text();
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. botao enviar.";
+    }
+    QSqlQuery query;
+
+    query.prepare("SELECT COUNT(*) FROM produtos WHERE codigo_barras = :codigoBarras");
+    query.bindValue(":codigoBarras", barrasProduto);
+    if (!query.exec()) {
+        qDebug() << "Erro na consulta: contagem codigo barras";
+    }
+    query.next();
+    bool barrasExiste = query.value(0).toInt() > 0 && barrasProduto != "";
+    qDebug() << barrasProduto;
+    if(barrasExiste){
+        // o código existe
+        QSqlQuery query;
+
+        query.prepare("SELECT * FROM produtos WHERE codigo_barras = :codigoBarras");
+        query.bindValue(":codigoBarras", barrasProduto);
+        if (!query.exec()) {
+            qDebug() << "Erro na consulta: contagem codigo barras";
+        }
+        query.next();
+        QString idBarras = query.value(0).toString();
+        QString descBarras = query.value(2).toString();
+        // preco na notacao br
+        QString precoBarras = portugues.toString(query.value(3).toFloat());
+        qDebug() << idBarras;
+
+        // mostrar na tabela Selecionados
+        modeloSelecionados->appendRow({new QStandardItem(idBarras), new QStandardItem("1"), new QStandardItem(descBarras), new QStandardItem(precoBarras)});
+
+        ui->Ledit_Pesquisa->clear();
+
+        // mostrar total
+        ui->Lbl_Total->setText(Total());
+
+    }
+    else{
+        // o código não existe
+        QMessageBox::warning(this, "Erro", "Esse código de barras não foi registrado ainda.");
+    }
+}
+
 

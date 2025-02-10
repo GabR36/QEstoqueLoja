@@ -1,6 +1,8 @@
 #include "delegateprecovalidate.h"
 #include <QLineEdit>
 #include <QLocale>
+#include <QPalette>
+#include <QPainter>
 
 DelegatePrecoValidate::DelegatePrecoValidate(QObject *parent)
     : QStyledItemDelegate{parent}
@@ -11,6 +13,7 @@ QWidget *DelegatePrecoValidate::createEditor(QWidget *parent, const QStyleOption
     QDoubleValidator *validator = new QDoubleValidator(0, 9999999, 2, editor);
     validator->setNotation(QDoubleValidator::StandardNotation);
     editor->setValidator(validator);
+    editor->setStyleSheet("background-color: lightblue;");
     return editor;
 }
 
@@ -49,4 +52,21 @@ void DelegatePrecoValidate::updateEditorGeometry(QWidget *editor, const QStyleOp
 {
     Q_UNUSED(index);
     editor->setGeometry(option.rect);
+}
+
+void DelegatePrecoValidate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QStyleOptionViewItem optionCopy = option;
+
+
+        painter->fillRect(option.rect, QColor(230, 240, 255)); // Azul claro permanente
+
+
+        // Altera a cor de fundo para um tom suave de azul
+        optionCopy.backgroundBrush = QBrush(QColor(230, 240, 255)); // Azul suave
+
+
+    // Chama o método de pintura padrão
+
+        QStyledItemDelegate::paint(painter, optionCopy, index);
 }

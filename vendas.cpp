@@ -41,9 +41,12 @@ Vendas::Vendas(QWidget *parent) :
 
     modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
     ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
-    modeloProdVendidos->setHeaderData(0, Qt::Horizontal, tr("Descrição"));
-    modeloProdVendidos->setHeaderData(1, Qt::Horizontal, tr("Quantidade"));
-    modeloProdVendidos->setHeaderData(2, Qt::Horizontal, tr("Preço Vendido"));
+    // esconder id produto_vendido
+    ui->Tview_ProdutosVendidos->hideColumn(0);
+    modeloProdVendidos->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    modeloProdVendidos->setHeaderData(1, Qt::Horizontal, tr("Descrição"));
+    modeloProdVendidos->setHeaderData(2, Qt::Horizontal, tr("Quantidade"));
+    modeloProdVendidos->setHeaderData(3, Qt::Horizontal, tr("Preço Vendido"));
     db.close();
     ui->Tview_Vendas2->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     ui->Tview_ProdutosVendidos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
@@ -81,9 +84,9 @@ Vendas::Vendas(QWidget *parent) :
 
     ui->Tview_Vendas2->setColumnWidth(8, 80);
       ui->Tview_Vendas2->setColumnWidth(9, 100);
-    ui->Tview_ProdutosVendidos->setColumnWidth(0, 400);
+    ui->Tview_ProdutosVendidos->setColumnWidth(1, 400);
     // coluna quantidade
-    ui->Tview_ProdutosVendidos->setColumnWidth(1, 85);
+    ui->Tview_ProdutosVendidos->setColumnWidth(2, 85);
 
 
     // conectar banco de dados para consultar as datas mais antigas e mais novas das vendas
@@ -206,8 +209,12 @@ void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSe
     QModelIndex selectedIndex = selected.indexes().first();
     QVariant idVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 0));
     QString productId = idVariant.toString();
-    modeloProdVendidos->setQuery("SELECT produtos.descricao, produtos_vendidos.quantidade, produtos_vendidos.preco_vendido FROM produtos_vendidos JOIN produtos ON produtos_vendidos.id_produto = produtos.id WHERE id_venda = " + productId);
-    ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
+    modeloProdVendidos->setQuery("SELECT produtos_vendidos.id, produtos.descricao, "
+                                 "produtos_vendidos.quantidade, produtos_vendidos.preco_vendido "
+                                 "FROM produtos_vendidos JOIN produtos "
+                                 "ON produtos_vendidos.id_produto = produtos.id "
+                                 "WHERE id_venda = " + productId);
+    // ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
     QVariant idVariant2 = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 2));
     idVendaSelec = idVariant.toString();
     QString FormaPagSelec = idVariant2.toString();
@@ -309,7 +316,7 @@ void Vendas::on_Btn_DeletarVenda_clicked()
         QSqlQuery query;
 
         // pegar os ids dos produtos e quantidades para adicionar depois
-        query.prepare("SELECT id_produto, quantidade FROM produtos_vendidos WHERE id_venda = :valor1");
+        query.prepare("SELECT id, id_produto, quantidade FROM produtos_vendidos WHERE id_venda = :valor1");
         query.bindValue(":valor1", productId);
         if (query.exec()) {
             qDebug() << "query bem-sucedido!";
@@ -317,20 +324,19 @@ void Vendas::on_Btn_DeletarVenda_clicked()
             qDebug() << "Erro no query: ";
         }
         while (query.next()){
-            QString idProduto = query.value(0).toString();
-            QString quantProduto = query.value(1).toString();
+            QString idProdVend = query.value(0).toString();
+            QString idProduto = query.value(1).toString();
+            QString quantProduto = query.value(2).toString();
+            qDebug() << idProdVend;
             qDebug() << idProduto;
             qDebug() <<  quantProduto;
-            QSqlQuery updatequery;
-            updatequery.prepare("UPDATE produtos SET quantidade = quantidade + :quantidade WHERE id = :id");
-            updatequery.bindValue(":id", idProduto);
-            updatequery.bindValue(":quantidade", quantProduto);
-            if (updatequery.exec()) {
-                qDebug() << "query UPDATE bem-sucedido!";
-            } else {
-                qDebug() << "Erro no query UPDATE: ";
-            }
+            devolverProduto(idProdVend, idProduto, quantProduto);
         }
+
+        if(!db.open()){
+            qDebug() << "erro ao abrir banco de dados. botao deletar.";
+        }
+
         query.prepare("DELETE FROM entradas_vendas WHERE id_venda = :valor1");
         query.bindValue(":valor1", productId);
         if (query.exec()) {
@@ -338,9 +344,6 @@ void Vendas::on_Btn_DeletarVenda_clicked()
         } else {
             qDebug() << "Erro no delete entrada ";
         }
-
-
-
 
         // deletar a venda
         query.prepare("DELETE FROM vendas2 WHERE id = :valor1");
@@ -350,14 +353,7 @@ void Vendas::on_Btn_DeletarVenda_clicked()
         } else {
             qDebug() << "Erro no Delete: ";
         }
-        // deletar os produtos vendidos
-        query.prepare("DELETE FROM produtos_vendidos WHERE id_venda = :valor1");
-        query.bindValue(":valor1", productId);
-        if (query.exec()) {
-            qDebug() << "Delete bem-sucedido!";
-        } else {
-            qDebug() << "Erro no Delete: ";
-        }      
+
         atualizarTabelas();
         db.close();
     }
@@ -413,6 +409,93 @@ void Vendas::filtrarData(QString de1, QString ate1){
 
 
 }
+
+void Vendas::devolverProdutoVenda(QString id_venda, QString id_prod_vend)
+{
+    // devolver produto vendido, retornando valor e recalculando valores da venda
+
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. devolver produto.";
+    }
+    QSqlQuery query;
+
+    // verificar se é o unico produto para deletar a venda
+    query.prepare("SELECT COUNT() FROM produtos_vendidos WHERE id_venda = :valor1");
+    query.bindValue(":valor1", id_venda);
+    bool produtoUnico = false;
+    if (query.exec()) {
+        while (query.next()) {
+            produtoUnico = query.value(0).toInt() == 1;
+        }
+    }
+    qDebug() << "produtoUnico: " + QString::number(produtoUnico);
+
+    if (produtoUnico){
+        on_Btn_DeletarVenda_clicked();
+    }
+    else{
+
+        // obter id do produto vendido, quantidade e preço vendido para usar depois
+        query.prepare("SELECT id_produto, quantidade, preco_vendido FROM produtos_vendidos "
+                      "WHERE id = :valor1");
+        query.bindValue(":valor1", id_prod_vend);
+        QString id_produto, qntd, preco_vend;
+        if (query.exec()) {
+            while (query.next()) {
+                id_produto = query.value(0).toString();
+                qntd = query.value(1).toString();
+                preco_vend = query.value(2).toString();
+            }
+        }
+        qDebug() << "id_produto: " + id_produto;
+        qDebug() << "qntd: " + qntd;
+        qDebug() << "preco_vend: " + preco_vend;
+
+        devolverProduto(id_prod_vend, id_produto, qntd);
+
+        if(!db.open()){
+            qDebug() << "erro ao abrir banco de dados. devolver produto.";
+        }
+
+        // obter total, taxa, desconto e recebido antigos
+        query.prepare("SELECT total, taxa, desconto, valor_recebido FROM vendas2 WHERE id = :valor1");
+        query.bindValue(":valor1", id_venda);
+        float total = 0;
+        float taxa = 0;
+        float desconto = 0;
+        float recebido = 0;
+        if (query.exec()) {
+            while (query.next()) {
+                total = query.value(0).toFloat();
+                taxa = 1 + (query.value(1).toFloat()/100);
+                desconto = query.value(2).toFloat();
+                recebido = query.value(3).toFloat();
+            }
+        }
+        else {
+            qDebug() << "Algo deu errado devolver produto! query";
+        }
+        qDebug() << "total: " + QString::number(total);
+        qDebug() << "taxa: " + QString::number(taxa);
+        qDebug() << "desconto: " + QString::number(desconto);
+        qDebug() << "recebido: " + QString::number(recebido);
+
+        // mudar o registro da venda para retirar o valor do produto devolvido
+        query.prepare("UPDATE vendas2 SET total = :valor1, troco = :valor2, valor_final = :valor3 "
+                      "WHERE id = :valor4");
+        float totalSub = qntd.toFloat() * preco_vend.toFloat();
+        float totalNovo = total - totalSub;
+        float valorFinalNovo = (totalNovo - desconto)*taxa;
+        query.bindValue(":valor1", QString::number(totalNovo));
+        query.bindValue(":valor2", QString::number(recebido - valorFinalNovo));
+        query.bindValue(":valor3", QString::number(valorFinalNovo));
+        query.bindValue(":valor4", id_venda);
+        query.exec();
+    }
+
+    db.close();
+}
+
 void Vendas::actionAbrirPagamentosVenda(QString id_venda){
     EntradasVendasPrazo *pagamentosVenda = new EntradasVendasPrazo(this, id_venda);
     pagamentosVenda->setWindowModality(Qt::ApplicationModal);
@@ -831,3 +914,76 @@ void Vendas::on_Btn_AbrirPag_clicked()
     actionAbrirPagamentosVenda(idVendaSelec);
 }
 
+
+void Vendas::on_Tview_ProdutosVendidos_customContextMenuRequested(const QPoint &pos)
+{
+    if(!ui->Tview_ProdutosVendidos->currentIndex().isValid())
+        return;
+    QModelIndexList selectedRows = ui->Tview_ProdutosVendidos->selectionModel()->selectedRows();
+    QString idProdVend;
+    if (!selectedRows.isEmpty()) {
+        // Pega o primeiro índice selecionado (caso múltiplas linhas possam ser selecionadas)
+        QModelIndex selectedIndex = selectedRows.first();
+
+        // Obtém o índice da célula na coluna 0 da linha selecionada
+        QModelIndex columnIndex = ui->Tview_ProdutosVendidos->model()->index(selectedIndex.row(), 0);
+
+        // Obtém o valor da célula como uma QString
+        idProdVend = ui->Tview_ProdutosVendidos->model()->data(columnIndex).toString();
+        qDebug() << "idprodvend: " + idProdVend + " idVendSElec: " + idVendaSelec;
+    } else {
+        QMessageBox::warning(this, "Aviso", "Nenhuma linha selecionada.");
+    }
+
+    QMenu menu(this);
+
+    actionMenuDevolverProd = new QAction();
+    actionMenuDevolverProd->setText("Devolver Produto");
+    QObject::connect(actionMenuDevolverProd, &QAction::triggered, [&]() {
+        // Cria uma mensagem de confirmação
+        QMessageBox::StandardButton resposta;
+        resposta = QMessageBox::question(
+            nullptr,
+            "Confirmação",
+            "Tem certeza que deseja devolver esse produto?",
+            QMessageBox::Yes | QMessageBox::No
+            );
+        // Verifica a resposta do usuário
+        if (resposta == QMessageBox::Yes) {
+            devolverProdutoVenda(idVendaSelec, idProdVend); // Chama nossa função com o parâmetro
+            atualizarTabelas();
+        }
+        else {
+            qDebug() << "A devolução do produto foi cancelada.";
+        }
+    });
+
+    menu.addAction(actionMenuDevolverProd);
+
+    menu.exec(ui->Tview_ProdutosVendidos->viewport()->mapToGlobal(pos));
+}
+
+void Vendas::devolverProduto(QString id_prod_vend, QString id_produto, QString qntd)
+{
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. devolver produto.";
+    }
+    QSqlQuery query2;
+
+    // deletar registro do produto devolvido
+    query2.prepare("DELETE FROM produtos_vendidos WHERE id = :valor1");
+    query2.bindValue(":valor1", id_prod_vend);
+    if (query2.exec()) {
+        qDebug() << "query bem-sucedido!";
+    } else {
+        qDebug() << "Erro no query: ";
+    }
+
+    // devolver produto ao estoque
+    query2.prepare("UPDATE produtos SET quantidade = quantidade + :valor1 WHERE id = :valor2");
+    query2.bindValue(":valor1", qntd);
+    query2.bindValue(":valor2", id_produto);
+    query2.exec();
+
+    db.close();
+}

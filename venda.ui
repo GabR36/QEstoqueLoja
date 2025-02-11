@@ -3,7 +3,7 @@
  <class>venda</class>
  <widget class="QDialog" name="venda">
   <property name="windowModality">
-   <enum>Qt::WindowModal</enum>
+   <enum>Qt::WindowModality::WindowModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -59,6 +59,9 @@ color: rgb(255, 255, 255);
 font-size: 15px;
 border-radius: 13px;
 }
+QPushButton:disabled{	
+	background-color: rgb(154, 153, 150);
+}
 QGroupBox{
 background-color:rgb(170, 170, 170);
 	font: 700 9pt &quot;Segoe UI&quot;;
@@ -67,82 +70,181 @@ background-color:rgb(170, 170, 170);
 </string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout_6">
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_5">
-       <item>
-        <widget class="QLabel" name="label_7">
-         <property name="font">
-          <font>
-           <pointsize>20</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Total (R$):</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="Lbl_Total">
-         <property name="font">
-          <font>
-           <pointsize>20</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="Btn_Aceitar">
-       <property name="minimumSize">
-        <size>
-         <width>200</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">#Btn_Aceitar{
-background-color: rgb(33, 105, 149);
-}
-#Btn_Aceitar:hover{
-background-color:rgb(03,75,119);
-}
-#Btn_Aceitar:pressed{
-
-	background-color: rgb(153, 193, 241);
-
-}</string>
-       </property>
-       <property name="text">
-        <string>Próximo: Pagamento</string>
-       </property>
-       <property name="autoDefault">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>75</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout">
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout_2">
+              <item>
+               <widget class="QLabel" name="label_2">
+                <property name="styleSheet">
+                 <string notr="true">font-size: 15px;
+      font: 700 9pt &quot;Segoe UI&quot;;</string>
+                </property>
+                <property name="text">
+                 <string>Código de barras ou pesquise(F4):</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout">
+                <item>
+                 <widget class="CustomLineEdit" name="Ledit_Pesquisa">
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="Btn_Pesquisa">
+                  <property name="minimumSize">
+                   <size>
+                    <width>30</width>
+                    <height>23</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>35</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="Imagens/recursosImg.qrc">
+                    <normaloff>:/QEstoqueLOja/edit-find.svg</normaloff>:/QEstoqueLOja/edit-find.svg</iconset>
+                  </property>
+                  <property name="autoDefault">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QPushButton" name="Btn_SelecionarProduto">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>300</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Selecionar Produto </string>
+              </property>
+              <property name="icon">
+               <iconset resource="Imagens/recursosImg.qrc">
+                <normaloff>:/QEstoqueLOja/dialog-ok-apply.svg</normaloff>:/QEstoqueLOja/dialog-ok-apply.svg</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>20</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="autoDefault">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="text">
+               <string>Cliente: </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="CustomLineEdit" name="Ledit_Cliente">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>300</width>
+                <height>0</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Data:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDateTimeEdit" name="DateEdt_Venda">
+            <property name="calendarPopup">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
    </item>
-   <item row="1" column="0" colspan="2">
-    <layout class="QVBoxLayout" name="verticalLayout_5">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="pixmap">
+      <pixmap resource="Imagens/recursosImg.qrc">:/QEstoqueLOja/ICONEjanela.ico</pixmap>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <layout class="QVBoxLayout" name="verticalLayout_6">
      <item>
       <widget class="QLabel" name="label_4">
        <property name="styleSheet">
@@ -169,16 +271,16 @@ background-color:rgb(03,75,119);
         </size>
        </property>
        <property name="contextMenuPolicy">
-        <enum>Qt::CustomContextMenu</enum>
+        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
        </property>
        <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
+        <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
        </property>
        <property name="selectionMode">
-        <enum>QAbstractItemView::SingleSelection</enum>
+        <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
        </property>
        <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectRows</enum>
+        <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
        </property>
        <attribute name="horizontalHeaderDefaultSectionSize">
         <number>100</number>
@@ -193,170 +295,106 @@ background-color:rgb(03,75,119);
      </item>
     </layout>
    </item>
-   <item row="0" column="0">
-    <layout class="QVBoxLayout" name="verticalLayout_8">
+   <item row="3" column="0" colspan="3">
+    <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
        <item>
-        <widget class="QDateTimeEdit" name="DateEdt_Venda">
-         <property name="calendarPopup">
-          <bool>true</bool>
+        <widget class="QLabel" name="label_7">
+         <property name="font">
+          <font>
+           <family>Ubuntu</family>
+           <pointsize>16</pointsize>
+           <italic>false</italic>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">font: 700 16pt &quot;Ubuntu&quot;;</string>
+         </property>
+         <property name="text">
+          <string>Total (R$):</string>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <item>
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Cliente: </string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="Ledit_Cliente">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>300</width>
-             <height>0</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QLabel" name="label_6">
-           <property name="styleSheet">
-            <string notr="true"/>
-           </property>
-           <property name="text">
-            <string>Código de barras:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="Ledit_Barras">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>250</width>
-             <height>0</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QLabel" name="Lbl_Total">
+         <property name="font">
+          <font>
+           <pointsize>20</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
      <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Quantidade Vendida: </string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="Ledit_QuantVendido">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>250</width>
-               <height>0</height>
-              </size>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Preço (R$): </string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="Ledit_Preco">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>300</width>
-             <height>0</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QPushButton" name="Btn_SelecionarProduto">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
-       <property name="minimumSize">
+       <property name="sizeHint" stdset="0">
         <size>
-         <width>300</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>300</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Selecionar Produto</string>
-       </property>
-       <property name="icon">
-        <iconset resource="Imagens/recursosImg.qrc">
-         <normaloff>:/QEstoqueLOja/dialog-ok-apply.svg</normaloff>:/QEstoqueLOja/dialog-ok-apply.svg</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>20</width>
+         <width>40</width>
          <height>20</height>
         </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Btn_CancelarVenda">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#Btn_CancelarVenda{
+background-color:rgb(191, 61, 64);
+}
+#Btn_CancelarVenda:hover{
+background-color: rgb(139, 44, 47);
+}
+#Btn_CancelarVenda:pressed{
+background-color:rgb(255, 96, 99)
+
+}</string>
+       </property>
+       <property name="text">
+        <string>Cancelar Venda (ESC)</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Btn_Aceitar">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">#Btn_Aceitar{
+background-color: rgb(33, 105, 149);
+}
+#Btn_Aceitar:hover{
+background-color:rgb(03,75,119);
+}
+#Btn_Aceitar:pressed{
+
+	background-color: rgb(153, 193, 241);
+
+}</string>
+       </property>
+       <property name="text">
+        <string>Próximo: Pagamento(F6)</string>
+       </property>
+       <property name="shortcut">
+        <string>F6</string>
        </property>
        <property name="autoDefault">
         <bool>false</bool>
@@ -365,8 +403,8 @@ background-color:rgb(03,75,119);
      </item>
     </layout>
    </item>
-   <item row="0" column="1">
-    <layout class="QVBoxLayout" name="verticalLayout_6">
+   <item row="1" column="2">
+    <layout class="QVBoxLayout" name="verticalLayout_5">
      <item>
       <widget class="QLabel" name="label_5">
        <property name="styleSheet">
@@ -388,7 +426,7 @@ background-color:rgb(03,75,119);
        </property>
        <property name="minimumSize">
         <size>
-         <width>300</width>
+         <width>600</width>
          <height>180</height>
         </size>
        </property>
@@ -402,10 +440,10 @@ background-color:rgb(03,75,119);
         <bool>true</bool>
        </property>
        <property name="selectionMode">
-        <enum>QAbstractItemView::SingleSelection</enum>
+        <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
        </property>
        <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectRows</enum>
+        <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
        </property>
        <attribute name="horizontalHeaderDefaultSectionSize">
         <number>50</number>
@@ -418,50 +456,27 @@ background-color:rgb(03,75,119);
        </attribute>
       </widget>
      </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_7">
-       <item>
-        <widget class="QLineEdit" name="Ledit_Pesquisa"/>
-       </item>
-       <item>
-        <widget class="QPushButton" name="Btn_Pesquisa">
-         <property name="minimumSize">
-          <size>
-           <width>35</width>
-           <height>25</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>35</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset resource="Imagens/recursosImg.qrc">
-           <normaloff>:/QEstoqueLOja/edit-find.svg</normaloff>:/QEstoqueLOja/edit-find.svg</iconset>
-         </property>
-         <property name="autoDefault">
-          <bool>false</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_4">
-       <item>
-        <layout class="QVBoxLayout" name="verticalLayout_7"/>
-       </item>
-      </layout>
-     </item>
     </layout>
+   </item>
+   <item row="0" column="2">
+    <widget class="QLabel" name="label_8">
+     <property name="styleSheet">
+      <string notr="true">font: 700 20pt &quot;Ubuntu&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Ponto De Venda</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>customlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="Imagens/recursosImg.qrc"/>
  </resources>

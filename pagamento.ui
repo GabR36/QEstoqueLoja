@@ -3,7 +3,7 @@
  <class>pagamento</class>
  <widget class="QDialog" name="pagamento">
   <property name="windowModality">
-   <enum>Qt::NonModal</enum>
+   <enum>Qt::WindowModality::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -69,10 +69,10 @@ background-color:rgb(170, 170, 170);
     </rect>
    </property>
    <property name="orientation">
-    <enum>Qt::Horizontal</enum>
+    <enum>Qt::Orientation::Horizontal</enum>
    </property>
    <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+    <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
    </property>
    <property name="centerButtons">
     <bool>false</bool>
@@ -171,10 +171,10 @@ font-size: 15px;
 </string>
    </property>
    <property name="frameShape">
-    <enum>QFrame::StyledPanel</enum>
+    <enum>QFrame::Shape::StyledPanel</enum>
    </property>
    <property name="frameShadow">
-    <enum>QFrame::Raised</enum>
+    <enum>QFrame::Shadow::Raised</enum>
    </property>
    <widget class="QLabel" name="label_4">
     <property name="geometry">
@@ -269,7 +269,7 @@ font-size: 15px;
           <string>Data:</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
          </property>
         </widget>
        </item>
@@ -291,7 +291,7 @@ font-size: 15px;
           <string>TextLabel</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
          </property>
         </widget>
        </item>
@@ -318,7 +318,7 @@ font-size: 15px;
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="Ledit_Recebido"/>
+     <widget class="CustomLineEdit" name="Ledit_Recebido"/>
     </item>
    </layout>
   </widget>
@@ -402,7 +402,7 @@ font-size: 15px;
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="Ledit_Taxa"/>
+     <widget class="CustomLineEdit" name="Ledit_Taxa"/>
     </item>
    </layout>
   </widget>
@@ -411,7 +411,7 @@ font-size: 15px;
     <rect>
      <x>40</x>
      <y>230</y>
-     <width>195</width>
+     <width>321</width>
      <height>28</height>
     </rect>
    </property>
@@ -424,7 +424,14 @@ font-size: 15px;
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="Ledit_Desconto"/>
+     <widget class="CustomLineEdit" name="Ledit_Desconto"/>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="CheckPorcentagem">
+      <property name="text">
+       <string>Porcentagem?</string>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -453,6 +460,13 @@ cupom </string>
    </property>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>customlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="Imagens/recursosImg.qrc"/>
  </resources>

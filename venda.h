@@ -29,18 +29,16 @@ public:
     QIcon deletar;
 
 
+protected:
+    void handleSelectionChangeProdutos(const QItemSelection &selected, const QItemSelection &deselected);
+
+    void keyPressEvent(QKeyEvent *event) override;
 private slots:
     void on_Btn_SelecionarProduto_clicked();
 
     void handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected);
 
     void on_Btn_Pesquisa_clicked();
-
-    void on_Ledit_QuantVendido_textChanged(const QString &arg1);
-
-    void on_Ledit_Preco_textChanged(const QString &arg1);
-
-    void on_Ledit_Barras_returnPressed();
 
     void on_Btn_Aceitar_clicked();
 
@@ -49,6 +47,10 @@ private slots:
     void on_Tview_ProdutosSelecionados_customContextMenuRequested(const QPoint &pos);
 
     void deletarProd();
+
+    void on_Ledit_Pesquisa_returnPressed();
+
+    void on_Btn_CancelarVenda_clicked();
 
 private:
     QSqlQueryModel *modeloProdutos = new QSqlQueryModel;

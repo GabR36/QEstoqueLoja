@@ -56,8 +56,8 @@ private slots:
     void on_Btn_AbrirPag_clicked();
 
 private:
-    void LabelLucro();
-    void LabelLucro(QString whereQuery);
+    // void LabelLucro();
+    void LabelLucro(QString whereQueryData, QString whereQueryPrazo);
     QSqlQueryModel *modeloProdVendidos = new QSqlQueryModel;
     QSqlQueryModel *modeloVendas2 = new QSqlQueryModel;
     Ui::Vendas *ui;

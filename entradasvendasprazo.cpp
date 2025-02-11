@@ -6,7 +6,7 @@
 #include <QMessageBox>
 #include "pagamentoaprazo.h"
 #include "mainwindow.h"
-
+#include "delegatehora.h"
 
 EntradasVendasPrazo::EntradasVendasPrazo(QWidget *parent, QString id_venda)
     : QDialog(parent)
@@ -53,6 +53,9 @@ EntradasVendasPrazo::EntradasVendasPrazo(QWidget *parent, QString id_venda)
     ui->tview_Entradas->setColumnWidth(0,100);
     ui->tview_Entradas->setColumnWidth(1,150);
     ui->tview_Entradas->setColumnWidth(2,160);
+
+    DelegateHora *delegateHora = new DelegateHora(this);
+    ui->tview_Entradas->setItemDelegateForColumn(1, delegateHora);
 
     ui->label_2->setText("Valor Inicial da Venda: " + valorVenda);
     ui->label_3->setText("Data Inicial da Venda: "+ dataHoraVenda);

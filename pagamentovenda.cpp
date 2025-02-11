@@ -22,8 +22,14 @@ void pagamentoVenda::terminarPagamento(){
     QString forma_pagamento = ui->CBox_FormaPagamento->currentText();
     QString taxa = ui->Ledit_Taxa->text();
     QString valor_final = ui->Lbl_TotalTaxa->text();
-    QString desconto = ui->Ledit_Desconto->text();
-
+    QString descontoInicial = ui->Ledit_Desconto->text();
+    QString desconto;
+    if (ui->CheckPorcentagem->isChecked()){
+        desconto = portugues.toString((portugues.toFloat(descontoInicial)/100)*portugues.toFloat(totalGlobal));
+    }
+    else{
+        desconto = descontoInicial;
+    }
     // validar line edits
 
     // desconto

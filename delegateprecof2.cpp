@@ -12,3 +12,5 @@ QString DelegatePrecoF2::displayText(const QVariant &value, const QLocale &local
     return QStyledItemDelegate::displayText(value, locale);
 
 }
+
+

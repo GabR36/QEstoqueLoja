@@ -11,6 +11,7 @@
 #include <QRandomGenerator>
 #include <QKeyEvent>
 #include "config.h"
+#include "subclass/customlineedit.h"
 
 
 //#include "vendas.h"
@@ -90,6 +91,7 @@ private:
     QAction* actionMenuPrintBarCode1;
     QAction* actionMenuPrintBarCode3;
 
+    void setarIconesJanela();
     //QModelIndex selected_index;
 
 protected:

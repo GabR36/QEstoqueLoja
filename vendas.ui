@@ -275,20 +275,20 @@ background-color:rgb(03,75,119);
 font: 700 9pt &quot;Segoe UI&quot;;</string>
        </property>
        <property name="text">
-        <string>Produtos vendidos nessa venda:</string>
+        <string>Produtos vendidos:</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QTableView" name="Tview_ProdutosVendidos">
        <property name="contextMenuPolicy">
-        <enum>Qt::CustomContextMenu</enum>
+        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
        </property>
        <property name="alternatingRowColors">
         <bool>true</bool>
        </property>
        <property name="selectionMode">
-        <enum>QAbstractItemView::SingleSelection</enum>
+        <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
        </property>
        <property name="selectionBehavior">
         <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>

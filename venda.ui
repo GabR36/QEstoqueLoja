@@ -97,7 +97,7 @@ background-color:rgb(170, 170, 170);
       font: 700 9pt &quot;Segoe UI&quot;;</string>
                 </property>
                 <property name="text">
-                 <string>Código de barras ou pesquise(F4):</string>
+                 <string>Código de barras ou pesquise (F1):</string>
                 </property>
                </widget>
               </item>
@@ -108,7 +108,7 @@ background-color:rgb(170, 170, 170);
                   <property name="minimumSize">
                    <size>
                     <width>100</width>
-                    <height>0</height>
+                    <height>30</height>
                    </size>
                   </property>
                  </widget>
@@ -184,7 +184,7 @@ background-color:rgb(170, 170, 170);
             <item>
              <widget class="QLabel" name="label">
               <property name="text">
-               <string>Cliente: </string>
+               <string>Cliente (F2): </string>
               </property>
              </widget>
             </item>
@@ -215,7 +215,7 @@ background-color:rgb(170, 170, 170);
              </size>
             </property>
             <property name="text">
-             <string>Data:</string>
+             <string>Data (F3):</string>
             </property>
            </widget>
           </item>
@@ -252,7 +252,7 @@ background-color:rgb(170, 170, 170);
       font: 700 9pt &quot;Segoe UI&quot;;</string>
        </property>
        <property name="text">
-        <string>Produtos Selecionados</string>
+        <string>Produtos Selecionados (F9):</string>
        </property>
       </widget>
      </item>
@@ -391,7 +391,7 @@ background-color:rgb(03,75,119);
 }</string>
        </property>
        <property name="text">
-        <string>Próximo: Pagamento(F6)</string>
+        <string>Próximo: Pagamento (F6)</string>
        </property>
        <property name="shortcut">
         <string>F6</string>
@@ -412,7 +412,7 @@ background-color:rgb(03,75,119);
       font: 700 9pt &quot;Segoe UI&quot;;</string>
        </property>
        <property name="text">
-        <string>Catalogo de Produtos</string>
+        <string>Catalogo de Produtos (F4):</string>
        </property>
       </widget>
      </item>

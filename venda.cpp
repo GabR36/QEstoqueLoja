@@ -148,25 +148,6 @@ void venda::handleSelectionChange(const QItemSelection &selected, const QItemSel
     Q_UNUSED(deselected);
 
 
-    // if (selected.indexes().isEmpty()) {
-    //     qDebug() << "Nenhum registro selecionado.";
-    //     db.close();
-    //     return;
-    // }
-
-    // qDebug() << "Registro(s) selecionado(s):";
-
-    // if(!db.open()){
-    //     qDebug() << "erro ao abrir banco de dados. handleselectionchange Venda";
-    // }
-    // QModelIndex selectedIndex = selected.indexes().first();
-    // QVariant idVariant = ui->Tview_ProdutosSelecionados->model()->data(ui->Tview_ProdutosSelecionados->model()->index(selectedIndex.row(), 0));
-    // QString productId = idVariant.toString();
-
-
-    // qDebug() << productId;
-    // db.close();
-
 }
 void venda::handleSelectionChangeProdutos(const QItemSelection &selected, const QItemSelection &deselected){
     if (selected.indexes().isEmpty()) {
@@ -181,11 +162,26 @@ void venda::handleSelectionChangeProdutos(const QItemSelection &selected, const 
 
 void venda::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_F4) {
+    if (event->key() == Qt::Key_F1) {
         ui->Ledit_Pesquisa->setFocus();  // Foca no QLineEdit quando F4 é pressionado
         ui->Ledit_Pesquisa->selectAll();
     }else if(event->key() == Qt::Key_Escape){
         ui->Btn_CancelarVenda->click();
+    }else if(event->key() == Qt::Key_F4){
+        ui->Tview_Produtos->setFocus();
+    }else if(event->key() == Qt::Key_F2){
+        ui->Ledit_Cliente->setFocus();
+        ui->Ledit_Cliente->selectAll();
+    }else if(event->key() == Qt::Key_F3){
+        ui->DateEdt_Venda->setFocus();
+    }else if(event->key() == Qt::Key_F9){
+        ui->Tview_ProdutosSelecionados->setFocus();
+    }
+    else if(ui->Tview_Produtos->hasFocus() && (event->key() == Qt::Key_Return ||
+                                                  event->key() == Qt::Key_Enter)){
+        ui->Btn_SelecionarProduto->click();
+    }else if(ui->Tview_ProdutosSelecionados->hasFocus() && (event->key() == Qt::Key_Delete)){
+        deletarProd();
     }
     QWidget::keyPressEvent(event);
     // Chama a implementação base

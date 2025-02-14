@@ -75,6 +75,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         delegateprecovalidate.h delegateprecovalidate.cpp
         delegatelockcol.h delegatelockcol.cpp
         delegatequant.h delegatequant.cpp
+        clientes.h clientes.cpp clientes.ui
 
 
 

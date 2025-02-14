@@ -542,6 +542,25 @@ background-color:rgb(03,75,119);
                </widget>
               </item>
               <item>
+               <widget class="QPushButton" name="Btn_Clientes">
+                <property name="minimumSize">
+                 <size>
+                  <width>140</width>
+                  <height>60</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Clientes</string>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>40</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
                <spacer name="horizontalSpacer">
                 <property name="orientation">
                  <enum>Qt::Orientation::Horizontal</enum>

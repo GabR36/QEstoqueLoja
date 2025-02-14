@@ -22,6 +22,7 @@
 #include <zint.h>
 #include "delegateprecof2.h"
 #include "util/pdfexporter.h"
+#include "clientes.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -95,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug() << dbSchemaVersion;
 
     // a versão mais recente do esquema do banco de dados
-    int dbSchemaLastVersion = 3;
+    int dbSchemaLastVersion = 4;
 
     while (dbSchemaVersion < dbSchemaLastVersion){
         // selecionar a atualizacao conforme a versao atual do banco de dados
@@ -285,6 +286,38 @@ MainWindow::MainWindow(QWidget *parent)
 
             break;
         }
+        case 3:
+        {
+            // schema versao 3 atualizar para a versao 4
+
+            // comecar transacao
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+            }
+            QSqlQuery query;
+
+            query.exec("CREATE TABLE clientes (id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                       "nome TEXT NOT NULL,"
+                       "email TEXT,"
+                       "telefone TEXT,"
+                       "endereco TEXT,"
+                       "cpf TEXT,"
+                       "data_nascimento DATE,"
+                       "data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP)");
+
+            // mudar a versao para 4
+            query.exec("PRAGMA user_version = 4");
+
+            // terminar transacao
+            if (!db.commit()) {
+                qDebug() << "Error: unable to commit transaction";
+                db.rollback(); // Desfaz a transação
+            }
+
+            dbSchemaVersion = 4;
+
+            break;
+        }
         }
     }
     qDebug() << dbSchemaVersion;
@@ -361,6 +394,7 @@ void MainWindow::setarIconesJanela(){
     iconPesquisa.addFile(":/QEstoqueLOja/edit-find.svg");
     iconBtnRelatorios.addFile(":/QEstoqueLOja/view-financial-account-investment-security.svg");
     iconImpressora.addFile(":/QEstoqueLOja/document-print.svg");
+    iconClientes.addFile(":/QEstoqueLOja/user-others.svg");
 
 
     ui->Btn_AddProd->setIcon(iconAddProduto);
@@ -369,6 +403,7 @@ void MainWindow::setarIconesJanela(){
     ui->Btn_Delete->setIcon(iconDelete);
     ui->Btn_Pesquisa->setIcon(iconPesquisa);
     ui->Btn_Relatorios->setIcon(iconBtnRelatorios);
+    ui->Btn_Clientes->setIcon(iconClientes);
 }
 void MainWindow::atualizarTableview(){
     if(!db.open()){
@@ -965,5 +1000,15 @@ void MainWindow::on_actionConfig_triggered()
 void MainWindow::on_Ledit_Pesquisa_textChanged(const QString &arg1)
 {
     ui->Btn_Pesquisa->click();
+}
+
+
+void MainWindow::on_Btn_Clientes_clicked()
+{
+
+
+    Clientes *clientes = new Clientes;
+    clientes->setWindowModality(Qt::ApplicationModal);
+    clientes->show();
 }
 

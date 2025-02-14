@@ -13,6 +13,16 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <widget class="QTableView" name="Tview_Clientes">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>40</y>
+     <width>351</width>
+     <height>192</height>
+    </rect>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>

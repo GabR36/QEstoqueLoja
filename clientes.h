@@ -2,6 +2,8 @@
 #define CLIENTES_H
 
 #include <QWidget>
+#include <QSqlDatabase>
+#include <QSqlQueryModel>
 
 namespace Ui {
 class Clientes;
@@ -17,6 +19,8 @@ public:
 
 private:
     Ui::Clientes *ui;
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQueryModel* model = new QSqlQueryModel;
 };
 
 #endif // CLIENTES_H

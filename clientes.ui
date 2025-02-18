@@ -6,22 +6,77 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>559</width>
     <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QTableView" name="Tview_Clientes">
+  <widget class="QLabel" name="lbl_Titulo">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>40</y>
-     <width>351</width>
-     <height>192</height>
+     <x>170</x>
+     <y>10</y>
+     <width>121</width>
+     <height>21</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>17</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Clientes</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>50</y>
+     <width>491</width>
+     <height>194</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QPushButton" name="Btn_Alterar">
+        <property name="text">
+         <string>Alterar</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="Btn_Deletar">
+        <property name="text">
+         <string>Deletar</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="Btn_Novo">
+        <property name="text">
+         <string>Novo</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTableView" name="Tview_Clientes">
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>

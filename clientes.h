@@ -17,6 +17,9 @@ public:
     explicit Clientes(QWidget *parent = nullptr);
     ~Clientes();
 
+private slots:
+    void on_Btn_Alterar_clicked();
+
 private:
     Ui::Clientes *ui;
     QSqlDatabase db = QSqlDatabase::database();

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Clientes</string>
   </property>
   <widget class="QLabel" name="lbl_Titulo">
    <property name="geometry">
@@ -31,7 +31,7 @@
     <string>Clientes</string>
    </property>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>30</x>

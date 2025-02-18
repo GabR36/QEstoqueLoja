@@ -11,9 +11,9 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Alterar Cliente</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -28,7 +28,7 @@
       <item>
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Nome:</string>
+         <string>Nome: (*)</string>
         </property>
        </widget>
       </item>
@@ -84,7 +84,7 @@
       <item>
        <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>CPF:</string>
+         <string>CPF/CNPJ:</string>
         </property>
        </widget>
       </item>
@@ -109,7 +109,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>170</x>
@@ -134,6 +134,24 @@
      </widget>
     </item>
    </layout>
+  </widget>
+  <widget class="QLabel" name="label_7">
+   <property name="geometry">
+    <rect>
+     <x>130</x>
+     <y>10</y>
+     <width>141</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>13</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Alterar Cliente</string>
+   </property>
   </widget>
  </widget>
  <resources/>

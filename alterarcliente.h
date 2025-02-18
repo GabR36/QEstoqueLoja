@@ -16,9 +16,15 @@ public:
     explicit AlterarCliente(QWidget *parent = nullptr, QString id = "1");
     ~AlterarCliente();
 
+private slots:
+    void on_Btn_Cancelar_clicked();
+
+    void on_Btn_Ok_clicked();
+
 private:
     Ui::AlterarCliente *ui;
     QSqlDatabase db =  QSqlDatabase::database();
+    QString id;
 };
 
 #endif // ALTERARCLIENTE_H

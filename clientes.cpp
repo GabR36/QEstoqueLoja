@@ -4,6 +4,7 @@
 #include <QSqlDatabase>
 #include <QMessageBox>
 #include "alterarcliente.h"
+#include <QSqlQuery>
 
 Clientes::Clientes(QWidget *parent)
     : QWidget(parent)
@@ -32,7 +33,7 @@ void Clientes::on_Btn_Alterar_clicked()
 {
     qDebug() << "Teste";
     if(ui->Tview_Clientes->selectionModel()->isSelected(ui->Tview_Clientes->currentIndex())){
-        // obter id, nome, etc. selecionado
+        // obter id selecionado
         QItemSelectionModel *selectionModel = ui->Tview_Clientes->selectionModel();
         QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
         QVariant idVariant = ui->Tview_Clientes->model()->data(ui->Tview_Clientes->model()->index(selectedIndex.row(), 0));
@@ -42,7 +43,44 @@ void Clientes::on_Btn_Alterar_clicked()
         alterarJanela->show();
     }
     else{
-        QMessageBox::warning(this,"Erro","Selecione um produto antes de alterar!");
+        QMessageBox::warning(this,"Erro","Selecione um cliente antes de alterar!");
+    }
+}
+
+
+void Clientes::on_Btn_Deletar_clicked()
+{
+    if(ui->Tview_Clientes->selectionModel()->isSelected(ui->Tview_Clientes->currentIndex())){
+        // Cria uma mensagem de confirmação
+        QMessageBox::StandardButton resposta;
+        resposta = QMessageBox::question(
+            nullptr,
+            "Confirmação",
+            "Tem certeza que deseja deletar o cliente?",
+            QMessageBox::Yes | QMessageBox::No
+            );
+        // Verifica a resposta do usuário
+        if (resposta == QMessageBox::Yes) {
+
+            // obter id selecionado
+            QItemSelectionModel *selectionModel = ui->Tview_Clientes->selectionModel();
+            QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+            QVariant idVariant = ui->Tview_Clientes->model()->data(ui->Tview_Clientes->model()->index(selectedIndex.row(), 0));
+            QString clienteId = idVariant.toString();
+
+            // query para deletar a partir do id
+            db.open();
+            QSqlQuery query;
+            query.prepare("DELETE FROM clientes WHERE id = :valor1");
+            query.bindValue(":valor1", clienteId);
+            query.exec();
+
+            // atualizar
+            model->setQuery("SELECT * FROM clientes");
+        }
+    }
+    else{
+        QMessageBox::warning(this,"Erro","Selecione um cliente antes de deletar!");
     }
 }
 

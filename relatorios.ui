@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>508</width>
-    <height>264</height>
+    <width>649</width>
+    <height>420</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -100,7 +100,7 @@ background-color:rgb(170, 170, 170);
         <string>Exportar estoque</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignCenter</set>
+        <set>Qt::AlignmentFlag::AlignCenter</set>
        </property>
        <property name="margin">
         <number>-1</number>

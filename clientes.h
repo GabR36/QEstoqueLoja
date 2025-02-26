@@ -22,6 +22,8 @@ private slots:
 
     void on_Btn_Deletar_clicked();
 
+    void on_Btn_Novo_clicked();
+
 private:
     Ui::Clientes *ui;
     QSqlDatabase db = QSqlDatabase::database();

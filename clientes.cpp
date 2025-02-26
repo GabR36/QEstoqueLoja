@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include "alterarcliente.h"
 #include <QSqlQuery>
+#include "inserircliente.h"
 
 Clientes::Clientes(QWidget *parent)
     : QWidget(parent)
@@ -82,5 +83,12 @@ void Clientes::on_Btn_Deletar_clicked()
     else{
         QMessageBox::warning(this,"Erro","Selecione um cliente antes de deletar!");
     }
+}
+
+
+void Clientes::on_Btn_Novo_clicked()
+{
+    InserirCliente *inserircliente = new InserirCliente();
+    inserircliente->show();
 }
 

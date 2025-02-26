@@ -3,16 +3,52 @@
 #include "mainwindow.h"
 #include <QDebug>
 #include "util/pdfexporter.h"
-
+#include <QChart>
+#include <QPieSeries>
+#include <QChartView>
 //#include <QDebug>;
-
 
 relatorios::relatorios(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::relatorios)
 {
+
     ui->setupUi(this);
+
+    while (ui->Stacked_Vendas->count() > 0) {
+        QWidget *pagina = ui->Stacked_Vendas->widget(0);
+        ui->Stacked_Vendas->removeWidget(pagina);
+        pagina->deleteLater(); // Libera a memória
+    }
+    // Criando o gráfico
+    QChart *chartVenda = new QChart();
+    QPieSeries *seriesPeriodo = new QPieSeries();
+    seriesPeriodo->append("Janeiro", 30);
+    seriesPeriodo->append("Fevereiro", 40);
+    seriesPeriodo->append("Março", 50);
+    chartVenda->addSeries(seriesPeriodo);
+    chartVenda->setTitle("Vendas por Mês");
+
+    QChartView *chartViewPeriodo = new QChartView(chartVenda);
+    chartViewPeriodo->setRenderHint(QPainter::Antialiasing);
+
+    // IMPORTANTE: Adicione primeiro o gráfico, depois a página vazia
+    ui->Stacked_Vendas->addWidget(chartViewPeriodo);
+
+    QWidget *paginaVazia = new QWidget();
+    ui->Stacked_Vendas->addWidget(paginaVazia);
+
+    // Definindo o índice inicial para mostrar o gráfico
+    ui->Stacked_Vendas->setCurrentIndex(0);
+
+    // Conectando o ComboBox ao StackedWidget
+    connect(ui->CBox_VendasMain, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            ui->Stacked_Vendas, &QStackedWidget::setCurrentIndex);
+
+    // Debug para verificar os índices
+    qDebug() << "Total de páginas no Stacked_Vendas:" << ui->Stacked_Vendas->count();
 }
+
 
 relatorios::~relatorios()
 {

@@ -73,6 +73,52 @@ background-color:rgb(170, 170, 170);
       <number>0</number>
      </property>
      <item>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>0</number>
+       </property>
+       <widget class="QWidget" name="tab_3">
+        <attribute name="title">
+         <string>Vendas</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <item>
+            <widget class="QComboBox" name="CBox_VendasMain">
+             <item>
+              <property name="text">
+               <string>Vendas por período</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Produtos mais vendidos</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QStackedWidget" name="Stacked_Vendas">
+             <property name="currentIndex">
+              <number>0</number>
+             </property>
+             <widget class="QWidget" name="page"/>
+             <widget class="QWidget" name="page_2"/>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_4">
+        <attribute name="title">
+         <string>Estoque</string>
+        </attribute>
+       </widget>
+      </widget>
+     </item>
+     <item>
       <widget class="QLabel" name="label">
        <property name="enabled">
         <bool>true</bool>

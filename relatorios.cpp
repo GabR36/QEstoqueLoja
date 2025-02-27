@@ -5,54 +5,197 @@
 #include "util/pdfexporter.h"
 #include <QChart>
 #include <QPieSeries>
+#include <QBarSeries>
 #include <QChartView>
+#include <QBarCategoryAxis>
+#include <QBarSet>
+#include <QMap>
+#include <QValueAxis>
 //#include <QDebug>;
 
 relatorios::relatorios(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::relatorios)
 {
-
     ui->setupUi(this);
 
+    // Limpando páginas antigas do StackedWidget
     while (ui->Stacked_Vendas->count() > 0) {
         QWidget *pagina = ui->Stacked_Vendas->widget(0);
         ui->Stacked_Vendas->removeWidget(pagina);
-        pagina->deleteLater(); // Libera a memória
+        pagina->deleteLater();
     }
-    // Criando o gráfico
-    QChart *chartVenda = new QChart();
-    QPieSeries *seriesPeriodo = new QPieSeries();
-    seriesPeriodo->append("Janeiro", 30);
-    seriesPeriodo->append("Fevereiro", 40);
-    seriesPeriodo->append("Março", 50);
-    chartVenda->addSeries(seriesPeriodo);
-    chartVenda->setTitle("Vendas por Mês");
 
-    QChartView *chartViewPeriodo = new QChartView(chartVenda);
-    chartViewPeriodo->setRenderHint(QPainter::Antialiasing);
+    // Criando o ComboBox para selecionar o período
+    QComboBox *CBox_Periodo = new QComboBox();
+    CBox_Periodo->addItem("Mes");
+    CBox_Periodo->addItem("Ano");
 
-    // IMPORTANTE: Adicione primeiro o gráfico, depois a página vazia
-    ui->Stacked_Vendas->addWidget(chartViewPeriodo);
+    // Criando o ComboBox para selecionar o ano (inicialmente oculto)
+    QComboBox *CBox_Ano = new QComboBox();
+    CBox_Ano->setVisible(false);
 
+    // Criando o container da página 0
+    QWidget *paginaGrafico = new QWidget();
+    QVBoxLayout *layoutGrafico = new QVBoxLayout();
+    layoutGrafico->addWidget(CBox_Periodo);
+    layoutGrafico->addWidget(CBox_Ano);
+    paginaGrafico->setLayout(layoutGrafico);
+
+    // Adicionando a página 0 ao StackedWidget
+    ui->Stacked_Vendas->addWidget(paginaGrafico);
+
+    // Adicionando uma página vazia como segunda página
     QWidget *paginaVazia = new QWidget();
     ui->Stacked_Vendas->addWidget(paginaVazia);
 
-    // Definindo o índice inicial para mostrar o gráfico
+    // Definindo o índice inicial para mostrar o gráfico e o ComboBox juntos
     ui->Stacked_Vendas->setCurrentIndex(0);
 
-    // Conectando o ComboBox ao StackedWidget
+    // Conectando o ComboBox de período
+    connect(CBox_Periodo, &QComboBox::currentTextChanged, this, [=](const QString &texto){
+        if (texto == "Ano") {
+            // Mostrar ComboBox de anos e buscar anos no banco de dados
+            CBox_Ano->setVisible(true);
+            CBox_Ano->clear();
+            CBox_Ano->addItems(buscarAnosDisponiveis());
+        } else {
+            CBox_Ano->setVisible(false);
+        }
+    });
+
+    // Conectando o ComboBox de ano para atualizar o gráfico
+    connect(CBox_Ano, &QComboBox::currentTextChanged, this, [=](const QString &anoSelecionado){
+        QMap<QString, int> vendas = buscarVendasPorMesAno(anoSelecionado);
+
+        // Criando o gráfico de barras
+        QBarSet *set = new QBarSet("Vendas");
+        QStringList categorias;
+
+        for (int i = 1; i <= 12; ++i) {
+            QString mes = QString("%1").arg(i, 2, 10, QChar('0'));
+            categorias << mes;
+            *set << vendas.value(mes, 0);
+        }
+
+        QBarSeries *series = new QBarSeries();
+        series->append(set);
+
+        QChart *chart = new QChart();
+        chart->addSeries(series);
+        chart->setTitle("Quantidade de Vendas por Mês - Ano " + anoSelecionado);
+        chart->setAnimationOptions(QChart::SeriesAnimations);
+
+        QBarCategoryAxis *axisX = new QBarCategoryAxis();
+        axisX->append(categorias);
+        chart->addAxis(axisX, Qt::AlignBottom);
+        series->attachAxis(axisX);
+
+        QValueAxis *axisY = new QValueAxis();
+        axisY->setRange(0, *std::max_element(vendas.begin(), vendas.end()));
+        chart->addAxis(axisY, Qt::AlignLeft);
+        series->attachAxis(axisY);
+
+        QChartView *chartView = new QChartView(chart);
+        chartView->setRenderHint(QPainter::Antialiasing);
+
+        // Limpando e adicionando o gráfico na página 0
+        QLayoutItem *item;
+        while ((item = layoutGrafico->takeAt(2)) != nullptr) {
+            delete item->widget();
+            delete item;
+        }
+        layoutGrafico->addWidget(chartView);
+    });
+    CBox_Periodo->setCurrentIndex(1);
+    emit CBox_Periodo->currentTextChanged(CBox_Periodo->currentText());
+
+    // Conectando o ComboBox principal para alternar páginas
     connect(ui->CBox_VendasMain, QOverload<int>::of(&QComboBox::currentIndexChanged),
             ui->Stacked_Vendas, &QStackedWidget::setCurrentIndex);
-
-    // Debug para verificar os índices
-    qDebug() << "Total de páginas no Stacked_Vendas:" << ui->Stacked_Vendas->count();
 }
+
+
+
+
 
 
 relatorios::~relatorios()
 {
     delete ui;
+}
+void relatorios::conectarBancoDados() {
+    if (!db.open()) {
+        qDebug() << "Erro ao conectar ao banco de dados:" << db.lastError().text();
+    } else {
+        qDebug() << "Conectado ao banco de dados.";
+    }
+}
+QStringList relatorios::buscarAnosDisponiveis() {
+    QStringList anos;
+    QSqlQuery query;
+    query.prepare(R"(
+        SELECT DISTINCT strftime('%Y', data_hora) AS ano
+        FROM vendas2
+        ORDER BY ano DESC
+    )");
+
+    if (query.exec()) {
+        while (query.next()) {
+            anos << query.value(0).toString();
+        }
+    } else {
+        qDebug() << "Erro ao buscar anos:" << query.lastError().text();
+    }
+
+    return anos;
+}
+
+QMap<QString, int> relatorios::buscarVendasPorMes() {
+    QMap<QString, int> vendasPorMes;
+
+    QSqlQuery query;
+    query.prepare(R"(
+        SELECT strftime('%m', data_hora) AS mes, COUNT(*) AS total
+        FROM vendas2
+        WHERE strftime('%Y', data_hora) = strftime('%Y', 'now')
+        GROUP BY mes
+    )");
+
+    if (query.exec()) {
+        while (query.next()) {
+            QString mes = query.value(0).toString();
+            int total = query.value(1).toInt();
+            vendasPorMes[mes] = total;
+        }
+    } else {
+        qDebug() << "Erro na consulta:" << query.lastError().text();
+    }
+
+    return vendasPorMes;
+}
+QMap<QString, int> relatorios::buscarVendasPorMesAno(const QString& ano) {
+    QMap<QString, int> vendasPorMes;
+    QSqlQuery query;
+    query.prepare(R"(
+        SELECT strftime('%m', data_hora) AS mes, COUNT(*) AS total
+        FROM vendas2
+        WHERE strftime('%Y', data_hora) = :ano
+        GROUP BY mes
+    )");
+    query.bindValue(":ano", ano);
+
+    if (query.exec()) {
+        while (query.next()) {
+            QString mes = query.value(0).toString();
+            int total = query.value(1).toInt();
+            vendasPorMes[mes] = total;
+        }
+    } else {
+        qDebug() << "Erro ao buscar vendas:" << query.lastError().text();
+    }
+
+    return vendasPorMes;
 }
 
 void relatorios::on_Btn_PdfGen_clicked()

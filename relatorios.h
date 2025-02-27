@@ -30,8 +30,10 @@ public:
 
     ~relatorios();
 
+    QMap<QString, int> buscarVendasPorMes();
 
-
+    QStringList buscarAnosDisponiveis();
+    QMap<QString, int> buscarVendasPorMesAno(const QString &ano);
 private slots:
     void on_Btn_PdfGen_clicked();
 
@@ -39,6 +41,7 @@ private slots:
 
 private:
     Ui::relatorios *ui;
+    void conectarBancoDados();
     QLocale portugues;
 };
 

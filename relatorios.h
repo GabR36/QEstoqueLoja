@@ -34,6 +34,8 @@ public:
 
     QStringList buscarAnosDisponiveis();
     QMap<QString, int> buscarVendasPorMesAno(const QString &ano);
+protected:
+    QMap<QString, int> buscarVendasPorDiaMesAno(const QString &ano, const QString &mes);
 private slots:
     void on_Btn_PdfGen_clicked();
 

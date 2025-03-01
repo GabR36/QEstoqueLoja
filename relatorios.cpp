@@ -26,10 +26,17 @@ relatorios::relatorios(QWidget *parent)
         pagina->deleteLater();
     }
 
+
     // Criando o ComboBox para selecionar o período
     QComboBox *CBox_Periodo = new QComboBox();
     CBox_Periodo->addItem("Mes");
     CBox_Periodo->addItem("Ano");
+
+    QLabel *Lbl_Periodo = new QLabel();
+    Lbl_Periodo->setText("Período:");
+    QVBoxLayout *layoutPeriodo = new QVBoxLayout();
+    layoutPeriodo->addWidget(Lbl_Periodo);
+    layoutPeriodo->addWidget(CBox_Periodo);
 
     // Criando o ComboBox para selecionar o ano (inicialmente oculto)
     QComboBox *CBox_Ano = new QComboBox();
@@ -42,22 +49,38 @@ relatorios::relatorios(QWidget *parent)
     CBox_Mes->setVisible(false);
 
     // Criando o container da página 0
-    QWidget *paginaGrafico = new QWidget();
+    QWidget *paginaQuantVendas = new QWidget();
     QVBoxLayout *layoutGrafico = new QVBoxLayout();
     QHBoxLayout *layoutAnoMes = new QHBoxLayout();
     layoutAnoMes->addWidget(CBox_Ano);
     layoutAnoMes->addWidget(CBox_Mes);
 
-    layoutGrafico->addWidget(CBox_Periodo);
+    layoutGrafico->addLayout(layoutPeriodo);
     layoutGrafico->addLayout(layoutAnoMes);
-    paginaGrafico->setLayout(layoutGrafico);
+    paginaQuantVendas->setLayout(layoutGrafico);
 
     // Adicionando a página 0 ao StackedWidget
-    ui->Stacked_Vendas->addWidget(paginaGrafico);
+    ui->Stacked_Vendas->addWidget(paginaQuantVendas);
 
     // Adicionando uma página vazia como segunda página
-    QWidget *paginaVazia = new QWidget();
-    ui->Stacked_Vendas->addWidget(paginaVazia);
+    QWidget *paginaProdVendidos = new QWidget();
+    QVBoxLayout *layoutProdVendidos = new QVBoxLayout();
+    paginaProdVendidos->setLayout(layoutProdVendidos);
+    ui->Stacked_Vendas->addWidget(paginaProdVendidos);
+
+    QWidget *paginaValorVendas = new QWidget();
+    QVBoxLayout *layoutValorVendasValor = new QVBoxLayout();
+
+    QComboBox *CBox_periodoValor = new QComboBox();
+    CBox_periodoValor->addItem("Mes");
+    CBox_periodoValor->addItem("Ano");
+
+
+    layoutValorVendasValor->addWidget(CBox_periodoValor);
+
+    paginaValorVendas->setLayout(layoutValorVendasValor);
+    ui->Stacked_Vendas->addWidget(paginaValorVendas);
+
 
     // Definindo o índice inicial para mostrar o gráfico e o ComboBox juntos
     ui->Stacked_Vendas->setCurrentIndex(0);
@@ -75,6 +98,8 @@ relatorios::relatorios(QWidget *parent)
             CBox_Mes->setVisible(true);
             CBox_Ano->clear();
             CBox_Ano->addItems(buscarAnosDisponiveis());
+            emit CBox_Mes->currentTextChanged(CBox_Mes->currentText());
+
         }else {
             CBox_Ano->setVisible(false);
             CBox_Mes->setVisible(false);
@@ -183,6 +208,40 @@ relatorios::relatorios(QWidget *parent)
     // Conectando o ComboBox principal para alternar páginas
     connect(ui->CBox_VendasMain, QOverload<int>::of(&QComboBox::currentIndexChanged),
             ui->Stacked_Vendas, &QStackedWidget::setCurrentIndex);
+
+    QMap<QString, int> topProdutos = buscarTopProdutosVendidos();
+
+    // Criando o gráfico de barras para os produtos mais vendidos
+    QBarSet *set = new QBarSet("Vendas");
+    QStringList categorias;
+
+    for (auto it = topProdutos.begin(); it != topProdutos.end(); ++it) {
+        categorias << it.key();
+        *set << it.value();
+    }
+
+    QBarSeries *series = new QBarSeries();
+    series->append(set);
+
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Top 10 Produtos Mais Vendidos");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append(categorias);
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
+
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setRange(0, *std::max_element(topProdutos.begin(), topProdutos.end()));
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    layoutProdVendidos->addWidget(chartView);
 }
 
 
@@ -294,6 +353,32 @@ QMap<QString, int> relatorios::buscarVendasPorMesAno(const QString& ano) {
 
     return vendasPorMes;
 }
+
+QMap<QString, int> relatorios::buscarTopProdutosVendidos() {
+    QMap<QString, int> topProdutos;
+    QSqlQuery query;
+    query.prepare(R"(
+        SELECT p.descricao, SUM(pv.quantidade) AS total
+        FROM produtos_vendidos pv
+        JOIN produtos p ON pv.id_produto = p.id
+        GROUP BY p.descricao
+        ORDER BY total DESC
+        LIMIT 10
+    )");
+
+    if (query.exec()) {
+        while (query.next()) {
+            QString produto = query.value(0).toString();
+            int total = query.value(1).toInt();
+            topProdutos[produto] = total;
+        }
+    } else {
+        qDebug() << "Erro ao buscar top produtos:" << query.lastError().text();
+    }
+
+    return topProdutos;
+}
+
 
 void relatorios::on_Btn_PdfGen_clicked()
 {

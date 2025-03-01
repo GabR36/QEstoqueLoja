@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>649</width>
-    <height>420</height>
+    <width>1200</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>508</width>
-    <height>264</height>
+    <width>1200</width>
+    <height>600</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -83,17 +83,29 @@ background-color:rgb(170, 170, 170);
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Tipo de relatório:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
             <widget class="QComboBox" name="CBox_VendasMain">
              <item>
               <property name="text">
-               <string>Vendas por período</string>
+               <string>Quantidade de vendas por período</string>
               </property>
              </item>
              <item>
               <property name="text">
                <string>Produtos mais vendidos</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Valor de vendas por período</string>
               </property>
              </item>
             </widget>

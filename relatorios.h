@@ -37,6 +37,7 @@ public:
 protected:
     QMap<QString, int> buscarVendasPorDiaMesAno(const QString &ano, const QString &mes);
     QMap<QString, int> buscarTopProdutosVendidos();
+    QMap<QString, QPair<double, double> > buscarValorVendasPorMesAno(const QString &ano);
 private slots:
     void on_Btn_PdfGen_clicked();
 

@@ -335,6 +335,61 @@ relatorios::relatorios(QWidget *parent)
         }
     });
 
+    // grafico VALOR mes - ano
+    connect(CBox_MesValor, &QComboBox::currentTextChanged, this, [=](const QString &mesSelecionado){
+        QString anoSelecionado = CBox_AnoValor->currentText();
+        if (CBox_periodoValor->currentText() == "Mes" && !anoSelecionado.isEmpty()) {
+            QString mesFormatado = mesSelecionado.left(2);  // Pega o número do mês
+
+            QMap<QString, double> vendas = buscarValorVendasPorDiaMesAno(anoSelecionado, mesFormatado); //<<<<<<
+
+            // Criando o gráfico de barras para vendas diárias
+            QBarSet *set = new QBarSet("Valor Total Vendas");
+            QStringList categorias;
+
+            int diasNoMes = QDate(anoSelecionado.toInt(), mesFormatado.toInt(), 1).daysInMonth();
+            for (int dia = 1; dia <= diasNoMes; ++dia) {
+                QString diaStr = QString("%1").arg(dia, 2, 10, QChar('0'));
+                categorias << diaStr;
+                *set << vendas.value(diaStr, 0);
+            }
+
+            QBarSeries *series = new QBarSeries();
+            series->append(set);
+            connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
+                if (status) {
+                    QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
+                }
+            });
+
+            QChart *chart = new QChart();
+            chart->addSeries(series);
+            chart->setTitle("Valor Vendas por Dia - " + mesSelecionado + " de " + anoSelecionado);
+            chart->setAnimationOptions(QChart::SeriesAnimations);
+
+            QBarCategoryAxis *axisX = new QBarCategoryAxis();
+            axisX->append(categorias);
+            chart->addAxis(axisX, Qt::AlignBottom);
+            series->attachAxis(axisX);
+
+            QValueAxis *axisY = new QValueAxis();
+            axisY->setRange(0, *std::max_element(vendas.begin(), vendas.end()));
+            chart->addAxis(axisY, Qt::AlignLeft);
+            series->attachAxis(axisY);
+
+            QChartView *chartView = new QChartView(chart);
+            chartView->setRenderHint(QPainter::Antialiasing);
+
+            // Limpando e adicionando o gráfico na página 0
+            QLayoutItem *item;
+            while ((item = layoutPeriodoValor->takeAt(2)) != nullptr) {
+                delete item->widget();
+                delete item;
+            }
+            layoutPeriodoValor->addWidget(chartView);
+        }
+    });
+
     CBox_Periodo->setCurrentIndex(1);
     emit CBox_Periodo->currentTextChanged(CBox_Periodo->currentText());
     CBox_periodoValor->setCurrentIndex(1);
@@ -444,6 +499,7 @@ QMap<QString, int> relatorios::buscarVendasPorMes() {
 
     return vendasPorMes;
 }
+
 QMap<QString, int> relatorios::buscarVendasPorDiaMesAno(const QString& ano, const QString& mes) {
     QMap<QString, int> vendasPorDia;
     QSqlQuery query;
@@ -468,6 +524,36 @@ QMap<QString, int> relatorios::buscarVendasPorDiaMesAno(const QString& ano, cons
 
     return vendasPorDia;
 }
+
+
+QMap<QString, double> relatorios::buscarValorVendasPorDiaMesAno(const QString& ano, const QString& mes) {
+    QMap<QString, double> vendasPorDia;
+    QSqlQuery query;
+    query.prepare(R"(
+        SELECT strftime('%d', data_hora) AS dia, SUM(valor_final) AS total
+        FROM vendas2
+        WHERE strftime('%Y', data_hora) = :ano
+          AND strftime('%m', data_hora) = :mes
+          AND forma_pagamento != 'Prazo'
+        GROUP BY dia
+    )");
+
+    query.bindValue(":ano", ano);
+    query.bindValue(":mes", mes);
+
+    if (query.exec()) {
+        while (query.next()) {
+            QString dia = query.value(0).toString();
+            double total = query.value(1).toDouble();
+            vendasPorDia[dia] = total;
+        }
+    } else {
+        qDebug() << "Erro ao buscar vendas por dia:" << query.lastError().text();
+    }
+
+    return vendasPorDia;
+}
+
 
 
 

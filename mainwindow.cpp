@@ -261,7 +261,7 @@ MainWindow::MainWindow(QWidget *parent)
             // Iterar sobre os resultados da consulta
             while (query.next()) {
                 int id = query.value(0).toInt();
-               // bool esta_pago = query.value(1).toInt();
+                // bool esta_pago = query.value(1).toInt();
 
                 QSqlQuery updateQuery;
                 updateQuery.prepare("UPDATE vendas2 SET esta_pago = 1 WHERE id = :id");
@@ -290,10 +290,13 @@ MainWindow::MainWindow(QWidget *parent)
         {
             // schema versao 3 atualizar para a versao 4
 
+            db.open();
+
             // comecar transacao
             if (!db.transaction()) {
                 qDebug() << "Error: unable to start transaction";
             }
+
             QSqlQuery query;
 
             query.exec("CREATE TABLE clientes (id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -305,6 +308,38 @@ MainWindow::MainWindow(QWidget *parent)
                        "data_nascimento DATE,"
                        "data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP)");
 
+            if(!query.exec("CREATE TABLE vendas (  id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                            "cliente TEXT, "
+                            "data_hora DATETIME DEFAULT CURRENT_TIMESTAMP,"
+                            "total DECIMAL(10,2), "
+                            "forma_pagamento VARCHAR(20), "
+                            "valor_recebido DECIMAL(10,2),"
+                            "troco DECIMAL(10,2),"
+                            "taxa DECIMAL(10,2),"
+                            "valor_final DECIMAL(10,2),"
+                            "desconto DECIMAL(10,2),"
+                            "esta_pago BOOLEAN DEFAULT 1,"
+                            "id_cliente INTEGER,"
+                            "FOREIGN KEY (id_cliente) REFERENCES clientes (id)) ")){
+                qDebug() << "Erro ao criar nova tabela vendas";
+            }
+
+            if(!query.exec("INSERT INTO vendas (id, cliente, data_hora, total, forma_pagamento, "
+                            "valor_recebido, troco, taxa, valor_final, desconto, esta_pago, id_cliente) "
+                            "SELECT id, cliente, data_hora, total, forma_pagamento, "
+                            "valor_recebido, troco, taxa, valor_final, desconto, esta_pago, NULL "
+                            "FROM vendas2")){
+                qDebug() << "nao copiou dados de vendas2 para vendas";
+            }
+
+            if (!query.exec("DROP TABLE vendas2")) {
+                qDebug() << "Erro ao dropar tabela:" << query.lastError().text();
+            }
+
+            if(!query.exec("ALTER TABLE vendas RENAME TO vendas2")){
+                qDebug() << "nao renomeou tabela vendas para vendas2";
+            }
+
             // mudar a versao para 4
             query.exec("PRAGMA user_version = 4");
 
@@ -313,6 +348,8 @@ MainWindow::MainWindow(QWidget *parent)
                 qDebug() << "Error: unable to commit transaction";
                 db.rollback(); // Desfaz a transação
             }
+
+            db.close();
 
             dbSchemaVersion = 4;
 

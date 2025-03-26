@@ -8,6 +8,7 @@ AlterarCliente::AlterarCliente(QWidget *parent, QString id)
     , ui(new Ui::AlterarCliente)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::Tool);
 
     qDebug() << "id alterar cliente: " + id;
 

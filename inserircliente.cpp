@@ -8,6 +8,7 @@ InserirCliente::InserirCliente(QWidget *parent)
     , ui(new Ui::InserirCliente)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::Tool);
 }
 
 InserirCliente::~InserirCliente()
@@ -41,8 +42,8 @@ void InserirCliente::on_Btn_Inserir_clicked()
         db.open();
 
         QSqlQuery query;
-        query.prepare("INSERT INTO clientes (nome, email, telefone, endereco, cpf, data_nascimento)"
-                      "VALUESA (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6");
+        query.prepare("INSERT INTO clientes (nome, email, telefone, endereco, cpf, data_nascimento) "
+                      "VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6)");
         query.bindValue(":valor1", nome);
         query.bindValue(":valor2", email);
         query.bindValue(":valor3", telefone);

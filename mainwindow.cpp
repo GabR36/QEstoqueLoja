@@ -306,7 +306,8 @@ MainWindow::MainWindow(QWidget *parent)
                        "endereco TEXT,"
                        "cpf TEXT,"
                        "data_nascimento DATE,"
-                       "data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP)");
+                       "data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,"
+                       "eh_pf BOOLEAN )");
 
             if(!query.exec("CREATE TABLE vendas (  id INTEGER PRIMARY KEY AUTOINCREMENT,"
                             "cliente TEXT, "

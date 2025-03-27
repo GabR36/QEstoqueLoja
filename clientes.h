@@ -17,6 +17,7 @@ public:
     explicit Clientes(QWidget *parent = nullptr);
     ~Clientes();
 
+    void atualizarTableview();
 private slots:
     void on_Btn_Alterar_clicked();
 

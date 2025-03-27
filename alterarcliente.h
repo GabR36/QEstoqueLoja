@@ -25,6 +25,8 @@ private:
     Ui::AlterarCliente *ui;
     QSqlDatabase db =  QSqlDatabase::database();
     QString id;
+signals:
+    void clienteAtualizado();
 };
 
 #endif // ALTERARCLIENTE_H

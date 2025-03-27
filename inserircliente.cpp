@@ -55,6 +55,7 @@ void InserirCliente::on_Btn_Inserir_clicked()
         }
 
         db.close();
+        emit clienteInserido();
 
         this->close();
     }

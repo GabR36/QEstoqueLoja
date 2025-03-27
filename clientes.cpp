@@ -42,6 +42,8 @@ void Clientes::on_Btn_Alterar_clicked()
 
         AlterarCliente *alterarJanela = new AlterarCliente(nullptr, clienteId);
         alterarJanela->setWindowModality(Qt::ApplicationModal);
+
+        connect(alterarJanela, &AlterarCliente::clienteAtualizado, this, &Clientes::atualizarTableview);
         alterarJanela->show();
     }
     else{
@@ -91,6 +93,16 @@ void Clientes::on_Btn_Novo_clicked()
 {
     InserirCliente *inserircliente = new InserirCliente();
     inserircliente->setWindowModality(Qt::ApplicationModal);
+    connect(inserircliente, &InserirCliente::clienteInserido, this, &Clientes::atualizarTableview);
+
     inserircliente->show();
+}
+void Clientes::atualizarTableview(){
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. atualizarTableView";
+    }
+    model->setQuery("SELECT * FROM clientes");
+
+    db.close();
 }
 

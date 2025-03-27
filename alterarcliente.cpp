@@ -91,6 +91,7 @@ void AlterarCliente::on_Btn_Ok_clicked()
         }
 
         db.close();
+        emit clienteAtualizado();
 
         this->close();
     }

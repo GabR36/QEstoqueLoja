@@ -40,6 +40,8 @@ protected:
     bool verificarNomeIdCliente(const QString &nome, int id);
     QPair<QString, int> extrairNomeId(const QString &texto);
     int validarCliente(bool mostrarMensagens);
+    void atualizarListaCliente();
+    void selecionarClienteNovo();
 private slots:
     void on_Btn_SelecionarProduto_clicked();
 
@@ -59,11 +61,14 @@ private slots:
 
     void on_Btn_CancelarVenda_clicked();
 
+    void on_Btn_NovoCliente_clicked();
+
 private:
     QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
     QStandardItemModel *modeloSelecionados = new QStandardItemModel;
     Ui::venda *ui;
     QAction *actionMenuDeletarProd;
+    QStringList clientesComId;
 
 
 };

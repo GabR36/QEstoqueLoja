@@ -15,7 +15,7 @@
 #include "delegatequant.h"
 #include <QCompleter>
 #include <QStringListModel>
-
+#include "inserircliente.h"
 
 
 venda::venda(QWidget *parent) :
@@ -116,24 +116,11 @@ venda::venda(QWidget *parent) :
     completer->setCaseSensitivity(Qt::CaseInsensitive); // Ignorar maiúsculas e minúsculas
     completer->setFilterMode(Qt::MatchContains); // Sugestões que contêm o texto digitado
 
-    QStringList clientesComId;
-    if (!db.open()) {
-        qDebug() << "Erro ao conectar ao banco de dados para autocompletar nomes.";
-    } else {
-        // Consultar nomes e IDs da tabela "clientes"
-        QSqlQuery query("SELECT id, nome FROM clientes");
 
 
 
-        while (query.next()) {
-            int id = query.value(0).toInt();
-            QString nome = query.value(1).toString();
-            // Formatar como "Nome (ID: 123)"
-            clientesComId << QString("%1 (ID: %2)").arg(nome).arg(id);
-        }
-        db.close();
+    atualizarListaCliente();
 
-    }
     if (!clientesComId.isEmpty()) {
         // Define o primeiro item da lista como texto do QLineEdit
         ui->Ledit_Cliente->setText(clientesComId.first());
@@ -149,7 +136,6 @@ venda::venda(QWidget *parent) :
             ui->Ledit_Cliente->setSelection(posInicioNome, posFinalNome);
         }
     }
-
 
     QStringListModel *model = new QStringListModel(clientesComId, this);
     completer->setModel(model);
@@ -167,6 +153,33 @@ venda::venda(QWidget *parent) :
         validarCliente(true); // Mostra mensagens para o usuário
     });
 
+}
+void venda::atualizarListaCliente(){
+    clientesComId.clear(); // Limpa a lista antes de recarregar
+
+    if (!db.open()) {
+        qDebug() << "Erro ao conectar ao banco de dados para autocompletar nomes.";
+    } else {
+        // Consultar nomes e IDs da tabela "clientes"
+        QSqlQuery query("SELECT id, nome FROM clientes");
+
+        while (query.next()) {
+            int id = query.value(0).toInt();
+            QString nome = query.value(1).toString();
+            // Formatar como "Nome (ID: 123)"
+            clientesComId << QString("%1 (ID: %2)").arg(nome).arg(id);
+        }
+        db.close();
+    }
+
+    // Atualizar o completer
+    QCompleter *completer = ui->Ledit_Cliente->completer();
+    if (completer) {
+        QStringListModel *model = qobject_cast<QStringListModel*>(completer->model());
+        if (model) {
+            model->setStringList(clientesComId);
+        }
+    }
 }
 
 
@@ -535,5 +548,34 @@ void venda::on_Ledit_Pesquisa_returnPressed()
 void venda::on_Btn_CancelarVenda_clicked()
 {
     this->close();
+}
+void venda::selecionarClienteNovo(){
+    atualizarListaCliente();
+    if (!clientesComId.isEmpty()) {
+        // Define o ultimo item da lista como texto do QLineEdit
+
+        ui->Ledit_Cliente->setText(clientesComId.last());
+
+        // Opcional: selecionar apenas o nome (se quiser destacar parte do texto)
+        // Isso depende do formato que você está usando ("Nome (ID: 123)")
+        QString ultimoCliente = clientesComId.last();
+        int posInicioNome = 0;
+        int posFinalNome = ultimoCliente.indexOf(" (ID:"); // Encontra onde começa o ID
+
+        if (posFinalNome != -1) {
+            // Seleciona apenas o nome (sem o ID)
+            ui->Ledit_Cliente->setSelection(posInicioNome, posFinalNome);
+        }
+    }
+
+}
+
+
+void venda::on_Btn_NovoCliente_clicked()
+{
+    InserirCliente *inserirCliente = new InserirCliente;
+    inserirCliente->setWindowModality(Qt::ApplicationModal);
+    connect(inserirCliente, &InserirCliente::clienteInserido, this, &venda::selecionarClienteNovo);
+    inserirCliente->show();
 }
 

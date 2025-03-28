@@ -1,10 +1,11 @@
 #include "pagamentovenda.h"
 
-pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, venda *ptrVenda, QString total, QString cliente, QString data, QWidget *parent)
+pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, venda *ptrVenda, QString total, QString cliente, QString data, int idCliente, QWidget *parent)
     : pagamento(total, cliente, data, parent)
 {
     janelaVenda = ptrVenda;
     rowDataList = listaProdutos;
+    this->idCliente = idCliente;
 }
 
 void pagamentoVenda::terminarPagamento(){
@@ -94,7 +95,10 @@ void pagamentoVenda::terminarPagamento(){
 
     }
 
-   // query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, valor_recebido, troco, taxa, valor_final, desconto) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, :valor8, :valor9)");
+    query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, "
+                  "valor_recebido, troco, taxa, valor_final, desconto, id_cliente) "
+                  "VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, "
+                  ":valor8, :valor9, :valor10)");
     query.bindValue(":valor1", clienteGlobal);
     // precisa converter para notacao usa para inserir no banco de dados
     query.bindValue(":valor2", QString::number(portugues.toFloat(totalGlobal)));
@@ -108,6 +112,7 @@ void pagamentoVenda::terminarPagamento(){
     query.bindValue(":valor7", QString::number(portugues.toFloat(taxa), 'f', 2));
     query.bindValue(":valor8", QString::number(portugues.toFloat(valor_final), 'f', 2));
     query.bindValue(":valor9", QString::number(portugues.toFloat(desconto), 'f', 2));
+    query.bindValue(":valor10", QString::number(idCliente));
 
     QString idVenda;
     if (query.exec()) {

@@ -308,6 +308,7 @@ MainWindow::MainWindow(QWidget *parent)
                        "data_nascimento DATE,"
                        "data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,"
                        "eh_pf BOOLEAN )");
+            query.exec("INSERT INTO clientes(nome, eh_pf) VALUES ('Consumidor', true)");
 
             if(!query.exec("CREATE TABLE vendas (  id INTEGER PRIMARY KEY AUTOINCREMENT,"
                             "cliente TEXT, "

@@ -28,11 +28,18 @@ public:
     QLocale portugues;
     QIcon deletar;
 
+    int buscarIdClientePeloNome(QString nome);
 
 protected:
     void handleSelectionChangeProdutos(const QItemSelection &selected, const QItemSelection &deselected);
 
     void keyPressEvent(QKeyEvent *event) override;
+
+    void focusInEvent(QFocusEvent *event) override;
+
+    bool verificarNomeIdCliente(const QString &nome, int id);
+    QPair<QString, int> extrairNomeId(const QString &texto);
+    int validarCliente(bool mostrarMensagens);
 private slots:
     void on_Btn_SelecionarProduto_clicked();
 

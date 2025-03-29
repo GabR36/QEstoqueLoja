@@ -15,6 +15,7 @@ Clientes::Clientes(QWidget *parent)
 
     model->setQuery("SELECT * FROM clientes");
     ui->Tview_Clientes->setModel(model);
+
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
     model->setHeaderData(1, Qt::Horizontal, tr("Nome"));
     model->setHeaderData(2, Qt::Horizontal, tr("Email"));
@@ -23,6 +24,12 @@ Clientes::Clientes(QWidget *parent)
     model->setHeaderData(5, Qt::Horizontal, tr("CPF"));
     model->setHeaderData(6, Qt::Horizontal, tr("Data Nascimento"));
     model->setHeaderData(7, Qt::Horizontal, tr("Data Cadastro"));
+
+    ui->Tview_Clientes->setColumnWidth(0,50);
+    ui->Tview_Clientes->setColumnWidth(1,150);//nome
+    ui->Tview_Clientes->setColumnWidth(2,150);
+    ui->Tview_Clientes->setColumnWidth(5,150);
+
 }
 
 Clientes::~Clientes()
@@ -39,12 +46,16 @@ void Clientes::on_Btn_Alterar_clicked()
         QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
         QVariant idVariant = ui->Tview_Clientes->model()->data(ui->Tview_Clientes->model()->index(selectedIndex.row(), 0));
         QString clienteId = idVariant.toString();
+        if(clienteId.toInt() > 1){
+            AlterarCliente *alterarJanela = new AlterarCliente(nullptr, clienteId);
+            alterarJanela->setWindowModality(Qt::ApplicationModal);
+            connect(alterarJanela, &AlterarCliente::clienteAtualizado, this, &Clientes::atualizarTableview);
+            alterarJanela->show();
+        }else{
+            QMessageBox::warning(this,"Erro","Não é possivel alterar o cliente 1!");
+            return;
+        }
 
-        AlterarCliente *alterarJanela = new AlterarCliente(nullptr, clienteId);
-        alterarJanela->setWindowModality(Qt::ApplicationModal);
-
-        connect(alterarJanela, &AlterarCliente::clienteAtualizado, this, &Clientes::atualizarTableview);
-        alterarJanela->show();
     }
     else{
         QMessageBox::warning(this,"Erro","Selecione um cliente antes de alterar!");
@@ -72,15 +83,21 @@ void Clientes::on_Btn_Deletar_clicked()
             QVariant idVariant = ui->Tview_Clientes->model()->data(ui->Tview_Clientes->model()->index(selectedIndex.row(), 0));
             QString clienteId = idVariant.toString();
 
-            // query para deletar a partir do id
-            db.open();
-            QSqlQuery query;
-            query.prepare("DELETE FROM clientes WHERE id = :valor1");
-            query.bindValue(":valor1", clienteId);
-            query.exec();
+            if(clienteId.toInt() > 1){
+                // query para deletar a partir do id
+                db.open();
+                QSqlQuery query;
+                query.prepare("DELETE FROM clientes WHERE id = :valor1");
+                query.bindValue(":valor1", clienteId);
+                query.exec();
 
-            // atualizar
-            model->setQuery("SELECT * FROM clientes");
+                // atualizar
+                model->setQuery("SELECT * FROM clientes");
+            }else{
+                QMessageBox::warning(this,"Erro","Não é possivel deletar o cliente 1!");
+                return;
+
+            }
         }
     }
     else{

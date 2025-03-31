@@ -6,6 +6,8 @@
 #include "alterarcliente.h"
 #include <QSqlQuery>
 #include "inserircliente.h"
+#include <QDateTime>
+#include <QSqlError>
 
 Clientes::Clientes(QWidget *parent)
     : QWidget(parent)
@@ -29,6 +31,10 @@ Clientes::Clientes(QWidget *parent)
     ui->Tview_Clientes->setColumnWidth(1,150);//nome
     ui->Tview_Clientes->setColumnWidth(2,150);
     ui->Tview_Clientes->setColumnWidth(5,150);
+
+    QItemSelectionModel *selectionModel = ui->Tview_Clientes->selectionModel();
+    connect(selectionModel, &QItemSelectionModel::selectionChanged,
+            this, &Clientes::atualizarInfos);
 
 }
 
@@ -122,4 +128,153 @@ void Clientes::atualizarTableview(){
 
     db.close();
 }
+int Clientes::getQuantCompras(int idCliente){
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. geQuantVendas";
+    }
 
+    QSqlQuery query;
+    query.prepare("SELECT * FROM vendas2 where id_cliente = :id");
+    query.bindValue(":id", idCliente);
+    int index = 0;
+
+    query.exec();
+    while(query.next()){
+        index += 1;
+    }
+    return index;
+
+}
+QString Clientes::getDataUltimoPagamento(int idCliente){
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. getUltimoPagamento";
+    }
+    QSqlQuery query;
+
+    query.prepare("SELECT ev.data_hora "
+        "FROM entradas_vendas ev "
+        "JOIN vendas2 v ON ev.id_venda = v.id "
+        "WHERE v.id_cliente = :id "
+        "ORDER BY ev.data_hora DESC "
+        "LIMIT 1;");
+    query.bindValue(":id", idCliente);
+
+    if(!query.exec()) {
+        qDebug() << "Erro na query:" << query.lastError().text();
+        db.close();
+        return QString();
+    }
+
+    QDateTime data;
+    if(query.next()) {
+        data = query.value(0).toDateTime();
+    } else {
+        db.close();
+        return QString("Nenhum pagamento encontrado");
+    }
+    db.close();
+
+    QString resultado = portugues.toString(data, "dddd, dd/MM/yyyy");
+
+    return resultado;
+
+
+}
+
+double Clientes::getValorUltimoPagamento(int idCliente){
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. getValorUltimoPagamento";
+    }
+    QSqlQuery query;
+
+        query.prepare("SELECT ev.valor_final "
+            "FROM entradas_vendas ev "
+            "JOIN vendas2 v ON ev.id_venda = v.id "
+            "WHERE v.id_cliente = :id "
+            "ORDER BY ev.data_hora DESC "
+            "LIMIT 1;");
+    query.bindValue(":id", idCliente);
+
+    if(!query.exec()) {
+        qDebug() << "Erro na query:" << query.lastError().text();
+        db.close();
+        return 0;
+    }
+    double valor;
+    if(query.next()) {
+        valor = query.value(0).toDouble();
+    } else {
+        db.close();
+        return 0;
+    }
+    db.close();
+
+    return valor;
+}
+double Clientes::getValorDevido(int idCliente) {
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir banco de dados";
+        return 0.0;
+    }
+
+    // 1. Soma o valor_final de todas as vendas do cliente
+    QSqlQuery queryVendas;
+    queryVendas.prepare(
+        "SELECT SUM(valor_final) FROM vendas2 "
+        "WHERE id_cliente = :id_cliente"
+        );
+    queryVendas.bindValue(":id_cliente", idCliente);
+
+    double totalVendas = 0.0;
+    if (queryVendas.exec() && queryVendas.next()) {
+        totalVendas = queryVendas.value(0).toDouble();
+    } else {
+        qDebug() << "Erro ao calcular total de vendas:" << queryVendas.lastError().text();
+        db.close();
+        return 0.0;
+    }
+
+    // 2. Soma o valor de todas as entradas relacionadas às vendas do cliente
+    QSqlQuery queryEntradas;
+    queryEntradas.prepare(
+        "SELECT SUM(ev.valor_final) FROM entradas_vendas ev "
+        "JOIN vendas2 v ON ev.id_venda = v.id "
+        "WHERE v.id_cliente = :id_cliente"
+        );
+    queryEntradas.bindValue(":id_cliente", idCliente);
+
+    double totalEntradas = 0.0;
+    if (queryEntradas.exec() && queryEntradas.next()) {
+        totalEntradas = queryEntradas.value(0).toDouble();
+    } else {
+        qDebug() << "Erro ao calcular total de entradas:" << queryEntradas.lastError().text();
+        db.close();
+        return 0.0;
+    }
+
+    db.close();
+
+    // 3. Calcula o valor devido
+    double valorDevido = totalVendas - totalEntradas;
+    qDebug() << "Valor devido para cliente" << idCliente << ":" << valorDevido;
+
+    return valorDevido;
+}
+
+void Clientes::on_Btn_abrirCompras_clicked()
+{
+}
+
+void Clientes::atualizarInfos(const QItemSelection &selected, const QItemSelection &)
+{
+    if (!selected.indexes().isEmpty()) {
+        QModelIndex index = selected.indexes().first();  // Pega a primeira célula selecionada
+        int idCliente = model->data(model->index(index.row(), 0)).toInt(); // Coluna 0 = id
+
+        ui->Lbl_QuantCompras->setText(QString::number(getQuantCompras(idCliente)));
+        ui->Lbl_DataUltimoPag->setText(getDataUltimoPagamento(idCliente));
+        ui->Lbl_ValorUltimoPag->setText("R$ " + portugues.toString(getValorUltimoPagamento(idCliente)));
+        ui->Lbl_valorTotalDevido->setText("R$ " + portugues.toString(getValorDevido(idCliente)));
+
+    }
+}

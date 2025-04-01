@@ -8,6 +8,8 @@
 #include "inserircliente.h"
 #include <QDateTime>
 #include <QSqlError>
+#include "vendas.h"
+#include "mainwindow.h"
 
 Clientes::Clientes(QWidget *parent)
     : QWidget(parent)
@@ -221,7 +223,8 @@ double Clientes::getValorDevido(int idCliente) {
     QSqlQuery queryVendas;
     queryVendas.prepare(
         "SELECT SUM(valor_final) FROM vendas2 "
-        "WHERE id_cliente = :id_cliente"
+        "WHERE id_cliente = :id_cliente AND "
+        "forma_pagamento = 'Prazo'"
         );
     queryVendas.bindValue(":id_cliente", idCliente);
 
@@ -263,6 +266,16 @@ double Clientes::getValorDevido(int idCliente) {
 
 void Clientes::on_Btn_abrirCompras_clicked()
 {
+    if(IDCLIENTE > 0){
+        Vendas *janelaVendas = new Vendas(nullptr, IDCLIENTE);
+        // MainWindow *mainwindow = new MainWindow;
+        // janelaVendas->janelaPrincipal = mainwindow;
+        janelaVendas->setWindowModality(Qt::ApplicationModal);
+        janelaVendas->show();
+    }else{
+        QMessageBox::warning(this,"Erro","Selecione um Cliente na tabela para ver suas compras!");
+
+    }
 }
 
 void Clientes::atualizarInfos(const QItemSelection &selected, const QItemSelection &)
@@ -270,7 +283,7 @@ void Clientes::atualizarInfos(const QItemSelection &selected, const QItemSelecti
     if (!selected.indexes().isEmpty()) {
         QModelIndex index = selected.indexes().first();  // Pega a primeira célula selecionada
         int idCliente = model->data(model->index(index.row(), 0)).toInt(); // Coluna 0 = id
-
+        IDCLIENTE = idCliente;
         ui->Lbl_QuantCompras->setText(QString::number(getQuantCompras(idCliente)));
         ui->Lbl_DataUltimoPag->setText(getDataUltimoPagamento(idCliente));
         ui->Lbl_ValorUltimoPag->setText("R$ " + portugues.toString(getValorUltimoPagamento(idCliente)));

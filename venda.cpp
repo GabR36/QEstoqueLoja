@@ -378,17 +378,7 @@ void venda::on_Btn_Pesquisa_clicked()
 
     db.close();
 }
-int venda::buscarIdClientePeloNome(QString nome){
-    QString selectedText = ui->Ledit_Cliente->text();
-    QRegularExpression regex("ID: (\\d+)");
-    QRegularExpressionMatch match = regex.match(selectedText);
-    if (match.hasMatch()) {
-        int clienteId = match.captured(1).toInt();
-        // Use o ID como necessário
-        return clienteId;
 
-    }
-}
 
 bool venda::verificarNomeIdCliente(const QString &nome, int id) {
     if (!db.open()) {

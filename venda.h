@@ -28,7 +28,6 @@ public:
     QLocale portugues;
     QIcon deletar;
 
-    int buscarIdClientePeloNome(QString nome);
 
 protected:
     void handleSelectionChangeProdutos(const QItemSelection &selected, const QItemSelection &deselected);

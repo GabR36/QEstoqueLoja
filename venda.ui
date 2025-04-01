@@ -86,7 +86,7 @@ background-color:rgb(170, 170, 170);
       <string notr="true">font: 700 20pt &quot;Ubuntu&quot;;</string>
      </property>
      <property name="text">
-      <string>Ponto De Venda</string>
+      <string>Ponto de Venda</string>
      </property>
     </widget>
    </item>

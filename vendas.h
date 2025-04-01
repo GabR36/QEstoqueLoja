@@ -22,7 +22,7 @@ class Vendas : public QWidget
 public:
     MainWindow *janelaPrincipal;
     QSqlDatabase db = QSqlDatabase::database();
-    explicit Vendas(QWidget *parent = nullptr);
+    explicit Vendas(QWidget *parent = nullptr, int idCliente = 0);
     ~Vendas();
     void atualizarTabelas();
     QLocale portugues;
@@ -73,6 +73,8 @@ private:
     QString idVendaSelec;
     void devolverProdutoVenda(QString id_venda, QString id_prod_vend);
     void devolverProduto(QString id_prod_vend, QString id_produto, QString qntd);
+    void mostrarVendasCliente(int idCliente);
+    int IDCLIENTE;
 };
 
 #endif // VENDAS_H

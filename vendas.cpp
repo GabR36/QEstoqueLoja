@@ -15,11 +15,12 @@
 #include "delegateprecof2.h"
 
 
-Vendas::Vendas(QWidget *parent) :
+Vendas::Vendas(QWidget *parent, int idCliente) :
     QWidget(parent),
     ui(new Ui::Vendas)
 {
     ui->setupUi(this);
+
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao venda.";
     }
@@ -118,8 +119,9 @@ Vendas::Vendas(QWidget *parent) :
     db.close();
 
     ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
+    IDCLIENTE = idCliente;
+    mostrarVendasCliente(IDCLIENTE);
 
-    // ------ icons ----
 
 
 }
@@ -202,6 +204,7 @@ void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSe
     Q_UNUSED(deselected);
 
     qDebug() << "Registro(s) selecionado(s):";
+
 
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. handleselectionchange";
@@ -985,5 +988,28 @@ void Vendas::devolverProduto(QString id_prod_vend, QString id_produto, QString q
     query2.bindValue(":valor2", id_produto);
     query2.exec();
 
+    db.close();
+}
+void Vendas::mostrarVendasCliente(int idCliente) {
+    if (idCliente == 0) {
+        qDebug() << "ID do cliente inválido.";
+        return;
+    }
+
+    if (!db.isOpen() && !db.open()) {
+        qDebug() << "Erro ao abrir banco de dados em mostrarVendasCliente: " << db.lastError().text();
+        return;
+    }
+    //qDebug() << "IdCliente: " + QString::number(idCliente);
+
+    // Passa diretamente a string SQL para o modelo
+    modeloVendas2->setQuery("SELECT id, valor_final, forma_pagamento, data_hora, "
+                            "cliente, esta_pago, total, desconto, taxa, valor_recebido, "
+                            "troco FROM vendas2 WHERE id_cliente = " + QString::number(idCliente) +
+                                " ORDER BY id DESC", db);
+
+    if (modeloVendas2->lastError().isValid()) {
+        qDebug() << "Erro ao carregar modelo de vendas: " << modeloVendas2->lastError().text();
+    }
     db.close();
 }

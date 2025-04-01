@@ -136,7 +136,7 @@ background-color:rgb(170, 170, 170);
            <string notr="true">font: 500 10pt ;</string>
           </property>
           <property name="text">
-           <string>Valor Último Pagamento:</string>
+           <string>Valor do Último Pagamento:</string>
           </property>
          </widget>
         </item>

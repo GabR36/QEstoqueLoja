@@ -38,7 +38,9 @@ private:
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQueryModel *model = new QSqlQueryModel;
     QLocale portugues;
+    int IDCLIENTE = 0;
     void atualizarInfos(const QItemSelection &selected, const QItemSelection &);
+
 };
 
 #endif // CLIENTES_H

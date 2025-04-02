@@ -19,8 +19,7 @@ class venda : public QDialog
     Q_OBJECT
 
 public:
-    Vendas *janelaVenda;
-    MainWindow *janelaPrincipal;
+    //Vendas *janelaVenda;
     QSqlDatabase db = QSqlDatabase::database();
     explicit venda(QWidget *parent = nullptr);
     ~venda();
@@ -68,6 +67,8 @@ private:
     Ui::venda *ui;
     QAction *actionMenuDeletarProd;
     QStringList clientesComId;
+signals:
+    void vendaConcluida();
 
 
 };

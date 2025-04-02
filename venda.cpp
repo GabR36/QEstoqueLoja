@@ -333,7 +333,7 @@ void venda::on_Btn_Pesquisa_clicked()
 {
 
     QString inputText = ui->Ledit_Pesquisa->text();
-    QString normalizadoPesquisa = janelaPrincipal->normalizeText(inputText);
+    QString normalizadoPesquisa = MainWindow::normalizeText(inputText);
 
     // Dividir a string em palavras usando split por espaços em branco
     QStringList palavras = normalizadoPesquisa.split(" ", Qt::SkipEmptyParts);
@@ -443,8 +443,14 @@ void venda::on_Btn_Aceitar_clicked()
 
     //QString cliente = ui->Ledit_Cliente->text();
     QString data =  portugues.toString(ui->DateEdt_Venda->dateTime(), "dd-MM-yyyy hh:mm:ss");
-    pagamentoVenda *pagamento = new pagamentoVenda(rowDataList, this, Total(), nome, data, idCliente);
+    pagamentoVenda *pagamento = new pagamentoVenda(rowDataList, Total(), nome, data, idCliente);
     pagamento->setWindowModality(Qt::ApplicationModal);
+    connect(pagamento, &pagamento::pagamentoConcluido, this, &venda::vendaConcluida);
+    connect(pagamento, &pagamento::pagamentoConcluido, this, &venda::close);
+
+
+
+
     pagamento->show();
 }
 

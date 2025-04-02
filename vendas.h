@@ -20,7 +20,7 @@ class Vendas : public QWidget
 
 
 public:
-    MainWindow *janelaPrincipal;
+    //MainWindow *janelaPrincipal;
     QSqlDatabase db = QSqlDatabase::database();
     explicit Vendas(QWidget *parent = nullptr, int idCliente = 0);
     ~Vendas();
@@ -75,6 +75,8 @@ private:
     void devolverProduto(QString id_prod_vend, QString id_produto, QString qntd);
     void mostrarVendasCliente(int idCliente);
     int IDCLIENTE;
+signals:
+    void vendaConcluidaVendas();
 };
 
 #endif // VENDAS_H

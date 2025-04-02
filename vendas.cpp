@@ -134,9 +134,10 @@ Vendas::~Vendas()
 void Vendas::on_Btn_InserirVenda_clicked()
 {
     venda *inserirVenda = new venda;
-    inserirVenda->janelaVenda = this;
-    inserirVenda->janelaPrincipal = janelaPrincipal;
     inserirVenda->setWindowModality(Qt::ApplicationModal);
+    connect(inserirVenda, &venda::vendaConcluida, this, &Vendas::vendaConcluidaVendas);
+    connect(inserirVenda, &venda::vendaConcluida, this, &Vendas::atualizarTabelas);
+
     inserirVenda->show();
 }
 
@@ -501,7 +502,7 @@ void Vendas::devolverProdutoVenda(QString id_venda, QString id_prod_vend)
 
 void Vendas::actionAbrirPagamentosVenda(QString id_venda){
     EntradasVendasPrazo *pagamentosVenda = new EntradasVendasPrazo(this, id_venda);
-    pagamentosVenda->setWindowModality(Qt::ApplicationModal);
+    pagamentosVenda->setWindowModality(Qt::ApplicationModal);    
     pagamentosVenda->show();
 }
 
@@ -534,12 +535,11 @@ void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
 
     actionMenuDeletarVenda = new QAction();
     actionMenuDeletarVenda->setText("Deletar Venda");
-    actionMenuDeletarVenda->setIcon(janelaPrincipal->iconDelete);
     connect(actionMenuDeletarVenda,SIGNAL(triggered(bool)),this,SLOT(on_Btn_DeletarVenda_clicked()));
 
     actionImprimirRecibo = new QAction();
     actionImprimirRecibo->setText("Imprimir Recibo da Venda");
-    actionImprimirRecibo->setIcon(janelaPrincipal->iconImpressora);
+    //actionImprimirRecibo->setIcon(janelaPrincipal->iconImpressora);
     QObject::connect(actionImprimirRecibo, &QAction::triggered, [&]() {
         imprimirReciboVenda(cellValue); // Chama nossa função com o parâmetro
     });

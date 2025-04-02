@@ -1,9 +1,8 @@
 #include "pagamentovenda.h"
 
-pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, venda *ptrVenda, QString total, QString cliente, QString data, int idCliente, QWidget *parent)
+pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString total, QString cliente, QString data, int idCliente, QWidget *parent)
     : pagamento(total, cliente, data, parent)
 {
-    janelaVenda = ptrVenda;
     rowDataList = listaProdutos;
     this->idCliente = idCliente;
 }
@@ -153,11 +152,9 @@ void pagamentoVenda::terminarPagamento(){
     }
 
     db.close();
-    janelaVenda->janelaVenda->atualizarTabelas();
-    janelaVenda->janelaPrincipal->atualizarTableview();
+    emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
 
 
     // fechar as janelas
     this->close();
-    janelaVenda->close();
 }

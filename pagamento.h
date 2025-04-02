@@ -48,6 +48,8 @@ protected:
     void descontoTaxa();
     Ui::pagamento *ui;
     virtual void terminarPagamento();
+signals:
+    void pagamentoConcluido();
 };
 
 #endif // PAGAMENTO_H

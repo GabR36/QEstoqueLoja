@@ -23,6 +23,7 @@
 #include "delegateprecof2.h"
 #include "util/pdfexporter.h"
 #include "clientes.h"
+#include "pagamentovenda.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -697,9 +698,11 @@ void MainWindow::on_Btn_Alterar_clicked()
 void MainWindow::on_Btn_Venda_clicked()
 {
     Vendas *vendas = new Vendas;
-    vendas->janelaPrincipal = this;
     vendas->setWindowModality(Qt::ApplicationModal);
+    connect(vendas, &Vendas::vendaConcluidaVendas, this, &MainWindow::atualizarTableview);
+
     vendas->show();
+
 }
 
 
@@ -925,8 +928,6 @@ void MainWindow::on_actionRealizar_Venda_triggered()
    // QSqlDatabase db = QSqlDatabase::database();
     //explicit venda(QWidget *parent = nullptr);
     venda *inserirVenda = new venda;
-    inserirVenda->janelaVenda = janelaVenda;
-    inserirVenda->janelaPrincipal = this;
     inserirVenda->setWindowModality(Qt::ApplicationModal);
     inserirVenda->show();
 }

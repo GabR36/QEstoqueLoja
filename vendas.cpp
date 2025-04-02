@@ -117,10 +117,11 @@ Vendas::Vendas(QWidget *parent, int idCliente) :
     ui->DateEdt_Ate->setDate(dateRange.second);
 
     db.close();
-
-    ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
     IDCLIENTE = idCliente;
     mostrarVendasCliente(IDCLIENTE);
+
+    ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
+
 
 
 
@@ -233,12 +234,12 @@ void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSe
 
 }
 
-void Vendas::LabelLucro(QString whereQueryData, QString whereQueryPrazo){
+void Vendas::LabelLucro(QString whereQueryData, QString whereQueryPrazo, QString whereQueryCliente){
     // colocar valores nos labels de lucro etc
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. labelLucro";
     }
-    QString whereQuery = whereQueryData + whereQueryPrazo;
+    QString whereQuery = whereQueryData + whereQueryPrazo + whereQueryCliente;
     QSqlQuery query;
     float total = 0;
     int quantidadeVendas = 0;
@@ -396,13 +397,17 @@ void Vendas::on_DateEdt_Ate_dateChanged(const QDate &date)
 void Vendas::filtrarData(QString de1, QString ate1){
     QString whereQueryData;
     QString whereQueryPrazo;
+    QString whereQueryCliente;
     if(ui->cb_BuscaVendasPrazo->isChecked()){
         whereQueryPrazo =  " AND forma_pagamento = 'Prazo'";
     }
+    if(IDCLIENTE > 0){
+        whereQueryCliente =  " AND id_cliente = " + QString::number(IDCLIENTE);
+    }
     whereQueryData = QString("WHERE data_hora BETWEEN '%1' AND '%2'").arg(de1, ate1);
-    QString whereQuery = whereQueryData + whereQueryPrazo;
+    QString whereQuery = whereQueryData + whereQueryPrazo + whereQueryCliente;
 
-    LabelLucro(whereQueryData, whereQueryPrazo);
+    LabelLucro(whereQueryData, whereQueryPrazo, whereQueryCliente);
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. filtrarData";
     }
@@ -1012,4 +1017,5 @@ void Vendas::mostrarVendasCliente(int idCliente) {
         qDebug() << "Erro ao carregar modelo de vendas: " << modeloVendas2->lastError().text();
     }
     db.close();
+    filtrarData(de,ate);
 }

@@ -59,7 +59,7 @@ private slots:
 
 private:
     // void LabelLucro();
-    void LabelLucro(QString whereQueryData, QString whereQueryPrazo);
+    void LabelLucro(QString whereQueryData, QString whereQueryPrazo, QString whereQueryCliente);
     QSqlQueryModel *modeloProdVendidos = new QSqlQueryModel;
     QSqlQueryModel *modeloVendas2 = new QSqlQueryModel;
     Ui::Vendas *ui;
@@ -74,7 +74,7 @@ private:
     void devolverProdutoVenda(QString id_venda, QString id_prod_vend);
     void devolverProduto(QString id_prod_vend, QString id_produto, QString qntd);
     void mostrarVendasCliente(int idCliente);
-    int IDCLIENTE;
+    int IDCLIENTE = 0;
 signals:
     void vendaConcluidaVendas();
 };

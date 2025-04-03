@@ -24,6 +24,7 @@ public:
     QString getDataUltimoPagamento(int idCliente);
     double getValorUltimoPagamento(int idCliente);
     double getValorDevido(int idCliente);
+    void atualizarInfosSinal();
 private slots:
     void on_Btn_Alterar_clicked();
 
@@ -32,6 +33,8 @@ private slots:
     void on_Btn_Novo_clicked();
 
     void on_Btn_abrirCompras_clicked();
+
+    void on_Ledit_Pesquisa_textChanged(const QString &arg1);
 
 private:
     Ui::Clientes *ui;

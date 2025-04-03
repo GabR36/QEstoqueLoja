@@ -10,6 +10,7 @@
 #include <QSqlError>
 #include "vendas.h"
 #include "mainwindow.h"
+#include "delegatehora.h"
 
 Clientes::Clientes(QWidget *parent)
     : QWidget(parent)
@@ -37,6 +38,9 @@ Clientes::Clientes(QWidget *parent)
     QItemSelectionModel *selectionModel = ui->Tview_Clientes->selectionModel();
     connect(selectionModel, &QItemSelectionModel::selectionChanged,
             this, &Clientes::atualizarInfos);
+
+    DelegateHora *delegateData = new DelegateHora;
+    ui->Tview_Clientes->setItemDelegateForColumn(7,delegateData);
 
 }
 
@@ -264,6 +268,12 @@ double Clientes::getValorDevido(int idCliente) {
     return valorDevido;
 }
 
+void Clientes::atualizarInfosSinal(){
+    ui->Lbl_QuantCompras->setText(QString::number(getQuantCompras(IDCLIENTE)));
+    ui->Lbl_DataUltimoPag->setText(getDataUltimoPagamento(IDCLIENTE));
+    ui->Lbl_ValorUltimoPag->setText("R$ " + portugues.toString(getValorUltimoPagamento(IDCLIENTE)));
+    ui->Lbl_valorTotalDevido->setText("R$ " + portugues.toString(getValorDevido(IDCLIENTE)));
+}
 void Clientes::on_Btn_abrirCompras_clicked()
 {
     if(IDCLIENTE > 0){
@@ -272,11 +282,14 @@ void Clientes::on_Btn_abrirCompras_clicked()
         // janelaVendas->janelaPrincipal = mainwindow;
         janelaVendas->setWindowModality(Qt::ApplicationModal);
         janelaVendas->show();
+        connect(janelaVendas, &Vendas::pagamentosConcluidos,
+                this, &Clientes::atualizarInfosSinal);
     }else{
         QMessageBox::warning(this,"Erro","Selecione um Cliente na tabela para ver suas compras!");
 
     }
 }
+
 
 void Clientes::atualizarInfos(const QItemSelection &selected, const QItemSelection &)
 {
@@ -291,3 +304,26 @@ void Clientes::atualizarInfos(const QItemSelection &selected, const QItemSelecti
 
     }
 }
+
+void Clientes::on_Ledit_Pesquisa_textChanged(const QString &arg1)
+{
+    QString inputText = ui->Ledit_Pesquisa->text();
+   // QString normalizadoPesquisa = MainWindow::normalizeText(inputText);
+
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir banco de dados. Botão Pesquisar.";
+        return;
+    }
+
+    QString sql = "SELECT * FROM clientes WHERE nome LIKE '%" + inputText + "%' ORDER BY id DESC";
+
+    // Executar a consulta
+    model->setQuery(sql, db);
+    if (model->lastError().isValid()) {
+        qDebug() << "Erro ao executar consulta:" << model->lastError().text();
+    }
+
+
+    db.close();
+}
+

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>730</width>
-    <height>452</height>
+    <width>732</width>
+    <height>462</height>
    </rect>
   </property>
   <property name="baseSize">
@@ -53,105 +53,6 @@ background-color:rgb(170, 170, 170);
 </string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="minimumSize">
-      <size>
-       <width>400</width>
-       <height>100</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Informações Sobre o Cliente</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QLabel" name="label">
-          <property name="styleSheet">
-           <string notr="true">font: 500 10pt ;</string>
-          </property>
-          <property name="text">
-           <string>Valor Total Devido:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="Lbl_valorTotalDevido">
-          <property name="text">
-           <string>R$</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="0" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QLabel" name="label_2">
-          <property name="styleSheet">
-           <string notr="true">font: 500 10pt ;</string>
-          </property>
-          <property name="text">
-           <string>Quantidade de Compras:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="Lbl_QuantCompras">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="0">
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
-        <item>
-         <widget class="QLabel" name="label_4">
-          <property name="styleSheet">
-           <string notr="true">font: 500 10pt ;</string>
-          </property>
-          <property name="text">
-           <string>Último Pagamento:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="Lbl_DataUltimoPag">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
-        <item>
-         <widget class="QLabel" name="label_6">
-          <property name="styleSheet">
-           <string notr="true">font: 500 10pt ;</string>
-          </property>
-          <property name="text">
-           <string>Valor do Último Pagamento:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="Lbl_ValorUltimoPag">
-          <property name="text">
-           <string>R$</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
-    </widget>
-   </item>
    <item row="0" column="0">
     <widget class="QLabel" name="lbl_Titulo">
      <property name="font">
@@ -266,17 +167,31 @@ background-color:rgb(03,75,119);
       </layout>
      </item>
      <item>
-      <widget class="QTableView" name="Tview_Clientes">
-       <property name="alternatingRowColors">
-        <bool>true</bool>
-       </property>
-       <property name="selectionMode">
-        <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
-       </property>
-       <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-       </property>
-      </widget>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLineEdit" name="Ledit_Pesquisa">
+         <property name="placeholderText">
+          <string>Pesquisar por nome</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableView" name="Tview_Clientes">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+         </property>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
@@ -290,7 +205,7 @@ background-color:rgb(03,75,119);
      </property>
      <property name="minimumSize">
       <size>
-       <width>0</width>
+       <width>100</width>
        <height>40</height>
       </size>
      </property>
@@ -310,6 +225,105 @@ background-color:rgb(03,75,119);
       <string>Visualizar 
  compras</string>
      </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="minimumSize">
+      <size>
+       <width>400</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Informações Sobre o Cliente</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="styleSheet">
+           <string notr="true">font: 500 10pt ;</string>
+          </property>
+          <property name="text">
+           <string>Valor Total Devido:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="Lbl_valorTotalDevido">
+          <property name="text">
+           <string>R$</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="styleSheet">
+           <string notr="true">font: 500 10pt ;</string>
+          </property>
+          <property name="text">
+           <string>Quantidade de Compras:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="Lbl_QuantCompras">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="styleSheet">
+           <string notr="true">font: 500 10pt ;</string>
+          </property>
+          <property name="text">
+           <string>Último Pagamento:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="Lbl_DataUltimoPag">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="styleSheet">
+           <string notr="true">font: 500 10pt ;</string>
+          </property>
+          <property name="text">
+           <string>Valor do Último Pagamento:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="Lbl_ValorUltimoPag">
+          <property name="text">
+           <string>R$</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

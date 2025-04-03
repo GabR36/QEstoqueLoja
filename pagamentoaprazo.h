@@ -15,6 +15,8 @@ public:
 protected:
     void terminarPagamento() override;
     QString idVenda;
+signals:
+    void pagamentoPrazoConcluido();
 };
 
 #endif // PAGAMENTOAPRAZO_H

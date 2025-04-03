@@ -146,22 +146,25 @@ void Vendas::atualizarTabelas(){
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao venda.";
     }
-
-
-    modeloVendas2->setQuery("SELECT id, valor_final,forma_pagamento, data_hora, cliente, esta_pago, total, desconto, taxa, valor_recebido, troco FROM vendas2 ORDER BY id DESC");
+    modeloVendas2->setQuery("SELECT id, valor_final,forma_pagamento, data_hora, cliente,"
+                            " esta_pago, total, desconto, taxa, valor_recebido, troco FROM "
+                            "vendas2 ORDER BY id DESC");
 
     modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
 
+
     db.close();
 
+
     QModelIndex firstIndex = modeloVendas2->index(0, 0);
+
 
 
     ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
 
     // Definir a primeira linha como a linha atual
-//    selectionModel->setCurrentIndex(topLeft, QItemSelectionModel::NoUpdate);
-
+    //selectionModel->setCurrentIndex(topLeft, QItemSelectionModel::NoUpdate);
+    qDebug() << "tabelas vendas atualizadas;";
 }
  QStringList Vendas::getProdutosVendidos( QString idVenda){
 
@@ -504,11 +507,19 @@ void Vendas::devolverProdutoVenda(QString id_venda, QString id_prod_vend)
 
     db.close();
 }
+void Vendas::testeMsg(){
+}
 
 void Vendas::actionAbrirPagamentosVenda(QString id_venda){
     EntradasVendasPrazo *pagamentosVenda = new EntradasVendasPrazo(this, id_venda);
-    pagamentosVenda->setWindowModality(Qt::ApplicationModal);    
+    pagamentosVenda->setWindowModality(Qt::ApplicationModal);
+    connect(pagamentosVenda, &EntradasVendasPrazo::entradaConcluida,
+            this, &Vendas::atualizarTabelas);
+    connect(pagamentosVenda, &EntradasVendasPrazo::entradaConcluida,
+            this, &Vendas::pagamentosConcluidos);
     pagamentosVenda->show();
+
+
 }
 
 
@@ -1006,6 +1017,14 @@ void Vendas::mostrarVendasCliente(int idCliente) {
         return;
     }
     //qDebug() << "IdCliente: " + QString::number(idCliente);
+    QSqlQuery query;
+    query.prepare("SELECT nome FROM clientes WHERE id = :idcliente");
+    query.bindValue(":idcliente", idCliente);
+    QString nomeCliente;
+    query.exec();
+    while(query.next()){
+        nomeCliente = query.value(0).toString();
+    }
 
     // Passa diretamente a string SQL para o modelo
     modeloVendas2->setQuery("SELECT id, valor_final, forma_pagamento, data_hora, "
@@ -1017,5 +1036,9 @@ void Vendas::mostrarVendasCliente(int idCliente) {
         qDebug() << "Erro ao carregar modelo de vendas: " << modeloVendas2->lastError().text();
     }
     db.close();
+    ui->Btn_InserirVenda->setDisabled(true);
+    ui->Btn_InserirVenda->setVisible(false);
+    ui->Lbl_ClienteHeader->setText(nomeCliente);
+
     filtrarData(de,ate);
 }

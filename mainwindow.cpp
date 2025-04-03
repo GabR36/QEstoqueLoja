@@ -618,10 +618,10 @@ void MainWindow::on_Btn_Pesquisa_clicked()
     QStringList palavras = normalizadoPesquisa.split(" ", Qt::SkipEmptyParts);
 
     // Exibir as palavras separadas no console (opcional)
-    qDebug() << "Palavras separadas:";
-    for (const QString& palavra : palavras) {
-        qDebug() << palavra;
-    }
+    // qDebug() << "Palavras separadas:";
+    // for (const QString& palavra : palavras) {
+    //     qDebug() << palavra;
+    // }
 
     if (!db.open()) {
         qDebug() << "Erro ao abrir banco de dados. Botão Pesquisar.";
@@ -923,12 +923,8 @@ void MainWindow::on_actionGerar_Relat_rio_CSV_triggered()
 
 void MainWindow::on_actionRealizar_Venda_triggered()
 {
-    Vendas *janelaVenda = new Vendas;
-   // MainWindow *janelaPrincipal;
-   // QSqlDatabase db = QSqlDatabase::database();
-    //explicit venda(QWidget *parent = nullptr);
     venda *inserirVenda = new venda;
-    inserirVenda->setWindowModality(Qt::ApplicationModal);
+    //inserirVenda->setWindowModality(Qt::ApplicationModal);
     inserirVenda->show();
 }
 

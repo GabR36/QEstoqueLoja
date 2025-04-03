@@ -128,6 +128,7 @@ void EntradasVendasPrazo::atualizarTabelaPag(){
 }
 
 
+
 void EntradasVendasPrazo::on_btn_AddValor_clicked()
 {
     float valorInseridoIngles = ui->ledit_AddValor->text().toFloat();
@@ -135,8 +136,13 @@ void EntradasVendasPrazo::on_btn_AddValor_clicked()
     // se tiver algo a dever e o valor informado for menor ou igual ao valor devido
     if ((valorDevidoGlobal > 0) && (valorInseridoIngles <= valorDevidoGlobal)) {
 
-        pagamentoAPrazo *pgmntPrazo= new pagamentoAPrazo(idVenda, portugues.toString(valorInserido, 'f', 2), clienteVenda, portugues.toString(QDateTime::currentDateTime(), "yyyy-MM-dd hh:mm:ss"));
-        connect(pgmntPrazo, &QObject::destroyed, this, &EntradasVendasPrazo::onPgmntFechado);
+        pagamentoAPrazo *pgmntPrazo= new pagamentoAPrazo(idVenda, portugues.toString(valorInserido, 'f', 2), clienteVenda,
+                                                          portugues.toString(QDateTime::currentDateTime(), "yyyy-MM-dd hh:mm:ss"));
+        connect(pgmntPrazo, &pagamentoAPrazo::pagamentoPrazoConcluido, this,
+                &EntradasVendasPrazo::entradaConcluida);
+
+       connect(pgmntPrazo, &QObject::destroyed, this, &EntradasVendasPrazo::onPgmntFechado);
+
         pgmntPrazo->show();
     }
 
@@ -196,6 +202,7 @@ void EntradasVendasPrazo::on_btn_DeletarEntrada_clicked()
 
 
                 atualizarTabelaPag();
+                emit entradaConcluida();
                 db.close();
             }
             else {

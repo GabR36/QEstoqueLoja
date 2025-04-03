@@ -155,6 +155,7 @@ void pagamentoVenda::terminarPagamento(){
     emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
 
 
+
     // fechar as janelas
     this->close();
 }

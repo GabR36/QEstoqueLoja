@@ -23,6 +23,7 @@
 #include "delegateprecof2.h"
 #include "util/pdfexporter.h"
 #include "clientes.h"
+#include "pagamentovenda.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -261,7 +262,7 @@ MainWindow::MainWindow(QWidget *parent)
             // Iterar sobre os resultados da consulta
             while (query.next()) {
                 int id = query.value(0).toInt();
-               // bool esta_pago = query.value(1).toInt();
+                // bool esta_pago = query.value(1).toInt();
 
                 QSqlQuery updateQuery;
                 updateQuery.prepare("UPDATE vendas2 SET esta_pago = 1 WHERE id = :id");
@@ -290,10 +291,13 @@ MainWindow::MainWindow(QWidget *parent)
         {
             // schema versao 3 atualizar para a versao 4
 
+            db.open();
+
             // comecar transacao
             if (!db.transaction()) {
                 qDebug() << "Error: unable to start transaction";
             }
+
             QSqlQuery query;
 
             query.exec("CREATE TABLE clientes (id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -303,7 +307,41 @@ MainWindow::MainWindow(QWidget *parent)
                        "endereco TEXT,"
                        "cpf TEXT,"
                        "data_nascimento DATE,"
-                       "data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP)");
+                       "data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,"
+                       "eh_pf BOOLEAN )");
+            query.exec("INSERT INTO clientes(nome, eh_pf) VALUES ('Consumidor', true)");
+
+            if(!query.exec("CREATE TABLE vendas (  id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                            "cliente TEXT, "
+                            "data_hora DATETIME DEFAULT CURRENT_TIMESTAMP,"
+                            "total DECIMAL(10,2), "
+                            "forma_pagamento VARCHAR(20), "
+                            "valor_recebido DECIMAL(10,2),"
+                            "troco DECIMAL(10,2),"
+                            "taxa DECIMAL(10,2),"
+                            "valor_final DECIMAL(10,2),"
+                            "desconto DECIMAL(10,2),"
+                            "esta_pago BOOLEAN DEFAULT 1,"
+                            "id_cliente INTEGER,"
+                            "FOREIGN KEY (id_cliente) REFERENCES clientes (id)) ")){
+                qDebug() << "Erro ao criar nova tabela vendas";
+            }
+
+            if(!query.exec("INSERT INTO vendas (id, cliente, data_hora, total, forma_pagamento, "
+                            "valor_recebido, troco, taxa, valor_final, desconto, esta_pago, id_cliente) "
+                            "SELECT id, cliente, data_hora, total, forma_pagamento, "
+                            "valor_recebido, troco, taxa, valor_final, desconto, esta_pago, NULL "
+                            "FROM vendas2")){
+                qDebug() << "nao copiou dados de vendas2 para vendas";
+            }
+
+            if (!query.exec("DROP TABLE vendas2")) {
+                qDebug() << "Erro ao dropar tabela:" << query.lastError().text();
+            }
+
+            if(!query.exec("ALTER TABLE vendas RENAME TO vendas2")){
+                qDebug() << "nao renomeou tabela vendas para vendas2";
+            }
 
             // mudar a versao para 4
             query.exec("PRAGMA user_version = 4");
@@ -313,6 +351,8 @@ MainWindow::MainWindow(QWidget *parent)
                 qDebug() << "Error: unable to commit transaction";
                 db.rollback(); // Desfaz a transação
             }
+
+            db.close();
 
             dbSchemaVersion = 4;
 
@@ -578,10 +618,10 @@ void MainWindow::on_Btn_Pesquisa_clicked()
     QStringList palavras = normalizadoPesquisa.split(" ", Qt::SkipEmptyParts);
 
     // Exibir as palavras separadas no console (opcional)
-    qDebug() << "Palavras separadas:";
-    for (const QString& palavra : palavras) {
-        qDebug() << palavra;
-    }
+    // qDebug() << "Palavras separadas:";
+    // for (const QString& palavra : palavras) {
+    //     qDebug() << palavra;
+    // }
 
     if (!db.open()) {
         qDebug() << "Erro ao abrir banco de dados. Botão Pesquisar.";
@@ -658,9 +698,11 @@ void MainWindow::on_Btn_Alterar_clicked()
 void MainWindow::on_Btn_Venda_clicked()
 {
     Vendas *vendas = new Vendas;
-    vendas->janelaPrincipal = this;
     vendas->setWindowModality(Qt::ApplicationModal);
+    connect(vendas, &Vendas::vendaConcluidaVendas, this, &MainWindow::atualizarTableview);
+
     vendas->show();
+
 }
 
 
@@ -881,14 +923,8 @@ void MainWindow::on_actionGerar_Relat_rio_CSV_triggered()
 
 void MainWindow::on_actionRealizar_Venda_triggered()
 {
-    Vendas *janelaVenda = new Vendas;
-   // MainWindow *janelaPrincipal;
-   // QSqlDatabase db = QSqlDatabase::database();
-    //explicit venda(QWidget *parent = nullptr);
     venda *inserirVenda = new venda;
-    inserirVenda->janelaVenda = janelaVenda;
-    inserirVenda->janelaPrincipal = this;
-    inserirVenda->setWindowModality(Qt::ApplicationModal);
+    //inserirVenda->setWindowModality(Qt::ApplicationModal);
     inserirVenda->show();
 }
 

@@ -13,7 +13,9 @@
 #include "delegateprecovalidate.h"
 #include "delegatelockcol.h"
 #include "delegatequant.h"
-
+#include <QCompleter>
+#include <QStringListModel>
+#include "inserircliente.h"
 
 
 venda::venda(QWidget *parent) :
@@ -110,11 +112,143 @@ venda::venda(QWidget *parent) :
 
     ui->Btn_SelecionarProduto->setEnabled(false);
 
+    QCompleter *completer = new QCompleter(this);
+    completer->setCaseSensitivity(Qt::CaseInsensitive); // Ignorar maiúsculas e minúsculas
+    completer->setFilterMode(Qt::MatchContains); // Sugestões que contêm o texto digitado
+
+
+
+
+    atualizarListaCliente();
+
+    if (!clientesComId.isEmpty()) {
+        // Define o primeiro item da lista como texto do QLineEdit
+        ui->Ledit_Cliente->setText(clientesComId.first());
+
+        // Opcional: selecionar apenas o nome (se quiser destacar parte do texto)
+        // Isso depende do formato que você está usando ("Nome (ID: 123)")
+        QString primeiroCliente = clientesComId.first();
+        int posInicioNome = 0;
+        int posFinalNome = primeiroCliente.indexOf(" (ID:"); // Encontra onde começa o ID
+
+        if (posFinalNome != -1) {
+            // Seleciona apenas o nome (sem o ID)
+            ui->Ledit_Cliente->setSelection(posInicioNome, posFinalNome);
+        }
+    }
+
+    QStringListModel *model = new QStringListModel(clientesComId, this);
+    completer->setModel(model);
+    ui->Ledit_Cliente->setCompleter(completer);
+
+
+    connect(ui->Ledit_Cliente, &QLineEdit::textEdited, this, [=]() {
+            completer->complete();
+    });
+    connect(ui->Ledit_Cliente, &QLineEdit::cursorPositionChanged, this, [=]() {
+            completer->complete();
+    });
+
+    connect(ui->Ledit_Cliente, &QLineEdit::editingFinished, this, [=]() {
+        validarCliente(true); // Mostra mensagens para o usuário
+    });
+
 }
+void venda::atualizarListaCliente(){
+    clientesComId.clear(); // Limpa a lista antes de recarregar
+
+    if (!db.open()) {
+        qDebug() << "Erro ao conectar ao banco de dados para autocompletar nomes.";
+    } else {
+        // Consultar nomes e IDs da tabela "clientes"
+        QSqlQuery query("SELECT id, nome FROM clientes");
+
+        while (query.next()) {
+            int id = query.value(0).toInt();
+            QString nome = query.value(1).toString();
+            // Formatar como "Nome (ID: 123)"
+            clientesComId << QString("%1 (ID: %2)").arg(nome).arg(id);
+        }
+        db.close();
+    }
+
+    // Atualizar o completer
+    QCompleter *completer = ui->Ledit_Cliente->completer();
+    if (completer) {
+        QStringListModel *model = qobject_cast<QStringListModel*>(completer->model());
+        if (model) {
+            model->setStringList(clientesComId);
+        }
+    }
+}
+
 
 venda::~venda()
 {
     delete ui;
+}
+int venda::validarCliente(bool mostrarMensagens) {
+    QString texto = ui->Ledit_Cliente->text().trimmed();
+
+   // Se o campo estiver vazio
+    if (texto.isEmpty()) {
+        if (mostrarMensagens) {
+            QMessageBox::warning(this, "Cliente não informado", "Por favor, informe o cliente!");
+            ui->Ledit_Cliente->setFocus();
+        }
+        return -1; // Código de erro para campo vazio
+    }
+
+    // Extrai nome e ID do texto digitado
+    auto [nome, id] = extrairNomeId(texto);
+
+    // Verifica formato válido
+    if (id == -1) {
+        // Tenta encontrar o cliente mais próximo no banco de dados
+        if (!db.open()) {
+            if (mostrarMensagens) {
+                qDebug() << "Erro ao abrir banco de dados";
+                QMessageBox::warning(this, "Erro", "Não foi possível validar o cliente!");
+            }
+            return -2; // Código de erro para falha no banco de dados
+        }
+
+        QSqlQuery query;
+        query.prepare("SELECT id, nome FROM clientes WHERE nome LIKE :nome ORDER BY LENGTH(nome) ASC LIMIT 1");
+        query.bindValue(":nome", "%" + texto + "%");
+
+        if (query.exec() && query.next()) {
+            int foundId = query.value(0).toInt();
+            QString foundName = query.value(1).toString();
+            ui->Ledit_Cliente->setText(QString("%1 (ID: %2)").arg(foundName).arg(foundId));
+            db.close();
+            return foundId; // Retorna o ID encontrado
+        } else {
+            db.close();
+            if (mostrarMensagens) {
+                QMessageBox::warning(this, "Cliente não encontrado",
+                                     "Nenhum cliente correspondente foi encontrado.\n"
+                                     "Digite no formato: Nome (ID: 123) ou selecione uma sugestão.");
+                ui->Ledit_Cliente->clear();
+                ui->Ledit_Cliente->setFocus();
+            }
+            return -3; // Código de erro para cliente não encontrado
+        }
+    }
+
+    // Verifica correspondência entre nome e ID
+    if (!verificarNomeIdCliente(nome, id)) {
+        if (mostrarMensagens) {
+            QMessageBox::warning(this, "Dados inválidos",
+                                 "O nome não corresponde ao ID informado!\n"
+                                 "Por favor, corrija ou selecione uma sugestão válida.");
+            ui->Ledit_Cliente->selectAll();
+            ui->Ledit_Cliente->setFocus();
+        }
+        return -4; // Código de erro para nome e ID não correspondentes
+    }
+
+    return id; // Retorna o ID válido
 }
 
 
@@ -187,13 +321,19 @@ void venda::keyPressEvent(QKeyEvent *event)
     // Chama a implementação base
 }
 
+void venda::focusInEvent(QFocusEvent *event)
+{
+    QWidget::focusInEvent(event);
+    ui->Ledit_Cliente->setReadOnly(false); // Permite edição ao focar
+}
+
 
 
 void venda::on_Btn_Pesquisa_clicked()
 {
 
     QString inputText = ui->Ledit_Pesquisa->text();
-    QString normalizadoPesquisa = janelaPrincipal->normalizeText(inputText);
+    QString normalizadoPesquisa = MainWindow::normalizeText(inputText);
 
     // Dividir a string em palavras usando split por espaços em branco
     QStringList palavras = normalizadoPesquisa.split(" ", Qt::SkipEmptyParts);
@@ -240,10 +380,55 @@ void venda::on_Btn_Pesquisa_clicked()
 }
 
 
+bool venda::verificarNomeIdCliente(const QString &nome, int id) {
+    if (!db.open()) {
+        qDebug() << "Erro ao conectar ao banco de dados";
+        return false;
+    }
+
+    QSqlQuery query;
+    query.prepare("SELECT nome FROM clientes WHERE id = :id");
+    query.bindValue(":id", id);
+
+    if (!query.exec()) {
+        qDebug() << "Erro na consulta:";
+        db.close();
+        return false;
+    }
+
+    if (query.next()) {
+        QString nomeNoBanco = query.value(0).toString();
+        db.close();
+        return nomeNoBanco.compare(nome, Qt::CaseInsensitive) == 0;
+    }
+
+    db.close();
+    return false;
+}
+
+QPair<QString, int> venda::extrairNomeId(const QString &texto) {
+        QRegularExpression regex("^(.*?)\\s*\\(ID:\\s*(\\d+)\\)$");
+        QRegularExpressionMatch match = regex.match(texto);
+
+        if (match.hasMatch()) {
+            return qMakePair(match.captured(1).trimmed(), match.captured(2).toInt());
+        }
+        return qMakePair(QString(), -1); // Retorno inválido
+}
+
+
 
 
 void venda::on_Btn_Aceitar_clicked()
 {
+    int idCliente = validarCliente(true);
+    if (idCliente < 0) { // Se retornou algum código de erro
+        return;
+    }
+
+    auto [nome, id] = extrairNomeId(ui->Ledit_Cliente->text());
+
+
     // pegar os valores da tabela dos produtos selecionados
     QList<QList<QVariant>> rowDataList;
     for (int row = 0; row < modeloSelecionados->rowCount(); ++row){
@@ -256,11 +441,16 @@ void venda::on_Btn_Aceitar_clicked()
     }
     qDebug() << rowDataList;
 
-    QString cliente = ui->Ledit_Cliente->text();
+    //QString cliente = ui->Ledit_Cliente->text();
     QString data =  portugues.toString(ui->DateEdt_Venda->dateTime(), "dd-MM-yyyy hh:mm:ss");
-
-    pagamentoVenda *pagamento = new pagamentoVenda(rowDataList, this, Total(), cliente, data);
+    pagamentoVenda *pagamento = new pagamentoVenda(rowDataList, Total(), nome, data, idCliente);
     pagamento->setWindowModality(Qt::ApplicationModal);
+    connect(pagamento, &pagamento::pagamentoConcluido, this, &venda::vendaConcluida);
+    connect(pagamento, &pagamento::pagamentoConcluido, this, &venda::close);
+
+
+
+
     pagamento->show();
 }
 
@@ -354,5 +544,34 @@ void venda::on_Ledit_Pesquisa_returnPressed()
 void venda::on_Btn_CancelarVenda_clicked()
 {
     this->close();
+}
+void venda::selecionarClienteNovo(){
+    atualizarListaCliente();
+    if (!clientesComId.isEmpty()) {
+        // Define o ultimo item da lista como texto do QLineEdit
+
+        ui->Ledit_Cliente->setText(clientesComId.last());
+
+        // Opcional: selecionar apenas o nome (se quiser destacar parte do texto)
+        // Isso depende do formato que você está usando ("Nome (ID: 123)")
+        QString ultimoCliente = clientesComId.last();
+        int posInicioNome = 0;
+        int posFinalNome = ultimoCliente.indexOf(" (ID:"); // Encontra onde começa o ID
+
+        if (posFinalNome != -1) {
+            // Seleciona apenas o nome (sem o ID)
+            ui->Ledit_Cliente->setSelection(posInicioNome, posFinalNome);
+        }
+    }
+
+}
+
+
+void venda::on_Btn_NovoCliente_clicked()
+{
+    InserirCliente *inserirCliente = new InserirCliente;
+    inserirCliente->setWindowModality(Qt::ApplicationModal);
+    connect(inserirCliente, &InserirCliente::clienteInserido, this, &venda::selecionarClienteNovo);
+    inserirCliente->show();
 }
 

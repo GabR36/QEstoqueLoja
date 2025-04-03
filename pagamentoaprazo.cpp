@@ -123,8 +123,10 @@ void pagamentoAPrazo::terminarPagamento()
     }
 
     db.close();
+    emit pagamentoPrazoConcluido(); //sinal para atualizar tabelas
 
     // fechar as janelas
     this->close();
+
     this->deleteLater();
 }

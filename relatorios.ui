@@ -74,8 +74,11 @@ background-color:rgb(170, 170, 170);
      </property>
      <item>
       <widget class="QTabWidget" name="tabWidget">
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab_3">
         <attribute name="title">
@@ -84,6 +87,9 @@ background-color:rgb(170, 170, 170);
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
           <widget class="QLabel" name="label_2">
+           <property name="styleSheet">
+            <string notr="true">font: 700 10pt &quot;Ubuntu&quot;;</string>
+           </property>
            <property name="text">
             <string>Tipo de relatório:</string>
            </property>
@@ -93,6 +99,9 @@ background-color:rgb(170, 170, 170);
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
             <widget class="QComboBox" name="CBox_VendasMain">
+             <property name="styleSheet">
+              <string notr="true">font: 700 10pt &quot;Ubuntu&quot;;</string>
+             </property>
              <item>
               <property name="text">
                <string>Quantidade de vendas por período</string>
@@ -100,23 +109,106 @@ background-color:rgb(170, 170, 170);
              </item>
              <item>
               <property name="text">
-               <string>Produtos mais vendidos</string>
+               <string>Valor de vendas por período</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Valor de vendas por período</string>
+               <string>Produtos mais vendidos</string>
               </property>
              </item>
             </widget>
            </item>
            <item>
             <widget class="QStackedWidget" name="Stacked_Vendas">
-             <property name="currentIndex">
-              <number>0</number>
+             <property name="styleSheet">
+              <string notr="true"/>
              </property>
-             <widget class="QWidget" name="page"/>
-             <widget class="QWidget" name="page_2"/>
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <widget class="QWidget" name="page">
+              <layout class="QVBoxLayout" name="verticalLayout_8">
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_7">
+                 <item>
+                  <widget class="QLabel" name="label_4">
+                   <property name="text">
+                    <string>Período:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="CBox_Periodo">
+                   <item>
+                    <property name="text">
+                     <string>Mes</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Ano</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout">
+                 <item>
+                  <widget class="QComboBox" name="CBox_Ano"/>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="CBox_Mes"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="page_2">
+              <layout class="QVBoxLayout" name="verticalLayout_10">
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_9">
+                 <item>
+                  <widget class="QLabel" name="label_5">
+                   <property name="text">
+                    <string>Período:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="CBox_periodoValor">
+                   <property name="styleSheet">
+                    <string notr="true"/>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>Mes</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Ano</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_2">
+                 <item>
+                  <widget class="QComboBox" name="CBox_AnoValor"/>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="CBox_MesValor"/>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="page_5"/>
             </widget>
            </item>
           </layout>
@@ -127,130 +219,170 @@ background-color:rgb(170, 170, 170);
         <attribute name="title">
          <string>Estoque</string>
         </attribute>
-        <widget class="QLabel" name="label">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="geometry">
-          <rect>
-           <x>10</x>
-           <y>20</y>
-           <width>250</width>
-           <height>20</height>
-          </rect>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>250</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="toolTip">
-          <string>Exporte o estoque!</string>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">font: 700 12pt &quot;Segoe UI&quot;;
+        <layout class="QVBoxLayout" name="verticalLayout_6">
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_4">
+           <item>
+            <widget class="QLabel" name="label_3">
+             <property name="styleSheet">
+              <string notr="true">font: 700 10pt &quot;Ubuntu&quot;;</string>
+             </property>
+             <property name="text">
+              <string>Tipo de Relatório:</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="CBox_EstoqueMain">
+             <property name="styleSheet">
+              <string notr="true">font: 700 10pt &quot;Ubuntu&quot;;</string>
+             </property>
+             <item>
+              <property name="text">
+               <string>Orçamento Produtos</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Lista Todos Produtos</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QStackedWidget" name="Stacked_Estoque">
+           <property name="midLineWidth">
+            <number>0</number>
+           </property>
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <widget class="QWidget" name="page_3"/>
+           <widget class="QWidget" name="page_4">
+            <widget class="QWidget" name="">
+             <property name="geometry">
+              <rect>
+               <x>300</x>
+               <y>110</y>
+               <width>252</width>
+               <height>96</height>
+              </rect>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_5">
+              <item>
+               <widget class="QLabel" name="label">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>250</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="toolTip">
+                 <string>Exporte o estoque!</string>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">font: 700 12pt &quot;Segoe UI&quot;;
 </string>
-         </property>
-         <property name="text">
-          <string>Exportar estoque</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignCenter</set>
-         </property>
-         <property name="margin">
-          <number>-1</number>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="Btn_PdfGen">
-         <property name="geometry">
-          <rect>
-           <x>50</x>
-           <y>90</y>
-           <width>250</width>
-           <height>32</height>
-          </rect>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>250</width>
-           <height>32</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>250</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <property name="text">
-          <string>Gerar PDF produtos estoque</string>
-         </property>
-        </widget>
-        <widget class="QPushButton" name="Btn_CsvGen">
-         <property name="geometry">
-          <rect>
-           <x>50</x>
-           <y>50</y>
-           <width>250</width>
-           <height>30</height>
-          </rect>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>250</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>250</width>
-           <height>30</height>
-          </size>
-         </property>
-         <property name="autoFillBackground">
-          <bool>false</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
-         <property name="text">
-          <string>Gerar CSV produtos estoque</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="checked">
-          <bool>false</bool>
-         </property>
-         <property name="default">
-          <bool>false</bool>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-        </widget>
+                </property>
+                <property name="text">
+                 <string>Exportar estoque</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignmentFlag::AlignCenter</set>
+                </property>
+                <property name="margin">
+                 <number>-1</number>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="Btn_CsvGen">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>250</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>250</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="autoFillBackground">
+                 <bool>false</bool>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Gerar CSV produtos estoque</string>
+                </property>
+                <property name="checkable">
+                 <bool>true</bool>
+                </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
+                <property name="default">
+                 <bool>false</bool>
+                </property>
+                <property name="flat">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="Btn_PdfGen">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>250</width>
+                  <height>32</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>250</width>
+                  <height>30</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true"/>
+                </property>
+                <property name="text">
+                 <string>Gerar PDF produtos estoque</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </widget>
      </item>

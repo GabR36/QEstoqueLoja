@@ -32,7 +32,7 @@ public:
     void actionAbrirPagamentosVenda(QString id_venda);
 
 
-    void testeMsg();
+    void AtualizarTabelasSinal();
 public slots:
     void imprimirReciboVendaSelec(QString id); //precisa ser slot :(
 
@@ -78,8 +78,9 @@ private:
     int IDCLIENTE = 0;
 signals:
     void vendaConcluidaVendas();
-    void janelaFechada();
     void pagamentosConcluidos();
+    void devolvidoProduto();
+    void vendaDeletada();
 };
 
 #endif // VENDAS_H

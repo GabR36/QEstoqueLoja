@@ -361,7 +361,7 @@ void Vendas::on_Btn_DeletarVenda_clicked()
         } else {
             qDebug() << "Erro no Delete: ";
         }
-
+        emit vendaDeletada();
         atualizarTabelas();
         db.close();
     }
@@ -507,14 +507,16 @@ void Vendas::devolverProdutoVenda(QString id_venda, QString id_prod_vend)
 
     db.close();
 }
-void Vendas::testeMsg(){
+void Vendas::AtualizarTabelasSinal(){
+    qDebug() << "Teste Atualizar Tabelas deletar, add valor emitido";
+    filtrarData(de,ate);
 }
 
 void Vendas::actionAbrirPagamentosVenda(QString id_venda){
     EntradasVendasPrazo *pagamentosVenda = new EntradasVendasPrazo(this, id_venda);
     pagamentosVenda->setWindowModality(Qt::ApplicationModal);
     connect(pagamentosVenda, &EntradasVendasPrazo::entradaConcluida,
-            this, &Vendas::atualizarTabelas);
+            this, &Vendas::AtualizarTabelasSinal);
     connect(pagamentosVenda, &EntradasVendasPrazo::entradaConcluida,
             this, &Vendas::pagamentosConcluidos);
     pagamentosVenda->show();
@@ -1003,6 +1005,7 @@ void Vendas::devolverProduto(QString id_prod_vend, QString id_produto, QString q
     query2.bindValue(":valor1", qntd);
     query2.bindValue(":valor2", id_produto);
     query2.exec();
+    emit devolvidoProduto();
 
     db.close();
 }

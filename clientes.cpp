@@ -284,6 +284,11 @@ void Clientes::on_Btn_abrirCompras_clicked()
         janelaVendas->show();
         connect(janelaVendas, &Vendas::pagamentosConcluidos,
                 this, &Clientes::atualizarInfosSinal);
+        connect(janelaVendas, &Vendas::devolvidoProduto,
+                this, &Clientes::atualizarInfosSinal);
+        connect(janelaVendas, &Vendas::vendaDeletada,
+                this, &Clientes::atualizarInfosSinal);
+
     }else{
         QMessageBox::warning(this,"Erro","Selecione um Cliente na tabela para ver suas compras!");
 

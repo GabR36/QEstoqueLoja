@@ -20,196 +20,121 @@ relatorios::relatorios(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Limpando páginas antigas do StackedWidget
-    while (ui->Stacked_Vendas->count() > 0) {
-        QWidget *pagina = ui->Stacked_Vendas->widget(0);
-        ui->Stacked_Vendas->removeWidget(pagina);
-        pagina->deleteLater();
+    ui->Stacked_Vendas->setCurrentIndex(0);
+    ui->Stacked_Estoque->setCurrentIndex(0);
+
+
+    configurarJanelaQuantVendas();
+
+    connect(ui->CBox_VendasMain, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            ui->Stacked_Vendas, &QStackedWidget::setCurrentIndex);
+    connect(ui->CBox_EstoqueMain, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            ui->Stacked_Estoque, &QStackedWidget::setCurrentIndex);
+
+    configurarJanelaValorVendas();
+    configurarJanelaTopProdutosVendas();
+
+
+
+
+
+}
+
+
+
+
+
+
+
+relatorios::~relatorios()
+{
+    delete ui;
+}
+void relatorios::configurarJanelaTopProdutosVendas(){
+    QMap<QString, int> topProdutos = buscarTopProdutosVendidos();
+
+    // Criando o gráfico de barras para os produtos mais vendidos
+    QBarSet *set = new QBarSet("Vendas");
+    QStringList categorias;
+
+    for (auto it = topProdutos.begin(); it != topProdutos.end(); ++it) {
+        categorias << it.key();
+        *set << it.value();
     }
 
+    QBarSeries *series = new QBarSeries();
+    series->append(set);
+    connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
+        if (status) {
+            QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
+        }
+    });
 
-    // Criando o ComboBox para selecionar o período
-    QComboBox *CBox_Periodo = new QComboBox();
-    CBox_Periodo->addItem("Mes");
-    CBox_Periodo->addItem("Ano");
+    QChart *chart = new QChart();
+    chart->addSeries(series);
+    chart->setTitle("Top 10 Produtos Mais Vendidos");
+    chart->setAnimationOptions(QChart::SeriesAnimations);
 
-    QLabel *Lbl_Periodo = new QLabel();
-    Lbl_Periodo->setText("Período:");
-    QVBoxLayout *layoutPeriodo = new QVBoxLayout();
-    layoutPeriodo->addWidget(Lbl_Periodo);
-    layoutPeriodo->addWidget(CBox_Periodo);
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append(categorias);
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
 
-    // Criando o ComboBox para selecionar o ano (inicialmente oculto)
-    QComboBox *CBox_Ano = new QComboBox();
-    CBox_Ano->setVisible(false);
-    QComboBox *CBox_Mes = new QComboBox();
-    QStringList meses = {"01 - Janeiro", "02 - Fevereiro", "03 - Março", "04 - Abril", "05 - Maio",
-                         "06 - Junho", "07 - Julho", "08 - Agosto", "09 - Setembro",
-                         "10 - Outubro", "11 - Novembro", "12 - Dezembro"};
-    CBox_Mes->addItems(meses);
-    CBox_Mes->setVisible(false);
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setRange(0, *std::max_element(topProdutos.begin(), topProdutos.end()));
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
 
-    // Criando o container da página 0
-    QWidget *paginaQuantVendas = new QWidget();
-    QVBoxLayout *layoutGrafico = new QVBoxLayout();
-    QHBoxLayout *layoutAnoMes = new QHBoxLayout();
-    layoutAnoMes->addWidget(CBox_Ano);
-    layoutAnoMes->addWidget(CBox_Mes);
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
 
-    layoutGrafico->addLayout(layoutPeriodo);
-    layoutGrafico->addLayout(layoutAnoMes);
-    paginaQuantVendas->setLayout(layoutGrafico);
-
-    // Adicionando a página 0 ao StackedWidget
-    ui->Stacked_Vendas->addWidget(paginaQuantVendas);
-
-    // Adicionando uma página vazia como segunda página
-    QWidget *paginaProdVendidos = new QWidget();
-    QVBoxLayout *layoutProdVendidos = new QVBoxLayout();
-    paginaProdVendidos->setLayout(layoutProdVendidos);
-    ui->Stacked_Vendas->addWidget(paginaProdVendidos);
-
-    QWidget *paginaValorVendas = new QWidget();
-    QVBoxLayout *layoutVendasValor = new QVBoxLayout();
-    QVBoxLayout *layoutPeriodoValor= new QVBoxLayout();
+    QWidget* paginaGrafico = ui->Stacked_Vendas->widget(2); // página 3
+    QLayout* layoutPagina = paginaGrafico->layout();
 
 
-    QLabel *Lbl_PeriodoValor = new QLabel();
-    Lbl_PeriodoValor->setText("Periodo");
+    if (!layoutPagina) {
+        layoutPagina = new QVBoxLayout(paginaGrafico);
+        paginaGrafico->setLayout(layoutPagina);
+    }
 
-    QComboBox *CBox_periodoValor = new QComboBox();
+    // Limpando e adicionando o gráfico na interface
+    QLayoutItem *item;
+    while ((item = layoutPagina->takeAt(2)) != nullptr) {
+        delete item->widget();
+        delete item;
+    }
+    layoutPagina->addWidget(chartView);
 
-    QHBoxLayout *layoutMesAnoValor = new QHBoxLayout();
+}
+void relatorios::configurarJanelaValorVendas(){
+    ui->CBox_MesValor->setVisible(false);
+    ui->CBox_AnoValor->setVisible(false);
 
+    ui->CBox_MesValor->addItems(meses);
 
-    QComboBox *CBox_MesValor = new QComboBox();
-    QComboBox *CBox_AnoValor = new QComboBox();
-    CBox_MesValor->setVisible(false);
-    CBox_AnoValor->setVisible(false);
-
-
-    CBox_MesValor->addItems(meses);
-
-    layoutMesAnoValor->addWidget(CBox_MesValor);
-    layoutMesAnoValor->addWidget(CBox_AnoValor);
-
-
-
-    CBox_periodoValor->addItem("Mes");
-    CBox_periodoValor->addItem("Ano");
-
-    layoutPeriodoValor->addWidget(Lbl_PeriodoValor);
-    layoutPeriodoValor->addWidget(CBox_periodoValor);
-
-    layoutVendasValor->addLayout(layoutPeriodoValor);
-    layoutVendasValor->addLayout(layoutMesAnoValor);
-
-    paginaValorVendas->setLayout(layoutVendasValor);
-    ui->Stacked_Vendas->addWidget(paginaValorVendas);
-
-
-    // Definindo o índice inicial para mostrar o gráfico e o ComboBox juntos
-    ui->Stacked_Vendas->setCurrentIndex(0);
-
-    // Conectando o ComboBox de período
-    connect(CBox_Periodo, &QComboBox::currentTextChanged, this, [=](const QString &texto){
+    connect(ui->CBox_periodoValor, &QComboBox::currentTextChanged, this, [=](const QString &texto){
         if (texto == "Ano") {
             // Mostrar ComboBox de anos e buscar anos no banco de dados
-            CBox_Ano->setVisible(true);
-            CBox_Mes->setVisible(false);
-            CBox_Ano->clear();
-            CBox_Ano->addItems(buscarAnosDisponiveis());
+            ui->CBox_AnoValor->setVisible(true);
+            ui->CBox_MesValor->setVisible(false);
+            ui->CBox_AnoValor->clear();
+            ui->CBox_AnoValor->addItems(buscarAnosDisponiveis());
         }else if(texto == "Mes"){
-            CBox_Ano->setVisible(true);
-            CBox_Mes->setVisible(true);
-            CBox_Ano->clear();
-            CBox_Ano->addItems(buscarAnosDisponiveis());
-            emit CBox_Mes->currentTextChanged(CBox_Mes->currentText());
+            ui->CBox_AnoValor->setVisible(true);
+            ui->CBox_MesValor->setVisible(true);
+            ui->CBox_AnoValor->clear();
+            ui->CBox_AnoValor->addItems(buscarAnosDisponiveis());
+            emit ui->CBox_MesValor->currentTextChanged(ui->CBox_MesValor->currentText());
 
         }else {
-            CBox_Ano->setVisible(false);
-            CBox_Mes->setVisible(false);
+            ui->CBox_AnoValor->setVisible(false);
+            ui->CBox_MesValor->setVisible(false);
 
         }
     });
 
-    // Conectando o ComboBox de período
-    connect(CBox_periodoValor, &QComboBox::currentTextChanged, this, [=](const QString &texto){
-        if (texto == "Ano") {
-            // Mostrar ComboBox de anos e buscar anos no banco de dados
-            CBox_AnoValor->setVisible(true);
-            CBox_MesValor->setVisible(false);
-            CBox_AnoValor->clear();
-            CBox_AnoValor->addItems(buscarAnosDisponiveis());
-        }else if(texto == "Mes"){
-            CBox_AnoValor->setVisible(true);
-            CBox_MesValor->setVisible(true);
-            CBox_AnoValor->clear();
-            CBox_AnoValor->addItems(buscarAnosDisponiveis());
-            emit CBox_MesValor->currentTextChanged(CBox_MesValor->currentText());
-
-        }else {
-            CBox_AnoValor->setVisible(false);
-            CBox_MesValor->setVisible(false);
-
-        }
-    });
-
-    // Conectando o ComboBox de ano para atualizar o gráfico
-    connect(CBox_Ano, &QComboBox::currentTextChanged, this, [=](const QString &anoSelecionado){
-        if(CBox_Periodo->currentText() == "Ano"){
-            QMap<QString, int> vendas = buscarVendasPorMesAno(anoSelecionado);
-
-            // Criando o gráfico de barras
-            QBarSet *set = new QBarSet("Vendas");
-            QStringList categorias;
-
-            for (int i = 1; i <= 12; ++i) {
-                QString mes = QString("%1").arg(i, 2, 10, QChar('0'));
-                categorias << mes;
-                *set << vendas.value(mes, 0);
-            }
-
-            QBarSeries *series = new QBarSeries();
-            series->append(set);
-
-            connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
-                if (status) {
-                    QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
-                }
-            });
-
-            QChart *chart = new QChart();
-            chart->addSeries(series);
-            chart->setTitle("Quantidade de Vendas por Mês - Ano " + anoSelecionado);
-            chart->setAnimationOptions(QChart::SeriesAnimations);
-
-            QBarCategoryAxis *axisX = new QBarCategoryAxis();
-            axisX->append(categorias);
-            chart->addAxis(axisX, Qt::AlignBottom);
-            series->attachAxis(axisX);
-
-            QValueAxis *axisY = new QValueAxis();
-            axisY->setRange(0, *std::max_element(vendas.begin(), vendas.end()));
-            chart->addAxis(axisY, Qt::AlignLeft);
-            series->attachAxis(axisY);
-
-            QChartView *chartView = new QChartView(chart);
-            chartView->setRenderHint(QPainter::Antialiasing);
-
-            // Limpando e adicionando o gráfico na página 0
-            QLayoutItem *item;
-            while ((item = layoutGrafico->takeAt(2)) != nullptr) {
-                delete item->widget();
-                delete item;
-            }
-            layoutGrafico->addWidget(chartView);
-        }
-    });
-
-    // Grafico de valor por Ano
-    connect(CBox_AnoValor, &QComboBox::currentTextChanged, this, [=](const QString &anoSelecionado) {
-        if (CBox_periodoValor->currentText() == "Ano") {
+    connect(ui->CBox_AnoValor, &QComboBox::currentTextChanged, this, [=](const QString &anoSelecionado) {
+        if (ui->CBox_periodoValor->currentText() == "Ano") {
             QMap<QString, QPair<double, double>> vendasEEntradas = buscarValorVendasPorMesAno(anoSelecionado);
 
             // Criando conjuntos de dados para o gráfico
@@ -270,20 +195,187 @@ relatorios::relatorios(QWidget *parent)
             QChartView *chartView = new QChartView(chart);
             chartView->setRenderHint(QPainter::Antialiasing);
 
+            QWidget* paginaGrafico = ui->Stacked_Vendas->widget(1); // página 0
+            QLayout* layoutPagina = paginaGrafico->layout();
+
+
+            if (!layoutPagina) {
+                layoutPagina = new QVBoxLayout(paginaGrafico);
+                paginaGrafico->setLayout(layoutPagina);
+            }
+
             // Limpando e adicionando o gráfico na interface
             QLayoutItem *item;
-            while ((item = layoutPeriodoValor->takeAt(2)) != nullptr) {
+            while ((item = layoutPagina->takeAt(2)) != nullptr) {
                 delete item->widget();
                 delete item;
             }
-            layoutPeriodoValor->addWidget(chartView);
+            layoutPagina->addWidget(chartView);
+        }
+    });
+
+    connect(ui->CBox_MesValor, &QComboBox::currentTextChanged, this, [=](const QString &mesSelecionado){
+        QString anoSelecionado = ui->CBox_AnoValor->currentText();
+        if (ui->CBox_periodoValor->currentText() == "Mes" && !anoSelecionado.isEmpty()) {
+            QString mesFormatado = mesSelecionado.left(2);  // Pega o número do mês
+
+            QMap<QString, double> vendas = buscarValorVendasPorDiaMesAno(anoSelecionado, mesFormatado); //<<<<<<
+
+            // Criando o gráfico de barras para vendas diárias
+            QBarSet *set = new QBarSet("Valor Total Vendas");
+            QStringList categorias;
+
+            int diasNoMes = QDate(anoSelecionado.toInt(), mesFormatado.toInt(), 1).daysInMonth();
+            for (int dia = 1; dia <= diasNoMes; ++dia) {
+                QString diaStr = QString("%1").arg(dia, 2, 10, QChar('0'));
+                categorias << diaStr;
+                *set << vendas.value(diaStr, 0);
+            }
+
+            QBarSeries *series = new QBarSeries();
+            series->append(set);
+            connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
+                if (status) {
+                    QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
+                }
+            });
+
+            QChart *chart = new QChart();
+            chart->addSeries(series);
+            chart->setTitle("Valor Vendas por Dia - " + mesSelecionado + " de " + anoSelecionado);
+            chart->setAnimationOptions(QChart::SeriesAnimations);
+
+            QBarCategoryAxis *axisX = new QBarCategoryAxis();
+            axisX->append(categorias);
+            chart->addAxis(axisX, Qt::AlignBottom);
+            series->attachAxis(axisX);
+
+            QValueAxis *axisY = new QValueAxis();
+            axisY->setRange(0, *std::max_element(vendas.begin(), vendas.end()));
+            chart->addAxis(axisY, Qt::AlignLeft);
+            series->attachAxis(axisY);
+
+
+            QChartView *chartView = new QChartView(chart);
+            chartView->setRenderHint(QPainter::Antialiasing);
+
+            QWidget* paginaGrafico = ui->Stacked_Vendas->widget(1); // página 0
+            QLayout* layoutPagina = paginaGrafico->layout();
+
+
+            if (!layoutPagina) {
+                layoutPagina = new QVBoxLayout(paginaGrafico);
+                paginaGrafico->setLayout(layoutPagina);
+            }
+            // Limpando e adicionando o gráfico na página 0
+            QLayoutItem *item;
+            while ((item = layoutPagina->takeAt(2)) != nullptr) {
+                delete item->widget();
+                delete item;
+            }
+
+
+            layoutPagina->addWidget(chartView);
+        }
+    });
+    ui->CBox_periodoValor->setCurrentIndex(1);
+    emit ui->CBox_periodoValor->currentTextChanged(ui->CBox_periodoValor->currentText());
+
+}
+void relatorios::configurarJanelaQuantVendas(){
+
+    ui->CBox_Ano->setVisible(false);
+    ui->CBox_Mes->addItems(meses);
+    ui->CBox_Mes->setVisible(false);
+
+    connect(ui->CBox_Periodo, &QComboBox::currentTextChanged, this, [=](const QString &texto){
+        if (texto == "Ano") {
+            // Mostrar ComboBox de anos e buscar anos no banco de dados
+            ui->CBox_Ano->setVisible(true);
+            ui->CBox_Mes->setVisible(false);
+            ui->CBox_Ano->clear();
+            ui->CBox_Ano->addItems(buscarAnosDisponiveis());
+        }else if(texto == "Mes"){
+            ui->CBox_Ano->setVisible(true);
+            ui->CBox_Mes->setVisible(true);
+            ui->CBox_Ano->clear();
+            ui->CBox_Ano->addItems(buscarAnosDisponiveis());
+            emit ui->CBox_Mes->currentTextChanged(ui->CBox_Mes->currentText());
+
+        }else {
+            ui->CBox_Ano->setVisible(false);
+            ui->CBox_Mes->setVisible(false);
+
         }
     });
 
 
-    connect(CBox_Mes, &QComboBox::currentTextChanged, this, [=](const QString &mesSelecionado){
-        QString anoSelecionado = CBox_Ano->currentText();
-        if (CBox_Periodo->currentText() == "Mes" && !anoSelecionado.isEmpty()) {
+    // Conectando o ComboBox de ano para atualizar o gráfico
+    connect(ui->CBox_Ano, &QComboBox::currentTextChanged, this, [=](const QString &anoSelecionado){
+        if(ui->CBox_Periodo->currentText() == "Ano"){
+            QMap<QString, int> vendas = buscarVendasPorMesAno(anoSelecionado);
+
+            // Criando o gráfico de barras
+            QBarSet *set = new QBarSet("Vendas");
+            QStringList categorias;
+
+            for (int i = 1; i <= 12; ++i) {
+                QString mes = QString("%1").arg(i, 2, 10, QChar('0'));
+                categorias << mes;
+                *set << vendas.value(mes, 0);
+            }
+
+            QBarSeries *series = new QBarSeries();
+            series->append(set);
+
+            connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
+                if (status) {
+                    QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
+                }
+            });
+
+            QChart *chart = new QChart();
+            chart->addSeries(series);
+            chart->setTitle("Quantidade de Vendas por Mês - Ano " + anoSelecionado);
+            chart->setAnimationOptions(QChart::SeriesAnimations);
+
+            QBarCategoryAxis *axisX = new QBarCategoryAxis();
+            axisX->append(categorias);
+            chart->addAxis(axisX, Qt::AlignBottom);
+            series->attachAxis(axisX);
+
+            QValueAxis *axisY = new QValueAxis();
+            axisY->setRange(0, *std::max_element(vendas.begin(), vendas.end()));
+            chart->addAxis(axisY, Qt::AlignLeft);
+            series->attachAxis(axisY);
+
+            QChartView *chartView = new QChartView(chart);
+            chartView->setRenderHint(QPainter::Antialiasing);
+
+            QWidget* paginaGrafico = ui->Stacked_Vendas->widget(0); // página 0
+            QLayout* layoutPagina = paginaGrafico->layout();
+
+
+            if (!layoutPagina) {
+                layoutPagina = new QVBoxLayout(paginaGrafico);
+                paginaGrafico->setLayout(layoutPagina);
+            }
+
+            // Limpando e adicionando o gráfico na página 0
+            QLayoutItem *item;
+            while ((item = layoutPagina->takeAt(2)) != nullptr) {
+                delete item->widget();
+                delete item;
+            }
+            layoutPagina->addWidget(chartView);
+        }
+    });
+    ui->CBox_Periodo->setCurrentIndex(1);
+    //emit ui->CBox_Periodo->currentTextChanged(ui->CBox_Periodo->currentText()); //emite ao abrir para resolver bugs
+
+    connect( ui->CBox_Mes, &QComboBox::currentTextChanged, this, [=](const QString &mesSelecionado){
+        QString anoSelecionado = ui->CBox_Ano->currentText();
+        if (ui->CBox_Periodo->currentText() == "Mes" && !anoSelecionado.isEmpty()) {
             QString mesFormatado = mesSelecionado.left(2);  // Pega o número do mês
 
             QMap<QString, int> vendas = buscarVendasPorDiaMesAno(anoSelecionado, mesFormatado);
@@ -325,129 +417,27 @@ relatorios::relatorios(QWidget *parent)
             QChartView *chartView = new QChartView(chart);
             chartView->setRenderHint(QPainter::Antialiasing);
 
-            // Limpando e adicionando o gráfico na página 0
-            QLayoutItem *item;
-            while ((item = layoutGrafico->takeAt(2)) != nullptr) {
-                delete item->widget();
-                delete item;
+            QWidget* paginaGrafico = ui->Stacked_Vendas->widget(0); // página 0
+            QLayout* layoutPagina = paginaGrafico->layout();
+
+
+            if (!layoutPagina) {
+                layoutPagina = new QVBoxLayout(paginaGrafico);
+                paginaGrafico->setLayout(layoutPagina);
             }
-            layoutGrafico->addWidget(chartView);
-        }
-    });
-
-    // grafico VALOR mes - ano
-    connect(CBox_MesValor, &QComboBox::currentTextChanged, this, [=](const QString &mesSelecionado){
-        QString anoSelecionado = CBox_AnoValor->currentText();
-        if (CBox_periodoValor->currentText() == "Mes" && !anoSelecionado.isEmpty()) {
-            QString mesFormatado = mesSelecionado.left(2);  // Pega o número do mês
-
-            QMap<QString, double> vendas = buscarValorVendasPorDiaMesAno(anoSelecionado, mesFormatado); //<<<<<<
-
-            // Criando o gráfico de barras para vendas diárias
-            QBarSet *set = new QBarSet("Valor Total Vendas");
-            QStringList categorias;
-
-            int diasNoMes = QDate(anoSelecionado.toInt(), mesFormatado.toInt(), 1).daysInMonth();
-            for (int dia = 1; dia <= diasNoMes; ++dia) {
-                QString diaStr = QString("%1").arg(dia, 2, 10, QChar('0'));
-                categorias << diaStr;
-                *set << vendas.value(diaStr, 0);
-            }
-
-            QBarSeries *series = new QBarSeries();
-            series->append(set);
-            connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
-                if (status) {
-                    QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
-                }
-            });
-
-            QChart *chart = new QChart();
-            chart->addSeries(series);
-            chart->setTitle("Valor Vendas por Dia - " + mesSelecionado + " de " + anoSelecionado);
-            chart->setAnimationOptions(QChart::SeriesAnimations);
-
-            QBarCategoryAxis *axisX = new QBarCategoryAxis();
-            axisX->append(categorias);
-            chart->addAxis(axisX, Qt::AlignBottom);
-            series->attachAxis(axisX);
-
-            QValueAxis *axisY = new QValueAxis();
-            axisY->setRange(0, *std::max_element(vendas.begin(), vendas.end()));
-            chart->addAxis(axisY, Qt::AlignLeft);
-            series->attachAxis(axisY);
-
-            QChartView *chartView = new QChartView(chart);
-            chartView->setRenderHint(QPainter::Antialiasing);
 
             // Limpando e adicionando o gráfico na página 0
             QLayoutItem *item;
-            while ((item = layoutPeriodoValor->takeAt(2)) != nullptr) {
+            while ((item = layoutPagina->takeAt(2)) != nullptr) {
                 delete item->widget();
                 delete item;
             }
-            layoutPeriodoValor->addWidget(chartView);
+            layoutPagina->addWidget(chartView);
         }
     });
+    ui->CBox_Periodo->setCurrentIndex(1);
+    //emit ui->CBox_Ano->currentTextChanged(ui->CBox_Ano->currentText());
 
-    CBox_Periodo->setCurrentIndex(1);
-    emit CBox_Periodo->currentTextChanged(CBox_Periodo->currentText());
-    CBox_periodoValor->setCurrentIndex(1);
-    emit CBox_periodoValor->currentTextChanged(CBox_periodoValor->currentText());
-
-
-    // Conectando o ComboBox principal para alternar páginas
-    connect(ui->CBox_VendasMain, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            ui->Stacked_Vendas, &QStackedWidget::setCurrentIndex);
-
-    QMap<QString, int> topProdutos = buscarTopProdutosVendidos();
-
-    // Criando o gráfico de barras para os produtos mais vendidos
-    QBarSet *set = new QBarSet("Vendas");
-    QStringList categorias;
-
-    for (auto it = topProdutos.begin(); it != topProdutos.end(); ++it) {
-        categorias << it.key();
-        *set << it.value();
-    }
-
-    QBarSeries *series = new QBarSeries();
-    series->append(set);
-    connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
-        if (status) {
-            QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
-        }
-    });
-
-    QChart *chart = new QChart();
-    chart->addSeries(series);
-    chart->setTitle("Top 10 Produtos Mais Vendidos");
-    chart->setAnimationOptions(QChart::SeriesAnimations);
-
-    QBarCategoryAxis *axisX = new QBarCategoryAxis();
-    axisX->append(categorias);
-    chart->addAxis(axisX, Qt::AlignBottom);
-    series->attachAxis(axisX);
-
-    QValueAxis *axisY = new QValueAxis();
-    axisY->setRange(0, *std::max_element(topProdutos.begin(), topProdutos.end()));
-    chart->addAxis(axisY, Qt::AlignLeft);
-    series->attachAxis(axisY);
-
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-
-    layoutProdVendidos->addWidget(chartView);
-}
-
-
-
-
-
-
-relatorios::~relatorios()
-{
-    delete ui;
 }
 void relatorios::conectarBancoDados() {
     if (!db.open()) {

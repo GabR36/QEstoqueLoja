@@ -34,10 +34,12 @@ public:
 
     QStringList buscarAnosDisponiveis();
     QMap<QString, int> buscarVendasPorMesAno(const QString &ano);
+    QMap<QString, int> buscarQuantidadePorFormaPagamento();
+    QMap<QString, QPair<double, double> > buscarValorVendasPorMesAno(const QString &ano);
+    QMap<QString, QVector<int> > buscarFormasPagamentoPorAno(const QString &anoSelecionado);
 protected:
     QMap<QString, int> buscarVendasPorDiaMesAno(const QString &ano, const QString &mes);
     QMap<QString, int> buscarTopProdutosVendidos();
-    QMap<QString, QPair<double, double> > buscarValorVendasPorMesAno(const QString &ano);
     QMap<QString, double> buscarValorVendasPorDiaMesAno(const QString &ano, const QString &mes);
 private slots:
     void on_Btn_PdfGen_clicked();
@@ -54,6 +56,7 @@ private:
     void configurarJanelaQuantVendas();
     void configurarJanelaValorVendas();
     void configurarJanelaTopProdutosVendas();
+    void configurarJanelaFormasPagamentoAno();
 };
 
 #endif // RELATORIOS_H

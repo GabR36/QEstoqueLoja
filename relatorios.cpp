@@ -33,6 +33,7 @@ relatorios::relatorios(QWidget *parent)
 
     configurarJanelaValorVendas();
     configurarJanelaTopProdutosVendas();
+    configurarJanelaFormasPagamentoAno();
 
 
 
@@ -50,6 +51,121 @@ relatorios::~relatorios()
 {
     delete ui;
 }
+QMap<QString, QVector<int>> relatorios::buscarFormasPagamentoPorAno(const QString &anoSelecionado) {
+    QMap<QString, QVector<int>> resultado;
+
+    // Inicializa com 12 zeros para cada forma
+    QStringList formas = {"Dinheiro", "Crédito", "Débito", "Pix", "Prazo", "Não Sei"};
+    for (const QString &forma : formas) {
+        resultado[forma] = QVector<int>(12, 0);
+    }
+
+    QSqlQuery query;
+    query.prepare(R"(
+        SELECT strftime('%m', data_hora) AS mes, forma_pagamento, COUNT(*) as total
+        FROM vendas2
+        WHERE strftime('%Y', data_hora) = :ano
+        GROUP BY mes, forma_pagamento
+    )");
+    query.bindValue(":ano", anoSelecionado);
+
+    if (query.exec()) {
+        while (query.next()) {
+            int mes = query.value(0).toString().toInt(); // 1 a 12
+            QString forma = query.value(1).toString();
+            int total = query.value(2).toInt();
+
+            if (resultado.contains(forma)) {
+                resultado[forma][mes - 1] = total;
+            }
+        }
+    } else {
+        qDebug() << "Erro ao buscar formas pagamento por ano:" << query.lastError().text();
+    }
+
+    return resultado;
+}
+void relatorios::configurarJanelaFormasPagamentoAno() {
+    static bool jaConectado = false; // evita múltiplos connects
+
+    // Carrega os anos apenas se o combo estiver vazio
+    if (ui->CBox_AnoFormaPagamento->count() == 0) {
+        ui->CBox_AnoFormaPagamento->addItems(buscarAnosDisponiveis());
+    }
+
+    // Conecta o combo apenas uma vez
+    if (!jaConectado) {
+        connect(ui->CBox_AnoFormaPagamento, &QComboBox::currentTextChanged, this, [=](const QString &ano){
+            configurarJanelaFormasPagamentoAno(); // chama a si mesma para atualizar com o novo ano
+        });
+        jaConectado = true;
+    }
+
+    // Pega o ano selecionado e monta o gráfico
+    QString anoSelecionado = ui->CBox_AnoFormaPagamento->currentText();
+    if (anoSelecionado.isEmpty()) return;
+
+    QMap<QString, QVector<int>> dados = buscarFormasPagamentoPorAno(anoSelecionado);
+    QStringList meses = {"Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"};
+
+    QChart *chart = new QChart();
+    chart->setTitle("Formas de Pagamento por Mês - Ano " + anoSelecionado);
+    chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    QBarSeries *series = new QBarSeries();
+    int maxValor = 0;
+
+    for (auto it = dados.begin(); it != dados.end(); ++it) {
+        QBarSet *set = new QBarSet(it.key());
+        for (int val : it.value()) {
+            *set << val;
+            maxValor = std::max(maxValor, val);
+        }
+        QString nomeForma = it.key();  // Captura fora da lambda
+
+        connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
+            if (status) {
+                QToolTip::showText(QCursor::pos(), QString("%1: %2").arg(nomeForma).arg((*set)[index]));
+            }
+        });
+
+        series->append(set);
+    }
+
+    chart->addSeries(series);
+
+    QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    axisX->append(meses);
+    chart->addAxis(axisX, Qt::AlignBottom);
+    series->attachAxis(axisX);
+
+    QValueAxis *axisY = new QValueAxis();
+    axisY->setRange(0, maxValor);
+    chart->addAxis(axisY, Qt::AlignLeft);
+    series->attachAxis(axisY);
+
+    QChartView *chartView = new QChartView(chart);
+    chartView->setRenderHint(QPainter::Antialiasing);
+
+    QWidget* paginaGrafico = ui->Stacked_Vendas->widget(3);
+    QLayout* layoutPagina = paginaGrafico->layout();
+
+    if (!layoutPagina) {
+        layoutPagina = new QVBoxLayout(paginaGrafico);
+        paginaGrafico->setLayout(layoutPagina);
+    }
+
+    // Remove widgets anteriores (mantendo os dois primeiros, se quiser)
+    QLayoutItem *item;
+    while ((item = layoutPagina->takeAt(1)) != nullptr) {
+        delete item->widget();
+        delete item;
+    }
+    layoutPagina->addWidget(chartView);
+}
+
+
+
 void relatorios::configurarJanelaTopProdutosVendas(){
     QMap<QString, int> topProdutos = buscarTopProdutosVendidos();
 

@@ -11,9 +11,11 @@
 #include <QPdfWriter>
 #include <QSqlQueryModel>
 #include <QSqlQuery>
-#include <QtSql>
 #include <QDesktopServices>
 #include <QLocale>
+#include <QStandardItemModel>
+#include <QMenu>
+#include <QAction>
 
 namespace Ui {
 class relatorios;
@@ -41,10 +43,22 @@ protected:
     QMap<QString, int> buscarVendasPorDiaMesAno(const QString &ano, const QString &mes);
     QMap<QString, int> buscarTopProdutosVendidos();
     QMap<QString, double> buscarValorVendasPorDiaMesAno(const QString &ano, const QString &mes);
+    QString totalGeral();
+    void atualizarTotalProduto();
 private slots:
     void on_Btn_PdfGen_clicked();
 
     void on_Btn_CsvGen_clicked();
+
+    void on_Btn_AddProd_clicked();
+
+    void on_Ledit_PesquisaProduto_textChanged(const QString &arg1);
+
+    void on_Btn_Terminar_clicked();
+
+    void on_Btn_NovoCliente_clicked();
+
+
 
 private:
     Ui::relatorios *ui;
@@ -53,10 +67,21 @@ private:
     QStringList meses = {"01 - Janeiro", "02 - Fevereiro", "03 - Março", "04 - Abril", "05 - Maio",
                          "06 - Junho", "07 - Julho", "08 - Agosto", "09 - Setembro",
                          "10 - Outubro", "11 - Novembro", "12 - Dezembro"};
+    QStandardItemModel *modeloSelecionados = new QStandardItemModel;
+    QStringList clientesComId;
+
+
     void configurarJanelaQuantVendas();
     void configurarJanelaValorVendas();
     void configurarJanelaTopProdutosVendas();
     void configurarJanelaFormasPagamentoAno();
+    void configurarOrcamentoEstoque();
+    void atualizarListaCliente();
+    int validarCliente(bool mostrarMensagens);
+    QPair<QString, int> extrairNomeId(const QString &texto);
+    bool verificarNomeIdCliente(const QString &nome, int id);
+    void selecionarClienteNovo();
+
 };
 
 #endif // RELATORIOS_H

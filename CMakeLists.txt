@@ -13,10 +13,24 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # set(CMAKE_PREFIX_PATH "C:/Qt/6.6.2/mingw_64/lib/cmake")
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml)
 
-
+if (CMAKE_SYSTEM MATCHES "Linux")
+    include_directories(
+        /usr/include/libxml2
+        /usr/include/QtRPT
+    )
+elseif (CMAKE_SYSTEM MATCHES "Windows")
+    include_directories(
+        ../../include
+        ../../third-party/windows/OpenSSL1.1.1q/include
+        ../../third-party/windows/libxml2-v2.9.13/include/libxml2
+        ../../third-party/windows/libiconv-for-Windows/include
+        ../../third-party/windows/zlib-1.2.12/include
+        ../../third-party/windows/QtRptProject3.0/include/QtRPT
+    )
+endif()
 
 
 set(TS_FILES QEstoqueLoja_pt_BR.ts)
@@ -78,6 +92,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         clientes.h clientes.cpp clientes.ui
         alterarcliente.h alterarcliente.cpp alterarcliente.ui
         inserircliente.h inserircliente.cpp inserircliente.ui
+        subclass/produtotableview.h subclass/produtotableview.cpp
 
 
 
@@ -108,7 +123,10 @@ else()
 
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
-target_link_libraries(QEstoqueLoja PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::Sql Qt6::PrintSupport zint Qt6::Charts)
+target_link_libraries(QEstoqueLoja PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::Sql Qt6::PrintSupport
+    zint Qt6::Charts QtRPT Qt6::Xml Qt6::Qml)
+target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lxml2)
+
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

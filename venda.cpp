@@ -106,9 +106,7 @@ venda::venda(QWidget *parent) :
 
 
 
-    connect(modeloSelecionados, &QStandardItemModel::itemChanged, this, [=]() {
-        ui->Lbl_Total->setText(Total());
-    });
+
 
     ui->Btn_SelecionarProduto->setEnabled(false);
 

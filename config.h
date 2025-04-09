@@ -25,6 +25,8 @@ private slots:
 
     void on_Btn_Cancelar_clicked();
 
+    void on_Btn_LogoEmpresa_clicked();
+
 private:
     Ui::Config *ui;
     QSqlDatabase db = QSqlDatabase::database();

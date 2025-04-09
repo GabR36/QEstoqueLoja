@@ -343,6 +343,19 @@ MainWindow::MainWindow(QWidget *parent)
                 qDebug() << "nao renomeou tabela vendas para vendas2";
             }
 
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('cidade_empresa', '')")){
+                qDebug() << "nao inserir config cidade_empresa";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('estado_empresa', '')")){
+                qDebug() << "nao inserir config estado_empresa";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('caminho_logo_empresa', '')")){
+                qDebug() << "nao inserir config caminho_logo_empresa";
+            }
+
+
             // mudar a versao para 4
             query.exec("PRAGMA user_version = 4");
 

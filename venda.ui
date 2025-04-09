@@ -404,9 +404,6 @@ background-color:rgb(170, 170, 170);
            <bold>true</bold>
           </font>
          </property>
-         <property name="styleSheet">
-          <string notr="true">font: 700 16pt &quot;Ubuntu&quot;;</string>
-         </property>
          <property name="text">
           <string>Total (R$):</string>
          </property>

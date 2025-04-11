@@ -173,7 +173,7 @@ void relatorios::atualizarListaCliente(){
             // Formatar como "Nome (ID: 123)"
             clientesComId << QString("%1 (ID: %2)").arg(nome).arg(id);
         }
-        db.close();
+        //db.close();
     }
 
     // Atualizar o completer
@@ -259,12 +259,6 @@ void relatorios::configurarOrcamentoEstoque(){
     actionMenuDeletarProd = new QAction(this);
     actionMenuDeletarProd->setText("Deletar Produto");
     connect(actionMenuDeletarProd,SIGNAL(triggered(bool)),this,SLOT(deletarProd()));
-
-
-
-
-
-
 }
 QMap<QString, QVector<int>> relatorios::buscarFormasPagamentoPorAno(const QString &anoSelecionado) {
     QMap<QString, QVector<int>> resultado;

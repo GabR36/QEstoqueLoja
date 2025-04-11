@@ -24,6 +24,7 @@
 #include <QSqlQuery>
 #include <QCompleter>
 #include "inserircliente.h"
+#include <QStringListModel>
 //#include <QDebug>;
 
 relatorios::relatorios(QWidget *parent)
@@ -255,9 +256,9 @@ void relatorios::configurarOrcamentoEstoque(){
     });
 
     //actionMenu contextMenu
-    actionMenuDeletarProdSelec = new QAction(this);
-    actionMenuDeletarProdSelec->setText("Deletar Produto");
-    connect(actionMenuDeletarProdSelec,SIGNAL(triggered(bool)),this,SLOT(deletarProd()));
+    actionMenuDeletarProd = new QAction(this);
+    actionMenuDeletarProd->setText("Deletar Produto");
+    connect(actionMenuDeletarProd,SIGNAL(triggered(bool)),this,SLOT(deletarProd()));
 
 
 
@@ -1336,7 +1337,7 @@ void relatorios::on_Tview_ProdutosOrcamento_customContextMenuRequested(const QPo
         return;
     QMenu menu(this);
 
-    menu.addAction(actionMenuDeletarProdSelec);
+    menu.addAction(actionMenuDeletarProd);
 
 
 

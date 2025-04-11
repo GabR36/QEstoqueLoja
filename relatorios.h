@@ -60,6 +60,7 @@ private slots:
 
 
 
+    void on_Tview_ProdutosOrcamento_customContextMenuRequested(const QPoint &pos);
 private:
     Ui::relatorios *ui;
     void conectarBancoDados();
@@ -69,6 +70,7 @@ private:
                          "10 - Outubro", "11 - Novembro", "12 - Dezembro"};
     QStandardItemModel *modeloSelecionados = new QStandardItemModel;
     QStringList clientesComId;
+    QAction *actionMenuDeletarProd;
 
 
     void configurarJanelaQuantVendas();
@@ -82,6 +84,7 @@ private:
     bool verificarNomeIdCliente(const QString &nome, int id);
     void selecionarClienteNovo();
 
+    void deletarProd();
 };
 
 #endif // RELATORIOS_H

@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # set(CMAKE_PREFIX_PATH "C:/Qt/6.6.2/mingw_64/lib/cmake")
 
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Qml Xml)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Qml Xml )
 
@@ -98,6 +99,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
 
     )
+
+
+
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET QEstoqueLoja APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
 #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
@@ -146,6 +150,18 @@ install(TARGETS QEstoqueLoja
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+# Caminho do arquivo de origem
+set(ARQUIVO_ORIGEM "${CMAKE_SOURCE_DIR}/reports/orcamentoReport.xml")
+
+# Caminho do diretório de destino (ao lado do executável no diretório de build)
+set(DIRETORIO_DESTINO "${CMAKE_CURRENT_BINARY_DIR}/reports")
+
+# Copiar o arquivo após a compilação
+add_custom_command(TARGET QEstoqueLoja POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${DIRETORIO_DESTINO}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ARQUIVO_ORIGEM}" "${DIRETORIO_DESTINO}"
+    COMMENT "Copiando orcamentoReport.xml para a pasta do executável"
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)

@@ -1216,7 +1216,7 @@ void relatorios::on_Btn_Terminar_clicked()
 
     QtRPT *report = new QtRPT(this);
     qDebug() << QCoreApplication::applicationDirPath();
-    report->loadReport(QCoreApplication::applicationDirPath() + "/../../reports/orcamentoReport.xml");
+    report->loadReport(QCoreApplication::applicationDirPath() + "/reports/orcamentoReport.xml");
 
 
     connect(report, &QtRPT::setDSInfo, [&](DataSetInfo &dsinfo){

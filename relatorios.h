@@ -45,6 +45,7 @@ protected:
     QMap<QString, double> buscarValorVendasPorDiaMesAno(const QString &ano, const QString &mes);
     QString totalGeral();
     void atualizarTotalProduto();
+    bool existeProdutoVendido();
 private slots:
     void on_Btn_PdfGen_clicked();
 
@@ -58,9 +59,13 @@ private slots:
 
     void on_Btn_NovoCliente_clicked();
 
+    void on_tabWidget_tabBarClicked(int index);
+
+    void on_Tview_ProdutosSelec_customContextMenuRequested(const QPoint &pos);
+
+    void deletarProd();
 
 
-    void on_Tview_ProdutosOrcamento_customContextMenuRequested(const QPoint &pos);
 private:
     Ui::relatorios *ui;
     void conectarBancoDados();
@@ -83,8 +88,6 @@ private:
     QPair<QString, int> extrairNomeId(const QString &texto);
     bool verificarNomeIdCliente(const QString &nome, int id);
     void selecionarClienteNovo();
-
-    void deletarProd();
 };
 
 #endif // RELATORIOS_H

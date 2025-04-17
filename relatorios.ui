@@ -532,7 +532,7 @@ background-color:rgb(170, 170, 170);
                 </size>
                </property>
                <property name="text">
-                <string>Vizualizar/Exportar 
+                <string>Visualizar/Exportar 
  Orçamento</string>
                </property>
               </widget>

@@ -25,6 +25,7 @@
 #include <QCompleter>
 #include "inserircliente.h"
 #include <QStringListModel>
+#include <QTimer>
 //#include <QDebug>;
 
 relatorios::relatorios(QWidget *parent)
@@ -33,21 +34,16 @@ relatorios::relatorios(QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->Stacked_Vendas->setCurrentIndex(0);
     ui->Stacked_Estoque->setCurrentIndex(0);
-    ui->tabWidget->setCurrentIndex(0);
 
 
 
 
-    connect(ui->CBox_VendasMain, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            ui->Stacked_Vendas, &QStackedWidget::setCurrentIndex);
+
+
     connect(ui->CBox_EstoqueMain, QOverload<int>::of(&QComboBox::currentIndexChanged),
             ui->Stacked_Estoque, &QStackedWidget::setCurrentIndex);
-    configurarJanelaQuantVendas();
-    configurarJanelaValorVendas();
-    configurarJanelaTopProdutosVendas();
-    configurarJanelaFormasPagamentoAno();
+
     configurarOrcamentoEstoque();
 
 }
@@ -254,11 +250,15 @@ void relatorios::configurarOrcamentoEstoque(){
     connect(ui->Ledit_Cliente, &QLineEdit::editingFinished, this, [=]() {
         validarCliente(true); // Mostra mensagens para o usuário
     });
-
-    //actionMenu contextMenu
     actionMenuDeletarProd = new QAction(this);
     actionMenuDeletarProd->setText("Deletar Produto");
     connect(actionMenuDeletarProd,SIGNAL(triggered(bool)),this,SLOT(deletarProd()));
+
+
+    ui->Tview_ProdutosSelec->setContextMenuPolicy(Qt::CustomContextMenu);
+    // connect(ui->Tview_ProdutosSelec, &QTableView::customContextMenuRequested,
+    //         this, &relatorios::mostrarMenuContexto);
+
 }
 QMap<QString, QVector<int>> relatorios::buscarFormasPagamentoPorAno(const QString &anoSelecionado) {
     QMap<QString, QVector<int>> resultado;
@@ -1325,14 +1325,59 @@ void relatorios::on_Btn_NovoCliente_clicked()
 }
 
 
-void relatorios::on_Tview_ProdutosOrcamento_customContextMenuRequested(const QPoint &pos)
+bool relatorios::existeProdutoVendido(){
+    if(!db.open()){
+        qDebug() << "Erro ao abrir o banco de dados";
+        return false;
+    }
+
+    QSqlQuery query;
+    if(query.exec("SELECT 1 FROM produtos_vendidos LIMIT 1")) {
+        if(query.next()) {
+            return true; // Existe pelo menos um produto vendido
+        }
+    } else {
+        qDebug() << "Erro na consulta:" << query.lastError().text();
+    }
+
+    return false; // Nenhum produto encontrado ou erro na consulta
+}
+
+
+void relatorios::on_tabWidget_tabBarClicked(int index)
+{
+    if(index == 0){
+        if(existeProdutoVendido()){
+            db.open();
+            ui->Stacked_Vendas->setCurrentIndex(0);
+            ui->tabWidget->setCurrentIndex(0);
+            connect(ui->CBox_VendasMain, QOverload<int>::of(&QComboBox::currentIndexChanged),
+                    ui->Stacked_Vendas, &QStackedWidget::setCurrentIndex);
+            configurarJanelaQuantVendas();
+            configurarJanelaValorVendas();
+            configurarJanelaTopProdutosVendas();
+            configurarJanelaFormasPagamentoAno();
+
+        }else{
+            QMessageBox::warning(this, "Acesso contido", "você deve vender algum produto antes de "
+                                                                "visualizar os relatórios de vendas!");
+            QTimer::singleShot(0, [this]() {
+                ui->tabWidget->setCurrentIndex(1); // ou qualquer aba segura que você queira mostrar
+            });
+        }
+
+
+    }
+}
+
+
+void relatorios::on_Tview_ProdutosSelec_customContextMenuRequested(const QPoint &pos)
 {
     if(!ui->Tview_ProdutosSelec->currentIndex().isValid())
         return;
     QMenu menu(this);
 
     menu.addAction(actionMenuDeletarProd);
-
 
 
     menu.exec(ui->Tview_ProdutosSelec->viewport()->mapToGlobal(pos));

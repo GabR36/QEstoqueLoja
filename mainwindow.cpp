@@ -24,6 +24,9 @@
 #include "util/pdfexporter.h"
 #include "clientes.h"
 #include "pagamentovenda.h"
+#include <QSqlError>
+#include <QSqlRecord>
+#include <QSql>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)

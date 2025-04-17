@@ -24,12 +24,8 @@ if (CMAKE_SYSTEM MATCHES "Linux")
     )
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     include_directories(
-        ../../include
-        ../../third-party/windows/OpenSSL1.1.1q/include
-        ../../third-party/windows/libxml2-v2.9.13/include/libxml2
-        ../../third-party/windows/libiconv-for-Windows/include
-        ../../third-party/windows/zlib-1.2.12/include
-        ../../third-party/windows/QtRptProject3.0/include/QtRPT
+        ${CMAKE_CURRENT_SOURCE_DIR}/third-party/windows/libxml2-v2.11.5/include/libxml2
+        ${CMAKE_CURRENT_SOURCE_DIR}/third-party/windows/QtRptProject3.0/include/QtRPT
     )
 endif()
 
@@ -129,7 +125,20 @@ else()
 endif()
 target_link_libraries(QEstoqueLoja PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::Sql Qt6::PrintSupport
     zint Qt6::Charts QtRPT Qt6::Xml Qt6::Qml)
+
 target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lxml2)
+
+if (CMAKE_SYSTEM MATCHES "Linux")
+    target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lxml2)
+elseif (CMAKE_SYSTEM MATCHES "Windows")
+    target_link_directories(QEstoqueLoja PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/third-party/windows/libxml2-v2.11.5/lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/third-party/windows/QtRptProject3.0/lib/debug/lib
+    )
+    target_link_libraries(QEstoqueLoja  PRIVATE QtRPT libxml2)
+
+endif()
+
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

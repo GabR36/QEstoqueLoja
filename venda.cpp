@@ -110,6 +110,12 @@ venda::venda(QWidget *parent) :
 
     ui->Btn_SelecionarProduto->setEnabled(false);
 
+    connect(modeloSelecionados, &QStandardItemModel::itemChanged, this, [=]() {
+        ui->Lbl_Total->setText(Total());
+        atualizarTotalProduto();
+    });
+
+
     QCompleter *completer = new QCompleter(this);
     completer->setCaseSensitivity(Qt::CaseInsensitive); // Ignorar maiúsculas e minúsculas
     completer->setFilterMode(Qt::MatchContains); // Sugestões que contêm o texto digitado
@@ -151,6 +157,27 @@ venda::venda(QWidget *parent) :
         validarCliente(true); // Mostra mensagens para o usuário
     });
 
+}
+void venda::atualizarTotalProduto() {
+    for (int row = 0; row < modeloSelecionados->rowCount(); ++row) {
+        double totalproduto = 0.0;
+
+        float quantidade = portugues.toFloat(
+            modeloSelecionados->data(modeloSelecionados->index(row, 1)).toString()
+            ); // Coluna de quantidade
+
+        double preco = portugues.toDouble(
+            modeloSelecionados->data(modeloSelecionados->index(row, 3)).toString()
+            ); // Coluna de preço
+
+        totalproduto = quantidade * preco;
+
+        // Atualiza o valor na coluna 4
+        modeloSelecionados->setData(
+            modeloSelecionados->index(row, 4),
+            QString::number(totalproduto, 'f', 2) // 2 casas decimais
+            );
+    }
 }
 void venda::atualizarListaCliente(){
     clientesComId.clear(); // Limpa a lista antes de recarregar

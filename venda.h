@@ -40,6 +40,7 @@ protected:
     int validarCliente(bool mostrarMensagens);
     void atualizarListaCliente();
     void selecionarClienteNovo();
+    void atualizarTotalProduto();
 private slots:
     void on_Btn_SelecionarProduto_clicked();
 

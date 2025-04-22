@@ -362,7 +362,7 @@ void relatorios::configurarJanelaFormasPagamentoAno() {
         paginaGrafico->setLayout(layoutPagina);
     }
 
-    // Remove widgets anteriores (mantendo os dois primeiros, se quiser)
+    // Remove widgets anteriores (mantendo os dois primeiros)
     QLayoutItem *item;
     while ((item = layoutPagina->takeAt(1)) != nullptr) {
         delete item->widget();

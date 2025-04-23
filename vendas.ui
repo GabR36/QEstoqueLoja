@@ -72,74 +72,53 @@ background-color:rgb(170, 170, 170);
 </string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="0">
-    <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item row="4" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout_4">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="styleSheet">
-          <string notr="true">font: 700 9pt &quot;Segoe UI&quot;;</string>
-         </property>
-         <property name="text">
-          <string>Lucro (R$):</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="Lbl_Lucro">
-         <property name="text">
-          <string>TextLabel</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QLabel" name="label_4">
+       <property name="styleSheet">
+        <string notr="true">font-size: 15px;
+font: 700 9pt &quot;Segoe UI&quot;;</string>
+       </property>
+       <property name="text">
+        <string>Produtos vendidos:</string>
+       </property>
+      </widget>
      </item>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="styleSheet">
-          <string notr="true">font: 700 9pt &quot;Segoe UI&quot;;</string>
-         </property>
-         <property name="text">
-          <string>Valor Total (R$):</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="Lbl_Total">
-         <property name="text">
-          <string>TextLabel</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QLabel" name="label_5">
-         <property name="styleSheet">
-          <string notr="true">font: 700 9pt &quot;Segoe UI&quot;;</string>
-         </property>
-         <property name="text">
-          <string>Quantidade Vendas: </string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="Lbl_Quantidade">
-         <property name="text">
-          <string>TextLabel</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
+      <widget class="QTableView" name="Tview_ProdutosVendidos">
+       <property name="contextMenuPolicy">
+        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+       </property>
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+       <property name="selectionMode">
+        <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+       </property>
+       <property name="selectionBehavior">
+        <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+       </property>
+       <attribute name="horizontalHeaderCascadingSectionResizes">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="horizontalHeaderDefaultSectionSize">
+        <number>50</number>
+       </attribute>
+       <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="horizontalHeaderStretchLastSection">
+        <bool>true</bool>
+       </attribute>
+       <attribute name="verticalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
+      </widget>
      </item>
     </layout>
    </item>
-   <item row="3" column="0">
+   <item row="4" column="0">
     <layout class="QVBoxLayout" name="verticalLayout_5">
      <item>
       <widget class="QPushButton" name="Btn_DeletarVenda">
@@ -157,7 +136,7 @@ background-color:rgb(170, 170, 170);
        </property>
        <property name="maximumSize">
         <size>
-         <width>120</width>
+         <width>150</width>
          <height>22</height>
         </size>
        </property>
@@ -266,41 +245,44 @@ background-color:rgb(03,75,119);
      </item>
     </layout>
    </item>
-   <item row="3" column="1">
-    <layout class="QVBoxLayout" name="verticalLayout_4">
+   <item row="1" column="1" rowspan="3">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="label_3">
        <property name="styleSheet">
         <string notr="true">font-size: 15px;
 font: 700 9pt &quot;Segoe UI&quot;;</string>
        </property>
        <property name="text">
-        <string>Produtos vendidos nessa venda:</string>
+        <string>Vendas:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QTableView" name="Tview_ProdutosVendidos">
+      <widget class="QTableView" name="Tview_Vendas2">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>300</height>
+        </size>
+       </property>
        <property name="contextMenuPolicy">
-        <enum>Qt::CustomContextMenu</enum>
+        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+       </property>
+       <property name="inputMethodHints">
+        <set>Qt::InputMethodHint::ImhNone</set>
        </property>
        <property name="alternatingRowColors">
         <bool>true</bool>
        </property>
        <property name="selectionMode">
-        <enum>QAbstractItemView::SingleSelection</enum>
+        <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
        </property>
        <property name="selectionBehavior">
         <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
        </property>
-       <attribute name="horizontalHeaderCascadingSectionResizes">
-        <bool>false</bool>
-       </attribute>
        <attribute name="horizontalHeaderDefaultSectionSize">
         <number>50</number>
-       </attribute>
-       <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
-        <bool>false</bool>
        </attribute>
        <attribute name="horizontalHeaderStretchLastSection">
         <bool>true</bool>
@@ -312,7 +294,7 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
      </item>
     </layout>
    </item>
-   <item row="0" column="0">
+   <item row="1" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -392,59 +374,97 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
      </widget>
     </widget>
    </item>
-   <item row="0" column="1" rowspan="3">
-    <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item row="3" column="0">
+    <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
-      <widget class="QLabel" name="label_3">
-       <property name="styleSheet">
-        <string notr="true">font-size: 15px;
-font: 700 9pt &quot;Segoe UI&quot;;</string>
-       </property>
-       <property name="text">
-        <string>Vendas:</string>
-       </property>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label">
+         <property name="styleSheet">
+          <string notr="true">font: 700 9pt &quot;Segoe UI&quot;;</string>
+         </property>
+         <property name="text">
+          <string>Lucro (R$):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="Lbl_Lucro">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
      <item>
-      <widget class="QTableView" name="Tview_Vendas2">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>300</height>
-        </size>
-       </property>
-       <property name="contextMenuPolicy">
-        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
-       </property>
-       <property name="inputMethodHints">
-        <set>Qt::InputMethodHint::ImhNone</set>
-       </property>
-       <property name="alternatingRowColors">
-        <bool>true</bool>
-       </property>
-       <property name="selectionMode">
-        <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
-       </property>
-       <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-       </property>
-       <attribute name="horizontalHeaderDefaultSectionSize">
-        <number>50</number>
-       </attribute>
-       <attribute name="horizontalHeaderStretchLastSection">
-        <bool>true</bool>
-       </attribute>
-       <attribute name="verticalHeaderVisible">
-        <bool>false</bool>
-       </attribute>
-      </widget>
+      <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="styleSheet">
+          <string notr="true">font: 700 9pt &quot;Segoe UI&quot;;</string>
+         </property>
+         <property name="text">
+          <string>Valor Total (R$):</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="Lbl_Total">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="styleSheet">
+          <string notr="true">font: 700 9pt &quot;Segoe UI&quot;;</string>
+         </property>
+         <property name="text">
+          <string>Quantidade Vendas: </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="Lbl_Quantidade">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
-   <item row="1" column="0">
+   <item row="2" column="0">
     <widget class="QCheckBox" name="cb_BuscaVendasPrazo">
      <property name="text">
       <string>Buscar por vendas à prazo</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="Lbl_Header">
+     <property name="styleSheet">
+      <string notr="true">font: 700 20pt &quot;Ubuntu&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Vendas:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="Lbl_ClienteHeader">
+     <property name="styleSheet">
+      <string notr="true">font: 700 15pt &quot;Ubuntu&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Geral</string>
      </property>
     </widget>
    </item>

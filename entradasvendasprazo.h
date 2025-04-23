@@ -35,6 +35,8 @@ private:
     float valor_Venda;
     QSqlQueryModel *modeloEntradas = new QSqlQueryModel;
     QString idEntradaSelec; //id global da entrada selecionada da tabela
+signals:
+    void entradaConcluida();
 
 
 

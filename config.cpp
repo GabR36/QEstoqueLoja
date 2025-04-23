@@ -1,5 +1,7 @@
 #include "config.h"
 #include "ui_config.h"
+#include <QFileDialog>
+#include <QMessageBox>
 
 Config::Config(QWidget *parent)
     : QWidget(parent)
@@ -24,8 +26,11 @@ Config::Config(QWidget *parent)
     ui->Ledt_CnpjEmpresa->setText(configValues.value("cnpj_empresa", ""));
     ui->Ledt_EmailEmpresa->setText(configValues.value("email_empresa", ""));
     ui->Ledt_EnderecoEmpresa->setText(configValues.value("endereco_empresa", ""));
+    ui->Ledt_CidadeEmpresa->setText(configValues.value("cidade_empresa", ""));
+    ui->Ledt_EstadoEmpresa->setText(configValues.value("estado_empresa", ""));
     ui->Ledt_NomeEmpresa->setText(configValues.value("nome_empresa", ""));
     ui->Ledt_TelEmpresa->setText(configValues.value("telefone_empresa", ""));
+    ui->Ledt_LogoEmpresa->setText(configValues.value("caminho_logo_empresa", ""));
     // converter notacao americana em ptbr
     ui->Ledt_LucroEmpresa->setText(portugues.toString(configValues.value("porcent_lucro", "").toFloat()));
     ui->Ledt_debito->setText(portugues.toString(configValues.value("taxa_debito", "").toFloat()));
@@ -48,13 +53,17 @@ Config::~Config()
 
 void Config::on_Btn_Aplicar_clicked()
 {
-    QString nomeEmpresa, enderecoEmpresa, emailEmpresa, cnpjEmpresa, telEmpresa, lucro, debito, credito;
+    QString nomeEmpresa, enderecoEmpresa, emailEmpresa, cnpjEmpresa, telEmpresa, lucro,
+        debito, credito, cidadeEmpresa, estadoEmpresa, logoEmpresa;
     // converter para notacao americana para armazenar no banco de dados
     nomeEmpresa = ui->Ledt_NomeEmpresa->text();
     enderecoEmpresa = ui->Ledt_EnderecoEmpresa->text();
     emailEmpresa = ui->Ledt_EmailEmpresa->text();
     cnpjEmpresa = ui->Ledt_CnpjEmpresa->text();
     telEmpresa = ui->Ledt_TelEmpresa->text();
+    cidadeEmpresa = ui->Ledt_CidadeEmpresa->text();
+    estadoEmpresa = ui->Ledt_EstadoEmpresa->text();
+    logoEmpresa = ui->Ledt_LogoEmpresa->text();
     lucro = QString::number(portugues.toFloat(ui->Ledt_LucroEmpresa->text()));
     debito = QString::number(portugues.toFloat(ui->Ledt_debito->text()));
     credito = QString::number(portugues.toFloat(ui->Ledt_credito->text()));
@@ -96,6 +105,18 @@ void Config::on_Btn_Aplicar_clicked()
     query.bindValue(":value", credito);
     query.bindValue(":key", "taxa_credito");
     query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", cidadeEmpresa);
+    query.bindValue(":key", "cidade_empresa");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", estadoEmpresa);
+    query.bindValue(":key", "estado_empresa");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", logoEmpresa);
+    query.bindValue(":key", "caminho_logo_empresa");
+    query.exec();
 
     db.close();
 
@@ -106,5 +127,47 @@ void Config::on_Btn_Aplicar_clicked()
 void Config::on_Btn_Cancelar_clicked()
 {
     this->close();
+}
+
+
+void Config::on_Btn_LogoEmpresa_clicked()
+{
+    QString caminhoOriginal = QFileDialog::getOpenFileName(
+        this,
+        tr("Selecionar Logo da Empresa"),
+        "",
+        tr("Imagens (*.png *.jpg *.jpeg *.bmp)")
+        );
+
+    if (caminhoOriginal.isEmpty())
+        return;
+
+    // Criar diretório de destino se não existir
+    QString pastaDestino = QCoreApplication::applicationDirPath() + "/imagens";
+    QDir dir;
+    if (!dir.exists(pastaDestino)) {
+        dir.mkpath(pastaDestino);
+    }
+
+    // Copiar arquivo para o diretório do projeto com um nome único
+    QFileInfo info(caminhoOriginal);
+    QString nomeArquivo = info.fileName();
+    QString novoCaminho = pastaDestino + "/" + nomeArquivo;
+
+    // Verifica se já existe um arquivo com esse nome e adiciona sufixo se necessário
+    int contador = 1;
+    while (QFile::exists(novoCaminho)) {
+        novoCaminho = pastaDestino + "/" + info.baseName() + "_" + QString::number(contador++) + "." + info.completeSuffix();
+    }
+
+    // Copiar o arquivo
+    if (QFile::copy(caminhoOriginal, novoCaminho)) {
+        // Atualiza o line edit com o novo caminho
+        QString caminhoRelativo = "imagens/" + QFileInfo(novoCaminho).fileName();
+        ui->Ledt_LogoEmpresa->setText(caminhoRelativo);
+    } else {
+        QMessageBox::warning(this, "Erro", "Não foi possível copiar a imagem.");
+    }
+
 }
 

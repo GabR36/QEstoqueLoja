@@ -26,10 +26,6 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgb
 
 
 }
-QLabel{
-	font: 700 10pt &quot;DejaVu Sans Mono&quot;;
-
-}
 QPushButton{
 background-color: rgb(43, 132, 191);
 color: rgb(255, 255, 255);
@@ -55,84 +51,114 @@ border-radius: 13px;
 }
 QGroupBox{
 background-color:rgb(170, 170, 170);
-	font: 700 9pt &quot;Segoe UI&quot;;
-	font-size: 15px;
+
 }
 </string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="2">
-    <widget class="QFrame" name="frame">
+   <item row="1" column="1">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="label_8">
+       <property name="text">
+        <string>Adicionar Pagamento:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="CustomLineEdit" name="ledit_AddValor">
+       <property name="placeholderText">
+        <string>valor</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btn_AddValor">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>150</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>180</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="sizeIncrement">
+        <size>
+         <width>150</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>-1</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Prosseguir Pagamento</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="btn_DeletarEntrada">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
      <property name="minimumSize">
       <size>
-       <width>660</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="sizeIncrement">
-      <size>
-       <width>0</width>
-       <height>0</height>
+       <width>180</width>
+       <height>30</height>
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(35, 125, 185);
-	font: 700 12pt &quot;DejaVu Sans Mono&quot;;
+      <string notr="true">#btn_DeletarEntrada{
+background-color:rgb(191, 61, 64);
+}
+#btn_DeletarEntrada:hover{
+background-color: rgb(139, 44, 47);
+}
+#btn_DeletarEntrada:pressed{
+background-color:rgb(255, 96, 99)
 
-
-</string>
+}</string>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::Shape::StyledPanel</enum>
+     <property name="text">
+      <string>Deletar Pagamento 
+ Selecionado</string>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Shadow::Raised</enum>
+     <property name="icon">
+      <iconset theme="QIcon::ThemeIcon::EditDelete"/>
      </property>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>347</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="QLabel" name="label_6">
-         <property name="styleSheet">
-          <string notr="true">color: white;</string>
-         </property>
-         <property name="text">
-          <string>Pagamento venda a Prazo:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label">
-         <property name="styleSheet">
-          <string notr="true">color: white;
-	</string>
-         </property>
-         <property name="text">
-          <string>TextLabel</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
    <item row="1" column="0">
@@ -223,6 +249,32 @@ background-color:rgb(170, 170, 170);
      </widget>
     </widget>
    </item>
+   <item row="0" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="styleSheet">
+        <string notr="true">font: 700 20pt &quot;Ubuntu&quot;;
+</string>
+       </property>
+       <property name="text">
+        <string>Pagamento venda a Prazo:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="styleSheet">
+        <string notr="true">font: 700 20pt &quot;Ubuntu&quot;;
+</string>
+       </property>
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item row="2" column="0">
     <layout class="QVBoxLayout" name="verticalLayout_3">
      <property name="spacing">
@@ -273,107 +325,6 @@ background-color:rgb(170, 170, 170);
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="1" column="1">
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="spacing">
-      <number>6</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="label_8">
-       <property name="text">
-        <string>Adicionar Pagamento:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="CustomLineEdit" name="ledit_AddValor">
-       <property name="placeholderText">
-        <string>valor</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btn_AddValor">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>150</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="maximumSize">
-        <size>
-         <width>180</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="sizeIncrement">
-        <size>
-         <width>150</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>-1</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Prosseguir Pagamento</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="1">
-    <widget class="QPushButton" name="btn_DeletarEntrada">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>220</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">#btn_DeletarEntrada{
-background-color:rgb(191, 61, 64);
-}
-#btn_DeletarEntrada:hover{
-background-color: rgb(139, 44, 47);
-}
-#btn_DeletarEntrada:pressed{
-background-color:rgb(255, 96, 99)
-
-}</string>
-     </property>
-     <property name="text">
-      <string>Deletar Entrada Selecionada</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

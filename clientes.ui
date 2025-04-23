@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Clientes</class>
+ <widget class="QWidget" name="Clientes">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>732</width>
+    <height>462</height>
+   </rect>
+  </property>
+  <property name="baseSize">
+   <size>
+    <width>600</width>
+    <height>800</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Clientes</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+
+#Clientes{
+background-color: rgb(199, 199, 199);
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(199, 199, 199, 255), stop:1 rgba(170, 170, 170, 255));
+
+}
+QPushButton{
+background-color: rgb(43, 132, 191);
+color: rgb(255, 255, 255);
+font-size: 15px;
+border-radius: 13px;
+
+}
+
+QPushButton:hover{
+	background-color: rgb(13, 92, 161);
+}
+QPushButton:pressed{
+	
+color: rgb(255, 255, 255);
+	background-color: rgb(153, 193, 241);
+font-size: 15px;
+border-radius: 13px;
+}
+QGroupBox{
+background-color:rgb(170, 170, 170);
+	font: 700 9pt &quot;Segoe UI&quot;;
+	font-size: 15px;
+}
+</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="lbl_Titulo">
+     <property name="font">
+      <font>
+       <family>Ubuntu</family>
+       <pointsize>20</pointsize>
+       <italic>false</italic>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font: 700 20pt &quot;Ubuntu&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Clientes</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>40</number>
+       </property>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Btn_Alterar">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Alterar</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::EditPaste"/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Btn_Deletar">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">#Btn_Deletar{
+background-color:rgb(191, 61, 64);
+}
+#Btn_Deletar:hover{
+background-color: rgb(139, 44, 47);
+}
+#Btn_Deletar:pressed{
+background-color:rgb(255, 96, 99)
+
+}</string>
+         </property>
+         <property name="text">
+          <string>Deletar</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::EditDelete"/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="Btn_Novo">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>30</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">#Btn_Novo{
+background-color: rgb(33, 105, 149);
+}
+#Btn_Novo:hover{
+background-color:rgb(03,75,119);
+}
+#Btn_Novo:pressed{
+
+	background-color: rgb(153, 193, 241);
+
+}</string>
+         </property>
+         <property name="text">
+          <string>Novo</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::ContactNew"/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLineEdit" name="Ledit_Pesquisa">
+         <property name="placeholderText">
+          <string>Pesquisar por nome</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableView" name="Tview_Clientes">
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+         </property>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="Btn_abrirCompras">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>40</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>130</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="baseSize">
+      <size>
+       <width>300</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Visualizar 
+ compras</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="minimumSize">
+      <size>
+       <width>400</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Informações Sobre o Cliente</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="styleSheet">
+           <string notr="true">font: 500 10pt ;</string>
+          </property>
+          <property name="text">
+           <string>Valor Total Devido:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="Lbl_valorTotalDevido">
+          <property name="text">
+           <string>R$</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="styleSheet">
+           <string notr="true">font: 500 10pt ;</string>
+          </property>
+          <property name="text">
+           <string>Quantidade de Compras:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="Lbl_QuantCompras">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="styleSheet">
+           <string notr="true">font: 500 10pt ;</string>
+          </property>
+          <property name="text">
+           <string>Último Pagamento:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="Lbl_DataUltimoPag">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="styleSheet">
+           <string notr="true">font: 500 10pt ;</string>
+          </property>
+          <property name="text">
+           <string>Valor do Último Pagamento:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="Lbl_ValorUltimoPag">
+          <property name="text">
+           <string>R$</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

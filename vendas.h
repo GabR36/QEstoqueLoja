@@ -20,9 +20,9 @@ class Vendas : public QWidget
 
 
 public:
-    MainWindow *janelaPrincipal;
+    //MainWindow *janelaPrincipal;
     QSqlDatabase db = QSqlDatabase::database();
-    explicit Vendas(QWidget *parent = nullptr);
+    explicit Vendas(QWidget *parent = nullptr, int idCliente = 0);
     ~Vendas();
     void atualizarTabelas();
     QLocale portugues;
@@ -32,6 +32,7 @@ public:
     void actionAbrirPagamentosVenda(QString id_venda);
 
 
+    void AtualizarTabelasSinal();
 public slots:
     void imprimirReciboVendaSelec(QString id); //precisa ser slot :(
 
@@ -59,7 +60,7 @@ private slots:
 
 private:
     // void LabelLucro();
-    void LabelLucro(QString whereQueryData, QString whereQueryPrazo);
+    void LabelLucro(QString whereQueryData, QString whereQueryPrazo, QString whereQueryCliente);
     QSqlQueryModel *modeloProdVendidos = new QSqlQueryModel;
     QSqlQueryModel *modeloVendas2 = new QSqlQueryModel;
     Ui::Vendas *ui;
@@ -73,6 +74,13 @@ private:
     QString idVendaSelec;
     void devolverProdutoVenda(QString id_venda, QString id_prod_vend);
     void devolverProduto(QString id_prod_vend, QString id_produto, QString qntd);
+    void mostrarVendasCliente(int idCliente);
+    int IDCLIENTE = 0;
+signals:
+    void vendaConcluidaVendas();
+    void pagamentosConcluidos();
+    void devolvidoProduto();
+    void vendaDeletada();
 };
 
 #endif // VENDAS_H

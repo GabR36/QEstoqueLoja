@@ -36,7 +36,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     QLocale portugues;
-    QIcon iconAlterarProduto, iconAddProduto, iconBtnVenda, iconDelete, iconPesquisa, iconBtnRelatorios, iconImpressora;
+    QIcon iconAlterarProduto, iconAddProduto, iconBtnVenda, iconDelete, iconPesquisa, iconBtnRelatorios,
+        iconImpressora, iconClientes;
     QString gerarNumero();
     static QString normalizeText(const QString &text);
 
@@ -81,6 +82,8 @@ private slots:
     void on_actionConfig_triggered();
 
     void on_Ledit_Pesquisa_textChanged(const QString &arg1);
+
+    void on_Btn_Clientes_clicked();
 
 private:
     Ui::MainWindow *ui;

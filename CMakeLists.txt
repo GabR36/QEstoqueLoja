@@ -13,10 +13,21 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # set(CMAKE_PREFIX_PATH "C:/Qt/6.6.2/mingw_64/lib/cmake")
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport)
 
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Qml Xml)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Qml Xml )
 
+if (CMAKE_SYSTEM MATCHES "Linux")
+    include_directories(
+        /usr/include/libxml2
+        /usr/include/QtRPT
+    )
+elseif (CMAKE_SYSTEM MATCHES "Windows")
+    include_directories(
+        ${CMAKE_CURRENT_SOURCE_DIR}/third-party/windows/libxml2-v2.11.5/include/libxml2
+        ${CMAKE_CURRENT_SOURCE_DIR}/third-party/windows/QtRptProject3.0/include/QtRPT
+    )
+endif()
 
 
 set(TS_FILES QEstoqueLoja_pt_BR.ts)
@@ -75,11 +86,18 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         delegateprecovalidate.h delegateprecovalidate.cpp
         delegatelockcol.h delegatelockcol.cpp
         delegatequant.h delegatequant.cpp
+        clientes.h clientes.cpp clientes.ui
+        alterarcliente.h alterarcliente.cpp alterarcliente.ui
+        inserircliente.h inserircliente.cpp inserircliente.ui
+        subclass/produtotableview.h subclass/produtotableview.cpp
 
 
 
 
     )
+
+
+
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET QEstoqueLoja APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
 #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
@@ -105,7 +123,22 @@ else()
 
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
-target_link_libraries(QEstoqueLoja PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::Sql Qt6::PrintSupport zint)
+target_link_libraries(QEstoqueLoja PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::Sql Qt6::PrintSupport
+    zint Qt6::Charts QtRPT Qt6::Xml Qt6::Qml)
+
+target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lxml2)
+
+if (CMAKE_SYSTEM MATCHES "Linux")
+    target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lxml2)
+elseif (CMAKE_SYSTEM MATCHES "Windows")
+    target_link_directories(QEstoqueLoja PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/third-party/windows/libxml2-v2.11.5/lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/third-party/windows/QtRptProject3.0/lib/debug/lib
+    )
+    target_link_libraries(QEstoqueLoja  PRIVATE QtRPT libxml2)
+
+endif()
+
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an
@@ -126,6 +159,18 @@ install(TARGETS QEstoqueLoja
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+# Caminho do arquivo de origem
+set(ARQUIVO_ORIGEM "${CMAKE_SOURCE_DIR}/reports/orcamentoReport.xml")
+
+# Caminho do diretório de destino (ao lado do executável no diretório de build)
+set(DIRETORIO_DESTINO "${CMAKE_CURRENT_BINARY_DIR}/reports")
+
+# Copiar o arquivo após a compilação
+add_custom_command(TARGET QEstoqueLoja POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${DIRETORIO_DESTINO}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ARQUIVO_ORIGEM}" "${DIRETORIO_DESTINO}"
+    COMMENT "Copiando orcamentoReport.xml para a pasta do executável"
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)

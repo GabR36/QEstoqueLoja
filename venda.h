@@ -19,8 +19,7 @@ class venda : public QDialog
     Q_OBJECT
 
 public:
-    Vendas *janelaVenda;
-    MainWindow *janelaPrincipal;
+    //Vendas *janelaVenda;
     QSqlDatabase db = QSqlDatabase::database();
     explicit venda(QWidget *parent = nullptr);
     ~venda();
@@ -33,6 +32,15 @@ protected:
     void handleSelectionChangeProdutos(const QItemSelection &selected, const QItemSelection &deselected);
 
     void keyPressEvent(QKeyEvent *event) override;
+
+    void focusInEvent(QFocusEvent *event) override;
+
+    bool verificarNomeIdCliente(const QString &nome, int id);
+    QPair<QString, int> extrairNomeId(const QString &texto);
+    int validarCliente(bool mostrarMensagens);
+    void atualizarListaCliente();
+    void selecionarClienteNovo();
+    void atualizarTotalProduto();
 private slots:
     void on_Btn_SelecionarProduto_clicked();
 
@@ -52,11 +60,16 @@ private slots:
 
     void on_Btn_CancelarVenda_clicked();
 
+    void on_Btn_NovoCliente_clicked();
+
 private:
     QSqlQueryModel *modeloProdutos = new QSqlQueryModel;
     QStandardItemModel *modeloSelecionados = new QStandardItemModel;
     Ui::venda *ui;
     QAction *actionMenuDeletarProd;
+    QStringList clientesComId;
+signals:
+    void vendaConcluida();
 
 
 };

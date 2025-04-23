@@ -15,11 +15,12 @@
 #include "delegateprecof2.h"
 
 
-Vendas::Vendas(QWidget *parent) :
+Vendas::Vendas(QWidget *parent, int idCliente) :
     QWidget(parent),
     ui(new Ui::Vendas)
 {
     ui->setupUi(this);
+
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao venda.";
     }
@@ -116,10 +117,12 @@ Vendas::Vendas(QWidget *parent) :
     ui->DateEdt_Ate->setDate(dateRange.second);
 
     db.close();
+    IDCLIENTE = idCliente;
+    mostrarVendasCliente(IDCLIENTE);
 
     ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
 
-    // ------ icons ----
+
 
 
 }
@@ -132,9 +135,10 @@ Vendas::~Vendas()
 void Vendas::on_Btn_InserirVenda_clicked()
 {
     venda *inserirVenda = new venda;
-    inserirVenda->janelaVenda = this;
-    inserirVenda->janelaPrincipal = janelaPrincipal;
     inserirVenda->setWindowModality(Qt::ApplicationModal);
+    connect(inserirVenda, &venda::vendaConcluida, this, &Vendas::vendaConcluidaVendas);
+    connect(inserirVenda, &venda::vendaConcluida, this, &Vendas::atualizarTabelas);
+
     inserirVenda->show();
 }
 
@@ -142,22 +146,25 @@ void Vendas::atualizarTabelas(){
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. botao venda.";
     }
-
-
-    modeloVendas2->setQuery("SELECT id, valor_final,forma_pagamento, data_hora, cliente, esta_pago, total, desconto, taxa, valor_recebido, troco FROM vendas2 ORDER BY id DESC");
+    modeloVendas2->setQuery("SELECT id, valor_final,forma_pagamento, data_hora, cliente,"
+                            " esta_pago, total, desconto, taxa, valor_recebido, troco FROM "
+                            "vendas2 ORDER BY id DESC");
 
     modeloProdVendidos->setQuery("SELECT * FROM produtos_vendidos");
 
+
     db.close();
 
+
     QModelIndex firstIndex = modeloVendas2->index(0, 0);
+
 
 
     ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
 
     // Definir a primeira linha como a linha atual
-//    selectionModel->setCurrentIndex(topLeft, QItemSelectionModel::NoUpdate);
-
+    //selectionModel->setCurrentIndex(topLeft, QItemSelectionModel::NoUpdate);
+    qDebug() << "tabelas vendas atualizadas;";
 }
  QStringList Vendas::getProdutosVendidos( QString idVenda){
 
@@ -203,6 +210,7 @@ void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSe
 
     qDebug() << "Registro(s) selecionado(s):";
 
+
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. handleselectionchange";
     }
@@ -229,12 +237,12 @@ void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSe
 
 }
 
-void Vendas::LabelLucro(QString whereQueryData, QString whereQueryPrazo){
+void Vendas::LabelLucro(QString whereQueryData, QString whereQueryPrazo, QString whereQueryCliente){
     // colocar valores nos labels de lucro etc
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. labelLucro";
     }
-    QString whereQuery = whereQueryData + whereQueryPrazo;
+    QString whereQuery = whereQueryData + whereQueryPrazo + whereQueryCliente;
     QSqlQuery query;
     float total = 0;
     int quantidadeVendas = 0;
@@ -353,7 +361,7 @@ void Vendas::on_Btn_DeletarVenda_clicked()
         } else {
             qDebug() << "Erro no Delete: ";
         }
-
+        emit vendaDeletada();
         atualizarTabelas();
         db.close();
     }
@@ -392,13 +400,17 @@ void Vendas::on_DateEdt_Ate_dateChanged(const QDate &date)
 void Vendas::filtrarData(QString de1, QString ate1){
     QString whereQueryData;
     QString whereQueryPrazo;
+    QString whereQueryCliente;
     if(ui->cb_BuscaVendasPrazo->isChecked()){
         whereQueryPrazo =  " AND forma_pagamento = 'Prazo'";
     }
+    if(IDCLIENTE > 0){
+        whereQueryCliente =  " AND id_cliente = " + QString::number(IDCLIENTE);
+    }
     whereQueryData = QString("WHERE data_hora BETWEEN '%1' AND '%2'").arg(de1, ate1);
-    QString whereQuery = whereQueryData + whereQueryPrazo;
+    QString whereQuery = whereQueryData + whereQueryPrazo + whereQueryCliente;
 
-    LabelLucro(whereQueryData, whereQueryPrazo);
+    LabelLucro(whereQueryData, whereQueryPrazo, whereQueryCliente);
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. filtrarData";
     }
@@ -495,11 +507,21 @@ void Vendas::devolverProdutoVenda(QString id_venda, QString id_prod_vend)
 
     db.close();
 }
+void Vendas::AtualizarTabelasSinal(){
+    qDebug() << "Teste Atualizar Tabelas deletar, add valor emitido";
+    filtrarData(de,ate);
+}
 
 void Vendas::actionAbrirPagamentosVenda(QString id_venda){
     EntradasVendasPrazo *pagamentosVenda = new EntradasVendasPrazo(this, id_venda);
     pagamentosVenda->setWindowModality(Qt::ApplicationModal);
+    connect(pagamentosVenda, &EntradasVendasPrazo::entradaConcluida,
+            this, &Vendas::AtualizarTabelasSinal);
+    connect(pagamentosVenda, &EntradasVendasPrazo::entradaConcluida,
+            this, &Vendas::pagamentosConcluidos);
     pagamentosVenda->show();
+
+
 }
 
 
@@ -531,12 +553,11 @@ void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
 
     actionMenuDeletarVenda = new QAction();
     actionMenuDeletarVenda->setText("Deletar Venda");
-    actionMenuDeletarVenda->setIcon(janelaPrincipal->iconDelete);
     connect(actionMenuDeletarVenda,SIGNAL(triggered(bool)),this,SLOT(on_Btn_DeletarVenda_clicked()));
 
     actionImprimirRecibo = new QAction();
     actionImprimirRecibo->setText("Imprimir Recibo da Venda");
-    actionImprimirRecibo->setIcon(janelaPrincipal->iconImpressora);
+    //actionImprimirRecibo->setIcon(janelaPrincipal->iconImpressora);
     QObject::connect(actionImprimirRecibo, &QAction::triggered, [&]() {
         imprimirReciboVenda(cellValue); // Chama nossa função com o parâmetro
     });
@@ -984,6 +1005,43 @@ void Vendas::devolverProduto(QString id_prod_vend, QString id_produto, QString q
     query2.bindValue(":valor1", qntd);
     query2.bindValue(":valor2", id_produto);
     query2.exec();
+    emit devolvidoProduto();
 
     db.close();
+}
+void Vendas::mostrarVendasCliente(int idCliente) {
+    if (idCliente == 0) {
+        qDebug() << "ID do cliente inválido.";
+        return;
+    }
+
+    if (!db.isOpen() && !db.open()) {
+        qDebug() << "Erro ao abrir banco de dados em mostrarVendasCliente: " << db.lastError().text();
+        return;
+    }
+    //qDebug() << "IdCliente: " + QString::number(idCliente);
+    QSqlQuery query;
+    query.prepare("SELECT nome FROM clientes WHERE id = :idcliente");
+    query.bindValue(":idcliente", idCliente);
+    QString nomeCliente;
+    query.exec();
+    while(query.next()){
+        nomeCliente = query.value(0).toString();
+    }
+
+    // Passa diretamente a string SQL para o modelo
+    modeloVendas2->setQuery("SELECT id, valor_final, forma_pagamento, data_hora, "
+                            "cliente, esta_pago, total, desconto, taxa, valor_recebido, "
+                            "troco FROM vendas2 WHERE id_cliente = " + QString::number(idCliente) +
+                                " ORDER BY id DESC", db);
+
+    if (modeloVendas2->lastError().isValid()) {
+        qDebug() << "Erro ao carregar modelo de vendas: " << modeloVendas2->lastError().text();
+    }
+    db.close();
+    ui->Btn_InserirVenda->setDisabled(true);
+    ui->Btn_InserirVenda->setVisible(false);
+    ui->Lbl_ClienteHeader->setText(nomeCliente);
+
+    filtrarData(de,ate);
 }

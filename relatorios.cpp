@@ -293,7 +293,6 @@ QMap<QString, QVector<int>> relatorios::buscarFormasPagamentoPorAno(const QStrin
     return resultado;
 }
 void relatorios::configurarJanelaFormasPagamentoAno() {
-    static bool jaConectado = false; // evita múltiplos connects
 
     // Carrega os anos apenas se o combo estiver vazio
     if (ui->CBox_AnoFormaPagamento->count() == 0) {
@@ -301,74 +300,78 @@ void relatorios::configurarJanelaFormasPagamentoAno() {
     }
 
     // Conecta o combo apenas uma vez
-    if (!jaConectado) {
+
         connect(ui->CBox_AnoFormaPagamento, &QComboBox::currentTextChanged, this, [=](const QString &ano){
-            configurarJanelaFormasPagamentoAno(); // chama a si mesma para atualizar com o novo ano
-        });
-        jaConectado = true;
-    }
+           // qDebug() << "Combo mudou para ano:" << ano;
 
-    // Pega o ano selecionado e monta o gráfico
-    QString anoSelecionado = ui->CBox_AnoFormaPagamento->currentText();
-    if (anoSelecionado.isEmpty()) return;
+            // Pega o ano selecionado e monta o gráfico
+            QString anoSelecionado = ui->CBox_AnoFormaPagamento->currentText();
+            if (anoSelecionado.isEmpty()) return;
 
-    QMap<QString, QVector<int>> dados = buscarFormasPagamentoPorAno(anoSelecionado);
-    QStringList meses = {"Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"};
+            QMap<QString, QVector<int>> dados = buscarFormasPagamentoPorAno(anoSelecionado);
+            QStringList meses = {"Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"};
 
-    QChart *chart = new QChart();
-    chart->setTitle("Formas de Pagamento por Mês - Ano " + anoSelecionado);
-    chart->setAnimationOptions(QChart::SeriesAnimations);
+            QChart *chart = new QChart();
+            chart->setTitle("Formas de Pagamento por Mês - Ano " + anoSelecionado);
+            chart->setAnimationOptions(QChart::SeriesAnimations);
 
-    QBarSeries *series = new QBarSeries();
-    int maxValor = 0;
+            QBarSeries *series = new QBarSeries();
+            int maxValor = 0;
 
-    for (auto it = dados.begin(); it != dados.end(); ++it) {
-        QBarSet *set = new QBarSet(it.key());
-        for (int val : it.value()) {
-            *set << val;
-            maxValor = std::max(maxValor, val);
-        }
-        QString nomeForma = it.key();  // Captura fora da lambda
+            for (auto it = dados.begin(); it != dados.end(); ++it) {
+                QBarSet *set = new QBarSet(it.key());
+                for (int val : it.value()) {
+                    *set << val;
+                    maxValor = std::max(maxValor, val);
+                }
+                QString nomeForma = it.key();  // Captura fora da lambda
 
-        connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
-            if (status) {
-                QToolTip::showText(QCursor::pos(), QString("%1: %2").arg(nomeForma).arg((*set)[index]));
+                connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
+                    if (status) {
+                        QToolTip::showText(QCursor::pos(), QString("%1: %2").arg(nomeForma).arg((*set)[index]));
+                    }
+                });
+
+                series->append(set);
             }
+
+            chart->addSeries(series);
+
+            QBarCategoryAxis *axisX = new QBarCategoryAxis();
+            axisX->append(meses);
+            chart->addAxis(axisX, Qt::AlignBottom);
+            series->attachAxis(axisX);
+
+            QValueAxis *axisY = new QValueAxis();
+            axisY->setRange(0, maxValor);
+            chart->addAxis(axisY, Qt::AlignLeft);
+            series->attachAxis(axisY);
+
+            QChartView *chartView = new QChartView(chart);
+            chartView->setRenderHint(QPainter::Antialiasing);
+
+            QWidget* paginaGrafico = ui->Stacked_Vendas->widget(3);
+            QLayout* layoutPagina = paginaGrafico->layout();
+
+            if (!layoutPagina) {
+                layoutPagina = new QVBoxLayout(paginaGrafico);
+                paginaGrafico->setLayout(layoutPagina);
+            }
+
+            // Remove widgets anteriores (mantendo os dois primeiros)
+            QLayoutItem *item;
+            while ((item = layoutPagina->takeAt(1)) != nullptr) {
+                delete item->widget();
+                delete item;
+            }
+            layoutPagina->addWidget(chartView);
         });
 
-        series->append(set);
-    }
+        emit ui->CBox_AnoFormaPagamento->currentTextChanged(ui->CBox_AnoFormaPagamento->currentText());
 
-    chart->addSeries(series);
 
-    QBarCategoryAxis *axisX = new QBarCategoryAxis();
-    axisX->append(meses);
-    chart->addAxis(axisX, Qt::AlignBottom);
-    series->attachAxis(axisX);
 
-    QValueAxis *axisY = new QValueAxis();
-    axisY->setRange(0, maxValor);
-    chart->addAxis(axisY, Qt::AlignLeft);
-    series->attachAxis(axisY);
 
-    QChartView *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
-
-    QWidget* paginaGrafico = ui->Stacked_Vendas->widget(3);
-    QLayout* layoutPagina = paginaGrafico->layout();
-
-    if (!layoutPagina) {
-        layoutPagina = new QVBoxLayout(paginaGrafico);
-        paginaGrafico->setLayout(layoutPagina);
-    }
-
-    // Remove widgets anteriores (mantendo os dois primeiros)
-    QLayoutItem *item;
-    while ((item = layoutPagina->takeAt(1)) != nullptr) {
-        delete item->widget();
-        delete item;
-    }
-    layoutPagina->addWidget(chartView);
 }
 
 

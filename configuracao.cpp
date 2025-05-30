@@ -1,9 +1,9 @@
-#include "config.h"
-#include "ui_config.h"
+#include "configuracao.h"
+#include "ui_configuracao.h"
 #include <QFileDialog>
 #include <QMessageBox>
 
-Config::Config(QWidget *parent)
+Configuracao::Configuracao(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Config)
 {
@@ -45,13 +45,13 @@ Config::Config(QWidget *parent)
     ui->Ledt_debito->setValidator(validador);
 }
 
-Config::~Config()
+Configuracao::~Configuracao()
 {
     delete ui;
 }
 
 
-void Config::on_Btn_Aplicar_clicked()
+void Configuracao::on_Btn_Aplicar_clicked()
 {
     QString nomeEmpresa, enderecoEmpresa, emailEmpresa, cnpjEmpresa, telEmpresa, lucro,
         debito, credito, cidadeEmpresa, estadoEmpresa, logoEmpresa;
@@ -124,13 +124,13 @@ void Config::on_Btn_Aplicar_clicked()
 }
 
 
-void Config::on_Btn_Cancelar_clicked()
+void Configuracao::on_Btn_Cancelar_clicked()
 {
     this->close();
 }
 
 
-void Config::on_Btn_LogoEmpresa_clicked()
+void Configuracao::on_Btn_LogoEmpresa_clicked()
 {
     QString caminhoOriginal = QFileDialog::getOpenFileName(
         this,

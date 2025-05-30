@@ -1,5 +1,5 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef CONFIGURACAO_H
+#define CONFIGURACAO_H
 
 #include <QWidget>
 #include <QSqlDatabase>
@@ -11,13 +11,13 @@ namespace Ui {
 class Config;
 }
 
-class Config : public QWidget
+class Configuracao : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit Config(QWidget *parent = nullptr);
-    ~Config();
+    explicit Configuracao(QWidget *parent = nullptr);
+    ~Configuracao();
 
 private slots:
 
@@ -33,4 +33,4 @@ private:
     QLocale portugues;
 };
 
-#endif // CONFIG_H
+#endif // CONFIGURACAO_H

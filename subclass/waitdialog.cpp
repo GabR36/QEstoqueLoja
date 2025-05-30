@@ -1,0 +1,37 @@
+#include "waitdialog.h"
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QCloseEvent>
+
+WaitDialog::WaitDialog(QWidget* parent)
+    : QDialog(parent) {
+    setWindowTitle("Processando...");
+    setModal(true);
+    setWindowModality(Qt::ApplicationModal);
+    setFixedSize(400, 100);
+   //setWindowFlags(Qt::Dialog | Qt::CustomizeWindowHint | Qt::WindowTitleHint);
+    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::WindowCloseButtonHint);
+
+
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    label = new QLabel("Carregando, por favor aguarde...");
+    // label->wordWrap();
+    // label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    layout->addWidget(label);
+}
+
+void WaitDialog::allowClose() {
+    canClose = true;
+}
+
+void WaitDialog::setMessage(const QString& message) {
+    label->setText(message);
+}
+
+void WaitDialog::closeEvent(QCloseEvent* event) {
+    if (canClose) {
+        event->accept(); // permite o fechamento
+    } else {
+        event->ignore(); // bloqueia Alt+F4, etc.
+    }
+}

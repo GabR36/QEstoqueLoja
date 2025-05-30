@@ -14,13 +14,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set(CMAKE_PREFIX_PATH "C:/Qt/6.6.2/mingw_64/lib/cmake")
 
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Qml Xml)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Qml Xml )
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Qml Xml Svg Network)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Qml Xml Svg Network)
 
 if (CMAKE_SYSTEM MATCHES "Linux")
     include_directories(
         /usr/include/libxml2
         /usr/include/QtRPT
+        /usr/include/CppBrasil
+        /usr/include/
+        /usr/include/openssl
+
     )
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     include_directories(
@@ -44,6 +48,8 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        ${CMAKE_CURRENT_SOURCE_DIR}/nota/nota.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/nota/nota.h
         ${TS_FILES}
 )
 
@@ -68,7 +74,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         relatorios.h relatorios.cpp relatorios.ui
         pagamento.h pagamento.cpp pagamento.ui
 
-        config.h config.cpp config.ui
+        configuracao.h configuracao.cpp configuracao.ui
         entradasvendasprazo.h entradasvendasprazo.cpp entradasvendasprazo.ui
         pagamentoaprazo.h pagamentoaprazo.cpp
         delegateprecof2.h delegateprecof2.cpp
@@ -90,6 +96,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         alterarcliente.h alterarcliente.cpp alterarcliente.ui
         inserircliente.h inserircliente.cpp inserircliente.ui
         subclass/produtotableview.h subclass/produtotableview.cpp
+        subclass/waitdialog.h subclass/waitdialog.cpp
 
 
 
@@ -124,12 +131,13 @@ else()
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 target_link_libraries(QEstoqueLoja PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::Sql Qt6::PrintSupport
-    zint Qt6::Charts QtRPT Qt6::Xml Qt6::Qml)
+    zint Qt6::Charts QtRPT Qt6::Xml Qt6::Qml Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Svg
+)
 
-target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lxml2)
+#target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lxml2)
 
 if (CMAKE_SYSTEM MATCHES "Linux")
-    target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lxml2)
+    target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lCppDanfeQtRPT -lxml2 -lCppNFe -lcrypto -lssl -lz)
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     target_link_directories(QEstoqueLoja PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/third-party/windows/libxml2-v2.11.5/lib
@@ -161,7 +169,7 @@ install(TARGETS QEstoqueLoja
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 # Caminho do arquivo de origem
-set(ARQUIVO_ORIGEM "${CMAKE_SOURCE_DIR}/reports/orcamentoReport.xml")
+set(ARQUIVO_ORIGEM "${CMAKE_SOURCE_DIR}/reports/*")
 
 # Caminho do diretório de destino (ao lado do executável no diretório de build)
 set(DIRETORIO_DESTINO "${CMAKE_CURRENT_BINARY_DIR}/reports")

@@ -1044,7 +1044,7 @@ void MainWindow::on_actionApenas_NF_triggered()
 
 void MainWindow::on_actionConfig_triggered()
 {
-    Config *configuracao = new Config();
+    Configuracao *configuracao = new Configuracao();
     configuracao->show();
 }
 

@@ -1,10 +1,59 @@
 #include "pagamentovenda.h"
-
+#include "subclass/waitdialog.h"
+#include <QTimer>
 pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString total, QString cliente, QString data, int idCliente, QWidget *parent)
     : pagamento(total, cliente, data, parent)
 {
     rowDataList = listaProdutos;
     this->idCliente = idCliente;
+    //qDebug() << QDir::currentPath();
+    connect(this, &pagamentoVenda::gerarEnviarNf, &nota, &Nota::onReqGerarEnviar);
+    connect(&nota, &Nota::retWSChange, this, &pagamentoVenda::onRetWSChange);
+    connect(&nota, &Nota::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
+    connect(&nota, &Nota::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
+
+
+
+}
+void pagamentoVenda::onErrorOccurred(const QString &error){
+    if (waitDialog) {
+        waitDialog->setMessage(error);
+    }
+   // erroNf = error;
+}
+
+void pagamentoVenda::onRetWSChange(const QString &webServices){
+    if (waitDialog) {
+        waitDialog->setMessage(webServices);
+    }
+
+}
+
+void pagamentoVenda::onRetStatusServico(const QString &status){
+    if (waitDialog) {
+        waitDialog->setMessage(status);
+    }
+}
+void pagamentoVenda::verificarErroNf(const CppNFe *cppnfe){
+    if (cppnfe->notafiscal->retorno->protNFe->items->count() > 0)
+    {
+        if ((cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 100) ||
+            (cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 150))
+        {
+            waitDialog->setMessage("Sucesso!\n Status:" + cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat());
+            waitDialog->allowClose();
+            QTimer::singleShot(2000, waitDialog, &QDialog::close);
+        }else{
+
+            QString msg = "ERRO:\n" + cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_xMotivo();
+            //waitDialog->allowClose();
+            waitDialog->setMessage(msg);
+            waitDialog->allowClose();
+            //QTimer::singleShot(2000, waitDialog, &QDialog::close);
+        }
+    } else{
+
+    }
 }
 
 void pagamentoVenda::terminarPagamento(){
@@ -152,10 +201,51 @@ void pagamentoVenda::terminarPagamento(){
     }
 
     db.close();
+    if (!waitDialog) {
+        waitDialog = new WaitDialog(this);
+    }
+    waitDialog->setMessage("Aguardando resposta do servidor...");
+    waitDialog->show();
+
+
+    emit gerarEnviarNf();
     emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
+    verificarErroNf(this->nota.getCppNFe());
+    imprimirDANFE(this->nota.getCppNFe());
+
 
 
 
     // fechar as janelas
     this->close();
+}
+
+void pagamentoVenda::imprimirDANFE(const CppNFe *cppnfe)
+{
+    QString caminhoReportNFe = QDir::currentPath() + "/reports/DANFE-NFe.xml";
+    QString caminhoReportNFCe = QDir::currentPath() + "/reports/DANFE-NFCe.xml";
+
+    CppDanfeQtRPT danfe(cppnfe, 0);
+    //danfe.caminhoLogo(QDir::currentPath() + "/img/logo.png");
+    if (cppnfe->notafiscal->retorno->protNFe->items->count() > 0)
+    {
+        if ((cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 100) ||
+            (cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 150))
+        {
+            if (cppnfe->notafiscal->NFe->items->value(0)->infNFe->ide->get_mod() == ModeloDF::NFe)
+                danfe.caminhoArquivo(caminhoReportNFe);
+            else
+                danfe.caminhoArquivo(caminhoReportNFCe);
+
+            danfe.print();
+        }
+    } else
+    {
+        if (cppnfe->notafiscal->NFe->items->value(0)->infNFe->ide->get_mod() == ModeloDF::NFe)
+            danfe.caminhoArquivo(caminhoReportNFe);
+        else
+            danfe.caminhoArquivo(caminhoReportNFCe);
+
+        danfe.print();
+    }
 }

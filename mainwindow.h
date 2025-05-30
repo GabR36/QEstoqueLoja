@@ -10,7 +10,7 @@
 #include <QSet>
 #include <QRandomGenerator>
 #include <QKeyEvent>
-#include "config.h"
+#include "configuracao.h"
 #include "subclass/customlineedit.h"
 
 

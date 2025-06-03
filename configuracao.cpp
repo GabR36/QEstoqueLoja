@@ -31,6 +31,28 @@ Configuracao::Configuracao(QWidget *parent)
     ui->Ledt_NomeEmpresa->setText(configValues.value("nome_empresa", ""));
     ui->Ledt_TelEmpresa->setText(configValues.value("telefone_empresa", ""));
     ui->Ledt_LogoEmpresa->setText(configValues.value("caminho_logo_empresa", ""));
+    // fiscal
+    ui->Ledt_NomeFantasia->setText(configValues.value("nfant_empresa", ""));
+    ui->Ledt_NumeroEnd->setText(configValues.value("numero_empresa", ""));
+    ui->Ledt_Bairro->setText(configValues.value("bairro_empresa", ""));
+    ui->Ledt_Cep->setText(configValues.value("cep_empresa", ""));
+    ui->CBox_Opcao->setCurrentIndex(configValues.value("regime_trib", "").toInt());
+    ui->CBox_Tpamp->setCurrentIndex(configValues.value("tp_amb", "").toInt());
+    ui->Ledit_Idcsc->setText(configValues.value("id_csc", ""));
+    ui->Ledit_Csc->setText(configValues.value("csc", ""));
+    ui->Lbl_SchemaPath->setText(configValues.value("caminho_schema", ""));
+    ui->Lbl_CertificadoAcPath->setText(configValues.value("caminho_certac", ""));
+    ui->Lbl_CertificadoPath->setText(configValues.value("caminho_certificado", ""));
+    ui->Ledit_CertificadoSenha->setText(configValues.value("senha_certificado", ""));
+    ui->Ledt_CUf->setText(configValues.value("cuf", ""));
+    ui->Ledt_CMun->setText(configValues.value("cmun", ""));
+    ui->Ledt_IE->setText(configValues.value("iest", ""));
+    ui->Ledt_CnpjRespTec->setText(configValues.value("cnpj_rt", ""));
+    ui->Ledt_NomeRespTec->setText(configValues.value("nome_rt", ""));
+    ui->Ledt_EmailRespTec->setText(configValues.value("email_rt", ""));
+    ui->Ledt_FoneRespTec->setText(configValues.value("fone_rt", ""));
+    ui->Ledt_IdCsrtRespTec->setText(configValues.value("id_csrt", ""));
+    ui->Ledt_HashCsrtRespTec->setText(configValues.value("hash_csrt", ""));
     // converter notacao americana em ptbr
     ui->Ledt_LucroEmpresa->setText(portugues.toString(configValues.value("porcent_lucro", "").toFloat()));
     ui->Ledt_debito->setText(portugues.toString(configValues.value("taxa_debito", "").toFloat()));
@@ -53,11 +75,17 @@ Configuracao::~Configuracao()
 
 void Configuracao::on_Btn_Aplicar_clicked()
 {
-    QString nomeEmpresa, enderecoEmpresa, emailEmpresa, cnpjEmpresa, telEmpresa, lucro,
-        debito, credito, cidadeEmpresa, estadoEmpresa, logoEmpresa;
+    QString nomeEmpresa, nomeFant, enderecoEmpresa, numeroEmpresa, bairroEmpresa, cepEmpresa, emailEmpresa,
+        cnpjEmpresa, telEmpresa, lucro, debito, credito, cidadeEmpresa, estadoEmpresa, logoEmpresa, regimeTrib, tpAmb,
+        idCsc, csc, pastaSchema, pastaCertificadoAc, certificado, senhaCertificado, cUf, cMun, iEstad, cnpjRT, nomeRT,
+        emailRt, foneRt, idCSRT, hasCsrt;
     // converter para notacao americana para armazenar no banco de dados
     nomeEmpresa = ui->Ledt_NomeEmpresa->text();
+    nomeFant = ui->Ledt_NomeFantasia->text();
     enderecoEmpresa = ui->Ledt_EnderecoEmpresa->text();
+    numeroEmpresa = ui->Ledt_NumeroEnd->text();
+    bairroEmpresa = ui->Ledt_Bairro->text();
+    cepEmpresa = ui->Ledt_Cep->text();
     emailEmpresa = ui->Ledt_EmailEmpresa->text();
     cnpjEmpresa = ui->Ledt_CnpjEmpresa->text();
     telEmpresa = ui->Ledt_TelEmpresa->text();
@@ -67,6 +95,23 @@ void Configuracao::on_Btn_Aplicar_clicked()
     lucro = QString::number(portugues.toFloat(ui->Ledt_LucroEmpresa->text()));
     debito = QString::number(portugues.toFloat(ui->Ledt_debito->text()));
     credito = QString::number(portugues.toFloat(ui->Ledt_credito->text()));
+    regimeTrib = QString::number(ui->CBox_Opcao->currentIndex());
+    tpAmb = QString::number(ui->CBox_Tpamp->currentIndex());
+    idCsc = ui->Ledit_Idcsc->text();
+    csc = ui->Ledit_Csc->text();
+    pastaSchema = ui->Lbl_SchemaPath->text();
+    pastaCertificadoAc = ui->Lbl_CertificadoAcPath->text();
+    certificado = ui->Lbl_CertificadoPath->text();
+    senhaCertificado = ui->Ledit_CertificadoSenha->text();
+    cUf = ui->Ledt_CUf->text();
+    cMun = ui->Ledt_CMun->text();
+    iEstad = ui->Ledt_IE->text();
+    cnpjRT = ui->Ledt_CnpjRespTec->text();
+    nomeRT = ui->Ledt_NomeRespTec->text();
+    emailRt = ui->Ledt_EmailRespTec->text();
+    foneRt = ui->Ledt_FoneRespTec->text();
+    idCSRT = ui->Ledt_IdCsrtRespTec->text();
+    hasCsrt = ui->Ledt_HashCsrtRespTec->text();
 
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";
@@ -116,6 +161,94 @@ void Configuracao::on_Btn_Aplicar_clicked()
     query.prepare("UPDATE config set value = :value WHERE key = :key");
     query.bindValue(":value", logoEmpresa);
     query.bindValue(":key", "caminho_logo_empresa");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", nomeFant);
+    query.bindValue(":key", "nfant_empresa");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", numeroEmpresa);
+    query.bindValue(":key", "numero_empresa");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", bairroEmpresa);
+    query.bindValue(":key", "bairro_empresa");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", bairroEmpresa);
+    query.bindValue(":key", "bairro_empresa");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", cepEmpresa);
+    query.bindValue(":key", "cep_empresa");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", regimeTrib);
+    query.bindValue(":key", "regime_trib");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", tpAmb);
+    query.bindValue(":key", "tp_amb");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", idCsc);
+    query.bindValue(":key", "id_csc");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", csc);
+    query.bindValue(":key", "csc");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", pastaSchema);
+    query.bindValue(":key", "caminho_schema");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", pastaCertificadoAc);
+    query.bindValue(":key", "caminho_certac");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", certificado);
+    query.bindValue(":key", "caminho_certificado");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", senhaCertificado);
+    query.bindValue(":key", "senha_certificado");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", cUf);
+    query.bindValue(":key", "cuf");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", cMun);
+    query.bindValue(":key", "cmun");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", iEstad);
+    query.bindValue(":key", "iest");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", cnpjRT);
+    query.bindValue(":key", "cnpj_rt");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", nomeRT);
+    query.bindValue(":key", "nome_rt");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", emailRt);
+    query.bindValue(":key", "email_rt");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", foneRt);
+    query.bindValue(":key", "fone_rt");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", idCSRT);
+    query.bindValue(":key", "id_csrt");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", hasCsrt);
+    query.bindValue(":key", "hash_csrt");
     query.exec();
 
     db.close();
@@ -169,5 +302,52 @@ void Configuracao::on_Btn_LogoEmpresa_clicked()
         QMessageBox::warning(this, "Erro", "Não foi possível copiar a imagem.");
     }
 
+}
+
+
+void Configuracao::on_Btn_schemaPath_clicked()
+{
+    QString pastaSelecionada = QFileDialog::getExistingDirectory(
+        this,
+        tr("Selecionar a Pasta dos Schemas"),
+        "",
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+        );
+
+    if (pastaSelecionada.isEmpty())
+        return;
+
+    ui->Lbl_SchemaPath->setText(pastaSelecionada);
+
+}
+
+
+void Configuracao::on_Btn_certificadoPath_clicked()
+{
+    QString caminhoOriginal = QFileDialog::getOpenFileName(
+        this,
+        tr("Selecionar o Certificado A1 da Empresa"),
+        "",
+        tr("Certificado (*.pfx)")
+        );
+    if (caminhoOriginal.isEmpty())
+        return;
+    ui->Lbl_CertificadoPath->setText(caminhoOriginal);
+}
+
+
+void Configuracao::on_Btn_CertficadoAcPath_clicked()
+{
+    QString pastaSelecionada = QFileDialog::getExistingDirectory(
+        this,
+        tr("Selecionar a Pasta dos Certificaods AC"),
+        "",
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+        );
+
+    if (pastaSelecionada.isEmpty())
+        return;
+
+    ui->Lbl_CertificadoAcPath->setText(pastaSelecionada);
 }
 

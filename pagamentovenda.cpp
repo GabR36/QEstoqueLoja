@@ -40,9 +40,9 @@ void pagamentoVenda::verificarErroNf(const CppNFe *cppnfe){
         if ((cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 100) ||
             (cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 150))
         {
-            waitDialog->setMessage("Sucesso!\n Status:" + cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat());
+            waitDialog->setMessage("Sucesso!\n Status:" + QString::number(cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat()));
             waitDialog->allowClose();
-            QTimer::singleShot(2000, waitDialog, &QDialog::close);
+            QTimer::singleShot(2000, waitDialog, &QDialog::close); //fecha depois de 2 segundos
         }else{
 
             QString msg = "ERRO:\n" + cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_xMotivo();

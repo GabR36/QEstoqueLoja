@@ -100,7 +100,7 @@ MainWindow::MainWindow(QWidget *parent)
     qDebug() << dbSchemaVersion;
 
     // a versão mais recente do esquema do banco de dados
-    int dbSchemaLastVersion = 4;
+    int dbSchemaLastVersion = 5;
 
     while (dbSchemaVersion < dbSchemaLastVersion){
         // selecionar a atualizacao conforme a versao atual do banco de dados
@@ -374,6 +374,112 @@ MainWindow::MainWindow(QWidget *parent)
 
             break;
         }
+        case 4:
+        {
+            db.open();
+
+            // comecar transacao
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+            }
+
+            QSqlQuery query;
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nfant_empresa', '')")){
+                qDebug() << "nao inserir config nfant_empresa";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('numero_empresa', '')")){
+                qDebug() << "nao inserir config numero_empresa";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('bairro_empresa', '')")){
+                qDebug() << "nao inserir config bairro_empresa";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('cep_empresa', '')")){
+                qDebug() << "nao inserir config cep_empresa";
+            }
+
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('regime_trib', '')")){
+                qDebug() << "nao inserir config regime_trib";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('tp_amb', '')")){
+                qDebug() << "nao inserir config tp_amb";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('id_csc', '')")){
+                qDebug() << "nao inserir config id_csc";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('csc', '')")){
+                qDebug() << "nao inserir config csc";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('caminho_schema', '')")){
+                qDebug() << "nao inserir config caminho_schema";
+            }
+
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('caminho_certac', '')")){
+                qDebug() << "nao inserir config caminho_certac";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('caminho_certificado', '')")){
+                qDebug() << "nao inserir config caminho_certificado";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('senha_certificado', '')")){
+                qDebug() << "nao inserir config senha_certificado";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('cuf', '')")){
+                qDebug() << "nao inserir config cuf";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('cmun', '')")){
+                qDebug() << "nao inserir config cmun";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('iest', '')")){
+                qDebug() << "nao inserir config iest";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('cnpj_rt', '')")){
+                qDebug() << "nao inserir config cnpj_rt";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nome_rt', '')")){
+                qDebug() << "nao inserir config nome_rt";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('email_rt', '')")){
+                qDebug() << "nao inserir config email_rt";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('fone_rt', '')")){
+                qDebug() << "nao inserir config fone_rt";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('id_csrt', '')")){
+                qDebug() << "nao inserir config id_cst";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('hash_csrt', '')")){
+                qDebug() << "nao inserir config hash_csrt";
+            }
+
+
+
+
+            query.exec("PRAGMA user_version = 5");
+
+            // terminar transacao
+            if (!db.commit()) {
+                qDebug() << "Error: unable to commit transaction";
+                db.rollback(); // Desfaz a transação
+            }
+
+            db.close();
+
+            dbSchemaVersion = 5;
+        }
+
         }
     }
     qDebug() << dbSchemaVersion;

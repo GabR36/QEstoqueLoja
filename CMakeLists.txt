@@ -97,6 +97,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         inserircliente.h inserircliente.cpp inserircliente.ui
         subclass/produtotableview.h subclass/produtotableview.cpp
         subclass/waitdialog.h subclass/waitdialog.cpp
+        nota/nfcevenda.h nota/nfcevenda.cpp
 
 
 

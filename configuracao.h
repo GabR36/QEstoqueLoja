@@ -27,6 +27,12 @@ private slots:
 
     void on_Btn_LogoEmpresa_clicked();
 
+    void on_Btn_schemaPath_clicked();
+
+    void on_Btn_certificadoPath_clicked();
+
+    void on_Btn_CertficadoAcPath_clicked();
+
 private:
     Ui::Config *ui;
     QSqlDatabase db = QSqlDatabase::database();

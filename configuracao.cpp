@@ -2,6 +2,11 @@
 #include "ui_configuracao.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QMap>
+#include <QSqlQuery>
+#include <QSqlError>
+#include <QVariant>
+#include <QDebug>
 
 Configuracao::Configuracao(QWidget *parent)
     : QWidget(parent)
@@ -349,5 +354,121 @@ void Configuracao::on_Btn_CertficadoAcPath_clicked()
         return;
 
     ui->Lbl_CertificadoAcPath->setText(pastaSelecionada);
+}
+
+
+QMap<QString, QString> Configuracao::get_All_Fiscal_Values() {
+
+    QSqlDatabase db2 = QSqlDatabase::database();
+    if(!db2.open()){
+        qDebug() << "erro bancodedados";
+    }
+    QMap<QString, QString> result;
+
+    // Lista fixa de chaves que queremos buscar
+    QStringList keys = {
+        "regime_trib",
+        "tp_amb",
+        "id_csc",
+        "csc",
+        "caminho_schema",
+        "caminho_certac",
+        "caminho_certificado",
+        "senha_certificado",
+        "cuf",
+        "cmun",
+        "iest",
+        "cnpj_rt",
+        "nome_rt",
+        "email_rt",
+        "fone_rt",
+        "id_csrt",
+        "hash_csrt"
+    };
+
+    // Montar a query com placeholders
+    QStringList placeholders;
+    for (int i = 0; i < keys.size(); ++i) {
+        placeholders << "?";
+    }
+
+    QString queryStr = QString("SELECT key, value FROM config WHERE key IN (%1)")
+                           .arg(placeholders.join(", "));
+
+    QSqlQuery query;
+    query.prepare(queryStr);
+
+    // Vincular os valores
+    for (const QString &key : keys) {
+        query.addBindValue(key);
+    }
+
+    if (!query.exec()) {
+        qWarning() << "Erro ao executar a query de configuração:" << query.lastError().text();
+        return result;
+    }
+
+    while (query.next()) {
+        QString key = query.value("key").toString();
+        QString value = query.value("value").toString();
+        result.insert(key, value);
+    }
+
+    return result;
+}
+
+QMap<QString, QString> Configuracao::get_All_Empresa_Values() {
+
+    QSqlDatabase db2 = QSqlDatabase::database();
+    if(!db2.open()){
+        qDebug() << "erro bancodedados";
+    }
+    QMap<QString, QString> result;
+
+    // Lista fixa de chaves que queremos buscar
+    QStringList keys = {
+        "nome_empresa",
+        "endereco_empresa",
+        "telefone_empresa",
+        "cnpj_empresa",
+        "email_empresa",
+        "cidade_empresa",
+        "estado_empresa",
+        "caminho_logo_empresa",
+        "nfant_empresa",
+        "numero_empresa",
+        "bairro_empresa",
+        "cep_empresa"
+    };
+
+    // Montar a query com placeholders
+    QStringList placeholders;
+    for (int i = 0; i < keys.size(); ++i) {
+        placeholders << "?";
+    }
+
+    QString queryStr = QString("SELECT key, value FROM config WHERE key IN (%1)")
+                           .arg(placeholders.join(", "));
+
+    QSqlQuery query;
+    query.prepare(queryStr);
+
+    // Vincular os valores
+    for (const QString &key : keys) {
+        query.addBindValue(key);
+    }
+
+    if (!query.exec()) {
+        qWarning() << "Erro ao executar a query de configuração:" << query.lastError().text();
+        return result;
+    }
+
+    while (query.next()) {
+        QString key = query.value("key").toString();
+        QString value = query.value("value").toString();
+        result.insert(key, value);
+    }
+
+    return result;
 }
 

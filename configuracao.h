@@ -19,6 +19,8 @@ public:
     explicit Configuracao(QWidget *parent = nullptr);
     ~Configuracao();
 
+    static QMap<QString, QString> get_All_Fiscal_Values();
+    static QMap<QString, QString> get_All_Empresa_Values();
 private slots:
 
     void on_Btn_Aplicar_clicked();

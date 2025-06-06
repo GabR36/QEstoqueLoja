@@ -3,7 +3,7 @@
 
 #include "pagamento.h"
 #include "venda.h"
-#include "nota/nota.h"
+#include "nota/nfcevenda.h"
 #include <CppBrasil/NFe/CppNFe>
 #include <CppBrasil/DanfeQtRPT/CppDanfeQtRPT>
 #include <qtrpt.h>
@@ -20,7 +20,7 @@ public:
 private:
     void terminarPagamento() override;
     int idCliente;
-    Nota nota;
+    NfceVenda nota;
     WaitDialog* waitDialog = nullptr;
     QString erroNf;
 signals:

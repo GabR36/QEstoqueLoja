@@ -7,10 +7,10 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
     rowDataList = listaProdutos;
     this->idCliente = idCliente;
     //qDebug() << QDir::currentPath();
-    connect(this, &pagamentoVenda::gerarEnviarNf, &nota, &Nota::onReqGerarEnviar);
-    connect(&nota, &Nota::retWSChange, this, &pagamentoVenda::onRetWSChange);
-    connect(&nota, &Nota::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
-    connect(&nota, &Nota::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
+    connect(this, &pagamentoVenda::gerarEnviarNf, &nota, &NfceVenda::onReqGerarEnviar);
+    connect(&nota, &NfceVenda::retWSChange, this, &pagamentoVenda::onRetWSChange);
+    connect(&nota, &NfceVenda::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
+    connect(&nota, &NfceVenda::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
 
 
 

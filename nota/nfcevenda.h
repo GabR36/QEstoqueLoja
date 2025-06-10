@@ -7,6 +7,7 @@
 #include <CppBrasil/CppUtil>
 #include <CppBrasil/NFe/CppNFe>
 #include <CppBrasil/NFe/ConvNF>
+#include <QLocale>
 
 class NfceVenda : public QObject
 {
@@ -16,11 +17,21 @@ public:
     ~NfceVenda();
     const CppNFe *getCppNFe();
 
+    void setProdutosVendidos(QList<QList<QVariant>> produtosVendidos);
+    void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco);
 private:
     CppNFe *m_nfe;
     QMap<QString, QString> fiscalValues;
     QMap<QString, QString> empresaValues;
     QString caminhoXml = QCoreApplication::applicationDirPath() + "/xmlNf";
+    QList<QList<QVariant>>listaProdutos;
+    int quantProds = 0;
+    QVector<double> vTotTribProduto;
+    double descontoNf,trocoNf,vPagNf = 0;
+    QString tPagNf = "01";
+    QString indPagNf = "0";
+    double vNf = 0.0;
+    QLocale portugues;
 
     void configurar();
     void nfe();
@@ -32,9 +43,9 @@ private:
     void retirada(); //Grupo F. Identificação do Local de Retirada
     void entrega(); //Grupo G. Identificação do Local de Entrega
     void autXML(); //Grupo GA. Autorização para obter XML
-    void det(); //Grupo H. Detalhamento de Produtos e Serviços da NF-e
+    void det(int quantProdutos); //Grupo H. Detalhamento de Produtos e Serviços da NF-e
     void det_produto(const int &i); //dentro de det - Grupo I. Produtos e Serviços da NF-e
-    void det_imposto(); //dentro de det - Grupo M. Tributos incidentes no Produto ou Serviço
+    void det_imposto(const int &i); //dentro de det - Grupo M. Tributos incidentes no Produto ou Serviço
     void det_impostoDevol(); //dentro de det - Grupo UA. Tributos Devolvidos (para o item da NF-e)
     void det_obsItem(); //dentro de det - Grupo VA. Observações de uso livre (para o item da NF-e)
     void total(); //Grupo W. Total da NF-e

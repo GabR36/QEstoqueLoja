@@ -47,6 +47,7 @@ void pagamentoVenda::verificarErroNf(const CppNFe *cppnfe){
 
             QString msg = "ERRO:\n" + cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_xMotivo();
             //waitDialog->allowClose();
+            qDebug() << "Erro nf:" << msg;
             waitDialog->setMessage(msg);
             waitDialog->allowClose();
             //QTimer::singleShot(2000, waitDialog, &QDialog::close);
@@ -204,12 +205,16 @@ void pagamentoVenda::terminarPagamento(){
     if (!waitDialog) {
         waitDialog = new WaitDialog(this);
     }
+
     waitDialog->setMessage("Aguardando resposta do servidor...");
     waitDialog->show();
 
-
+    nota.setProdutosVendidos(rowDataList);
+    qDebug() << "troco todobule" << portugues.toFloat(troco);
+    nota.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco));
     emit gerarEnviarNf();
     emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
+
     verificarErroNf(this->nota.getCppNFe());
     imprimirDANFE(this->nota.getCppNFe());
 

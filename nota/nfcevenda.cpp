@@ -105,7 +105,27 @@ void NfceVenda::configurar()
     m_nfe->configuracoes->webservices->set_protocoloSSL(ConvNF::strToQSslProtocol("TlsV1_2"));//QSsl::TlsV1_3
     m_nfe->configuracoes->webservices->set_timeoutAssincrono(8000);//milisegundos
     m_nfe->configuracoes->webservices->set_tentativas(3);
-    m_nfe->configuracoes->webservices->set_uf(UF::PR);
+
+
+
+    std::map<QString, UF> estadosMap = {
+        {"AC", UF::AC}, {"AL", UF::AL}, {"AP", UF::AP}, {"AM", UF::AM},
+        {"BA", UF::BA}, {"CE", UF::CE}, {"DF", UF::DF}, {"ES", UF::ES},
+        {"GO", UF::GO}, {"MA", UF::MA}, {"MT", UF::MT}, {"MS", UF::MS},
+        {"MG", UF::MG}, {"PA", UF::PA}, {"PB", UF::PB}, {"PR", UF::PR},
+        {"PE", UF::PE}, {"PI", UF::PI}, {"RJ", UF::RJ}, {"RN", UF::RN},
+        {"RS", UF::RS}, {"RO", UF::RO}, {"RR", UF::RR}, {"SC", UF::SC},
+        {"SP", UF::SP}, {"SE", UF::SE}, {"TO", UF::TO}
+    };
+
+
+    QString estadoStr = empresaValues.value("estado_empresa");
+    auto it = estadosMap.find(estadoStr);
+    if (it != estadosMap.end()) {
+        m_nfe->configuracoes->webservices->set_uf(it->second);
+    } else {
+        m_nfe->configuracoes->webservices->set_uf(UF::None);
+    }
     m_nfe->configuracoes->webservices->set_compactar(true);
     m_nfe->configuracoes->webservices->set_compactarAcimaDe(300);
     m_nfe->configuracoes->webservices->set_verificarSslSocket(true); //remove o tratamento de exception
@@ -127,7 +147,7 @@ void NfceVenda::infNFe()
     retirada();
     entrega();
     autXML();
-    det();
+    det(quantProds);
     total();
     transp();
     cobr();
@@ -142,17 +162,17 @@ void NfceVenda::infNFe()
 
 void NfceVenda::ide()
 {
-    m_nfe->notafiscal->NFe->obj->infNFe->ide->set_cUF(41);
+    m_nfe->notafiscal->NFe->obj->infNFe->ide->set_cUF(fiscalValues.value("cuf").toInt());
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_cNF(CppUtil::random(8));
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_natOp("VENDA AO CONSUMIDOR");
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_mod(m_nfe->configuracoes->get_ModeloDF());
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_serie(1);
-    m_nfe->notafiscal->NFe->obj->infNFe->ide->set_nNF(73); //NUMERO *importante*
+    m_nfe->notafiscal->NFe->obj->infNFe->ide->set_nNF(85); //NUMERO *importante*
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_dhEmi(QDateTime::currentDateTime());
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_dhSaiEnt(QDateTime::currentDateTime());
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_tpNF(ConvNF::strToTpNF("1"));
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_idDest(ConvNF::strToIdDest("1"));
-    m_nfe->notafiscal->NFe->obj->infNFe->ide->set_cMunFG(4118600);
+    m_nfe->notafiscal->NFe->obj->infNFe->ide->set_cMunFG(fiscalValues.value("cmun").toInt());
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_tpImp(TpImp::NFCe); //TpImp::Retrato
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_tpEmis(TpEmis::Normal);
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_tpAmb(m_nfe->configuracoes->webservices->get_tpAmb());//(ConvNF::strToTpAmb("2"));
@@ -204,27 +224,27 @@ void NfceVenda::ide()
 
 void NfceVenda::emite()
 {
-    m_nfe->notafiscal->NFe->obj->infNFe->emite->set_CNPJ("03307205000102");
-    //m_nfe->notafiscal->NFe->obj->infNFe->emite->set_CPF("12340578914");
-    m_nfe->notafiscal->NFe->obj->infNFe->emite->set_xNome("Chuede e cia");
-    m_nfe->notafiscal->NFe->obj->infNFe->emite->set_xFant("FANTASIA");
-    m_nfe->notafiscal->NFe->obj->infNFe->emite->set_IE("9018979800");
+    m_nfe->notafiscal->NFe->obj->infNFe->emite->set_CNPJ(empresaValues.value("cnpj_empresa"));
+    //m_nfe->notafiscal->NFe->obj->infNFe->emite->set_CPF("");
+    m_nfe->notafiscal->NFe->obj->infNFe->emite->set_xNome(empresaValues.value("nome_empresa"));
+    m_nfe->notafiscal->NFe->obj->infNFe->emite->set_xFant(empresaValues.value("nfant_empresa"));
+    m_nfe->notafiscal->NFe->obj->infNFe->emite->set_IE(fiscalValues.value("iest"));
     //m_nfe->notafiscal->NFe->obj->infNFe->emite->set_IEST("IE do Substituto Tributário");
     //m_nfe->notafiscal->NFe->obj->infNFe->emite->set_IM("INSCRIÇÃO MUNICIPAL");
     //m_nfe->notafiscal->NFe->obj->infNFe->emite->set_CNAE("CNAE fiscal");
     m_nfe->notafiscal->NFe->obj->infNFe->emite->set_CRT(Crt::SimplesNacional);
     //****endereço
-    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_xLgr("RUA, AVENIDA E ETC..");
-    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_nro(777); //NUMERO INTEIRO
+    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_xLgr(empresaValues.value("endereco_empresa"));
+    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_nro(empresaValues.value("numero_empresa").toInt()); //NUMERO INTEIRO
     //m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_xCpl("complemento");
-    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_xBairro("BAIRRO");
-    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_cMun(4118600);//CODIGO DO MUNICIPIO NUMERO INTEIRO
-    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_xMun("NOME DO MUNICIPIO");
-    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_UF("PR");
-    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_CEP(84630000); //CEP NUMERO INTEIRO
+    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_xBairro(empresaValues.value("bairro_empresa"));
+    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_cMun(fiscalValues.value("cmun").toInt());//CODIGO DO MUNICIPIO NUMERO INTEIRO
+    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_xMun(empresaValues.value("cidade_empresa"));
+    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_UF(empresaValues.value("estado_empresa"));
+    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_CEP(empresaValues.value("cep_empresa").toInt()); //CEP NUMERO INTEIRO
     m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_cPais(1058); //1058 BRASIL
     m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_xPais("BRASIL");
-    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_fone("12312312312");
+    m_nfe->notafiscal->NFe->obj->infNFe->emite->enderEmit->set_fone(empresaValues.value("telefone_empresa"));
 
 
 }
@@ -232,90 +252,53 @@ void NfceVenda::emite()
 void NfceVenda::dest()
 {
 
-    //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CNPJ("CNPJ"); //PARA PESSOA JURIDICA
-    m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CPF("12340578914"); //PARA PESSOA FISICA
-    //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_idEstrangeiro("ID ESTRANGEIRO")
-    m_nfe->notafiscal->NFe->obj->infNFe->dest->set_xNome("rafael bormann chuede");
-    m_nfe->notafiscal->NFe->obj->infNFe->dest->set_indIEDest(IndIEDest::NaoContribuinte);
-    //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_IE("IE");
-    //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_ISUF("suframa");
-    //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_IM("insc municipal");
-    m_nfe->notafiscal->NFe->obj->infNFe->dest->set_email("email@.com");
-    //Endereço
-    m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xLgr("rua");
-    m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_nro(1234); //numero interio
-    //m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xCpl("complemento");
-    m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xBairro("BAIRRO");
-    m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_cMun(4118600); //CODIGO DO MUNICÍPIO
-    m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xMun("NOME DA CIDADE");
-    m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_UF("PR");
-    m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_CEP(84630000); //NUMERO INTEIRO
-    m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_cPais(1058); //BRASIL
-    m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xPais("1058");
-    m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_fone("1231231"); //STRING
+    // //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CNPJ("CNPJ"); //PARA PESSOA JURIDICA
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CPF(""); //PARA PESSOA FISICA
+    // //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_idEstrangeiro("ID ESTRANGEIRO")
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->set_xNome("Consumidor");
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->set_indIEDest(IndIEDest::NaoContribuinte);
+    // //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_IE("IE");
+    // //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_ISUF("suframa");
+    // //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_IM("insc municipal");
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->set_email("email@.com");
+    // //Endereço
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xLgr("rua");
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_nro(1234); //numero interio
+    // //m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xCpl("complemento");
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xBairro("BAIRRO");
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_cMun(4118600); //CODIGO DO MUNICÍPIO
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xMun("NOME DA CIDADE");
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_UF("PR");
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_CEP(84630000); //NUMERO INTEIRO
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_cPais(1058); //BRASIL
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xPais("1058");
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_fone("1231231"); //STRING
 
 
 }
 
 void NfceVenda::retirada()
 {
-
-        // //m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_CNPJ("03307205000102");
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_CPF("12340578914");
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_xNome("Rafael Chuede");
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_xLgr("teste");
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_nro(477);
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_xCpl("");
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_xBairro("centro");
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_cMun(4118600);
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_xMun("nome mun");
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_UF("PR");
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_CEP(84630000);
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_cPais(1058);
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_xPais("1058");
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_fone("123123124");
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_email("email@gmail.com");
-        // m_nfe->notafiscal->NFe->obj->infNFe->retirada->set_IE("9018979800");
-
-
 }
 
 void NfceVenda::entrega()
 {
-    /*
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_CNPJ();
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_CPF();
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_xNome();
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_xLgr();
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_nro();
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_xCpl();
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_xBairro();
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_cMun();
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_UF();
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_CEP();
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_cPais();
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_xPais();
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_fone();
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_email();
-    m_nfe->notafiscal->NFe->obj->infNFe->entrega->set_IE();
-    */
-
 }
 
 void NfceVenda::autXML()
 {
 
-    m_nfe->notafiscal->NFe->obj->infNFe->autXML->obj->set_CNPJ("03307205000102");
+    m_nfe->notafiscal->NFe->obj->infNFe->autXML->obj->set_CNPJ(empresaValues.value("cnpj_empresa"));
     m_nfe->notafiscal->NFe->obj->infNFe->autXML->obj->get_CPF();
     m_nfe->notafiscal->NFe->obj->infNFe->autXML->add();
 
 }
 
-void NfceVenda::det()
+void NfceVenda::det(int quantProdutos)
 {
-    for (int i = 0; i <= 1; ++i) {
+    for (int i = 0; i <= quantProdutos - 1; ++i) {
         det_produto(i);
-        det_imposto();
+        det_imposto(i);
         det_impostoDevol();
         det_obsItem();
         //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->set_infAdProd();
@@ -327,10 +310,20 @@ void NfceVenda::det()
 
 void NfceVenda::det_produto(const int &i)
 {
+    // Acessa a linha i da lista
+    QList<QVariant> produto = listaProdutos[i];
+    QString id            = produto[0].toString();
+    float quantVendida  = produto[1].toFloat();
+    QString desc          = produto[2].toString();
+    double valorUnitario = produto[3].toDouble();
+    double valorTotalProd = produto[4].toDouble();
+
+
+
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_nItem(i + 1);
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_cProd("123");
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_cProd(id);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_cEAN("SEM GTIN");
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_xProd("MACARRAO");
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_xProd(desc);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_NCM("19021100");
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_NVE();
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_CEST("1704900");
@@ -340,13 +333,13 @@ void NfceVenda::det_produto(const int &i)
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_EXTIPI("");
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_CFOP("5102");
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_uCom("UNID");
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_qCom(1.00);
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vUnCom(1.00);
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vProd(1.00);
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_qCom(quantVendida);
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vUnCom(valorUnitario);
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vProd(valorTotalProd);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_cEANTrib("SEM GTIN");
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_uTrib("UNID");
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_qTrib(1.00);
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vUnTrib(1.00);
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_qTrib(quantVendida);
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vUnTrib(valorUnitario);
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vFrete();
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vSeg();
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vDesc();
@@ -479,10 +472,21 @@ void NfceVenda::det_produto(const int &i)
 
 }
 
-void NfceVenda::det_imposto()
+void NfceVenda::det_imposto(const int &i)
 {
+    QList<QVariant> produto = listaProdutos[i];
+    QString id            = produto[0].toString();
+    //float quantVendida  = produto[1].toFloat();
+    //QString desc          = produto[2].toString();
+    //double valorUnitario = produto[3].toDouble();
+    double valorTotalProd = produto[4].toDouble();
+    double vTotTrib = valorTotalProd * 0.14;
+
     //Grupo M. Tributos incidentes no Produto ou Serviço
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->set_vTotTrib(0.10);
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->set_vTotTrib(vTotTrib);
+
+    // adiciona o imposto referente ao produto para contabilizar depois
+    vTotTribProduto[i] = vTotTrib;
     //Grupo N01. ICMS Normal e ST
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->ICMS->set_orig(ConvNF::strToOrig("0"));
     // m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->ICMS->set_CST(ConvNF::strToCstICMS("00"));
@@ -614,6 +618,17 @@ void NfceVenda::det_obsItem()
 
 void NfceVenda::total()
 {
+    double totalGeral,vSeg,vFrete,vDesc,totalTributo = 0.0;
+
+    for (const QList<QVariant>& produto : listaProdutos) {
+        if (produto.size() >= 5) { // índice 4 é o valor total
+            totalGeral += produto[4].toDouble();
+        }
+    }
+
+    vNf = totalGeral + vSeg + vFrete - vDesc;
+
+
     //Grupo W. Total da NF-e
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vBC(0.00); //2.00
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vICMS(0.00); //0.34
@@ -626,18 +641,24 @@ void NfceVenda::total()
     //m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vST(0.00);
     // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vFCPST(0.00);
     // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vFCPSTRet(0.00);
-    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vProd(2.00);
-    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vFrete(0.00);
-    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vSeg(0.00);
-    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vDesc(0.00);
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vProd(totalGeral);
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vFrete(vFrete);
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vSeg(vSeg);
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vDesc(vDesc);
     // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vII(0.00);
     // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vIPI(0.00);
     // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vIPIDevol(0.00);
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vPIS(0.00);
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vCOFINS(0.00);
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vOutro(0.00);
-    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vNF(2.00);
-    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vTotTrib(0.20);//0.20
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vNF(vNf);
+
+    for(int i = 0; i < listaProdutos.size(); i++){
+
+        totalTributo += vTotTribProduto[i];
+
+    }
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vTotTrib(totalTributo);//0.20
     /*
     //Grupo W01. Total da NF-e / ISSQN
     m_nfe->notafiscal->NFe->obj->infNFe->total->ISSQNtot->set_vServ();
@@ -777,9 +798,9 @@ void NfceVenda::pag()
 
     //Grupo Detalhamento do Pagamento
     //--***CONTAINER*** 1-100
-    m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->set_indPag(ConvNF::strToIndPag("0"));
-    m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->set_tPag(ConvNF::strToTPag("01"));
-    m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->set_vPag(2.00);
+    m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->set_indPag(ConvNF::strToIndPag(indPagNf));
+    m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->set_tPag(ConvNF::strToTPag(tPagNf));
+    m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->set_vPag(vPagNf);
     /*
     //Grupo de Cartões
     m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->card->set_tpIntegra();
@@ -789,7 +810,7 @@ void NfceVenda::pag()
     */
     m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->add();
 
-    m_nfe->notafiscal->NFe->obj->infNFe->pag->set_vTroco(0.00);
+    m_nfe->notafiscal->NFe->obj->infNFe->pag->set_vTroco(trocoNf);
 
 }
 
@@ -887,10 +908,10 @@ void NfceVenda::infRespTec()
 {
 
     // //Grupo ZD. Informações do Responsável Técnico
-    m_nfe->notafiscal->NFe->obj->infNFe->infRespTec->set_CNPJ("03106990000135");
-    m_nfe->notafiscal->NFe->obj->infNFe->infRespTec->set_xContato("rafael");
-    m_nfe->notafiscal->NFe->obj->infNFe->infRespTec->set_email("email@gmail.com");
-    m_nfe->notafiscal->NFe->obj->infNFe->infRespTec->set_fone("42942898");
+    m_nfe->notafiscal->NFe->obj->infNFe->infRespTec->set_CNPJ(fiscalValues.value("cnpj_rt"));
+    m_nfe->notafiscal->NFe->obj->infNFe->infRespTec->set_xContato(fiscalValues.value("nome_rt"));
+    m_nfe->notafiscal->NFe->obj->infNFe->infRespTec->set_email(fiscalValues.value("email_rt"));
+    m_nfe->notafiscal->NFe->obj->infNFe->infRespTec->set_fone(fiscalValues.value("fone_rt"));
     // m_nfe->notafiscal->NFe->obj->infNFe->infRespTec->set_idCSRT("");
     // m_nfe->notafiscal->NFe->obj->infNFe->infRespTec->set_hashCSRT("");
 
@@ -1011,4 +1032,58 @@ const CppNFe *NfceVenda::getCppNFe()
 {
     return this->m_nfe;
 }
+
+void NfceVenda::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos){
+    for (int i = 0; i < produtosVendidos.size(); ++i) {
+        QList<QVariant>& produto = produtosVendidos[i];
+
+        // [0] idProduto
+        // [1] quantVendida
+        // [2] descricao
+        // [3] valorUnitario
+
+        QString quantidadeStr =  QString::number(portugues.toFloat(produto[1].toString()));
+        QString valorUnitarioStr = QString::number(portugues.toFloat(produto[3].toString()));
+
+        double quantidade = quantidadeStr.toDouble();
+        double valorUnitario = valorUnitarioStr.toDouble();
+        double valorTotal = quantidade * valorUnitario;
+
+        produto[1] = quantidade;       // Atualiza quantidade como double
+        produto[3] = valorUnitario;    // Atualiza valorUnitario como double
+        produto.append(QVariant(valorTotal));
+    }
+    quantProds = produtosVendidos.size();
+    vTotTribProduto.resize(produtosVendidos.size());
+    listaProdutos = produtosVendidos;
+}
+void NfceVenda::setPagamentoValores(QString formaPag, float desconto,float recebido, float troco){
+    if(formaPag == "Prazo"){
+        indPagNf = "1";
+        tPagNf = "90";
+    }else if(formaPag == "Dinheiro"){
+        indPagNf = "0";
+        tPagNf = "01";
+    }else if(formaPag == "Crédito"){
+        indPagNf = "0";
+        tPagNf = "03";
+    }else if(formaPag == "Débito"){
+        indPagNf = "0";
+        tPagNf = "04";
+    }else if(formaPag == "Pix"){
+        indPagNf = "0";
+        tPagNf = "17";
+    }else if(formaPag == "Não Sei"){
+        indPagNf = "0";
+        tPagNf = "01";
+    }
+    vPagNf = recebido;
+    descontoNf = desconto;
+    trocoNf = troco;
+    qDebug() << "valores setpagamento " << formaPag << desconto << recebido << troco;
+
+}
+
+
+
 

@@ -1,11 +1,13 @@
 #include "nfcevenda.h"
 #include "../configuracao.h"
+#include <QSqlQuery>
 
 NfceVenda::NfceVenda(QObject *parent)
     : QObject{parent}, m_nfe{new CppNFe}
 {
     fiscalValues = Configuracao::get_All_Fiscal_Values();
     empresaValues = Configuracao::get_All_Empresa_Values();
+    nNf = getProximoNNF();
 
     connect(m_nfe, &CppNFe::wsChange, this, &NfceVenda::onWSChange);
     //connect(m_nfe, SIGNAL(errorOccurred(QString)), this, SIGNAL(errorOccurred(QString)));
@@ -166,8 +168,8 @@ void NfceVenda::ide()
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_cNF(CppUtil::random(8));
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_natOp("VENDA AO CONSUMIDOR");
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_mod(m_nfe->configuracoes->get_ModeloDF());
-    m_nfe->notafiscal->NFe->obj->infNFe->ide->set_serie(1);
-    m_nfe->notafiscal->NFe->obj->infNFe->ide->set_nNF(85); //NUMERO *importante*
+    m_nfe->notafiscal->NFe->obj->infNFe->ide->set_serie(serieNf);
+    m_nfe->notafiscal->NFe->obj->infNFe->ide->set_nNF(nNf); //NUMERO *importante*
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_dhEmi(QDateTime::currentDateTime());
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_dhSaiEnt(QDateTime::currentDateTime());
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_tpNF(ConvNF::strToTpNF("1"));
@@ -480,7 +482,7 @@ void NfceVenda::det_imposto(const int &i)
     //QString desc          = produto[2].toString();
     //double valorUnitario = produto[3].toDouble();
     double valorTotalProd = produto[4].toDouble();
-    double vTotTrib = valorTotalProd * 0.14;
+    float vTotTrib = QString::number(valorTotalProd * 0.14,'f',2).toFloat();
 
     //Grupo M. Tributos incidentes no Produto ou Serviço
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->set_vTotTrib(vTotTrib);
@@ -654,11 +656,11 @@ void NfceVenda::total()
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vNF(vNf);
 
     for(int i = 0; i < listaProdutos.size(); i++){
-
         totalTributo += vTotTribProduto[i];
-
     }
-    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vTotTrib(totalTributo);//0.20
+    qDebug() << "total trib: " << totalTributo;
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vTotTrib(totalTributo);//duas casas decimais
+
     /*
     //Grupo W01. Total da NF-e / ISSQN
     m_nfe->notafiscal->NFe->obj->infNFe->total->ISSQNtot->set_vServ();
@@ -1080,7 +1082,44 @@ void NfceVenda::setPagamentoValores(QString formaPag, float desconto,float receb
     vPagNf = recebido;
     descontoNf = desconto;
     trocoNf = troco;
-    qDebug() << "valores setpagamento " << formaPag << desconto << recebido << troco;
+    // qDebug() << "valores setpagamento " << formaPag << desconto << recebido << troco;
+
+}
+int NfceVenda::getNNF(){
+    return nNf;
+}
+int NfceVenda::getSerie(){
+    return serieNf;
+}
+QString NfceVenda::getXmlPath(){
+    return m_nfe->configuracoes->arquivos->get_caminhoSalvar();
+}
+int NfceVenda::getProximoNNF(){
+    if(!db.open()){
+        qDebug() << "erro ao abrir bd gerarNNFCorreto";
+    }
+    QSqlQuery query;
+    query.prepare(
+        "SELECT nnf FROM notas_fiscais "
+        "WHERE cstat IN (100, 150) AND modelo = :modelo AND serie = :serie "
+        "ORDER BY nnf DESC "
+        "LIMIT 1"
+    );
+
+    query.bindValue(":modelo", "65"); // 65 = NFC-e
+    query.bindValue(":serie", serieNf);   // série 1 por padrão
+
+    if (query.exec()) {
+        if (query.next()) {
+            int ultimoNNF = query.value(0).toInt();
+            return ultimoNNF + 1;
+        } else {
+            return 1; // Nenhuma nota desse tipo, começa do 1
+        }
+    } else {
+        qWarning() << "Erro na consulta NNF:" << query.lastError().text();
+        return -1;
+    }
 
 }
 

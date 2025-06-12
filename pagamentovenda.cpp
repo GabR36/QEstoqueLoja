@@ -40,13 +40,53 @@ void pagamentoVenda::verificarErroNf(const CppNFe *cppnfe){
         if ((cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 100) ||
             (cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 150))
         {
-            waitDialog->setMessage("Sucesso!\n Status:" + QString::number(cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat()));
+            QString cStatMessage = QString::number(cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat());
+            waitDialog->setMessage("Sucesso!\n Status:" + cStatMessage);
             waitDialog->allowClose();
+
+            if(!db.open()){
+                qDebug() << "erro ao abrir banco de dados. botao sucesso nota.";
+            }
+            QSqlQuery query;
+            query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
+                          "xml_path, atualizado_em, id_venda) "
+                          "VALUES (:cstat, :nnf, :serie, :modelo, :xml_path, :atualizado_em, :id_venda)");
+            query.bindValue(":cstat", cStatMessage);
+            query.bindValue(":nnf", QString::number(nota.getNNF()));
+            query.bindValue(":serie", QString::number(nota.getSerie()));
+            query.bindValue(":modelo", "65");
+            query.bindValue(":xml_path", nota.getXmlPath());
+            query.bindValue(":atualizado_em", QDateTime::currentDateTime());
+            query.bindValue(":id_venda", idVenda);
+            qDebug() << "idvenda: " << idVenda;
+            if (query.exec()) {
+                qDebug() << "Salvou nota no banco!";
+            }
+
             QTimer::singleShot(2000, waitDialog, &QDialog::close); //fecha depois de 2 segundos
         }else{
-
-            QString msg = "ERRO:\n" + cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_xMotivo();
+            QString cStatMessage = QString::number(cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat());
+            QString msg = "ERRO:\n" + cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_xMotivo() +
+                          "\n" +"cstat: " + cStatMessage ;
             //waitDialog->allowClose();
+            if(!db.open()){
+                qDebug() << "erro ao abrir banco de dados. erro nota.";
+            }
+            QSqlQuery query;
+            query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
+                          "xml_path, atualizado_em, id_venda) "
+                          "VALUES (:cstat, :nnf, :serie, :modelo, :xml_path, :atualizado_em, :id_venda)");
+            query.bindValue(":cstat", cStatMessage);
+            query.bindValue(":nnf", QString::number(nota.getNNF()));
+            query.bindValue(":serie", QString::number(nota.getSerie()));
+            query.bindValue(":modelo", "65");
+            query.bindValue(":xml_path", nota.getXmlPath());
+            query.bindValue(":atualizado_em", QDateTime::currentDateTime());
+            query.bindValue(":id_venda", idVenda);
+            qDebug() << "idvenda: " << idVenda;
+            if (query.exec()) {
+                qDebug() << "Salvou nota no banco!";
+            }
             qDebug() << "Erro nf:" << msg;
             waitDialog->setMessage(msg);
             waitDialog->allowClose();
@@ -143,6 +183,7 @@ void pagamentoVenda::terminarPagamento(){
                   "VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, "
                   ":valor8, :valor9, :valor10, :valor11)");
     query.bindValue(":valor1", clienteGlobal);
+
     // precisa converter para notacao usa para inserir no banco de dados
     query.bindValue(":valor2", QString::number(portugues.toFloat(totalGlobal)));
     // inserir a data do dateedit
@@ -164,7 +205,7 @@ void pagamentoVenda::terminarPagamento(){
 
     }
 
-    QString idVenda;
+
     if (query.exec()) {
         idVenda = query.lastInsertId().toString();
         qDebug() << "Inserção bem-sucedida!";
@@ -210,7 +251,6 @@ void pagamentoVenda::terminarPagamento(){
     waitDialog->show();
 
     nota.setProdutosVendidos(rowDataList);
-    qDebug() << "troco todobule" << portugues.toFloat(troco);
     nota.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco));
     emit gerarEnviarNf();
     emit pagamentoConcluido(); // sinal para outras janelas atualizarem...

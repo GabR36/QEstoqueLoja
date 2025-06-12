@@ -464,6 +464,23 @@ MainWindow::MainWindow(QWidget *parent)
                 qDebug() << "nao inserir config hash_csrt";
             }
 
+            if (!query.exec(
+                    "CREATE TABLE IF NOT EXISTS notas_fiscais ("
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    "cstat TEXT, "
+                    "nnf INTEGER NOT NULL, "
+                    "serie TEXT NOT NULL, "
+                    "modelo TEXT NOT NULL DEFAULT '65', "
+                    "xml_path TEXT, "
+                    "atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP, "
+                    "id_venda INTEGER, "
+                    "FOREIGN KEY (id_venda) REFERENCES vendas2(id)"
+                    ")"
+                    )) {
+                qDebug() << "Erro ao criar tabela notas_fiscais:" << query.lastError().text();
+            }
+
+
 
 
 

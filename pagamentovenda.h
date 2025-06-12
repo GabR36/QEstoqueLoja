@@ -23,6 +23,7 @@ private:
     NfceVenda nota;
     WaitDialog* waitDialog = nullptr;
     QString erroNf;
+    QString idVenda;
 signals:
     void gerarEnviarNf();
 

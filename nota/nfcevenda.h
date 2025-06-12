@@ -8,6 +8,7 @@
 #include <CppBrasil/NFe/CppNFe>
 #include <CppBrasil/NFe/ConvNF>
 #include <QLocale>
+#include <QSqlDatabase>
 
 class NfceVenda : public QObject
 {
@@ -19,6 +20,10 @@ public:
 
     void setProdutosVendidos(QList<QList<QVariant>> produtosVendidos);
     void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco);
+    int getNNF();
+    int getSerie();
+    QString getXmlPath();
+    int getProximoNNF();
 private:
     CppNFe *m_nfe;
     QMap<QString, QString> fiscalValues;
@@ -26,12 +31,16 @@ private:
     QString caminhoXml = QCoreApplication::applicationDirPath() + "/xmlNf";
     QList<QList<QVariant>>listaProdutos;
     int quantProds = 0;
-    QVector<double> vTotTribProduto;
+    QVector<float> vTotTribProduto;
     double descontoNf,trocoNf,vPagNf = 0;
     QString tPagNf = "01";
     QString indPagNf = "0";
     double vNf = 0.0;
     QLocale portugues;
+    int nNf = 103;
+    int serieNf = 1;
+    QSqlDatabase db = QSqlDatabase::database();
+
 
     void configurar();
     void nfe();

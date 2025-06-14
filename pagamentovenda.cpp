@@ -251,7 +251,7 @@ void pagamentoVenda::terminarPagamento(){
     waitDialog->show();
 
     nota.setProdutosVendidos(rowDataList);
-    nota.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco));
+    nota.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
     emit gerarEnviarNf();
     emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
 

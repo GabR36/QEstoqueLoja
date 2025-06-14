@@ -19,7 +19,7 @@ public:
     const CppNFe *getCppNFe();
 
     void setProdutosVendidos(QList<QList<QVariant>> produtosVendidos);
-    void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco);
+    void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco, float taxa);
     int getNNF();
     int getSerie();
     QString getXmlPath();
@@ -32,6 +32,7 @@ private:
     QList<QList<QVariant>>listaProdutos;
     int quantProds = 0;
     QVector<float> vTotTribProduto;
+    QVector<float> descontoProd;
     double descontoNf,trocoNf,vPagNf = 0;
     QString tPagNf = "01";
     QString indPagNf = "0";
@@ -39,6 +40,7 @@ private:
     QLocale portugues;
     int nNf = 103;
     int serieNf = 1;
+    float taxaPercentual = 0.0;
     QSqlDatabase db = QSqlDatabase::database();
 
 
@@ -73,6 +75,11 @@ private:
     void cana(); //Grupo ZC. Informações do Registro de Aquisição de Cana
     void infRespTec();//Grupo ZD. Informações do Responsável Técnico
 
+    void aplicarAcrescimoProporcional(float taxaPercentual);
+    void aplicarDescontoTotal(float descontoTotal);
+    void aplicarDescontoProduto(float descontoTotal);
+    float corrigirDescontoParaAplicacaoPosTaxa(float descontoDesejado, float taxaPercentual);
+    float corrigirTaxa(float taxaAntiga, float desconto);
 public slots:
     void onReqStatusServico();
     void onReqGerarEnviar();

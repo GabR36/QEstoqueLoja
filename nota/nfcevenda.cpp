@@ -298,6 +298,11 @@ void NfceVenda::autXML()
 
 void NfceVenda::det(int quantProdutos)
 {
+    //aplica no valor de cada produto da lista se houver taxa
+    aplicarDescontoTotal(descontoNf);
+    aplicarAcrescimoProporcional(taxaPercentual);
+
+
     for (int i = 0; i <= quantProdutos - 1; ++i) {
         det_produto(i);
         det_imposto(i);
@@ -319,7 +324,7 @@ void NfceVenda::det_produto(const int &i)
     QString desc          = produto[2].toString();
     double valorUnitario = produto[3].toDouble();
     double valorTotalProd = produto[4].toDouble();
-
+    float descontoProduto = descontoProd[i];
 
 
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_nItem(i + 1);
@@ -344,7 +349,7 @@ void NfceVenda::det_produto(const int &i)
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vUnTrib(valorUnitario);
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vFrete();
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vSeg();
-    //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vDesc();
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vDesc(descontoProduto);
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vOutro();
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_indTot(ConvNF::strToIndTot("1"));
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vFrete();
@@ -620,7 +625,7 @@ void NfceVenda::det_obsItem()
 
 void NfceVenda::total()
 {
-    double totalGeral,vSeg,vFrete,vDesc,totalTributo = 0.0;
+    double totalGeral,vSeg,vFrete,totalTributo = 0.0;
 
     for (const QList<QVariant>& produto : listaProdutos) {
         if (produto.size() >= 5) { // índice 4 é o valor total
@@ -628,7 +633,7 @@ void NfceVenda::total()
         }
     }
 
-    vNf = totalGeral + vSeg + vFrete - vDesc;
+    vNf = totalGeral + vSeg + vFrete - descontoNf;
 
 
     //Grupo W. Total da NF-e
@@ -646,7 +651,7 @@ void NfceVenda::total()
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vProd(totalGeral);
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vFrete(vFrete);
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vSeg(vSeg);
-    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vDesc(vDesc);
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vDesc(descontoNf);
     // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vII(0.00);
     // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vIPI(0.00);
     // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vIPIDevol(0.00);
@@ -1059,10 +1064,10 @@ void NfceVenda::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos){
     vTotTribProduto.resize(produtosVendidos.size());
     listaProdutos = produtosVendidos;
 }
-void NfceVenda::setPagamentoValores(QString formaPag, float desconto,float recebido, float troco){
+void NfceVenda::setPagamentoValores(QString formaPag, float desconto,float recebido, float troco, float taxa){
     if(formaPag == "Prazo"){
         indPagNf = "1";
-        tPagNf = "90";
+        tPagNf = "15";
     }else if(formaPag == "Dinheiro"){
         indPagNf = "0";
         tPagNf = "01";
@@ -1079,10 +1084,12 @@ void NfceVenda::setPagamentoValores(QString formaPag, float desconto,float receb
         indPagNf = "0";
         tPagNf = "01";
     }
+    taxaPercentual = corrigirTaxa(taxa, desconto);
     vPagNf = recebido;
-    descontoNf = desconto;
     trocoNf = troco;
-    // qDebug() << "valores setpagamento " << formaPag << desconto << recebido << troco;
+    descontoNf = desconto; //corrigirDescontoParaAplicacaoPosTaxa(desconto, taxa);
+
+     qDebug() << "valores setpagamento " << formaPag << desconto << recebido << troco << taxa;
 
 }
 int NfceVenda::getNNF(){
@@ -1092,7 +1099,9 @@ int NfceVenda::getSerie(){
     return serieNf;
 }
 QString NfceVenda::getXmlPath(){
-    return m_nfe->configuracoes->arquivos->get_caminhoSalvar();
+    QString xml = m_nfe->configuracoes->arquivos->get_caminhoNF() +
+                  m_nfe->notafiscal->NFe->items->value(0)->get_chNFe() + "-nfe.xml";
+    return xml;
 }
 int NfceVenda::getProximoNNF(){
     if(!db.open()){
@@ -1122,6 +1131,94 @@ int NfceVenda::getProximoNNF(){
     }
 
 }
+void NfceVenda::aplicarAcrescimoProporcional(float taxaPercentual)
+{
+    double totalOriginal = 0.0;
+    for (const QList<QVariant>& produto : listaProdutos) {
+        double valorTotalProd = produto[4].toDouble();
+        totalOriginal += valorTotalProd;
+    }
+
+    double totalComAcrescimo = qRound64(totalOriginal * (1.0 + taxaPercentual / 100.0) * 100.0) / 100.0;
+    double somaDistribuida = 0.0;
+
+    for (int i = 0; i < listaProdutos.size(); ++i) {
+        QList<QVariant>& produto = listaProdutos[i];
+
+        float quant = produto[1].toFloat();
+        double valorTotalProdOriginal = produto[4].toDouble();
+
+        // Distribui proporcionalmente com base no total original
+        double proporcao = valorTotalProdOriginal / totalOriginal;
+        double valorTotalComAcrescimo = qRound64((totalComAcrescimo * proporcao) * 100.0) / 100.0;
+        double valorUnitarioComAcrescimo = qRound64((valorTotalComAcrescimo / quant) * 100.0) / 100.0;
+
+        produto[4] = valorTotalComAcrescimo;
+        produto[3] = valorUnitarioComAcrescimo;
+
+        somaDistribuida += valorTotalComAcrescimo;
+    }
+
+    // Compensar diferença de centavos no último item
+    double diferenca = totalComAcrescimo - somaDistribuida;
+    if (!listaProdutos.isEmpty()) {
+        QList<QVariant>& ultimo = listaProdutos.last();
+        float quant = ultimo[1].toFloat();
+
+        double novoTotal = ultimo[4].toDouble() + diferenca;
+        double novoUnit = qRound64((novoTotal / quant) * 100.0) / 100.0;
+
+        ultimo[4] = novoTotal;
+        ultimo[3] = novoUnit;
+    }
+}
+void NfceVenda::aplicarDescontoTotal(float descontoTotal) {
+    descontoProd.clear();  // Limpa o vetor, caso já tenha valores anteriores
+
+    double totalGeral = 0.0;
+
+    // 1. Soma total da venda (valor dos produtos)
+    for (const QList<QVariant>& produto : listaProdutos) {
+        totalGeral += produto[4].toDouble(); // produto[4] é valorTotal
+    }
+
+    double descontoAcumulado = 0.0;
+
+    for (int i = 0; i < listaProdutos.size(); ++i) {
+        double descontoItem = 0.0;
+        double valorTotalProduto = listaProdutos[i][4].toDouble();
+
+        if (i < listaProdutos.size() - 1) {
+            // 2. Calcula desconto proporcional e arredonda com 2 casas
+            double proporcao = valorTotalProduto / totalGeral;
+            descontoItem = qRound64(descontoNf * proporcao * 100.0) / 100.0;
+            descontoAcumulado += descontoItem;
+        } else {
+            // 3. Último produto compensa a diferença para fechar o total
+            descontoItem = qRound64((descontoNf - descontoAcumulado) * 100.0) / 100.0;
+        }
+
+        // 4. Adiciona no vetor
+        descontoProd.append(descontoItem);
+    }
+}
+float NfceVenda::corrigirDescontoParaAplicacaoPosTaxa(float descontoDesejado, float taxaPercentual) {
+    float fatorTaxa = 1.0 + (taxaPercentual / 100.0);
+    return descontoDesejado * fatorTaxa;
+}
+float NfceVenda::corrigirTaxa(float taxaAntiga, float desconto){
+    float taxaConvertida = (taxaAntiga / 100) + 1;
+    float taxaNova = 0.0;
+    float valorTotalProdutos = 0.0;
+    for (int i = 0; i < listaProdutos.size(); ++i) {
+        valorTotalProdutos += listaProdutos[i][4].toDouble();
+    }
+    taxaNova = (valorTotalProdutos - desconto) * taxaConvertida + desconto;
+    return ((taxaNova/valorTotalProdutos) - 1) * 100;
+}
+
+
+
 
 
 

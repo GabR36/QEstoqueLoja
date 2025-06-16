@@ -256,6 +256,20 @@ font-size: 15px;
       </layout>
      </item>
      <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_10">
+       <item>
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>CPF/CPNJ:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="Ledit_CpfCnpjCliente"/>
+       </item>
+      </layout>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="horizontalLayout_6">
        <item>
         <widget class="QLabel" name="label_7">

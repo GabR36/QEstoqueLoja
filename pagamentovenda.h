@@ -24,6 +24,7 @@ private:
     WaitDialog* waitDialog = nullptr;
     QString erroNf;
     QString idVenda;
+    bool ehPfCliente = false;
 signals:
     void gerarEnviarNf();
 

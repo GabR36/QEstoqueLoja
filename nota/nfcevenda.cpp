@@ -1,4 +1,4 @@
-#include "nfcevenda.h"
+ #include "nfcevenda.h"
 #include "../configuracao.h"
 #include <QSqlQuery>
 
@@ -253,8 +253,17 @@ void NfceVenda::emite()
 
 void NfceVenda::dest()
 {
+    if(ehPfCliente == false && cpfCliente != ""){
+        m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CNPJ(cpfCliente); //PARA PESSOA JURIDICA
+    }
 
-    // //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CNPJ("CNPJ"); //PARA PESSOA JURIDICA
+    if(ehPfCliente == true && cpfCliente != ""){
+        m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CPF(cpfCliente); //PARA PESSOA FISICA
+
+    }
+    if(fiscalValues.value("tp_amb") == "0"){
+      m_nfe->notafiscal->NFe->obj->infNFe->dest->set_xNome("NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL");
+    }
     // m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CPF(""); //PARA PESSOA FISICA
     // //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_idEstrangeiro("ID ESTRANGEIRO")
     // m_nfe->notafiscal->NFe->obj->infNFe->dest->set_xNome("Consumidor");
@@ -482,7 +491,7 @@ void NfceVenda::det_produto(const int &i)
 void NfceVenda::det_imposto(const int &i)
 {
     QList<QVariant> produto = listaProdutos[i];
-    QString id            = produto[0].toString();
+    //QString id            = produto[0].toString();
     //float quantVendida  = produto[1].toFloat();
     //QString desc          = produto[2].toString();
     //double valorUnitario = produto[3].toDouble();
@@ -1215,6 +1224,11 @@ float NfceVenda::corrigirTaxa(float taxaAntiga, float desconto){
     }
     taxaNova = (valorTotalProdutos - desconto) * taxaConvertida + desconto;
     return ((taxaNova/valorTotalProdutos) - 1) * 100;
+}
+void NfceVenda::setCliente(QString cpf, bool ehPf){
+    this->cpfCliente = cpf;
+    this->ehPfCliente = ehPf;
+
 }
 
 

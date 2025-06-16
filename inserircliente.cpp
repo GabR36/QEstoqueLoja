@@ -43,8 +43,13 @@ void InserirCliente::on_Btn_Inserir_clicked()
     }
 
     // Validação do CPF (Apenas se o campo não estiver vazio)
-    if (!cpf.isEmpty() && (cpf.length() != 11 || !cpf.toLongLong())) {
+    if (!cpf.isEmpty() && (cpf.length() != 11 || !cpf.toLongLong()) && ui->RadioB_Pfisica->isChecked()) {
         QMessageBox::warning(this, "Erro", "CPF inválido! Insira um CPF com 11 números.");
+        return;
+    }
+    // Validação do CPF (Apenas se o campo não estiver vazio)
+    if (!cpf.isEmpty() && (cpf.length() != 14 || !cpf.toLongLong()) && ui->RadioB_Pjuridica->isChecked()) {
+        QMessageBox::warning(this, "Erro", "cnpj inválido! Insira um cnpj com 14 números.");
         return;
     }
 

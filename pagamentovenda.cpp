@@ -6,11 +6,30 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
 {
     rowDataList = listaProdutos;
     this->idCliente = idCliente;
-    //qDebug() << QDir::currentPath();
     connect(this, &pagamentoVenda::gerarEnviarNf, &nota, &NfceVenda::onReqGerarEnviar);
     connect(&nota, &NfceVenda::retWSChange, this, &pagamentoVenda::onRetWSChange);
     connect(&nota, &NfceVenda::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
     connect(&nota, &NfceVenda::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
+
+
+        if(!db.open()){
+            qDebug() << "erro bd cliente";
+        }else{
+            QSqlQuery query;
+            query.prepare("SELECT cpf, eh_pf FROM clientes WHERE id = :idcliente");
+            query.bindValue(":idcliente", idCliente);
+            if (query.exec()) {
+                qDebug() << "erro ao buscar cpf cliente";
+            }
+            while(query.next()) {
+                QString cpf = query.value(0).toString();
+                bool ehPf = query.value(1).toBool();
+                ui->Ledit_CpfCnpjCliente->setText(cpf);
+                ehPfCliente = ehPf;
+            }
+        }
+
+
 
 
 
@@ -143,6 +162,18 @@ void pagamentoVenda::terminarPagamento(){
         QMessageBox::warning(this, "Erro", "Por favor, insira um desconto válido.");
         return;
     }
+    QString cpf = ui->Ledit_CpfCnpjCliente->text().trimmed();
+    if(cpf != ""){
+        if (ehPfCliente == true && cpf.length() != 11){
+            QMessageBox::warning(this, "Erro", "Por favor, insira um cpf com 11 digitos.");
+            return;
+        }
+        if (ehPfCliente == false && cpf.length() != 14){
+            QMessageBox::warning(this, "Erro", "Por favor, insira um cnpj com 14 digitos.");
+            return;
+        }
+    }
+
 
     // recebido
     qDebug() << "validar valor recebido";
@@ -176,6 +207,7 @@ void pagamentoVenda::terminarPagamento(){
         QMessageBox::warning(this, "Erro", "Por favor, insira uma taxa válida.");
         return;
     }
+
 
 
     query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, "
@@ -249,7 +281,7 @@ void pagamentoVenda::terminarPagamento(){
 
     waitDialog->setMessage("Aguardando resposta do servidor...");
     waitDialog->show();
-
+    nota.setCliente(cpf,ehPfCliente);
     nota.setProdutosVendidos(rowDataList);
     nota.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
     emit gerarEnviarNf();

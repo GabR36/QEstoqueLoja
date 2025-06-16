@@ -20,6 +20,7 @@ public:
 
     void setProdutosVendidos(QList<QList<QVariant>> produtosVendidos);
     void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco, float taxa);
+    void setCliente(QString cpf, bool ehPf);
     int getNNF();
     int getSerie();
     QString getXmlPath();
@@ -41,7 +42,10 @@ private:
     int nNf = 103;
     int serieNf = 1;
     float taxaPercentual = 0.0;
+    QString nomeCliente, cpfCliente;
+    bool ehPfCliente = false;
     QSqlDatabase db = QSqlDatabase::database();
+
 
 
     void configurar();

@@ -27,6 +27,8 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QSql>
+#include  "inserirproduto.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -98,6 +100,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
     query.finish();
     qDebug() << dbSchemaVersion;
+    financeiroValues = Configuracao::get_All_Financeiro_Values();
 
     // a versão mais recente do esquema do banco de dados
     int dbSchemaLastVersion = 5;
@@ -480,16 +483,59 @@ MainWindow::MainWindow(QWidget *parent)
                 qDebug() << "Erro ao criar tabela notas_fiscais:" << query.lastError().text();
             }
 
+            // Adicionar colunas à tabela produtos
+            QStringList alterStatements = {
+                "ALTER TABLE produtos ADD COLUMN un_comercial TEXT",
+                "ALTER TABLE produtos ADD COLUMN preco_fornecedor DECIMAL(10,2) NULL",
+                "ALTER TABLE produtos ADD COLUMN porcent_lucro REAL",
+                "ALTER TABLE produtos ADD COLUMN ncm TEXT NULL",
+                "ALTER TABLE produtos ADD COLUMN cest TEXT NULL",
+                "ALTER TABLE produtos ADD COLUMN aliquota_imposto REAL NULL"
+            };
+            bool hasErrors = false;
 
+            foreach (const QString &sql, alterStatements) {
+                if (!query.exec(sql)) {
+                    qDebug() << "Erro ao executar:" << sql << ":" << query.lastError().text();
+                    hasErrors = true;
+                }
+            }
+            // Só atualiza as colunas se todas foram criadas com sucesso
 
+            if (!hasErrors) {
 
+                query.prepare("UPDATE produtos SET porcent_lucro = :porcent");
+                query.bindValue(":porcent", financeiroValues.value("porcent_lucro"));
+                if (!query.exec()) {
+                    qDebug() << "Erro ao atualizar porcent_lucro:" << query.lastError().text();
+                    hasErrors = true;
+                }
 
-            query.exec("PRAGMA user_version = 5");
+                if (!query.exec("UPDATE produtos SET un_comercial = 'UN'")) {
+                    qDebug() << "Erro ao atualizar un_comercial:" << query.lastError().text();
+                    hasErrors = true;
+                }
+            }
 
-            // terminar transacao
-            if (!db.commit()) {
-                qDebug() << "Error: unable to commit transaction";
-                db.rollback(); // Desfaz a transação
+            // Atualizar versão do schema se tudo correu bem
+            if (!hasErrors) {
+                if (!query.exec("PRAGMA user_version = 5")) {
+                    qDebug() << "Erro ao atualizar user_version:" << query.lastError().text();
+                    hasErrors = true;
+                }
+            }
+
+            // Finalizar transação
+            if (!hasErrors) {
+                if (!db.commit()) {
+                    qDebug() << "Error: unable to commit transaction";
+                    db.rollback();
+                } else {
+                    dbSchemaVersion = 5;
+                }
+            } else {
+                db.rollback();
+                qDebug() << "Transação revertida devido a erros";
             }
 
             db.close();
@@ -513,7 +559,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = model->index(0, 0);
     ui->Tview_Produtos->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
-     ui->Ledit_Desc->setMaxLength(120);
+    ui->Ledit_Desc->setMaxLength(120);
 
     // ajustar tamanho colunas
     // coluna descricao
@@ -555,7 +601,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Tview_Produtos->setItemDelegateForColumn(1,delegateVermelho);
 
     setarIconesJanela();
-
 
 
 }
@@ -1078,6 +1123,12 @@ void MainWindow::on_Btn_AddProd_clicked()
         ui->Tview_Produtos->setColumnWidth(2, 350);
 
     }
+    InserirProduto *addProdJanela = new InserirProduto;
+    addProdJanela->show();
+    connect(addProdJanela, &InserirProduto::codigoBarrasExistenteSignal,
+            this, &MainWindow::atualizarTableviewComQuery);
+    connect(addProdJanela, &InserirProduto::produtoInserido, this,
+            &MainWindow::atualizarTableview);
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
@@ -1185,5 +1236,9 @@ void MainWindow::on_Btn_Clientes_clicked()
     Clientes *clientes = new Clientes;
     clientes->setWindowModality(Qt::ApplicationModal);
     clientes->show();
+}
+
+void MainWindow::atualizarTableviewComQuery(QString &query){
+    model->setQuery(query);
 }
 

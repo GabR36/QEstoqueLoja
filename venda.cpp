@@ -129,7 +129,6 @@ venda::venda(QWidget *parent) :
         // Define o primeiro item da lista como texto do QLineEdit
         ui->Ledit_Cliente->setText(clientesComId.first());
 
-        // Opcional: selecionar apenas o nome (se quiser destacar parte do texto)
         // Isso depende do formato que você está usando ("Nome (ID: 123)")
         QString primeiroCliente = clientesComId.first();
         int posInicioNome = 0;

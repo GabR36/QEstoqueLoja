@@ -11,6 +11,7 @@ public:
     explicit CustomLineEdit(QWidget *parent = nullptr);
 protected:
     void mousePressEvent(QMouseEvent *event) override;
+
 };
 
 #endif // CUSTOMLINEEDIT_H

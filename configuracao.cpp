@@ -13,6 +13,7 @@ Configuracao::Configuracao(QWidget *parent)
     , ui(new Ui::Config)
 {
     ui->setupUi(this);
+    ui->tabWidget->setCurrentIndex(0); // começa na tab Empresa
 
     // colocar os valores do banco de dados nos line edits
     if(!db.open()){
@@ -439,6 +440,52 @@ QMap<QString, QString> Configuracao::get_All_Empresa_Values() {
         "numero_empresa",
         "bairro_empresa",
         "cep_empresa"
+    };
+
+    // Montar a query com placeholders
+    QStringList placeholders;
+    for (int i = 0; i < keys.size(); ++i) {
+        placeholders << "?";
+    }
+
+    QString queryStr = QString("SELECT key, value FROM config WHERE key IN (%1)")
+                           .arg(placeholders.join(", "));
+
+    QSqlQuery query;
+    query.prepare(queryStr);
+
+    // Vincular os valores
+    for (const QString &key : keys) {
+        query.addBindValue(key);
+    }
+
+    if (!query.exec()) {
+        qWarning() << "Erro ao executar a query de configuração:" << query.lastError().text();
+        return result;
+    }
+
+    while (query.next()) {
+        QString key = query.value("key").toString();
+        QString value = query.value("value").toString();
+        result.insert(key, value);
+    }
+
+    return result;
+}
+
+QMap<QString, QString> Configuracao::get_All_Financeiro_Values(){
+
+    QSqlDatabase db2 = QSqlDatabase::database();
+    if(!db2.open()){
+        qDebug() << "erro bd get all financeiro values config";
+    }
+    QMap<QString, QString> result;
+
+    // Lista fixa de chaves que queremos buscar
+    QStringList keys = {
+        "porcent_lucro",
+        "taxa_debito",
+        "taxa_credito"
     };
 
     // Montar a query com placeholders

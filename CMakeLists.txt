@@ -98,6 +98,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         subclass/produtotableview.h subclass/produtotableview.cpp
         subclass/waitdialog.h subclass/waitdialog.cpp
         nota/nfcevenda.h nota/nfcevenda.cpp
+        inserirproduto.h inserirproduto.cpp inserirproduto.ui
+        util/NfUtilidades.h
+        util/ibptutil.h util/ibptutil.cpp
 
 
 
@@ -180,6 +183,19 @@ add_custom_command(TARGET QEstoqueLoja POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory "${DIRETORIO_DESTINO}"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ARQUIVO_ORIGEM}" "${DIRETORIO_DESTINO}"
     COMMENT "Copiando orcamentoReport.xml para a pasta do executável"
+)
+
+# Caminho do arquivo de origem
+set(ARQUIVOS_RECURSOS "${CMAKE_SOURCE_DIR}/recursos/*")
+
+# Caminho do diretório de destino (ao lado do executável no diretório de build)
+set(DIRETORIO_DESTINO_RECURSOS "${CMAKE_CURRENT_BINARY_DIR}/recursos")
+
+# Copiar o arquivo após a compilação
+add_custom_command(TARGET QEstoqueLoja POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${DIRETORIO_DESTINO_RECURSOS}"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ARQUIVOS_RECURSOS}" "${DIRETORIO_DESTINO_RECURSOS}"
+    COMMENT "Copiando para a pasta do executável"
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)

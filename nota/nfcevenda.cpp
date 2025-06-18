@@ -342,8 +342,8 @@ void NfceVenda::det_produto(const int &i)
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_xProd(desc);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_NCM("19021100");
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_NVE();
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_CEST("1704900");
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_indEscala(ConvNF::strToIndEscala("S"));
+    //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_CEST("1704900");
+    //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_indEscala(ConvNF::strToIndEscala("S"));
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_CNPJFab("");
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_cBenef("");
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_EXTIPI("");
@@ -496,7 +496,8 @@ void NfceVenda::det_imposto(const int &i)
     //QString desc          = produto[2].toString();
     //double valorUnitario = produto[3].toDouble();
     double valorTotalProd = produto[4].toDouble();
-    float vTotTrib = QString::number(valorTotalProd * 0.14,'f',2).toFloat();
+    double porcentagemImposto = 0.14;
+    float vTotTrib = QString::number(valorTotalProd * porcentagemImposto,'f',2).toFloat();
 
     //Grupo M. Tributos incidentes no Produto ou Serviço
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->set_vTotTrib(vTotTrib);

@@ -45,8 +45,7 @@ public:
 public slots:
    void on_actionTodos_Produtos_triggered();
 
-
-
+   void atualizarTableviewComQuery(QString &query);
 
 private slots:
     void on_Btn_Enviar_clicked();
@@ -93,6 +92,8 @@ private:
     QAction* actionMenuDeletarProd;
     QAction* actionMenuPrintBarCode1;
     QAction* actionMenuPrintBarCode3;
+    QMap<QString, QString> financeiroValues;
+
 
     void setarIconesJanela();
     //QModelIndex selected_index;

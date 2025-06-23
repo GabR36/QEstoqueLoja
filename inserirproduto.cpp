@@ -250,7 +250,7 @@ void InserirProduto::on_Ledit_PrecoFornecedor_textChanged(const QString &arg1)
     if (atualizando) return;
 
     double precoFornecedor = portugues.toDouble(arg1);
-    double percentualLucro = ui->Ledit_PercentualLucro->text().toDouble();
+    float percentualLucro = portugues.toFloat(ui->Ledit_PercentualLucro->text());
 
     atualizando = true;
     double precoFinal = precoFornecedor * (1.0 + percentualLucro / 100.0);

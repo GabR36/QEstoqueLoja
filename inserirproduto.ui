@@ -13,6 +13,44 @@
   <property name="windowTitle">
    <string>Inserir Produto</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">
+
+#InserirProduto{
+background-color: rgb(199, 199, 199);
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(199, 199, 199, 255), stop:1 rgba(170, 170, 170, 255));
+
+}
+QPushButton{
+background-color: rgb(43, 132, 191);
+color: rgb(255, 255, 255);
+font-size: 15px;
+border-radius: 13px;
+
+}
+
+QPushButton:hover{
+	background-color: rgb(13, 92, 161);
+}
+QPushButton:pressed{
+	
+color: rgb(255, 255, 255);
+	background-color: rgb(153, 193, 241);
+font-size: 15px;
+border-radius: 13px;
+}
+QTabWidget{
+background-color:rgb(222, 221, 218)
+}
+QGroupBox{
+background-color:rgb(170, 170, 170);
+	font: 700 9pt &quot;Segoe UI&quot;;
+	font-size: 15px;
+}
+
+
+</string>
+  </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="0">
     <spacer name="horizontalSpacer">
@@ -29,6 +67,12 @@
    </item>
    <item row="1" column="1">
     <widget class="QPushButton" name="Btn_Enviar">
+     <property name="minimumSize">
+      <size>
+       <width>50</width>
+       <height>25</height>
+      </size>
+     </property>
      <property name="text">
       <string>OK</string>
      </property>
@@ -36,6 +80,9 @@
    </item>
    <item row="0" column="0" colspan="2">
     <widget class="QTabWidget" name="tabWidget">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -254,6 +301,9 @@ Comercial:</string>
        </property>
        <property name="text">
         <string>NF</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
       <widget class="QWidget" name="layoutWidget">

@@ -550,16 +550,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
-    ui->groupBox->setVisible(false);
-     ui->Ledit_Pesquisa->installEventFilter(this);
+    ui->Ledit_Pesquisa->installEventFilter(this);
     atualizarTableview();
     db.close();
     //
-    ui->Ledit_Barras->setFocus();
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = model->index(0, 0);
     ui->Tview_Produtos->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
-    ui->Ledit_Desc->setMaxLength(120);
 
     // ajustar tamanho colunas
     // coluna descricao
@@ -567,13 +564,6 @@ MainWindow::MainWindow(QWidget *parent)
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
     ui->Tview_Produtos->setColumnWidth(4,110);
-
-
-    // validadores para os campos
-    QDoubleValidator *DoubleValidador = new QDoubleValidator(0.0, 9999.99, 2);
-    ui->Ledit_Preco->setValidator(DoubleValidador);
-    ui->Ledit_Quantidade->setValidator(DoubleValidador);
-
 
     // ações para menu de contexto tabela produtos
     actionMenuAlterarProd = new QAction(this);
@@ -636,79 +626,6 @@ void MainWindow::atualizarTableview(){
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC");
     db.close();
 }
-
-void MainWindow::on_Btn_Enviar_clicked()
-{
-    QString quantidadeProduto, descProduto, precoProduto, barrasProduto;
-    bool nfProduto;
-    quantidadeProduto = ui->Ledit_Quantidade->text();
-    descProduto = normalizeText(ui->Ledit_Desc->text());
-    precoProduto = ui->Ledit_Preco->text();
-    barrasProduto = ui->Ledit_Barras->text();
-    nfProduto = ui->Check_Nf->isChecked();
-
-    // Converta o texto para um número
-    bool conversionOk;
-    bool conversionOkQuant;
-    double price = portugues.toDouble(precoProduto, &conversionOk);
-    qDebug() << price;
-    // quantidade precisa ser transformada com ponto para ser armazenada no db
-    quantidadeProduto = QString::number(portugues.toFloat(quantidadeProduto, &conversionOkQuant));
-
-    // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
-    if (conversionOk && price >= 0)
-    {
-        if (conversionOkQuant){
-            // guardar no banco de dados o valor notado em local da linguagem
-            precoProduto = QString::number(price, 'f', 2);
-            qDebug() << precoProduto;
-            // verificar se o codigo de barras ja existe
-            if (!verificarCodigoBarras()){
-                // adicionar ao banco de dados
-                if(!db.open()){
-                    qDebug() << "erro ao abrir banco de dados. botao enviar.";
-                }
-                QSqlQuery query;
-
-                query.prepare("INSERT INTO produtos (quantidade, descricao, preco, codigo_barras, nf) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5)");
-                query.bindValue(":valor1", quantidadeProduto);
-                query.bindValue(":valor2", descProduto);
-                query.bindValue(":valor3", precoProduto);
-                query.bindValue(":valor4", barrasProduto);
-                query.bindValue(":valor5", nfProduto);
-                if (query.exec()) {
-                    qDebug() << "Inserção bem-sucedida!";
-                } else {
-                    qDebug() << "Erro na inserção: ";
-                }
-                atualizarTableview();
-                db.close();
-
-                // limpar campos para nova inserçao
-                ui->Ledit_Desc->clear();
-                ui->Ledit_Quantidade->clear();
-                ui->Ledit_Preco->clear();
-                ui->Ledit_Barras->clear();
-                ui->Check_Nf->setChecked(false);
-                ui->Ledit_Barras->setFocus();
-            }
-        }
-        else {
-            // a quantidade é invalida
-            QMessageBox::warning(this, "Erro", "Por favor, insira uma quantiade válida.");
-            ui->Ledit_Quantidade->setFocus();
-        }
-    }
-    else
-    {
-        // Exiba uma mensagem de erro se o preço não for válido
-        QMessageBox::warning(this, "Erro", "Por favor, insira um preço válido.");
-        ui->Ledit_Preco->clear();
-    }
-
-
-}
-
 
 
 void MainWindow::on_Btn_Delete_clicked()
@@ -857,21 +774,38 @@ void MainWindow::on_Btn_Alterar_clicked()
     QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
     QVariant barrasVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 4));
     QVariant nfVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 5));
+    QVariant uCom = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 6));
+    QVariant precoForn = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 7));
+    QVariant porcentLucro = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 8));
+    QVariant ncm = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 9));
+    QVariant cest = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 10));
+    QVariant aliquotaImp = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 11));
+
     QString productId = idVariant.toString();
     QString productQuant = portugues.toString(quantVariant.toFloat());
     QString productDesc = descVariant.toString();
     QString productPreco = portugues.toString(precoVariant.toFloat());
     QString productBarras = barrasVariant.toString();
     bool productNf = nfVariant.toBool();
+    QString productUCom = uCom.toString();
+    QString produtoPrecoForn = portugues.toString(precoForn.toFloat());
+    QString productPorcentLucro = portugues.toString(porcentLucro.toFloat());
+    QString productNCM = ncm.toString();
+    QString productCEST = cest.toString();
+    QString productAliquotaImp = portugues.toString(aliquotaImp.toFloat());
+
     qDebug() << productId;
     qDebug() << productPreco;
     // criar janela
     AlterarProduto *alterar = new AlterarProduto;
     alterar->janelaPrincipal = this;
     alterar->idAlt = productId;
-    alterar->TrazerInfo(productDesc, productQuant, productPreco, productBarras, productNf);
+    alterar->TrazerInfo(productDesc, productQuant, productPreco, productBarras, productNf, productUCom,
+    produtoPrecoForn, productPorcentLucro, productNCM, productCEST, productAliquotaImp);
     alterar->setWindowModality(Qt::ApplicationModal);
     alterar->show();
+    connect(alterar, &AlterarProduto::produtoAlterado, this,
+            &MainWindow::atualizarTableview);
     }else{
         QMessageBox::warning(this,"Erro","Selecione um produto antes de alterar!");
     }
@@ -887,6 +821,7 @@ void MainWindow::on_Btn_Venda_clicked()
 
     vendas->show();
 
+
 }
 
 
@@ -898,45 +833,6 @@ void MainWindow::on_Btn_Relatorios_clicked()
     relatorios1->show();
 }
 
-void MainWindow::on_Ledit_Barras_returnPressed()
-{
-    // verificar se o codigo de barras existe
-    verificarCodigoBarras();
-    ui->Ledit_Desc->setFocus();
-}
-
-bool MainWindow::verificarCodigoBarras(){
-    QString barrasProduto = ui->Ledit_Barras->text();
-    // verificar se o codigo de barras ja existe
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao enviar.";
-    }
-    QSqlQuery query;
-
-    query.prepare("SELECT COUNT(*) FROM produtos WHERE codigo_barras = :codigoBarras");
-    query.bindValue(":codigoBarras", barrasProduto);
-    if (!query.exec()) {
-        qDebug() << "Erro na consulta: contagem codigo barras";
-    }
-    query.next();
-    bool barrasExiste = query.value(0).toInt() > 0 && barrasProduto != "";
-    qDebug() << barrasProduto;
-
-    if (barrasExiste){
-        // codigo de barras existe, mostrar mensagem e
-        // mostrar registro na tabela
-        QMessageBox::warning(this, "Erro", "Esse código de barras já foi registrado.\n" + barrasProduto );
-        if(!db.open()){
-            qDebug() << "erro ao abrir banco de dados. codigo de barras existente";
-        }
-        model->setQuery("SELECT * FROM produtos WHERE codigo_barras = '" + barrasProduto + "'");
-        db.close();
-        return true;
-    }
-    else{
-        return false;
-    }
-}
 void MainWindow::imprimirEtiqueta1(){
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
@@ -1115,14 +1011,7 @@ void MainWindow::on_actionRealizar_Venda_triggered()
 
 void MainWindow::on_Btn_AddProd_clicked()
 {
-    ui->groupBox->setVisible(!ui->groupBox->isVisible());
-    if(!ui->groupBox->isVisible()){
-        ui->Tview_Produtos->setColumnWidth(2, 750);
 
-    }else{
-        ui->Tview_Produtos->setColumnWidth(2, 350);
-
-    }
     InserirProduto *addProdJanela = new InserirProduto;
     addProdJanela->show();
     connect(addProdJanela, &InserirProduto::codigoBarrasExistenteSignal,
@@ -1182,12 +1071,6 @@ void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
 }
 
 
-
-void MainWindow::on_Btn_GerarCodBarras_clicked()
-{
-    ui->Ledit_Barras->setText(gerarNumero());
-
-}
 
 
 void MainWindow::on_actionTodos_Produtos_triggered()

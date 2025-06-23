@@ -48,7 +48,6 @@ public slots:
    void atualizarTableviewComQuery(QString &query);
 
 private slots:
-    void on_Btn_Enviar_clicked();
 
     void on_Btn_Delete_clicked();
 
@@ -60,8 +59,6 @@ private slots:
 
     void on_Btn_Relatorios_clicked();
     
-    void on_Ledit_Barras_returnPressed();
-
     void on_actionGerar_Relat_rio_CSV_triggered();
 
     void on_actionRealizar_Venda_triggered();
@@ -69,8 +66,6 @@ private slots:
     void on_Btn_AddProd_clicked();
 
     void on_Tview_Produtos_customContextMenuRequested(const QPoint &pos);
-
-    void on_Btn_GerarCodBarras_clicked();
 
     void imprimirEtiqueta1();
     void imprimirEtiqueta3();

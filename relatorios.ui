@@ -59,6 +59,9 @@ color: rgb(255, 255, 255);
 font-size: 15px;
 border-radius: 13px;
 }
+QTabWidget{
+background-color:rgb(222, 221, 218)
+}
 QGroupBox{
 background-color:rgb(170, 170, 170);
 	font: 700 9pt &quot;Segoe UI&quot;;
@@ -669,14 +672,14 @@ background-color:rgb(170, 170, 170);
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ProdutoTableView</class>
-   <extends>QTableView</extends>
-   <header>produtotableview.h</header>
-  </customwidget>
-  <customwidget>
    <class>CustomLineEdit</class>
    <extends>QLineEdit</extends>
    <header>customlineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ProdutoTableView</class>
+   <extends>QTableView</extends>
+   <header>produtotableview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

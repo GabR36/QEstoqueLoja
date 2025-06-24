@@ -84,6 +84,16 @@ background-color:rgb(170, 170, 170);
    <bool>false</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0">
+    <widget class="QDialogButtonBox" name="Btn_AltAceitar">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
@@ -311,7 +321,7 @@ background-color:rgb(170, 170, 170);
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>90</y>
+         <y>140</y>
          <width>221</width>
          <height>24</height>
         </rect>
@@ -333,7 +343,7 @@ background-color:rgb(170, 170, 170);
        <property name="geometry">
         <rect>
          <x>20</x>
-         <y>130</y>
+         <y>180</y>
          <width>221</width>
          <height>32</height>
         </rect>
@@ -341,9 +351,12 @@ background-color:rgb(170, 170, 170);
        <layout class="QHBoxLayout" name="horizontalLayout_10">
         <item>
          <widget class="QLabel" name="label_10">
+          <property name="toolTip">
+           <string>Porcentagem de ICMS aproximada cobrado de cada produto, APENAS PARA INFORMAÇÃO NA NF.</string>
+          </property>
           <property name="text">
            <string>Aliquota 
- Imposto:</string>
+ Imposto(%):</string>
           </property>
          </widget>
         </item>
@@ -357,7 +370,7 @@ background-color:rgb(170, 170, 170);
         <rect>
          <x>20</x>
          <y>50</y>
-         <width>221</width>
+         <width>201</width>
          <height>24</height>
         </rect>
        </property>
@@ -374,17 +387,29 @@ background-color:rgb(170, 170, 170);
         </item>
        </layout>
       </widget>
+      <widget class="QLabel" name="Lbl_AltNCMDesc">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>80</y>
+         <width>321</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>&quot;Descrição NCM&quot;</string>
+       </property>
+       <property name="scaledContents">
+        <bool>false</bool>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
      </widget>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QDialogButtonBox" name="Btn_AltAceitar">
-     <property name="orientation">
-      <enum>Qt::Orientation::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
-     </property>
     </widget>
    </item>
   </layout>

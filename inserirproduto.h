@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <QSqlDatabase>
 #include <QLocale>
+#include "util/ibptutil.h"
+
 
 namespace Ui {
 class InserirProduto;
@@ -30,6 +32,10 @@ private slots:
 
     void on_Ledit_PrecoFinal_textChanged(const QString &arg1);
 
+    void on_Ledit_NCM_editingFinished();
+
+    void on_Ledit_Desc_editingFinished();
+
 private:
 
     Ui::InserirProduto *ui;
@@ -40,7 +46,9 @@ private:
     bool verificarCodigoBarras();
     QSqlDatabase db = QSqlDatabase::database();
     bool atualizando = false; // Flag para evitar loops recursivos
-    bool eventFilter(QObject *watched, QEvent *event) override;
+    //bool eventFilter(QObject *watched, QEvent *event) override;
+    IbptUtil *util;
+
 signals:
     void codigoBarrasExistenteSignal(QString &query);
     void produtoInserido();

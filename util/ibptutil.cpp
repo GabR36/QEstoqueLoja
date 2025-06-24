@@ -1,22 +1,36 @@
 #include "ibptutil.h"
-#include <QFile>
 #include <QTextStream>
 #include <QDebug>
 #include <QCoreApplication>
 
 IbptUtil::IbptUtil(QObject *parent)
     : QObject{parent}
-{}
+{
+    caminhoArquivoTabela = QCoreApplication::applicationDirPath() + "/recursos/TabelaIBPTaxPR25.1.F.csv";
+    tabela.setFileName(caminhoArquivoTabela);
 
-float IbptUtil::get_Aliquota_From_Csv(QString ncm){
-    QString caminhoArquivo = QCoreApplication::applicationDirPath() + "/recursos/TabelaIBPTaxPR25.1.F.csv";
-    QFile file(caminhoArquivo);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "Não foi possível abrir o arquivo:" << caminhoArquivo;
-        return -1.0;
+    if (!tabela.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "Não foi possível abrir o arquivo:" << caminhoArquivoTabela;
     }
 
-    QTextStream in(&file);
+
+
+}
+
+float IbptUtil::get_Aliquota_From_Csv(QString ncm){
+
+    if (!tabela.isOpen()) {
+        qDebug() << "Arquivo não está aberto.";
+        return false;
+    }
+
+    // Volta para o início do arquivo
+    if (!tabela.seek(0)) {
+        qDebug() << "Erro ao voltar para o início do arquivo.";
+        return false;
+    }
+
+    QTextStream in(&tabela);
    // in.setCodec("UTF-8");  // ou "Latin1", conforme o encoding do CSV
 
     QString header = in.readLine();  // pula cabeçalho
@@ -45,15 +59,15 @@ float IbptUtil::get_Aliquota_From_Csv(QString ncm){
 }
 
 QStringList IbptUtil::get_Sugestoes_NCM(QString filtro) {
-    QFile file(caminhoArquivoTabela);
+    // QFile file(caminhoArquivoTabela);
     QStringList sugestoes;
 
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "Não foi possível abrir o arquivo:" << caminhoArquivoTabela;
-        return sugestoes;
-    }
+    // if (!tabela.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    //     qDebug() << "Não foi possível abrir o arquivo:" << caminhoArquivoTabela;
+    //     return sugestoes;
+    // }
 
-    QTextStream in(&file);
+    QTextStream in(&tabela);
     in.readLine(); // pula cabeçalho: codigo;ex;tipo;descricao;
 
     while (!in.atEnd()) {
@@ -75,6 +89,70 @@ QStringList IbptUtil::get_Sugestoes_NCM(QString filtro) {
 
     return sugestoes;
 }
+
+bool IbptUtil::eh_Valido_NCM(QString ncm){
+    if (!tabela.isOpen()) {
+        qDebug() << "Arquivo não está aberto.";
+        return false;
+    }
+
+    // Volta para o início do arquivo
+    if (!tabela.seek(0)) {
+        qDebug() << "Erro ao voltar para o início do arquivo.";
+        return false;
+    }
+
+    QTextStream in(&tabela);
+    in.readLine();  // pula o cabeçalho
+
+    while (!in.atEnd()) {
+        QString linha = in.readLine();
+        QStringList campos = linha.split(';');
+        if (campos.size() < 2)
+            continue;
+
+        QString ncmCSV = campos[0].trimmed();
+        QString exCSV = campos[1].trimmed();
+
+        if (ncmCSV == ncm && exCSV == "")
+            return true;
+    }
+
+    return false;
+}
+QString IbptUtil::get_Descricao_NCM(QString ncm) {
+    if (!tabela.isOpen()) {
+        qDebug() << "Arquivo não está aberto.";
+        return "";
+    }
+
+    if (!tabela.seek(0)) {
+        qDebug() << "Erro ao voltar para o início do arquivo.";
+        return "";
+    }
+
+    QTextStream in(&tabela);
+    in.readLine();  // pula o cabeçalho
+
+    while (!in.atEnd()) {
+        QString linha = in.readLine();
+        QStringList campos = linha.split(';');
+
+        if (campos.size() < 4)
+            continue;
+
+        QString ncmCSV = campos[0].trimmed();
+        QString exCSV = campos[1].trimmed();
+        QString descricao = campos[3].trimmed();
+
+        if (ncmCSV == ncm && exCSV == "") {
+            return descricao;
+        }
+    }
+
+    return "";  // não encontrado
+}
+
 
 
 

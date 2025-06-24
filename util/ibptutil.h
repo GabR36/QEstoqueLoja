@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QCoreApplication>
+#include <QFile>
 
 class IbptUtil : public QObject
 {
@@ -10,10 +11,13 @@ class IbptUtil : public QObject
 public:
     explicit IbptUtil(QObject *parent = nullptr);
 
-    static float get_Aliquota_From_Csv(QString ncm);
+    float get_Aliquota_From_Csv(QString ncm);
     QStringList get_Sugestoes_NCM(QString filtro = "");
+    bool eh_Valido_NCM(QString ncm);
+    QString get_Descricao_NCM(QString ncm);
 private:
-    QString caminhoArquivoTabela = QCoreApplication::applicationDirPath() + "/recursos/TabelaIBPTaxPR25.1.F.csv";
+    QString caminhoArquivoTabela;
+    QFile tabela;
 
 signals:
 };

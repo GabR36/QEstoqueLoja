@@ -340,7 +340,7 @@ void NfceVenda::det_produto(const int &i)
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_cProd(id);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_cEAN("SEM GTIN");
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_xProd(desc);
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_NCM("19021100");
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_NCM("19021100");//
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_NVE();
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_CEST("1704900");
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_indEscala(ConvNF::strToIndEscala("S"));

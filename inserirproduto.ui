@@ -52,19 +52,6 @@ background-color:rgb(170, 170, 170);
 </string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Orientation::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>543</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="1" column="1">
     <widget class="QPushButton" name="Btn_Enviar">
      <property name="minimumSize">
@@ -78,13 +65,26 @@ background-color:rgb(170, 170, 170);
      </property>
     </widget>
    </item>
+   <item row="1" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>543</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
    <item row="0" column="0" colspan="2">
     <widget class="QTabWidget" name="tabWidget">
      <property name="styleSheet">
       <string notr="true"/>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -310,36 +310,17 @@ Comercial:</string>
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>40</y>
-         <width>221</width>
-         <height>24</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_6">
-        <item>
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>NCM:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="CustomLineEdit" name="Ledit_NCM"/>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>70</y>
-         <width>221</width>
+         <y>100</y>
+         <width>251</width>
          <height>24</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
          <widget class="QLabel" name="label_7">
+          <property name="toolTip">
+           <string>Código Especificador da Substituição Tributária,  você geralmente pode deixar em branco.</string>
+          </property>
           <property name="text">
            <string>CEST:</string>
           </property>
@@ -354,14 +335,17 @@ Comercial:</string>
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>110</y>
-         <width>221</width>
+         <y>130</y>
+         <width>201</width>
          <height>32</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_10">
         <item>
          <widget class="QLabel" name="label_10">
+          <property name="toolTip">
+           <string>Porcentagem de ICMS aproximada cobrado de cada produto, APENAS PARA INFORMAÇÃO NA NF.</string>
+          </property>
           <property name="text">
            <string>Aliquota 
  Imposto:</string>
@@ -370,6 +354,51 @@ Comercial:</string>
         </item>
         <item>
          <widget class="QLineEdit" name="Ledit_Aliquota"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QLabel" name="Lbl_NcmDesc">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>371</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Descrição: NCM</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>173</width>
+         <height>26</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_11">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QLabel" name="label_6">
+            <property name="toolTip">
+             <string>Nomenclatura Comum do Mercosul, pesquise o codigo correto para seu produto.</string>
+            </property>
+            <property name="text">
+             <string>NCM:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CustomLineEdit" name="Ledit_NCM"/>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>

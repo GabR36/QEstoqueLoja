@@ -7,17 +7,15 @@
 #include "mainwindow.h"
 #include "util/NfUtilidades.h"
 #include "configuracao.h"
-#include "util/ibptutil.h"
 #include <QFocusEvent>
-#include <QCompleter>
-#include <QStringListModel>
+#include <QAbstractItemView>
 
 InserirProduto::InserirProduto(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::InserirProduto)
 {
     ui->setupUi(this);
-
+    ui->tabWidget->setCurrentIndex(0);
     financeiroValues = Configuracao::get_All_Financeiro_Values();
     ui->Ledit_CBarras->setFocus();
     ui->Ledit_Desc->setMaxLength(120);
@@ -40,44 +38,14 @@ InserirProduto::InserirProduto(QWidget *parent)
     ui->Ledit_NCM->setValidator(new QRegularExpressionValidator(ncmRegex, this));
     ui->Ledit_CEST->setValidator(new QRegularExpressionValidator(cestRegex, this));
 
-    IbptUtil *util = new IbptUtil(this);
-
-
-    QStringListModel *model = new QStringListModel(this);
-    QCompleter *completer = new QCompleter(model, this);
-    completer->setCaseSensitivity(Qt::CaseInsensitive);
-    completer->setFilterMode(Qt::MatchContains);
-    completer->setCompletionMode(QCompleter::PopupCompletion);
-
-    ui->Ledit_NCM->setCompleter(completer);
-
-    // 1. Quando terminar de digitar a descrição, gera uma nova lista de sugestões
-    connect(ui->Ledit_Desc, &QLineEdit::editingFinished, this, [=]() {
-        QString texto = ui->Ledit_Desc->text().trimmed();
-
-        if (!texto.isEmpty()) {
-            QString primeiraPalavra = texto.split(' ').first();
-            QStringList sugestoes = util->get_Sugestoes_NCM(primeiraPalavra);
-            model->setStringList(sugestoes); // Atualiza a base de sugestões
-        }
-    });
-
-    // 2. Quando o usuário digitar no Ledit_NCM, o filtro do completer continuará funcionando
-    connect(ui->Ledit_NCM, &QLineEdit::textEdited, this, [=]() {
-        completer->complete();  // Força exibição das sugestões
-    });
-    connect(ui->Ledit_NCM, &QLineEdit::cursorPositionChanged, this, [=]() {
-        completer->complete();
-    });
-
-
-
+    util = new IbptUtil(this);
 
 }
 
 InserirProduto::~InserirProduto()
 {
     delete ui;
+    delete util;
 }
 QString InserirProduto::gerarNumero()
 {
@@ -293,15 +261,28 @@ void InserirProduto::on_Ledit_PrecoFinal_textChanged(const QString &arg1)
 
     atualizando = false;
 }
-bool InserirProduto::eventFilter(QObject *watched, QEvent *event)
+
+
+void InserirProduto::on_Ledit_NCM_editingFinished()
 {
-    if (watched == ui->Ledit_NCM && event->type() == QEvent::FocusOut) {
-        QString texto = ui->Ledit_NCM->text();
-        QString textoFormatado = portugues.toString(IbptUtil::get_Aliquota_From_Csv(texto));
+    QString ncmText = ui->Ledit_NCM->text();
+    if(!util->eh_Valido_NCM(ncmText)){
+        QMessageBox::warning(this, "Atenção", "NCM inválido para NF");
+        ui->Lbl_NcmDesc->setText("Não Encontrado");
+
+
+    }else{
+        QString textoFormatado = portugues.toString(util->get_Aliquota_From_Csv(ncmText));
         ui->Ledit_Aliquota->setText(textoFormatado);
+        ui->Lbl_NcmDesc->setText(util->get_Descricao_NCM(ncmText));
     }
 
-    return QWidget::eventFilter(watched, event); // chama a implementação base
 }
+
+void InserirProduto::on_Ledit_Desc_editingFinished()
+{
+    //atualizarCompleterNCM();
+}
+
 
 

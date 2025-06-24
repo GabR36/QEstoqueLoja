@@ -5,6 +5,8 @@
 #include "mainwindow.h"
 #include <QLocale>
 #include <QSet>
+#include "util/ibptutil.h"
+
 
 namespace Ui {
 class AlterarProduto;
@@ -45,6 +47,7 @@ private:
     Ui::AlterarProduto *ui;
     QSet<QString> generatedNumbers;
     bool atualizando = false;
+    IbptUtil *util = new IbptUtil();
 signals:
     void produtoAlterado();
 };

@@ -4,14 +4,15 @@
 #include "QSqlQuery"
 #include <QMessageBox>
 #include <QDoubleValidator>
-#include "util/ibptutil.h"
 
 AlterarProduto::AlterarProduto(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AlterarProduto)
 {
     ui->setupUi(this);
+    util->setParent(this);
 
+    ui->tabWidget->setCurrentIndex(0);
     // validadores para os campos
     QDoubleValidator *DoubleValidador = new QDoubleValidator(0.0, 9999.99, 2);;
     ui->Ledit_AltPreco->setValidator(DoubleValidador);
@@ -25,6 +26,8 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
     ui->Ledit_AltCEST->setValidator(new QRegularExpressionValidator(cestRegex, this));
 
     ui->Btn_GerarCod->setIcon(QIcon(":/QEstoqueLOja/restart.svg"));
+
+
 
     //
 
@@ -73,6 +76,7 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
 AlterarProduto::~AlterarProduto()
 {
     delete ui;
+    delete util;
 }
 
  void AlterarProduto::TrazerInfo(QString desc, QString quant, QString preco, QString barras, bool nf,
@@ -103,6 +107,8 @@ AlterarProduto::~AlterarProduto()
     ui->Ledit_AltNCM->setText(ncm);
     ui->Ledit_AltCEST->setText(cest);
     ui->Ledit_AltAliquota->setText(aliquotaimp);
+
+    ui->Lbl_AltNCMDesc->setText(util->get_Descricao_NCM(ncm));
 }
 
 void AlterarProduto::on_Btn_AltAceitar_accepted()
@@ -268,8 +274,9 @@ void AlterarProduto::on_Btn_GerarCod_clicked()
 void AlterarProduto::on_Ledit_AltNCM_editingFinished()
 {
     QString texto = ui->Ledit_AltNCM->text();
-    QString textoFormatado = portugues.toString(IbptUtil::get_Aliquota_From_Csv(texto));
+    QString textoFormatado = portugues.toString(util->get_Aliquota_From_Csv(texto));
     ui->Ledit_AltAliquota->setText(textoFormatado);
+    ui->Lbl_AltNCMDesc->setText(util->get_Descricao_NCM(texto));
 }
 
 

@@ -15,6 +15,8 @@ Configuracao::Configuracao(QWidget *parent)
     ui->setupUi(this);
     ui->tabWidget->setCurrentIndex(0); // começa na tab Empresa
 
+
+
     // colocar os valores do banco de dados nos line edits
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";
@@ -63,6 +65,11 @@ Configuracao::Configuracao(QWidget *parent)
     ui->Ledt_LucroEmpresa->setText(portugues.toString(configValues.value("porcent_lucro", "").toFloat()));
     ui->Ledt_debito->setText(portugues.toString(configValues.value("taxa_debito", "").toFloat()));
     ui->Ledt_credito->setText(portugues.toString(configValues.value("taxa_credito", "").toFloat()));
+    ui->CheckBox_emitNf->setChecked(configValues.value("emit_nf") == "1");
+    ui->Ledit_NNfHomolog->setText(configValues.value("nnf_homolog", ""));
+    ui->Ledit_NNfProd->setText(configValues.value("nnf_prod", ""));
+
+
 
     db.close();
 
@@ -71,6 +78,10 @@ Configuracao::Configuracao(QWidget *parent)
     ui->Ledt_LucroEmpresa->setValidator(validador);
     ui->Ledt_credito->setValidator(validador);
     ui->Ledt_debito->setValidator(validador);
+
+    QIntValidator *validatorUint = new QIntValidator(0, INT_MAX, this);
+    ui->Ledit_NNfHomolog->setValidator(validatorUint);
+    ui->Ledit_NNfProd->setValidator(validatorUint);
 }
 
 Configuracao::~Configuracao()
@@ -84,7 +95,8 @@ void Configuracao::on_Btn_Aplicar_clicked()
     QString nomeEmpresa, nomeFant, enderecoEmpresa, numeroEmpresa, bairroEmpresa, cepEmpresa, emailEmpresa,
         cnpjEmpresa, telEmpresa, lucro, debito, credito, cidadeEmpresa, estadoEmpresa, logoEmpresa, regimeTrib, tpAmb,
         idCsc, csc, pastaSchema, pastaCertificadoAc, certificado, senhaCertificado, cUf, cMun, iEstad, cnpjRT, nomeRT,
-        emailRt, foneRt, idCSRT, hasCsrt;
+        emailRt, foneRt, idCSRT, hasCsrt, nnfHomolog, nnfProd;
+    bool emitNf;
     // converter para notacao americana para armazenar no banco de dados
     nomeEmpresa = ui->Ledt_NomeEmpresa->text();
     nomeFant = ui->Ledt_NomeFantasia->text();
@@ -118,6 +130,9 @@ void Configuracao::on_Btn_Aplicar_clicked()
     foneRt = ui->Ledt_FoneRespTec->text();
     idCSRT = ui->Ledt_IdCsrtRespTec->text();
     hasCsrt = ui->Ledt_HashCsrtRespTec->text();
+    emitNf = ui->CheckBox_emitNf->isChecked();
+    nnfHomolog = ui->Ledit_NNfHomolog->text();
+    nnfProd = ui->Ledit_NNfProd->text();
 
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";
@@ -256,6 +271,19 @@ void Configuracao::on_Btn_Aplicar_clicked()
     query.bindValue(":value", hasCsrt);
     query.bindValue(":key", "hash_csrt");
     query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", emitNf);
+    query.bindValue(":key", "emit_nf");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", nnfHomolog);
+    query.bindValue(":key", "nnf_homolog");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", nnfProd);
+    query.bindValue(":key", "nnf_prod");
+    query.exec();
+
 
     db.close();
 
@@ -384,7 +412,10 @@ QMap<QString, QString> Configuracao::get_All_Fiscal_Values() {
         "email_rt",
         "fone_rt",
         "id_csrt",
-        "hash_csrt"
+        "hash_csrt",
+        "emit_nf",
+        "nnf_homolog",
+        "nnf_prod"
     };
 
     // Montar a query com placeholders

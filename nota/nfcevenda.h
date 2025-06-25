@@ -39,7 +39,7 @@ private:
     QString indPagNf = "0";
     double vNf = 0.0;
     QLocale portugues;
-    int nNf = 103;
+    int nNf = 1;
     int serieNf = 1;
     float taxaPercentual = 0.0;
     QString nomeCliente, cpfCliente;

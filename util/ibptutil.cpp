@@ -62,10 +62,6 @@ QStringList IbptUtil::get_Sugestoes_NCM(QString filtro) {
     // QFile file(caminhoArquivoTabela);
     QStringList sugestoes;
 
-    // if (!tabela.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    //     qDebug() << "Não foi possível abrir o arquivo:" << caminhoArquivoTabela;
-    //     return sugestoes;
-    // }
 
     QTextStream in(&tabela);
     in.readLine(); // pula cabeçalho: codigo;ex;tipo;descricao;

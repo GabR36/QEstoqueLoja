@@ -466,6 +466,15 @@ MainWindow::MainWindow(QWidget *parent)
             if(!query.exec("INSERT INTO config (key, value) VALUES ('hash_csrt', '')")){
                 qDebug() << "nao inserir config hash_csrt";
             }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('emit_nf', '0')")){
+                qDebug() << "nao inserir config emitnf";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_homolog', '0')")){
+                qDebug() << "nao inserir config nnfhomo";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_prod', '0')")){
+                qDebug() << "nao inserir config nnfprod";
+            }
 
             if (!query.exec(
                     "CREATE TABLE IF NOT EXISTS notas_fiscais ("
@@ -473,7 +482,8 @@ MainWindow::MainWindow(QWidget *parent)
                     "cstat TEXT, "
                     "nnf INTEGER NOT NULL, "
                     "serie TEXT NOT NULL, "
-                    "modelo TEXT NOT NULL DEFAULT '65', "
+                    "modelo TEXT NOT NULL DEFAULT '65',"
+                    "tp_amb BOOLEAN, "
                     "xml_path TEXT, "
                     "atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP, "
                     "id_venda INTEGER, "

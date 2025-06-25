@@ -12,11 +12,13 @@ public:
     explicit WaitDialog(QWidget* parent = nullptr);
     void setMessage(const QString& message);
     void allowClose();
-
+    void setMessageErro(const QString &message);
 protected:
     void closeEvent(QCloseEvent *event) override;
 private:
     QLabel* label;
+    QLabel* labelErro;
+
     bool canClose = false;
 
 };

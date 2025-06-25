@@ -1,15 +1,14 @@
 #include "pagamentovenda.h"
 #include "subclass/waitdialog.h"
 #include <QTimer>
+#include "configuracao.h"
 pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString total, QString cliente, QString data, int idCliente, QWidget *parent)
     : pagamento(total, cliente, data, parent)
 {
+
     rowDataList = listaProdutos;
+    fiscalValues = Configuracao::get_All_Fiscal_Values();
     this->idCliente = idCliente;
-    connect(this, &pagamentoVenda::gerarEnviarNf, &nota, &NfceVenda::onReqGerarEnviar);
-    connect(&nota, &NfceVenda::retWSChange, this, &pagamentoVenda::onRetWSChange);
-    connect(&nota, &NfceVenda::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
-    connect(&nota, &NfceVenda::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
 
 
         if(!db.open()){
@@ -18,8 +17,8 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
             QSqlQuery query;
             query.prepare("SELECT cpf, eh_pf FROM clientes WHERE id = :idcliente");
             query.bindValue(":idcliente", idCliente);
-            if (query.exec()) {
-                qDebug() << "erro ao buscar cpf cliente";
+            if (!query.exec()) {
+                qDebug() << "cliente nao encontrado";
             }
             while(query.next()) {
                 QString cpf = query.value(0).toString();
@@ -29,14 +28,18 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
             }
         }
 
-
+        connect(this, &pagamentoVenda::gerarEnviarNf, &nota, &NfceVenda::onReqGerarEnviar);
+        connect(&nota, &NfceVenda::retWSChange, this, &pagamentoVenda::onRetWSChange);
+        connect(&nota, &NfceVenda::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
+        connect(&nota, &NfceVenda::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
 
 
 
 }
 void pagamentoVenda::onErrorOccurred(const QString &error){
     if (waitDialog) {
-        waitDialog->setMessage(error);
+        waitDialog->allowClose();
+        waitDialog->setMessageErro(error);
     }
    // erroNf = error;
 }
@@ -59,21 +62,24 @@ void pagamentoVenda::verificarErroNf(const CppNFe *cppnfe){
         if ((cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 100) ||
             (cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 150))
         {
+
             QString cStatMessage = QString::number(cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat());
             waitDialog->setMessage("Sucesso!\n Status:" + cStatMessage);
             waitDialog->allowClose();
+
 
             if(!db.open()){
                 qDebug() << "erro ao abrir banco de dados. botao sucesso nota.";
             }
             QSqlQuery query;
             query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
-                          "xml_path, atualizado_em, id_venda) "
-                          "VALUES (:cstat, :nnf, :serie, :modelo, :xml_path, :atualizado_em, :id_venda)");
+                          "tp_amb, xml_path, atualizado_em, id_venda) "
+                          "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :atualizado_em, :id_venda)");
             query.bindValue(":cstat", cStatMessage);
             query.bindValue(":nnf", QString::number(nota.getNNF()));
             query.bindValue(":serie", QString::number(nota.getSerie()));
             query.bindValue(":modelo", "65");
+            query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
             query.bindValue(":xml_path", nota.getXmlPath());
             query.bindValue(":atualizado_em", QDateTime::currentDateTime());
             query.bindValue(":id_venda", idVenda);
@@ -82,7 +88,8 @@ void pagamentoVenda::verificarErroNf(const CppNFe *cppnfe){
                 qDebug() << "Salvou nota no banco!";
             }
 
-            QTimer::singleShot(2000, waitDialog, &QDialog::close); //fecha depois de 2 segundos
+            QTimer::singleShot(2000, waitDialog, &WaitDialog::close); //fecha depois de 2 segundos
+            imprimirDANFE(this->nota.getCppNFe());
         }else{
             QString cStatMessage = QString::number(cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat());
             QString msg = "ERRO:\n" + cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_xMotivo() +
@@ -275,26 +282,28 @@ void pagamentoVenda::terminarPagamento(){
     }
 
     db.close();
-    if (!waitDialog) {
-        waitDialog = new WaitDialog(this);
+    if(fiscalValues.value("emit_nf") == "1"){ // se a config estiver ativada para emitir
+        if (!waitDialog) {
+            waitDialog = new WaitDialog(this);
+        }
+
+
+
+        waitDialog->setMessage("Aguardando resposta do servidor...");
+        waitDialog->show();
+        nota.setCliente(cpf, ehPfCliente);
+        nota.setProdutosVendidos(rowDataList);
+        nota.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
+        emit gerarEnviarNf();
+        emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
+
+        verificarErroNf(this->nota.getCppNFe());
     }
-
-    waitDialog->setMessage("Aguardando resposta do servidor...");
-    waitDialog->show();
-    nota.setCliente(cpf,ehPfCliente);
-    nota.setProdutosVendidos(rowDataList);
-    nota.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
-    emit gerarEnviarNf();
     emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
-
-    verificarErroNf(this->nota.getCppNFe());
-    imprimirDANFE(this->nota.getCppNFe());
-
-
-
 
     // fechar as janelas
     this->close();
+
 }
 
 void pagamentoVenda::imprimirDANFE(const CppNFe *cppnfe)

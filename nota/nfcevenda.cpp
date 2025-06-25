@@ -13,9 +13,9 @@ NfceVenda::NfceVenda(QObject *parent)
     //connect(m_nfe, SIGNAL(errorOccurred(QString)), this, SIGNAL(errorOccurred(QString)));
     connect(m_nfe, &CppNFe::errorOccurred, this, &NfceVenda::errorOccurred);
 
-
-   // qDebug() << "Ambiente:" << fiscalValues.value("csc");
-    configurar();
+    if(fiscalValues.value("emit_nf") == "1"){
+        configurar();
+    }
 }
 
 NfceVenda::~NfceVenda()
@@ -257,11 +257,11 @@ void NfceVenda::dest()
         m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CNPJ(cpfCliente); //PARA PESSOA JURIDICA
     }
 
-    if(ehPfCliente == true && cpfCliente != ""){
+    if(ehPfCliente == 1 && cpfCliente != ""){
         m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CPF(cpfCliente); //PARA PESSOA FISICA
 
     }
-    if(fiscalValues.value("tp_amb") == "0"){
+    if(fiscalValues.value("tp_amb") == "0" && cpfCliente != ""){
       m_nfe->notafiscal->NFe->obj->infNFe->dest->set_xNome("NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL");
     }
     // m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CPF(""); //PARA PESSOA FISICA
@@ -1114,31 +1114,43 @@ QString NfceVenda::getXmlPath(){
     return xml;
 }
 int NfceVenda::getProximoNNF(){
-    if(!db.open()){
-        qDebug() << "erro ao abrir bd gerarNNFCorreto";
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir banco de dados em getProximoNNF";
+        return -1;
     }
+
+    int tpAmb = fiscalValues.value("tp_amb").toInt(); // 1 = produção, 0 = homologação
+    QString chaveConfig = (tpAmb == 0) ? "nnf_homolog" : "nnf_prod";
     QSqlQuery query;
     query.prepare(
         "SELECT nnf FROM notas_fiscais "
-        "WHERE cstat IN (100, 150) AND modelo = :modelo AND serie = :serie "
+        "WHERE cstat IN (100, 150) AND modelo = :modelo AND serie = :serie AND tp_amb = :tp_amb "
         "ORDER BY nnf DESC "
         "LIMIT 1"
-    );
-
-    query.bindValue(":modelo", "65"); // 65 = NFC-e
-    query.bindValue(":serie", serieNf);   // série 1 por padrão
+        );
+    query.bindValue(":modelo", "65");             // NFC-e
+    query.bindValue(":serie", serieNf);           // série
+    query.bindValue(":tp_amb", tpAmb);            // ambiente atual
 
     if (query.exec()) {
         if (query.next()) {
             int ultimoNNF = query.value(0).toInt();
             return ultimoNNF + 1;
         } else {
-            return 1; // Nenhuma nota desse tipo, começa do 1
+            // Nenhuma nota no banco para este ambiente usa valor configurado manualmente
+            bool ok;
+            int ultimaConfigurada = fiscalValues.value(chaveConfig).toInt(&ok);
+            if (ok && ultimaConfigurada > 0) {
+                return ultimaConfigurada + 1;
+            } else {
+                return 1; // valor de fallback
+            }
         }
     } else {
         qWarning() << "Erro na consulta NNF:" << query.lastError().text();
         return -1;
     }
+
 
 }
 void NfceVenda::aplicarAcrescimoProporcional(float taxaPercentual)
@@ -1227,8 +1239,8 @@ float NfceVenda::corrigirTaxa(float taxaAntiga, float desconto){
     return ((taxaNova/valorTotalProdutos) - 1) * 100;
 }
 void NfceVenda::setCliente(QString cpf, bool ehPf){
-    this->cpfCliente = cpf;
-    this->ehPfCliente = ehPf;
+    cpfCliente = cpf;
+    ehPfCliente = ehPf;
 
 }
 

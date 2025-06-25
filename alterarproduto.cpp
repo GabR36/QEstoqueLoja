@@ -293,8 +293,6 @@ void AlterarProduto::on_Ledit_AltPrecoFornecedor_textChanged(const QString &arg1
     atualizando = false;
 }
 
-
-
 void AlterarProduto::on_Ledit_AltPercentualLucro_textChanged(const QString &arg1)
 {
     if (atualizando) return;

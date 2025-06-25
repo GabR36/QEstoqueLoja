@@ -8,6 +8,7 @@
 #include <CppBrasil/DanfeQtRPT/CppDanfeQtRPT>
 #include <qtrpt.h>
 #include "subclass/waitdialog.h"
+#include <qmap.h>
 
 
 class pagamentoVenda : public pagamento
@@ -25,6 +26,7 @@ private:
     QString erroNf;
     QString idVenda;
     bool ehPfCliente = false;
+    QMap<QString, QString> fiscalValues;
 signals:
     void gerarEnviarNf();
 

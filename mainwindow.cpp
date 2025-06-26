@@ -469,10 +469,10 @@ MainWindow::MainWindow(QWidget *parent)
             if(!query.exec("INSERT INTO config (key, value) VALUES ('emit_nf', '0')")){
                 qDebug() << "nao inserir config emitnf";
             }
-            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_homolog', '0')")){
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_homolog', '1')")){
                 qDebug() << "nao inserir config nnfhomo";
             }
-            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_prod', '0')")){
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_prod', '1')")){
                 qDebug() << "nao inserir config nnfprod";
             }
 
@@ -485,6 +485,7 @@ MainWindow::MainWindow(QWidget *parent)
                     "modelo TEXT NOT NULL DEFAULT '65',"
                     "tp_amb BOOLEAN, "
                     "xml_path TEXT, "
+                    "valor_total DECIMAL(10,2), "
                     "atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP, "
                     "id_venda INTEGER, "
                     "FOREIGN KEY (id_venda) REFERENCES vendas2(id)"
@@ -498,7 +499,7 @@ MainWindow::MainWindow(QWidget *parent)
                 "ALTER TABLE produtos ADD COLUMN un_comercial TEXT",
                 "ALTER TABLE produtos ADD COLUMN preco_fornecedor DECIMAL(10,2) NULL",
                 "ALTER TABLE produtos ADD COLUMN porcent_lucro REAL",
-                "ALTER TABLE produtos ADD COLUMN ncm TEXT NULL",
+                "ALTER TABLE produtos ADD COLUMN ncm VARCHAR(8) DEFAULT '00000000'",
                 "ALTER TABLE produtos ADD COLUMN cest TEXT NULL",
                 "ALTER TABLE produtos ADD COLUMN aliquota_imposto REAL NULL"
             };

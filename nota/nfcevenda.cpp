@@ -1,6 +1,7 @@
  #include "nfcevenda.h"
 #include "../configuracao.h"
 #include <QSqlQuery>
+#include <QRegularExpression>
 
 NfceVenda::NfceVenda(QObject *parent)
     : QObject{parent}, m_nfe{new CppNFe}
@@ -333,14 +334,20 @@ void NfceVenda::det_produto(const int &i)
     QString desc          = produto[2].toString();
     double valorUnitario = produto[3].toDouble();
     double valorTotalProd = produto[4].toDouble();
+    QString codigoBarra = produto[5].toString();
+    QString uCom = produto[6].toString();
+    QString ncm = produto[7].toString();
+    QString cest = produto[8].toString();
+    double aliquotaImp = produto[9].toDouble();
+
     float descontoProduto = descontoProd[i];
 
 
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_nItem(i + 1);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_cProd(id);
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_cEAN("SEM GTIN");
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_cEAN(codigoBarra);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_xProd(desc);
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_NCM("19021100");//
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_NCM(ncm);//
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_NVE();
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_CEST("1704900");
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_indEscala(ConvNF::strToIndEscala("S"));
@@ -348,12 +355,12 @@ void NfceVenda::det_produto(const int &i)
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_cBenef("");
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_EXTIPI("");
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_CFOP("5102");
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_uCom("UNID");
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_uCom(uCom);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_qCom(quantVendida);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vUnCom(valorUnitario);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vProd(valorTotalProd);
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_cEANTrib("SEM GTIN");
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_uTrib("UNID");
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_cEANTrib(codigoBarra);
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_uTrib(uCom);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_qTrib(quantVendida);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vUnTrib(valorUnitario);
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_vFrete();
@@ -496,7 +503,8 @@ void NfceVenda::det_imposto(const int &i)
     //QString desc          = produto[2].toString();
     //double valorUnitario = produto[3].toDouble();
     double valorTotalProd = produto[4].toDouble();
-    double porcentagemImposto = 0.14;
+    double aliquotaImp = produto[9].toDouble();
+    double porcentagemImposto = aliquotaImp/100;
     float vTotTrib = QString::number(valorTotalProd * porcentagemImposto,'f',2).toFloat();
 
     //Grupo M. Tributos incidentes no Produto ou Serviço
@@ -1051,6 +1059,11 @@ const CppNFe *NfceVenda::getCppNFe()
 }
 
 void NfceVenda::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos){
+    if (!db.open()) {
+        qDebug() << "não abriu bd setprodutosvendidos";
+        return;
+    }
+
     for (int i = 0; i < produtosVendidos.size(); ++i) {
         QList<QVariant>& produto = produtosVendidos[i];
 
@@ -1058,18 +1071,52 @@ void NfceVenda::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos){
         // [1] quantVendida
         // [2] descricao
         // [3] valorUnitario
+        // [4] valorTotalProduto (calculado)
 
-        QString quantidadeStr =  QString::number(portugues.toFloat(produto[1].toString()));
+        QString quantidadeStr = QString::number(portugues.toFloat(produto[1].toString()));
         QString valorUnitarioStr = QString::number(portugues.toFloat(produto[3].toString()));
 
         double quantidade = quantidadeStr.toDouble();
         double valorUnitario = valorUnitarioStr.toDouble();
         double valorTotal = quantidade * valorUnitario;
 
-        produto[1] = quantidade;       // Atualiza quantidade como double
-        produto[3] = valorUnitario;    // Atualiza valorUnitario como double
-        produto.append(QVariant(valorTotal));
+        produto[1] = quantidade;
+        produto[3] = valorUnitario;
+        produto.append(QVariant(valorTotal)); // [4] valor total
+
+        // Consultar informações adicionais do produto
+        QSqlQuery query;
+        query.prepare("SELECT codigo_barras, un_comercial, ncm, cest, aliquota_imposto FROM produtos WHERE id = :idprod");
+        query.bindValue(":idprod", produto[0]);
+
+        if (query.exec() && query.next()) {
+            QString codigoBarras     = query.value("codigo_barras").toString();
+            QString unComercial      = query.value("un_comercial").toString();
+            QString ncm              = query.value("ncm").toString();
+            QString cest             = query.value("cest").toString();
+            double aliquotaImposto   = query.value("aliquota_imposto").toDouble();
+            if (!isValidGTIN(codigoBarras)) {
+                codigoBarras = "SEM GTIN";
+            }
+            // Adiciona os novos campos na ordem
+            produto.append(codigoBarras);      // [5]
+            produto.append(unComercial);       // [6]
+            produto.append(ncm);               // [7]
+            produto.append(cest);              // [8]
+            produto.append(aliquotaImposto);   // [9]
+        } else {
+            qWarning() << "Produto ID não encontrado ou erro ao consultar:" << produto[0].toString()
+                       << query.lastError().text();
+
+            // Para evitar erro, adiciona valores vazios/defaults
+            produto.append("");      // codigo_barras
+            produto.append("");      // un_comercial
+            produto.append("");      // ncm
+            produto.append("");      // cest
+            produto.append(0.0);     // aliquota_imposto
+        }
     }
+
     quantProds = produtosVendidos.size();
     vTotTribProduto.resize(produtosVendidos.size());
     listaProdutos = produtosVendidos;
@@ -1242,6 +1289,23 @@ void NfceVenda::setCliente(QString cpf, bool ehPf){
     cpfCliente = cpf;
     ehPfCliente = ehPf;
 
+}
+bool NfceVenda::isValidGTIN(const QString& gtin) {
+    QString clean = gtin.trimmed();
+
+    // Verifica se é numérico e tamanho válido
+    if (clean.isEmpty() || !clean.contains(QRegularExpression("^\\d{8}$|^\\d{12}$|^\\d{13}$|^\\d{14}$"))) {
+        return false;
+    }
+
+    // Cálculo do dígito verificador (mod 10, peso 3-1)
+    int sum = 0;
+    for (int i = clean.length() - 2; i >= 0; --i) {
+        int digit = clean[i].digitValue();
+        sum += digit * (((clean.length() - 2 - i) % 2 == 0) ? 3 : 1);
+    }
+    int dv = (10 - (sum % 10)) % 10;
+    return dv == clean.right(1).toInt();
 }
 
 

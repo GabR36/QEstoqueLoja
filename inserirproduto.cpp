@@ -25,6 +25,7 @@ InserirProduto::InserirProduto(QWidget *parent)
     }
 
     ui->Ledit_PercentualLucro->setText(financeiroValues.value("porcent_lucro"));
+    ui->Ledit_NCM->setText("00000000"); // adciona 8 zero valor generico ncm
 
     QDoubleValidator *DoubleValidador = new QDoubleValidator(0.0, 9999.99, 2);
     ui->Ledit_PrecoFinal->setValidator(DoubleValidador);

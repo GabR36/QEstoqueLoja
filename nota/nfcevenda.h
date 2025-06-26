@@ -84,6 +84,7 @@ private:
     void aplicarDescontoProduto(float descontoTotal);
     float corrigirDescontoParaAplicacaoPosTaxa(float descontoDesejado, float taxaPercentual);
     float corrigirTaxa(float taxaAntiga, float desconto);
+    bool isValidGTIN(const QString &gtin);
 public slots:
     void onReqStatusServico();
     void onReqGerarEnviar();

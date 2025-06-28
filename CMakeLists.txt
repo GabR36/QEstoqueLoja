@@ -101,6 +101,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         inserirproduto.h inserirproduto.cpp inserirproduto.ui
         util/NfUtilidades.h
         util/ibptutil.h util/ibptutil.cpp
+        nota/DanfeUtil.h nota/DanfeUtil.cpp
 
 
 

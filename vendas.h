@@ -8,6 +8,7 @@
 #include "mainwindow.h"
 #include <QLocale>
 #include "entradasvendasprazo.h"
+#include "nota/DanfeUtil.h"
 
 
 namespace Ui {
@@ -69,6 +70,7 @@ private:
     QAction *actionImprimirRecibo;
     QAction *actionAbrirPagamentos;
     QAction *actionMenuDevolverProd;
+    QAction *actionMenuAbrirDanfe;
     QString de, ate;
     void Teste();
     QString idVendaSelec;
@@ -76,6 +78,7 @@ private:
     void devolverProduto(QString id_prod_vend, QString id_produto, QString qntd);
     void mostrarVendasCliente(int idCliente);
     int IDCLIENTE = 0;
+    void abrirDanfeXml(QString id_Venda);
 signals:
     void vendaConcluidaVendas();
     void pagamentosConcluidos();

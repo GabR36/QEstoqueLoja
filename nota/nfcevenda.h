@@ -25,6 +25,7 @@ public:
     int getSerie();
     QString getXmlPath();
     int getProximoNNF();
+    float getVNF();
 private:
     CppNFe *m_nfe;
     QMap<QString, QString> fiscalValues;

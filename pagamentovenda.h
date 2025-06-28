@@ -27,6 +27,8 @@ private:
     QString idVenda;
     bool ehPfCliente = false;
     QMap<QString, QString> fiscalValues;
+    QMap<QString, QString> empresaValues;
+
 signals:
     void gerarEnviarNf();
 

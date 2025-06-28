@@ -13,6 +13,7 @@
 #include "delegatehora.h"
 #include "delegatepago.h"
 #include "delegateprecof2.h"
+#include "nota/DanfeUtil.h"
 
 
 Vendas::Vendas(QWidget *parent, int idCliente) :
@@ -121,9 +122,6 @@ Vendas::Vendas(QWidget *parent, int idCliente) :
     mostrarVendasCliente(IDCLIENTE);
 
     ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
-
-
-
 
 }
 
@@ -540,7 +538,7 @@ void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
         QModelIndex columnIndex2 = ui->Tview_Vendas2->model()->index(selectedIndex.row(), 2);
 
         // Obtém o valor da célula como uma QString
-         cellValue = ui->Tview_Vendas2->model()->data(columnIndex).toString();
+        cellValue = ui->Tview_Vendas2->model()->data(columnIndex).toString();
         formaPag = ui->Tview_Vendas2->model()->data(columnIndex2).toString();
 
         // Mostra o valor em uma mensagem
@@ -559,25 +557,32 @@ void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
     actionImprimirRecibo->setText("Imprimir Recibo da Venda");
     //actionImprimirRecibo->setIcon(janelaPrincipal->iconImpressora);
     QObject::connect(actionImprimirRecibo, &QAction::triggered, [&]() {
-        imprimirReciboVenda(cellValue); // Chama nossa função com o parâmetro
+        imprimirReciboVenda(cellValue);
     });
 
     actionAbrirPagamentos = new QAction;
     actionAbrirPagamentos->setText("Abrir Pagamentos");
     QObject::connect(actionAbrirPagamentos, &QAction::triggered, [&]() {
-        actionAbrirPagamentosVenda(cellValue); // Chama nossa função com o parâmetro
+        actionAbrirPagamentosVenda(cellValue);
     });
     if(formaPag == "Prazo"){
         actionAbrirPagamentos->setEnabled(true);
     }else{
         actionAbrirPagamentos->setEnabled(false);
     }
+    actionMenuAbrirDanfe = new QAction;
+    actionMenuAbrirDanfe->setText("Abrir DANFE");
+    connect(actionMenuAbrirDanfe, &QAction::triggered, [&]() {
+        abrirDanfeXml(cellValue);
+    });
+
 
 
     menu.addAction(actionMenuDeletarVenda);
 
     menu.addAction(actionImprimirRecibo);
     menu.addAction(actionAbrirPagamentos);
+    menu.addAction(actionMenuAbrirDanfe);
 
 
 
@@ -1044,4 +1049,15 @@ void Vendas::mostrarVendasCliente(int idCliente) {
     ui->Lbl_ClienteHeader->setText(nomeCliente);
 
     filtrarData(de,ate);
+}
+
+void Vendas::abrirDanfeXml(QString id_Venda){
+    QSharedPointer<DanfeUtil> danfe(new DanfeUtil(this));
+    if(danfe->abrirDanfe(id_Venda.toInt())){
+        qDebug() << "abrindo danfe IDVenda:" << id_Venda;
+    }else{
+        QMessageBox::warning(this, "Aviso", "Não foi possivel gerar DANFE com essa venda");
+
+    }
+
 }

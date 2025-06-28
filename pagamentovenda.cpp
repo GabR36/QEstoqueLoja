@@ -8,6 +8,7 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
 
     rowDataList = listaProdutos;
     fiscalValues = Configuracao::get_All_Fiscal_Values();
+    empresaValues = Configuracao::get_All_Empresa_Values();
     this->idCliente = idCliente;
 
 
@@ -73,14 +74,15 @@ void pagamentoVenda::verificarErroNf(const CppNFe *cppnfe){
             }
             QSqlQuery query;
             query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
-                          "tp_amb, xml_path, atualizado_em, id_venda) "
-                          "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :atualizado_em, :id_venda)");
+                          "tp_amb, xml_path, valor_total, atualizado_em, id_venda) "
+                          "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :valortotal, :atualizado_em, :id_venda)");
             query.bindValue(":cstat", cStatMessage);
             query.bindValue(":nnf", QString::number(nota.getNNF()));
             query.bindValue(":serie", QString::number(nota.getSerie()));
             query.bindValue(":modelo", "65");
             query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
             query.bindValue(":xml_path", nota.getXmlPath());
+            query.bindValue(":valortotal", QString::number(nota.getVNF(),'f', 2));
             query.bindValue(":atualizado_em", QDateTime::currentDateTime());
             query.bindValue(":id_venda", idVenda);
             qDebug() << "idvenda: " << idVenda;
@@ -89,7 +91,7 @@ void pagamentoVenda::verificarErroNf(const CppNFe *cppnfe){
             }
 
             QTimer::singleShot(2000, waitDialog, &WaitDialog::close); //fecha depois de 2 segundos
-            imprimirDANFE(this->nota.getCppNFe());
+            //imprimirDANFE(this->nota.getCppNFe());
         }else{
             QString cStatMessage = QString::number(cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat());
             QString msg = "ERRO:\n" + cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_xMotivo() +
@@ -304,34 +306,4 @@ void pagamentoVenda::terminarPagamento(){
     // fechar as janelas
     this->close();
 
-}
-
-void pagamentoVenda::imprimirDANFE(const CppNFe *cppnfe)
-{
-    QString caminhoReportNFe = QDir::currentPath() + "/reports/DANFE-NFe.xml";
-    QString caminhoReportNFCe = QDir::currentPath() + "/reports/DANFE-NFCe.xml";
-
-    CppDanfeQtRPT danfe(cppnfe, 0);
-    //danfe.caminhoLogo(QDir::currentPath() + "/img/logo.png");
-    if (cppnfe->notafiscal->retorno->protNFe->items->count() > 0)
-    {
-        if ((cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 100) ||
-            (cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 150))
-        {
-            if (cppnfe->notafiscal->NFe->items->value(0)->infNFe->ide->get_mod() == ModeloDF::NFe)
-                danfe.caminhoArquivo(caminhoReportNFe);
-            else
-                danfe.caminhoArquivo(caminhoReportNFCe);
-
-            danfe.print();
-        }
-    } else
-    {
-        if (cppnfe->notafiscal->NFe->items->value(0)->infNFe->ide->get_mod() == ModeloDF::NFe)
-            danfe.caminhoArquivo(caminhoReportNFe);
-        else
-            danfe.caminhoArquivo(caminhoReportNFCe);
-
-        danfe.print();
-    }
 }

@@ -300,9 +300,9 @@ void NfceVenda::entrega()
 void NfceVenda::autXML()
 {
 
-    m_nfe->notafiscal->NFe->obj->infNFe->autXML->obj->set_CNPJ(empresaValues.value("cnpj_empresa"));
-    m_nfe->notafiscal->NFe->obj->infNFe->autXML->obj->get_CPF();
-    m_nfe->notafiscal->NFe->obj->infNFe->autXML->add();
+    // m_nfe->notafiscal->NFe->obj->infNFe->autXML->obj->set_CNPJ(empresaValues.value("cnpj_empresa"));
+    // m_nfe->notafiscal->NFe->obj->infNFe->autXML->obj->get_CPF();
+    // m_nfe->notafiscal->NFe->obj->infNFe->autXML->add();
 
 }
 
@@ -1306,6 +1306,10 @@ bool NfceVenda::isValidGTIN(const QString& gtin) {
     }
     int dv = (10 - (sum % 10)) % 10;
     return dv == clean.right(1).toInt();
+}
+
+float NfceVenda::getVNF(){
+    return vNf;
 }
 
 

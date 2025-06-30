@@ -28,6 +28,7 @@ private:
     bool ehPfCliente = false;
     QMap<QString, QString> fiscalValues;
     QMap<QString, QString> empresaValues;
+    bool emitTodosNf = false;
 
 signals:
     void gerarEnviarNf();

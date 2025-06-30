@@ -18,7 +18,7 @@ public:
     ~NfceVenda();
     const CppNFe *getCppNFe();
 
-    void setProdutosVendidos(QList<QList<QVariant>> produtosVendidos);
+    void setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool emitirTodos);
     void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco, float taxa);
     void setCliente(QString cpf, bool ehPf);
     int getNNF();
@@ -46,6 +46,7 @@ private:
     QString nomeCliente, cpfCliente;
     bool ehPfCliente = false;
     QSqlDatabase db = QSqlDatabase::database();
+    bool emitirApenasNf = false;
 
 
 

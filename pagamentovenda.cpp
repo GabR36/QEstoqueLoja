@@ -148,6 +148,11 @@ void pagamentoVenda::terminarPagamento(){
     else{
         desconto = descontoInicial;
     }
+    if(ui->RadioBtn_EmitNfTodos->isChecked()){
+        emitTodosNf = true;
+    }else{
+        emitTodosNf = false;
+    }
     // validar line edits
 
     // desconto
@@ -294,7 +299,7 @@ void pagamentoVenda::terminarPagamento(){
         waitDialog->setMessage("Aguardando resposta do servidor...");
         waitDialog->show();
         nota.setCliente(cpf, ehPfCliente);
-        nota.setProdutosVendidos(rowDataList);
+        nota.setProdutosVendidos(rowDataList, emitTodosNf);
         nota.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
         emit gerarEnviarNf();
         emit pagamentoConcluido(); // sinal para outras janelas atualizarem...

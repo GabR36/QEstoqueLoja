@@ -21,9 +21,8 @@ if (CMAKE_SYSTEM MATCHES "Linux")
     include_directories(
         /usr/include/libxml2
         /usr/include/QtRPT
-        /usr/include/CppBrasil
-        /usr/include/
-        /usr/include/openssl
+        # /usr/include/CppBrasil
+        # /usr/include/openssl
 
     )
 elseif (CMAKE_SYSTEM MATCHES "Windows")

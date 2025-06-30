@@ -449,29 +449,51 @@ font-size: 15px;
     </item>
    </layout>
   </widget>
-  <widget class="QCheckBox" name="CheckImprimirCNF">
+  <widget class="QWidget" name="">
    <property name="geometry">
     <rect>
-     <x>419</x>
-     <y>401</y>
-     <width>131</width>
-     <height>41</height>
+     <x>350</x>
+     <y>360</y>
+     <width>205</width>
+     <height>77</height>
     </rect>
    </property>
-   <property name="autoFillBackground">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Imprimir 
-cupom </string>
-   </property>
-   <property name="icon">
-    <iconset resource="Imagens/recursosImg.qrc">
-     <normaloff>:/QEstoqueLOja/document-print.svg</normaloff>:/QEstoqueLOja/document-print.svg</iconset>
-   </property>
-   <property name="tristate">
-    <bool>false</bool>
-   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QRadioButton" name="RadioBtn_EmitNfApenas">
+      <property name="text">
+       <string>Emitir NF apenas para itens NF</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QRadioButton" name="RadioBtn_EmitNfTodos">
+      <property name="text">
+       <string>Emitir NF para todos produtos</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="CheckImprimirCNF">
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Imprimir cupom </string>
+      </property>
+      <property name="icon">
+       <iconset resource="Imagens/recursosImg.qrc">
+        <normaloff>:/QEstoqueLOja/document-print.svg</normaloff>:/QEstoqueLOja/document-print.svg</iconset>
+      </property>
+      <property name="tristate">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <customwidgets>

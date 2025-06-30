@@ -337,11 +337,11 @@ void NfceVenda::det_produto(const int &i)
     QString codigoBarra = produto[5].toString();
     QString uCom = produto[6].toString();
     QString ncm = produto[7].toString();
-    QString cest = produto[8].toString();
-    double aliquotaImp = produto[9].toDouble();
+    // QString cest = produto[8].toString();
+    // double aliquotaImp = produto[9].toDouble();
 
     float descontoProduto = descontoProd[i];
-
+    qDebug() << "produto(" << i <<")" << desc;
 
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_nItem(i + 1);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->prod->set_cProd(id);
@@ -819,20 +819,29 @@ void NfceVenda::cobr()
 
 void NfceVenda::pag()
 {
+    // ajusta os valores de valor recebido e troco para poder emitir
+    if(emitirApenasNf){
+        vPagNf = vNf;
+        trocoNf = 0;
+    }
     //Grupo YA. Informações de Pagamento
+
 
     //Grupo Detalhamento do Pagamento
     //--***CONTAINER*** 1-100
     m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->set_indPag(ConvNF::strToIndPag(indPagNf));
     m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->set_tPag(ConvNF::strToTPag(tPagNf));
     m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->set_vPag(vPagNf);
-    /*
-    //Grupo de Cartões
-    m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->card->set_tpIntegra();
-    m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->card->set_CNPJ();
-    m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->card->set_tBand();
-    m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->card->set_cAut();
-    */
+    if(tPagNf == "03" || tPagNf == "04" || tPagNf == "17"){
+
+    //Grupo de Cartões //setado valores genericos sem procedencia
+        m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->card->set_tpIntegra(ConvNF::strToTpIntegra("2"));
+        //m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->card->set_CNPJ();
+        m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->card->set_tBand(ConvNF::strToTBand("99"));
+        m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->obj->card->set_cAut("000000");
+
+    }
+
     m_nfe->notafiscal->NFe->obj->infNFe->pag->detPag->add();
 
     m_nfe->notafiscal->NFe->obj->infNFe->pag->set_vTroco(trocoNf);
@@ -1058,21 +1067,34 @@ const CppNFe *NfceVenda::getCppNFe()
     return this->m_nfe;
 }
 
-void NfceVenda::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos){
+void NfceVenda::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool emitirTodos){
     if (!db.open()) {
         qDebug() << "não abriu bd setprodutosvendidos";
         return;
     }
+    emitirApenasNf = !emitirTodos;
+
+    QList<QList<QVariant>> produtosFiltrados; // nova lista filtrada
 
     for (int i = 0; i < produtosVendidos.size(); ++i) {
-        QList<QVariant>& produto = produtosVendidos[i];
+        QList<QVariant> produto = produtosVendidos[i];
 
-        // [0] idProduto
-        // [1] quantVendida
-        // [2] descricao
-        // [3] valorUnitario
-        // [4] valorTotalProduto (calculado)
+        // Verificar se o produto deve ser incluído conforme o campo 'nf'
+        QSqlQuery nfQuery;
+        nfQuery.prepare("SELECT nf FROM produtos WHERE id = :idprod");
+        nfQuery.bindValue(":idprod", produto[0]);
+        if (!nfQuery.exec() || !nfQuery.next()) {
+            qWarning() << "Erro ao consultar campo 'nf' do produto ID:" << produto[0].toString()
+            << nfQuery.lastError().text();
+            continue; // pula esse produto
+        }
 
+        int nf = nfQuery.value("nf").toInt();
+        if (!emitirTodos && nf != 1) {
+            continue; // ignora se não for para emitir todos e nf != 1
+        }
+
+        // [1] quantidade, [3] valor unitário
         QString quantidadeStr = QString::number(portugues.toFloat(produto[1].toString()));
         QString valorUnitarioStr = QString::number(portugues.toFloat(produto[3].toString()));
 
@@ -1084,7 +1106,7 @@ void NfceVenda::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos){
         produto[3] = valorUnitario;
         produto.append(QVariant(valorTotal)); // [4] valor total
 
-        // Consultar informações adicionais do produto
+        // Consulta dados adicionais do produto
         QSqlQuery query;
         query.prepare("SELECT codigo_barras, un_comercial, ncm, cest, aliquota_imposto FROM produtos WHERE id = :idprod");
         query.bindValue(":idprod", produto[0]);
@@ -1098,7 +1120,6 @@ void NfceVenda::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos){
             if (!isValidGTIN(codigoBarras)) {
                 codigoBarras = "SEM GTIN";
             }
-            // Adiciona os novos campos na ordem
             produto.append(codigoBarras);      // [5]
             produto.append(unComercial);       // [6]
             produto.append(ncm);               // [7]
@@ -1108,18 +1129,19 @@ void NfceVenda::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos){
             qWarning() << "Produto ID não encontrado ou erro ao consultar:" << produto[0].toString()
                        << query.lastError().text();
 
-            // Para evitar erro, adiciona valores vazios/defaults
             produto.append("");      // codigo_barras
             produto.append("");      // un_comercial
             produto.append("");      // ncm
             produto.append("");      // cest
             produto.append(0.0);     // aliquota_imposto
         }
+
+        produtosFiltrados.append(produto); // adiciona produto processado
     }
 
-    quantProds = produtosVendidos.size();
-    vTotTribProduto.resize(produtosVendidos.size());
-    listaProdutos = produtosVendidos;
+    quantProds = produtosFiltrados.size();
+    vTotTribProduto.resize(produtosFiltrados.size());
+    listaProdutos = produtosFiltrados;
 }
 void NfceVenda::setPagamentoValores(QString formaPag, float desconto,float recebido, float troco, float taxa){
     if(formaPag == "Prazo"){

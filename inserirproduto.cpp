@@ -17,16 +17,21 @@ InserirProduto::InserirProduto(QWidget *parent)
     ui->setupUi(this);
     ui->tabWidget->setCurrentIndex(0);
     financeiroValues = Configuracao::get_All_Financeiro_Values();
+    produtoValues = Configuracao::get_All_Produto_Values();
     ui->Ledit_CBarras->setFocus();
     ui->Ledit_Desc->setMaxLength(120);
     //add todas as unidades comerciais no combo box do header NFutilidades
-    for (const QString &unidade : unidadesComerciais) {
-        ui->CBox_UCom->addItem(unidade);
+    for (int i = 0; i < unidadesComerciaisCount; ++i) {
+        ui->CBox_UCom->addItem(unidadesComerciais[i]);
     }
 
     ui->Ledit_PercentualLucro->setText(financeiroValues.value("porcent_lucro"));
-    ui->Ledit_NCM->setText("00000000"); // adciona 8 zero valor generico ncm
+    ui->Ledit_NCM->setText(produtoValues.value("ncm_padrao"));
+    ui->Ledit_CSOSN->setText(produtoValues.value("csosn_padrao"));
+    ui->Ledit_PIS->setText(produtoValues.value("pis_padrao"));
+    ui->Ledit_CEST->setText(produtoValues.value("cest_padrao"));
 
+    QIntValidator *intValidador = new QIntValidator(1,999);
     QDoubleValidator *DoubleValidador = new QDoubleValidator(0.0, 9999.99, 2);
     ui->Ledit_PrecoFinal->setValidator(DoubleValidador);
     ui->Ledit_Quant->setValidator(DoubleValidador);
@@ -38,7 +43,8 @@ InserirProduto::InserirProduto(QWidget *parent)
 
     ui->Ledit_NCM->setValidator(new QRegularExpressionValidator(ncmRegex, this));
     ui->Ledit_CEST->setValidator(new QRegularExpressionValidator(cestRegex, this));
-
+    ui->Ledit_CSOSN->setValidator(intValidador);
+    ui->Ledit_PIS->setValidator(intValidador);
     util = new IbptUtil(this);
 
 }
@@ -110,7 +116,7 @@ bool InserirProduto::verificarCodigoBarras(){
 void InserirProduto::on_Btn_Enviar_clicked()
 {
     QString quantidadeProduto, descProduto, precoProduto, barrasProduto, uCom, precoFornecedor,
-        percentLucro, ncm, cest, aliquotaIcms;
+        percentLucro, ncm, cest, aliquotaIcms, csosn, pis;
     bool nfProduto;
     quantidadeProduto = ui->Ledit_Quant->text();
     descProduto = MainWindow::normalizeText(ui->Ledit_Desc->text());
@@ -123,6 +129,8 @@ void InserirProduto::on_Btn_Enviar_clicked()
     ncm = ui->Ledit_NCM->text();
     cest = ui->Ledit_CEST->text();
     aliquotaIcms = ui->Ledit_Aliquota->text();
+    csosn = ui->Ledit_CSOSN->text();
+    pis = ui->Ledit_PIS->text();
 
     if (percentLucro.trimmed().isEmpty()) {
         QMessageBox::warning(this, "Erro", "O campo 'Percentual de Lucro' não pode estar vazio.");
@@ -172,9 +180,10 @@ void InserirProduto::on_Btn_Enviar_clicked()
                 QSqlQuery query;
 
                 query.prepare("INSERT INTO produtos (quantidade, descricao, preco, codigo_barras, nf, "
-                              "un_comercial, preco_fornecedor, porcent_lucro, ncm, cest, aliquota_imposto)"
+                              "un_comercial, preco_fornecedor, porcent_lucro, ncm, cest, aliquota_imposto,"
+                              "csosn, pis)"
                               " VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :ucom, :preco_forn, "
-                              ":porcent_lucro, :ncm, :cest, :aliquota_imp)");
+                              ":porcent_lucro, :ncm, :cest, :aliquota_imp, :csosn, :pis)");
                 query.bindValue(":valor1", quantidadeProduto);
                 query.bindValue(":valor2", descProduto);
                 query.bindValue(":valor3", precoProduto);
@@ -186,6 +195,9 @@ void InserirProduto::on_Btn_Enviar_clicked()
                 query.bindValue(":ncm", ncm);
                 query.bindValue(":cest", cest);
                 query.bindValue(":aliquota_imp", aliquotaIcms);
+                query.bindValue(":csosn", csosn);
+                query.bindValue(":pis", pis);
+
                 if (query.exec()) {
                     qDebug() << "Inserção bem-sucedida!";
                 } else {

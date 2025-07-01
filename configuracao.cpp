@@ -7,6 +7,7 @@
 #include <QSqlError>
 #include <QVariant>
 #include <QDebug>
+#include "util/NfUtilidades.h"
 
 Configuracao::Configuracao(QWidget *parent)
     : QWidget(parent)
@@ -68,6 +69,14 @@ Configuracao::Configuracao(QWidget *parent)
     ui->CheckBox_emitNf->setChecked(configValues.value("emit_nf") == "1");
     ui->Ledit_NNfHomolog->setText(configValues.value("nnf_homolog", ""));
     ui->Ledit_NNfProd->setText(configValues.value("nnf_prod", ""));
+    //produto
+    ui->Ledit_NCMProd->setText(configValues.value("ncm_padrao", ""));
+    ui->Ledit_CSOSNProd->setText(configValues.value("csosn_padrao", ""));
+    ui->Ledit_PISProd->setText(configValues.value("pis_padrao", ""));
+    ui->LEdit_CESTProd->setText(configValues.value("cest_padrao", ""));
+
+
+
 
 
 
@@ -82,6 +91,12 @@ Configuracao::Configuracao(QWidget *parent)
     QIntValidator *validatorUint = new QIntValidator(0, INT_MAX, this);
     ui->Ledit_NNfHomolog->setValidator(validatorUint);
     ui->Ledit_NNfProd->setValidator(validatorUint);
+    ui->Ledit_CSOSNProd->setValidator(validatorUint);
+    QRegularExpression ncmRegex("^\\d{0,8}$");  // até 8 dígitos
+    QRegularExpression cestRegex("^\\d{0,7}$"); // até 7 dígitos
+    ui->LEdit_CESTProd->setValidator(new QRegularExpressionValidator(cestRegex, this));
+    ui->Ledit_NCMProd->setValidator(new QRegularExpressionValidator(ncmRegex, this));
+    ui->Ledit_PISProd->setValidator(validatorUint);
 }
 
 Configuracao::~Configuracao()
@@ -95,7 +110,7 @@ void Configuracao::on_Btn_Aplicar_clicked()
     QString nomeEmpresa, nomeFant, enderecoEmpresa, numeroEmpresa, bairroEmpresa, cepEmpresa, emailEmpresa,
         cnpjEmpresa, telEmpresa, lucro, debito, credito, cidadeEmpresa, estadoEmpresa, logoEmpresa, regimeTrib, tpAmb,
         idCsc, csc, pastaSchema, pastaCertificadoAc, certificado, senhaCertificado, cUf, cMun, iEstad, cnpjRT, nomeRT,
-        emailRt, foneRt, idCSRT, hasCsrt, nnfHomolog, nnfProd;
+        emailRt, foneRt, idCSRT, hasCsrt, nnfHomolog, nnfProd, csosnPadrao, ncmPadrao, cestPadrao, pisPadrao;
     bool emitNf;
     // converter para notacao americana para armazenar no banco de dados
     nomeEmpresa = ui->Ledt_NomeEmpresa->text();
@@ -133,6 +148,10 @@ void Configuracao::on_Btn_Aplicar_clicked()
     emitNf = ui->CheckBox_emitNf->isChecked();
     nnfHomolog = ui->Ledit_NNfHomolog->text();
     nnfProd = ui->Ledit_NNfProd->text();
+    csosnPadrao = ui->Ledit_CSOSNProd->text();
+    ncmPadrao = ui->Ledit_NCMProd->text();
+    cestPadrao = ui->LEdit_CESTProd->text();
+    pisPadrao = ui->Ledit_PISProd->text();
 
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";
@@ -282,6 +301,22 @@ void Configuracao::on_Btn_Aplicar_clicked()
     query.prepare("UPDATE config set value = :value WHERE key = :key");
     query.bindValue(":value", nnfProd);
     query.bindValue(":key", "nnf_prod");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", csosnPadrao);
+    query.bindValue(":key", "csosn_padrao");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", ncmPadrao);
+    query.bindValue(":key", "ncm_padrao");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", cestPadrao);
+    query.bindValue(":key", "cest_padrao");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", pisPadrao);
+    query.bindValue(":key", "pis_padrao");
     query.exec();
 
 
@@ -517,6 +552,53 @@ QMap<QString, QString> Configuracao::get_All_Financeiro_Values(){
         "porcent_lucro",
         "taxa_debito",
         "taxa_credito"
+    };
+
+    // Montar a query com placeholders
+    QStringList placeholders;
+    for (int i = 0; i < keys.size(); ++i) {
+        placeholders << "?";
+    }
+
+    QString queryStr = QString("SELECT key, value FROM config WHERE key IN (%1)")
+                           .arg(placeholders.join(", "));
+
+    QSqlQuery query;
+    query.prepare(queryStr);
+
+    // Vincular os valores
+    for (const QString &key : keys) {
+        query.addBindValue(key);
+    }
+
+    if (!query.exec()) {
+        qWarning() << "Erro ao executar a query de configuração:" << query.lastError().text();
+        return result;
+    }
+
+    while (query.next()) {
+        QString key = query.value("key").toString();
+        QString value = query.value("value").toString();
+        result.insert(key, value);
+    }
+
+    return result;
+}
+
+QMap<QString, QString> Configuracao::get_All_Produto_Values(){
+
+    QSqlDatabase db2 = QSqlDatabase::database();
+    if(!db2.open()){
+        qDebug() << "erro bd get all financeiro values config";
+    }
+    QMap<QString, QString> result;
+
+    // Lista fixa de chaves que queremos buscar
+    QStringList keys = {
+        "ncm_padrao",
+        "csosn_padrao",
+        "cest_padrao",
+        "pis_padrao"
     };
 
     // Montar a query com placeholders

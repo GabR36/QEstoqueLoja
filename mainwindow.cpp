@@ -475,6 +475,18 @@ MainWindow::MainWindow(QWidget *parent)
             if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_prod', '1')")){
                 qDebug() << "nao inserir config nnfprod";
             }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('ncm_padrao', '00000000')")){
+                qDebug() << "nao inserir config ncm_prod";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('csosn_padrao', '102')")){
+                qDebug() << "nao inserir config csosn_padrao";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('pis_padrao', '49')")){
+                qDebug() << "nao inserir config pis_padrao";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('cest_padrao', '')")){
+                qDebug() << "nao inserir config cest_padrao";
+            }
 
             if (!query.exec(
                     "CREATE TABLE IF NOT EXISTS notas_fiscais ("
@@ -501,7 +513,9 @@ MainWindow::MainWindow(QWidget *parent)
                 "ALTER TABLE produtos ADD COLUMN porcent_lucro REAL",
                 "ALTER TABLE produtos ADD COLUMN ncm VARCHAR(8) DEFAULT '00000000'",
                 "ALTER TABLE produtos ADD COLUMN cest TEXT NULL",
-                "ALTER TABLE produtos ADD COLUMN aliquota_imposto REAL NULL"
+                "ALTER TABLE produtos ADD COLUMN aliquota_imposto REAL NULL",
+                "ALTER TABLE produtos ADD COLUMN csosn VARCHAR(5)",
+                "ALTER TABLE produtos ADD COLUMN pis VARCHAR(5)"
             };
             bool hasErrors = false;
 
@@ -791,6 +805,9 @@ void MainWindow::on_Btn_Alterar_clicked()
     QVariant ncm = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 9));
     QVariant cest = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 10));
     QVariant aliquotaImp = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 11));
+    QVariant csosn = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 12));
+    QVariant pis = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 13));
+
 
     QString productId = idVariant.toString();
     QString productQuant = portugues.toString(quantVariant.toFloat());
@@ -804,6 +821,8 @@ void MainWindow::on_Btn_Alterar_clicked()
     QString productNCM = ncm.toString();
     QString productCEST = cest.toString();
     QString productAliquotaImp = portugues.toString(aliquotaImp.toFloat());
+    QString productPis = pis.toString();
+    QString productCsosn = csosn.toString();
 
     qDebug() << productId;
     qDebug() << productPreco;
@@ -812,7 +831,7 @@ void MainWindow::on_Btn_Alterar_clicked()
     alterar->janelaPrincipal = this;
     alterar->idAlt = productId;
     alterar->TrazerInfo(productDesc, productQuant, productPreco, productBarras, productNf, productUCom,
-    produtoPrecoForn, productPorcentLucro, productNCM, productCEST, productAliquotaImp);
+    produtoPrecoForn, productPorcentLucro, productNCM, productCEST, productAliquotaImp, productCsosn, productPis);
     alterar->setWindowModality(Qt::ApplicationModal);
     alterar->show();
     connect(alterar, &AlterarProduto::produtoAlterado, this,

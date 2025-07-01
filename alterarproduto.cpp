@@ -4,6 +4,7 @@
 #include "QSqlQuery"
 #include <QMessageBox>
 #include <QDoubleValidator>
+#include "util/NfUtilidades.h"
 
 AlterarProduto::AlterarProduto(QWidget *parent) :
     QDialog(parent),
@@ -14,7 +15,9 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
 
     ui->tabWidget->setCurrentIndex(0);
     // validadores para os campos
-    QDoubleValidator *DoubleValidador = new QDoubleValidator(0.0, 9999.99, 2);;
+    QDoubleValidator *DoubleValidador = new QDoubleValidator(0.0, 9999.99, 2);
+    QIntValidator *intValidador = new QIntValidator(1,999);
+
     ui->Ledit_AltPreco->setValidator(DoubleValidador);
     ui->Ledit_AltQuant->setValidator(DoubleValidador);
     ui->Ledit_AltPrecoFornecedor->setValidator(DoubleValidador);
@@ -24,51 +27,18 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
 
     ui->Ledit_AltNCM->setValidator(new QRegularExpressionValidator(ncmRegex, this));
     ui->Ledit_AltCEST->setValidator(new QRegularExpressionValidator(cestRegex, this));
+    ui->Ledit_AltCSOSN->setValidator(intValidador);
+    ui->Ledit_AltPIS->setValidator(intValidador);
 
     ui->Btn_GerarCod->setIcon(QIcon(":/QEstoqueLOja/restart.svg"));
 
 
 
     //
-
-    QString unidadesComerciais[] = {
-        "UN",   // Unidade
-        "PC",   // Peça
-        "CX",   // Caixa
-        "KG",   // Quilograma
-        "G",    // Grama
-        "MG",   // Miligrama
-        "L",    // Litro
-        "ML",   // Mililitro
-        "MT",   // Metro
-        "CM",   // Centímetro
-        "MM",   // Milímetro
-        "M2",   // Metro quadrado
-        "M3",   // Metro cúbico
-        "PCT",  // Pacote
-        "SC",   // Saco
-        "DZ",   // Dúzia
-        "PT",   // Ponta
-        "RL",   // Rolo
-        "CJ",   // Conjunto
-        "FD",   // Fardo
-        "AM",   // Ampola
-        "FR",   // Frasco
-        "TB",   // Tubo
-        "PA",   // Par
-        "VD",   // Vidro
-        "BL",   // Bloco
-        "FL",   // Folha
-        "JG",   // Jogo
-        "BG",   // Bag (sacola/saco)
-        "KT",   // Kit
-        "RP",   // Resma
-        "TR",   // Trilho
-        "GR"    // Garrafa
-    };
     ui->Ledit_AltDesc->setMaxLength(120);
-    for (const QString &unidade : unidadesComerciais) {
-        ui->CBox_AltUCom->addItem(unidade);
+    //add todas as unidades comerciais no combo box do header NFutilidades
+    for (int i = 0; i < unidadesComerciaisCount; ++i) {
+        ui->CBox_AltUCom->addItem(unidadesComerciais[i]);
     }
 
 }
@@ -80,8 +50,8 @@ AlterarProduto::~AlterarProduto()
 }
 
  void AlterarProduto::TrazerInfo(QString desc, QString quant, QString preco, QString barras, bool nf,
-                                QString ucom, QString precoforn, QString porcentlucro,
-                                 QString ncm, QString cest, QString aliquotaimp){
+                                QString ucom, QString precoforn, QString porcentlucro, QString ncm,
+                                QString cest, QString aliquotaimp, QString csosn, QString pis){
 
 
     descAlt = desc;
@@ -95,6 +65,8 @@ AlterarProduto::~AlterarProduto()
     ncmAlt = ncm;
     cestAlt = cest;
     aliquotaImpAlt = aliquotaimp;
+    csosnAlt = csosn;
+    pisAlt = pis;
 
     ui->Ledit_AltDesc->setText(desc);
     ui->Ledit_AltQuant->setText(quant);
@@ -107,6 +79,8 @@ AlterarProduto::~AlterarProduto()
     ui->Ledit_AltNCM->setText(ncm);
     ui->Ledit_AltCEST->setText(cest);
     ui->Ledit_AltAliquota->setText(aliquotaimp);
+    ui->Ledit_AltCSOSN->setText(csosn);
+    ui->Ledit_AltPIS->setText(pis);
 
     ui->Lbl_AltNCMDesc->setText(util->get_Descricao_NCM(ncm));
 }
@@ -124,6 +98,8 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
     QString ncm = ui->Ledit_AltNCM->text();
     QString cest = ui->Ledit_AltCEST->text();
     QString aliquotaImp = ui->Ledit_AltAliquota->text();
+    QString csosn = ui->Ledit_AltCSOSN->text();
+    QString pis = ui->Ledit_AltPIS->text();
 
 
     // Converta o texto para um número
@@ -193,6 +169,8 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
                                         "NCM: " + ncmAlt + "\n"
                                    "CEST: " + cestAlt + "\n"
                                     "Aliquota Imp: " + aliquotaImpAlt + "\n"
+                                    "CSOSN: " + csosnAlt + "\n"
+                                     "PIS: " +  pisAlt + "\n"
 
                                         "Para: \n\n"
                                         "Descrição: " + desc + "\n"
@@ -205,7 +183,9 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
                                    "NF: " + nfString + "\n\n"
                                      "NCM: " + ncm + "\n"
                                    "CEST: " + cest + "\n"
-                                    "Aliquota Imp: " + aliquotaImp + "\n",
+                                    "Aliquota Imp: " + aliquotaImp + "\n"
+                                    "CSOSN: " + csosn + "\n"
+                                    "PIS: " +  pis + "\n",
 
                     QMessageBox::Yes | QMessageBox::No
                     );
@@ -219,7 +199,8 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
                     query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4, "
                                   "codigo_barras = :valor5, nf = :valor6, un_comercial = :ucom,"
                                   "preco_fornecedor = :precoforn, porcent_lucro = :porcentlucro,"
-                                  "ncm = :ncm, cest = :cest, aliquota_imposto = :aliquotaimp WHERE id = :valor1");
+                                  "ncm = :ncm, cest = :cest, aliquota_imposto = :aliquotaimp,"
+                                  "csosn = :csosn, pis = :pis  WHERE id = :valor1");
                     query.bindValue(":valor1", idAlt);
                     query.bindValue(":valor2", QString::number(portugues.toFloat(quant)));
                     query.bindValue(":valor3", MainWindow::normalizeText(desc));
@@ -232,6 +213,8 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
                     query.bindValue(":ncm", ncm);
                     query.bindValue(":cest", cest);
                     query.bindValue(":aliquotaimp", aliquotaImp);
+                    query.bindValue(":csosn", csosn);
+                    query.bindValue(":pis", pis);
                     if (query.exec()) {
                         qDebug() << "Alteracao bem-sucedida!";
                     } else {

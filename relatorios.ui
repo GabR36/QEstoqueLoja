@@ -125,6 +125,11 @@ background-color:rgb(170, 170, 170);
                <string>Forma de Pagamento</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>Nota Fiscal Valores</string>
+              </property>
+             </item>
             </widget>
            </item>
            <item>

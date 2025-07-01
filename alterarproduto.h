@@ -24,12 +24,13 @@ public:
     QString quantAlt;
     QString barrasAlt;
     QString ucomAlt,precoFornAlt,porcentLucroAlt,ncmAlt,cestAlt,aliquotaImpAlt;
+    QString csosnAlt, pisAlt;
     bool nfAlt;
     explicit AlterarProduto(QWidget *parent = nullptr);
     ~AlterarProduto();
     QLocale portugues;
 
-    void TrazerInfo(QString desc, QString quant, QString preco, QString barras, bool nf, QString ucom, QString precoforn, QString porcentlucro, QString ncm, QString cest, QString aliquotaimp);
+    void TrazerInfo(QString desc, QString quant, QString preco, QString barras, bool nf, QString ucom, QString precoforn, QString porcentlucro, QString ncm, QString cest, QString aliquotaimp, QString csosn, QString pis);
 private slots:
     void on_Btn_AltAceitar_accepted();
 

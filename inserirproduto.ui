@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>424</width>
-    <height>425</height>
+    <height>452</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,7 +52,17 @@ background-color:rgb(170, 170, 170);
 </string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="1">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_11">
+     <property name="styleSheet">
+      <string notr="true">font: 700 15pt &quot;Ubuntu&quot;;</string>
+     </property>
+     <property name="text">
+      <string>Cadastrar Produto</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
     <widget class="QPushButton" name="Btn_Enviar">
      <property name="minimumSize">
       <size>
@@ -65,7 +75,7 @@ background-color:rgb(170, 170, 170);
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
+   <item row="2" column="0">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Orientation::Horizontal</enum>
@@ -78,7 +88,7 @@ background-color:rgb(170, 170, 170);
      </property>
     </spacer>
    </item>
-   <item row="0" column="0" colspan="2">
+   <item row="1" column="0" colspan="2">
     <widget class="QTabWidget" name="tabWidget">
      <property name="styleSheet">
       <string notr="true"/>
@@ -310,7 +320,7 @@ Comercial:</string>
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>100</y>
+         <y>220</y>
          <width>251</width>
          <height>24</height>
         </rect>
@@ -335,9 +345,9 @@ Comercial:</string>
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>130</y>
-         <width>201</width>
-         <height>32</height>
+         <y>100</y>
+         <width>251</width>
+         <height>47</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -347,8 +357,8 @@ Comercial:</string>
            <string>Porcentagem de ICMS aproximada cobrado de cada produto, APENAS PARA INFORMAÇÃO NA NF.</string>
           </property>
           <property name="text">
-           <string>Aliquota 
- Imposto:</string>
+           <string>Aliquota Imposto
+Aproximada(IBPT)(%) :</string>
           </property>
          </widget>
         </item>
@@ -373,12 +383,12 @@ Comercial:</string>
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
          <y>40</y>
-         <width>173</width>
+         <width>251</width>
          <height>26</height>
         </rect>
        </property>
@@ -399,6 +409,51 @@ Comercial:</string>
            <widget class="CustomLineEdit" name="Ledit_NCM"/>
           </item>
          </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>150</y>
+         <width>251</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_12">
+        <item>
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>CSOSN:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="Ledit_CSOSN"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>180</y>
+         <width>251</width>
+         <height>32</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_13">
+        <item>
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>CST 
+PIS/COFINS:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="Ledit_PIS"/>
         </item>
        </layout>
       </widget>

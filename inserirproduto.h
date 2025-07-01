@@ -40,6 +40,7 @@ private:
 
     Ui::InserirProduto *ui;
     QMap<QString, QString> financeiroValues;
+     QMap<QString, QString> produtoValues;
     QSet<QString> generatedNumbers;
     QLocale portugues;
     QString gerarNumero();

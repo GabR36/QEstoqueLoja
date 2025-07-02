@@ -504,6 +504,11 @@ void NfceVenda::det_imposto(const int &i)
     //double valorUnitario = produto[3].toDouble();
     double valorTotalProd = produto[4].toDouble();
     double aliquotaImp = produto[9].toDouble();
+    QString csosn = produto[10].toString();
+    QString pis = produto[11].toString();
+    qDebug() << "pis" << i << pis;
+    qDebug() << "csosn" << i << csosn;
+
     double porcentagemImposto = aliquotaImp/100;
     float vTotTrib = QString::number(valorTotalProd * porcentagemImposto,'f',2).toFloat();
 
@@ -523,7 +528,8 @@ void NfceVenda::det_imposto(const int &i)
     //m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->ICMS->set_vFCP();
 
     //simples nacional
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->ICMS->set_CSOSN(ConvNF::strToCsosnICMS("102"));
+
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->ICMS->set_CSOSN(ConvNF::strToCsosnICMS(csosn));
 
     /*
     //Grupo NA. ICMS para a UF de destino
@@ -563,7 +569,7 @@ void NfceVenda::det_imposto(const int &i)
 
 
     //Grupo Q. PIS
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->PIS->set_CST(ConvNF::strToCstPIS("49"));
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->PIS->set_CST(ConvNF::strToCstPIS(pis));
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->PIS->set_vBC(0.00);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->PIS->set_pPIS(0.00);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->PIS->set_vPIS(0.00);
@@ -580,7 +586,7 @@ void NfceVenda::det_imposto(const int &i)
     */
 
     //Grupo S. COFINS
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->COFINS->set_CST(ConvNF::strToCstCOFINS("49"));
+    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->COFINS->set_CST(ConvNF::strToCstCOFINS(pis));
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->COFINS->set_vBC(0.00);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->COFINS->set_pCOFINS(0.00);
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->COFINS->set_vCOFINS(0.00);
@@ -1108,14 +1114,17 @@ void NfceVenda::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, boo
 
         // Consulta dados adicionais do produto
         QSqlQuery query;
-        query.prepare("SELECT codigo_barras, un_comercial, ncm, cest, aliquota_imposto FROM produtos WHERE id = :idprod");
+        query.prepare("SELECT codigo_barras, un_comercial, ncm, cest, csosn, pis,"
+                      " aliquota_imposto FROM produtos WHERE id = :idprod");
         query.bindValue(":idprod", produto[0]);
 
         if (query.exec() && query.next()) {
-            QString codigoBarras     = query.value("codigo_barras").toString();
-            QString unComercial      = query.value("un_comercial").toString();
-            QString ncm              = query.value("ncm").toString();
-            QString cest             = query.value("cest").toString();
+            QString codigoBarras = query.value("codigo_barras").toString();
+            QString unComercial = query.value("un_comercial").toString();
+            QString ncm = query.value("ncm").toString();
+            QString cest = query.value("cest").toString();
+            QString csosn = query.value("csosn").toString();
+            QString pis = query.value("pis").toString();
             double aliquotaImposto   = query.value("aliquota_imposto").toDouble();
             if (!isValidGTIN(codigoBarras)) {
                 codigoBarras = "SEM GTIN";
@@ -1125,6 +1134,8 @@ void NfceVenda::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, boo
             produto.append(ncm);               // [7]
             produto.append(cest);              // [8]
             produto.append(aliquotaImposto);   // [9]
+            produto.append(csosn); //[10]
+            produto.append(pis);//[11]
         } else {
             qWarning() << "Produto ID não encontrado ou erro ao consultar:" << produto[0].toString()
                        << query.lastError().text();
@@ -1134,6 +1145,8 @@ void NfceVenda::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, boo
             produto.append("");      // ncm
             produto.append("");      // cest
             produto.append(0.0);     // aliquota_imposto
+            produto.append("");//csosn
+            produto.append("");//pis
         }
 
         produtosFiltrados.append(produto); // adiciona produto processado

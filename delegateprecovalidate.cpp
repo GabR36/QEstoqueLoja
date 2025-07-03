@@ -12,6 +12,7 @@ QWidget *DelegatePrecoValidate::createEditor(QWidget *parent, const QStyleOption
     QLineEdit *editor = new QLineEdit(parent);
     QDoubleValidator *validator = new QDoubleValidator(0, 9999999, 2, editor);
     validator->setNotation(QDoubleValidator::StandardNotation);
+    validator->setLocale(QLocale(QLocale::Portuguese, QLocale::Brazil));
     editor->setValidator(validator);
     editor->setStyleSheet("background-color: lightblue;");
     return editor;

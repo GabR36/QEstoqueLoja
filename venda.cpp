@@ -286,14 +286,14 @@ void venda::on_Btn_SelecionarProduto_clicked()
     QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
     QString idProduto = idVariant.toString();
     QString descProduto = descVariant.toString();
-    // preco com notacao br
-    QString precoProduto = portugues.toString(precoVariant.toFloat());
+
+    float precoProduto = precoVariant.toFloat();
     // mostrar na tabela Selecionados
     QStandardItem *itemQuantidade = new QStandardItem("1");
     //itemQuantidade->setEditable(true);
-
-    QStandardItem *itemPreco = new QStandardItem(precoProduto);
-   // itemPreco->setEditable(true);
+    QStandardItem *itemPreco = new QStandardItem();
+    itemPreco->setData(precoProduto, Qt::EditRole);  // valor bruto
+    itemPreco->setText(portugues.toString(precoProduto, 'f', 2)); // texto formatado
 
     modeloSelecionados->appendRow({new QStandardItem(idProduto), itemQuantidade, new QStandardItem(descProduto), itemPreco});
     // mostrar total

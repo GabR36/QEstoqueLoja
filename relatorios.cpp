@@ -1077,12 +1077,18 @@ void relatorios::on_Btn_AddProd_clicked()
     QString descProduto = descVariant.toString();
 
     // preco com notação BR
-    QString precoProduto = portugues.toString(precoVariant.toFloat());
+    float precoProduto = precoVariant.toFloat();
+    QStandardItem *itemPreco = new QStandardItem();
+    itemPreco->setData(precoProduto, Qt::EditRole);  // valor bruto
+    itemPreco->setText(portugues.toString(precoProduto, 'f', 2)); // texto formatado
 
     // montar os itens da nova linha
     QStandardItem *itemQuantidade = new QStandardItem("1");
-    QStandardItem *itemPreco = new QStandardItem(precoProduto);
-    QStandardItem *itemTotal = new QStandardItem(precoProduto);
+
+    QStandardItem *itemTotal = new QStandardItem();
+    itemTotal->setData(precoProduto, Qt::EditRole);
+    itemTotal->setText(portugues.toString(precoProduto, 'f', 2));
+
 
     modeloSelecionados->appendRow({
         new QStandardItem(idProduto),

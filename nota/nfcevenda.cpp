@@ -88,6 +88,7 @@ void NfceVenda::configurar()
     m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasilv10.crt");
     m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasilv11.crt");
     m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasilv12.crt");
+    qDebug() << fiscalValues.value("caminho_certac") + "/ICP-Brasilv12.crt";
 #elif defined(Q_OS_WIN)
     m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasil.crt");
     m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasilv2.crt");
@@ -663,22 +664,25 @@ void NfceVenda::total()
     //Grupo W. Total da NF-e
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vBC(0.00); //2.00
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vICMS(0.00); //0.34
-    // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vICMSDeson(0.00);
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vICMSDeson(0.00);
     //m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vFCPUFDest();
     //m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vICMSUFDest();
     //m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vICMSUFRemet();
-    // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vFCP(0.00);
-    //m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vBCST(0.00);
-    //m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vST(0.00);
-    // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vFCPST(0.00);
-    // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vFCPSTRet(0.00);
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vFCP(0.00);
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vBCST(0.00);
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vST(0.00);
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vFCPST(0.00);
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vFCPSTRet(0.00);
+
+
+
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vProd(totalGeral);
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vFrete(vFrete);
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vSeg(vSeg);
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vDesc(descontoNf);
-    // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vII(0.00);
-    // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vIPI(0.00);
-    // m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vIPIDevol(0.00);
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vII(0.00);
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vIPI(0.00);
+    m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vIPIDevol(0.00);
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vPIS(0.00);
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vCOFINS(0.00);
     m_nfe->notafiscal->NFe->obj->infNFe->total->ICMSTot->set_vOutro(0.00);

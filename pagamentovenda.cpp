@@ -60,35 +60,14 @@ void pagamentoVenda::onRetStatusServico(const QString &status){
 void pagamentoVenda::verificarErroNf(const CppNFe *cppnfe){
     if (cppnfe->notafiscal->retorno->protNFe->items->count() > 0)
     {
+        QString cStatMessage;
         if ((cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 100) ||
             (cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 150))
         {
 
-            QString cStatMessage = QString::number(cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat());
+            cStatMessage = QString::number(cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat());
             waitDialog->setMessage("Sucesso!\n Status:" + cStatMessage);
             waitDialog->allowClose();
-
-
-            if(!db.open()){
-                qDebug() << "erro ao abrir banco de dados. botao sucesso nota.";
-            }
-            QSqlQuery query;
-            query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
-                          "tp_amb, xml_path, valor_total, atualizado_em, id_venda) "
-                          "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :valortotal, :atualizado_em, :id_venda)");
-            query.bindValue(":cstat", cStatMessage);
-            query.bindValue(":nnf", QString::number(nota.getNNF()));
-            query.bindValue(":serie", QString::number(nota.getSerie()));
-            query.bindValue(":modelo", "65");
-            query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
-            query.bindValue(":xml_path", nota.getXmlPath());
-            query.bindValue(":valortotal", QString::number(nota.getVNF(),'f', 2));
-            query.bindValue(":atualizado_em", QDateTime::currentDateTime());
-            query.bindValue(":id_venda", idVenda);
-            qDebug() << "idvenda: " << idVenda;
-            if (query.exec()) {
-                qDebug() << "Salvou nota no banco!";
-            }
 
             QTimer::singleShot(2000, waitDialog, &WaitDialog::close); //fecha depois de 2 segundos
             //imprimirDANFE(this->nota.getCppNFe());
@@ -96,29 +75,32 @@ void pagamentoVenda::verificarErroNf(const CppNFe *cppnfe){
             QString cStatMessage = QString::number(cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat());
             QString msg = "ERRO:\n" + cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_xMotivo() +
                           "\n" +"cstat: " + cStatMessage ;
-            //waitDialog->allowClose();
-            if(!db.open()){
-                qDebug() << "erro ao abrir banco de dados. erro nota.";
-            }
-            QSqlQuery query;
-            query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
-                          "xml_path, atualizado_em, id_venda) "
-                          "VALUES (:cstat, :nnf, :serie, :modelo, :xml_path, :atualizado_em, :id_venda)");
-            query.bindValue(":cstat", cStatMessage);
-            query.bindValue(":nnf", QString::number(nota.getNNF()));
-            query.bindValue(":serie", QString::number(nota.getSerie()));
-            query.bindValue(":modelo", "65");
-            query.bindValue(":xml_path", nota.getXmlPath());
-            query.bindValue(":atualizado_em", QDateTime::currentDateTime());
-            query.bindValue(":id_venda", idVenda);
-            qDebug() << "idvenda: " << idVenda;
-            if (query.exec()) {
-                qDebug() << "Salvou nota no banco!";
-            }
             qDebug() << "Erro nf:" << msg;
             waitDialog->setMessage(msg);
             waitDialog->allowClose();
             //QTimer::singleShot(2000, waitDialog, &QDialog::close);
+        }
+        if(!db.open()){
+            qDebug() << "erro ao abrir banco de dados. botao sucesso nota.";
+        }
+        QSqlQuery query;
+        QDateTime dataIngles = portugues.toDateTime(dataGlobal, "dd-MM-yyyy hh:mm:ss");
+
+        query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
+                      "tp_amb, xml_path, valor_total, atualizado_em, id_venda) "
+                      "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :valortotal, :atualizado_em, :id_venda)");
+        query.bindValue(":cstat", cStatMessage);
+        query.bindValue(":nnf", QString::number(nota.getNNF()));
+        query.bindValue(":serie", QString::number(nota.getSerie()));
+        query.bindValue(":modelo", "65");
+        query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
+        query.bindValue(":xml_path", nota.getXmlPath());
+        query.bindValue(":valortotal", QString::number(nota.getVNF(),'f', 2));
+        query.bindValue(":atualizado_em", dataIngles.toString("yyyy-MM-dd hh:mm:ss"));
+        query.bindValue(":id_venda", idVenda);
+        qDebug() << "idvenda: " << idVenda;
+        if (query.exec()) {
+            qDebug() << "Salvou nota no banco!";
         }
     } else{
 

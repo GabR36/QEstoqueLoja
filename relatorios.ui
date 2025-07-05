@@ -138,7 +138,7 @@ background-color:rgb(170, 170, 170);
               <string notr="true"/>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>4</number>
              </property>
              <widget class="QWidget" name="page">
               <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -226,6 +226,13 @@ background-color:rgb(170, 170, 170);
               <layout class="QVBoxLayout" name="verticalLayout_11">
                <item>
                 <widget class="QComboBox" name="CBox_AnoFormaPagamento"/>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="page_7">
+              <layout class="QVBoxLayout" name="verticalLayout_19">
+               <item>
+                <widget class="QComboBox" name="CBox_AnoNfValor"/>
                </item>
               </layout>
              </widget>

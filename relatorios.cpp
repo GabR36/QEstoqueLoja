@@ -29,6 +29,7 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QSql>
+#include "configuracao.h"
 //#include <QDebug>;
 
 relatorios::relatorios(QWidget *parent)
@@ -38,6 +39,7 @@ relatorios::relatorios(QWidget *parent)
     ui->setupUi(this);
     ui->tabWidget->setCurrentIndex(1);
     ui->Stacked_Estoque->setCurrentIndex(3);
+    fiscalValues = Configuracao::get_All_Fiscal_Values();
 
     connect(ui->CBox_EstoqueMain, QOverload<int>::of(&QComboBox::currentIndexChanged),
             ui->Stacked_Estoque, &QStackedWidget::setCurrentIndex);
@@ -1372,6 +1374,7 @@ void relatorios::on_tabWidget_tabBarClicked(int index)
             configurarJanelaValorVendas();
             configurarJanelaTopProdutosVendas();
             configurarJanelaFormasPagamentoAno();
+            configurarJanelaNFValor();
 
         }else{
             QMessageBox::warning(this, "Acesso contido", "você deve vender algum produto antes de "
@@ -1396,5 +1399,101 @@ void relatorios::on_Tview_ProdutosSelec_customContextMenuRequested(const QPoint 
 
 
     menu.exec(ui->Tview_ProdutosSelec->viewport()->mapToGlobal(pos));
+}
+QMap<QString, float> relatorios::buscarValoresNfAno(const QString &ano) {
+
+    QMap<QString, float> valores;
+    QString tpamb = fiscalValues.value("tp_amb");
+    qDebug() << ano;
+    QSqlQuery query;
+    query.prepare("SELECT strftime('%m', atualizado_em) AS mes, SUM(valor_total) "
+                  "FROM notas_fiscais "
+                  "WHERE (strftime('%Y', atualizado_em) = :ano "
+                  "AND (cstat = '100' OR cstat = '150')) AND tp_amb = :tpamb "
+                  "GROUP BY mes");
+    query.bindValue(":ano", ano);
+    query.bindValue(":tpamb", tpamb);
+
+    if (query.exec()) {
+        while (query.next()) {
+            QString mes = query.value(0).toString(); // "01", "02", ..., "12"
+            float valor = query.value(1).toFloat();
+            valores[mes] = valor;
+        }
+    } else {
+        qDebug() << "Erro ao buscar valores das NFs por ano:" << query.lastError().text();
+    }
+
+    return valores;
+}
+
+void relatorios::configurarJanelaNFValor(){
+
+    ui->CBox_AnoNfValor->addItems(buscarAnosDisponiveis());
+    // Conectando o ComboBox de ano para atualizar o gráfico
+    connect(ui->CBox_AnoNfValor, &QComboBox::currentTextChanged, this, [=](const QString &anoSelecionado){
+            QMap<QString, float> valoresNf = buscarValoresNfAno(anoSelecionado);
+            if (valoresNf.isEmpty()) {
+                QMessageBox::information(this, "Sem dados", "Não há vendas registradas para esse ano.");
+                return; // ou pode limpar o gráfico, se quiser
+            }
+            // Criando o gráfico de barras
+            QBarSet *set = new QBarSet("Valor de Notas Fiscais emitidas");
+            QStringList categorias;
+
+            for (int i = 1; i <= 12; ++i) {
+                QString mes = QString("%1").arg(i, 2, 10, QChar('0'));
+                categorias << mes;
+                *set << valoresNf.value(mes, 0);
+            }
+
+            QBarSeries *series = new QBarSeries();
+            series->append(set);
+
+            connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
+                if (status) {
+                    QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
+                }
+            });
+
+            QChart *chart = new QChart();
+            chart->addSeries(series);
+            chart->setTitle("Valor Emitididos em Nota Fiscal - Ano " + anoSelecionado);
+            chart->setAnimationOptions(QChart::SeriesAnimations);
+
+            QBarCategoryAxis *axisX = new QBarCategoryAxis();
+            axisX->append(categorias);
+            chart->addAxis(axisX, Qt::AlignBottom);
+            series->attachAxis(axisX);
+
+            QValueAxis *axisY = new QValueAxis();
+            axisY->setRange(0, *std::max_element(valoresNf.begin(), valoresNf.end()));
+            chart->addAxis(axisY, Qt::AlignLeft);
+            series->attachAxis(axisY);
+
+            QChartView *chartView = new QChartView(chart);
+            chartView->setRenderHint(QPainter::Antialiasing);
+
+            QWidget* paginaGrafico = ui->Stacked_Vendas->widget(4); // página
+            QLayout* layoutPagina = paginaGrafico->layout();
+
+
+            if (!layoutPagina) {
+                layoutPagina = new QVBoxLayout(paginaGrafico);
+                paginaGrafico->setLayout(layoutPagina);
+            }
+
+            // Limpando e adicionando o gráfico na página 0
+            QLayoutItem *item;
+            while ((item = layoutPagina->takeAt(1)) != nullptr) {
+                delete item->widget();
+                delete item;
+            }
+            layoutPagina->addWidget(chartView);
+
+    });
+     emit ui->CBox_AnoNfValor->currentTextChanged(ui->CBox_AnoNfValor->currentText());
+
+
 }
 

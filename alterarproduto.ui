@@ -97,7 +97,7 @@ background-color:rgb(170, 170, 170);
    <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_1">
       <attribute name="title">
@@ -164,7 +164,7 @@ background-color:rgb(170, 170, 170);
         <rect>
          <x>10</x>
          <y>70</y>
-         <width>331</width>
+         <width>311</width>
          <height>24</height>
         </rect>
        </property>
@@ -184,10 +184,10 @@ background-color:rgb(170, 170, 170);
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>160</x>
-         <y>100</y>
-         <width>181</width>
-         <height>45</height>
+         <x>110</x>
+         <y>110</y>
+         <width>209</width>
+         <height>24</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -222,82 +222,60 @@ background-color:rgb(170, 170, 170);
       <widget class="QGroupBox" name="groupBox">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>160</y>
-         <width>261</width>
+         <x>10</x>
+         <y>148</y>
+         <width>331</width>
          <height>151</height>
         </rect>
        </property>
        <property name="title">
         <string>Preços</string>
        </property>
-       <widget class="QWidget" name="layoutWidget_2">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>60</y>
-          <width>221</width>
-          <height>33</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_8">
-         <item>
-          <widget class="QLabel" name="label_9">
-           <property name="text">
-            <string>Percentual de 
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_9">
+          <item>
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>Preço Fornecedor:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="CustomLineEdit" name="Ledit_AltPrecoFornecedor"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Percentual de 
  Lucro(%):</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="Ledit_AltPercentualLucro"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="layoutWidget_3">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>20</y>
-          <width>231</width>
-          <height>33</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_9">
-         <item>
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>Preço Fornecedor:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="CustomLineEdit" name="Ledit_AltPrecoFornecedor"/>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="layoutWidget">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>110</y>
-          <width>231</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Preço Final(R$): </string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="Ledit_AltPreco"/>
-         </item>
-        </layout>
-       </widget>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="Ledit_AltPercentualLucro"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_3">
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Preço Final(R$): </string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="Ledit_AltPreco"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
       </widget>
      </widget>
      <widget class="QWidget" name="tab_2">
@@ -307,9 +285,9 @@ background-color:rgb(170, 170, 170);
       <widget class="QCheckBox" name="Check_AltNf">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>10</y>
-         <width>42</width>
+         <x>10</x>
+         <y>20</y>
+         <width>161</width>
          <height>21</height>
         </rect>
        </property>
@@ -320,9 +298,9 @@ background-color:rgb(170, 170, 170);
       <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>230</y>
-         <width>251</width>
+         <x>10</x>
+         <y>260</y>
+         <width>201</width>
          <height>24</height>
         </rect>
        </property>
@@ -342,9 +320,9 @@ background-color:rgb(170, 170, 170);
       <widget class="QWidget" name="layoutWidget_4">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>10</x>
          <y>120</y>
-         <width>251</width>
+         <width>207</width>
          <height>32</height>
         </rect>
        </property>
@@ -368,9 +346,9 @@ background-color:rgb(170, 170, 170);
       <widget class="QWidget" name="layoutWidget_5">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>10</x>
          <y>50</y>
-         <width>251</width>
+         <width>201</width>
          <height>24</height>
         </rect>
        </property>
@@ -390,10 +368,10 @@ background-color:rgb(170, 170, 170);
       <widget class="QLabel" name="Lbl_AltNCMDesc">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>80</y>
-         <width>321</width>
-         <height>31</height>
+         <x>9</x>
+         <y>84</y>
+         <width>181</width>
+         <height>16</height>
         </rect>
        </property>
        <property name="text">
@@ -412,9 +390,9 @@ background-color:rgb(170, 170, 170);
       <widget class="QWidget" name="layoutWidget_7">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>190</y>
-         <width>251</width>
+         <x>10</x>
+         <y>210</y>
+         <width>203</width>
          <height>32</height>
         </rect>
        </property>
@@ -435,9 +413,9 @@ PIS/COFINS:</string>
       <widget class="QWidget" name="layoutWidget_8">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>160</y>
-         <width>251</width>
+         <x>10</x>
+         <y>170</y>
+         <width>201</width>
          <height>24</height>
         </rect>
        </property>
@@ -466,6 +444,23 @@ PIS/COFINS:</string>
    <header>customlineedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>Ledit_AltBarras</tabstop>
+  <tabstop>Ledit_AltDesc</tabstop>
+  <tabstop>CBox_AltUCom</tabstop>
+  <tabstop>Ledit_AltQuant</tabstop>
+  <tabstop>Ledit_AltPrecoFornecedor</tabstop>
+  <tabstop>Ledit_AltPercentualLucro</tabstop>
+  <tabstop>Ledit_AltPreco</tabstop>
+  <tabstop>Btn_GerarCod</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>Check_AltNf</tabstop>
+  <tabstop>Ledit_AltNCM</tabstop>
+  <tabstop>Ledit_AltAliquota</tabstop>
+  <tabstop>Ledit_AltCSOSN</tabstop>
+  <tabstop>Ledit_AltPIS</tabstop>
+  <tabstop>Ledit_AltCEST</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

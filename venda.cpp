@@ -156,6 +156,19 @@ venda::venda(QWidget *parent) :
         validarCliente(true); // Mostra mensagens para o usuário
     });
 
+    fiscalValues = Configuracao::get_All_Fiscal_Values();
+    QString tipoAmb = fiscalValues.value("tp_amb");
+    QString emitirNf = fiscalValues.value("emit_nf");
+
+    if (tipoAmb == "1" && emitirNf == "1") {
+        ui->Lbl_TpAmb->setText("🟢 Amb: Produção");
+        ui->Lbl_TpAmb->setStyleSheet("color: white; background-color: green; font-weight: bold; padding: 4px; border-radius: 5px;");
+    } else if(emitirNf == "1"){
+        ui->Lbl_TpAmb->setText("🟠 Amb: Homologação");
+        ui->Lbl_TpAmb->setStyleSheet("color: white; background-color: orange; font-weight: bold; padding: 4px; border-radius: 5px;");
+    }
+
+
 }
 void venda::atualizarTotalProduto() {
     for (int row = 0; row < modeloSelecionados->rowCount(); ++row) {

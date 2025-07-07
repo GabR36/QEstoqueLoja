@@ -94,7 +94,7 @@ background-color:rgb(170, 170, 170);
       <string notr="true"/>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -469,6 +469,24 @@ PIS/COFINS:</string>
    <header>customlineedit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>Ledit_CBarras</tabstop>
+  <tabstop>Ledit_Desc</tabstop>
+  <tabstop>CBox_UCom</tabstop>
+  <tabstop>Ledit_Quant</tabstop>
+  <tabstop>Ledit_PrecoFornecedor</tabstop>
+  <tabstop>Ledit_PercentualLucro</tabstop>
+  <tabstop>Ledit_PrecoFinal</tabstop>
+  <tabstop>Btn_Enviar</tabstop>
+  <tabstop>Btn_GerarCBarras</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>Check_Nf</tabstop>
+  <tabstop>Ledit_NCM</tabstop>
+  <tabstop>Ledit_Aliquota</tabstop>
+  <tabstop>Ledit_CSOSN</tabstop>
+  <tabstop>Ledit_PIS</tabstop>
+  <tabstop>Ledit_CEST</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

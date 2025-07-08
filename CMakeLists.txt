@@ -103,6 +103,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         nota/DanfeUtil.h nota/DanfeUtil.cpp
         util/NFUtilidades.cpp
         subclass/leditdialog.h subclass/leditdialog.cpp
+        infojanelaprod.h infojanelaprod.cpp infojanelaprod.ui
 
 
 

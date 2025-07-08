@@ -29,6 +29,7 @@
 #include <QSql>
 #include  "inserirproduto.h"
 #include "subclass/leditdialog.h"
+#include "infojanelaprod.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -599,8 +600,11 @@ MainWindow::MainWindow(QWidget *parent)
     actionMenuAlterarProd = new QAction(this);
     actionMenuDeletarProd = new QAction(this);
     actionSetLocalProd = new QAction(this);
+    actionVerProduto = new QAction(this);
     actionSetLocalProd->setText("Adicionar Local Produto");
+    actionVerProduto->setText("Ver Produto");
     connect(actionSetLocalProd,SIGNAL(triggered(bool)),this,SLOT(setLocalProd()));
+    connect(actionVerProduto, SIGNAL(triggered(bool)),this,SLOT(verProd()));
 
     actionMenuDeletarProd->setText("Deletar Produto");
     actionMenuDeletarProd->setIcon(iconDelete);
@@ -625,6 +629,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Tview_Produtos->setItemDelegateForColumn(1,delegateVermelho);
 
     setarIconesJanela();
+
+    connect(ui->Tview_Produtos, &QTableView::doubleClicked,
+            this, &MainWindow::verProd);
 
 
 }
@@ -1103,6 +1110,7 @@ void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
     menu.addAction(actionMenuAlterarProd);
     menu.addAction(actionMenuDeletarProd);
     menu.addAction(actionSetLocalProd);
+    menu.addAction(actionVerProduto);
     imprimirMenu->setIcon(iconImpressora);
     imprimirMenu->addAction(actionMenuPrintBarCode1);
     imprimirMenu->addAction(actionMenuPrintBarCode3);
@@ -1212,4 +1220,22 @@ void MainWindow::setLocalProd(){
         db.close();
     }
 }
+int MainWindow::getIdProdSelected(){
+    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
+
+    if (!selectedIndexes.isEmpty()) {
+        int selectedRow = selectedIndexes.first().row();
+        QModelIndex idIndex = ui->Tview_Produtos->model()->index(selectedRow, 0);
+
+        int id = ui->Tview_Produtos->model()->data(idIndex).toInt();
+        return id;
+    }
+}
+void MainWindow::verProd(){
+    int id = getIdProdSelected();
+    InfoJanelaProd *janelaProd = new InfoJanelaProd(this, id);
+    janelaProd->show();
+}
+
 

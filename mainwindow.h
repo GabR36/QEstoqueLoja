@@ -81,6 +81,9 @@ private slots:
 
     void setLocalProd();
 
+    void verProd();
+
+
 private:
     Ui::MainWindow *ui;
     bool verificarCodigoBarras();
@@ -90,6 +93,7 @@ private:
     QAction* actionSetLocalProd;
     QAction* actionMenuPrintBarCode1;
     QAction* actionMenuPrintBarCode3;
+    QAction* actionVerProduto;
     QMap<QString, QString> financeiroValues;
 
 
@@ -98,6 +102,7 @@ private:
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
+    int getIdProdSelected();
 signals:
     void localSetado();
 

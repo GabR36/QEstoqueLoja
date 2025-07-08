@@ -79,12 +79,15 @@ private slots:
 
     void on_Btn_Clientes_clicked();
 
+    void setLocalProd();
+
 private:
     Ui::MainWindow *ui;
     bool verificarCodigoBarras();
     QSet<QString> generatedNumbers;
     QAction* actionMenuAlterarProd;
     QAction* actionMenuDeletarProd;
+    QAction* actionSetLocalProd;
     QAction* actionMenuPrintBarCode1;
     QAction* actionMenuPrintBarCode3;
     QMap<QString, QString> financeiroValues;
@@ -95,6 +98,8 @@ private:
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
+signals:
+    void localSetado();
 
 
 

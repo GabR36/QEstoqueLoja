@@ -28,6 +28,7 @@
 #include <QSqlRecord>
 #include <QSql>
 #include  "inserirproduto.h"
+#include "subclass/leditdialog.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -515,7 +516,8 @@ MainWindow::MainWindow(QWidget *parent)
                 "ALTER TABLE produtos ADD COLUMN cest TEXT NULL",
                 "ALTER TABLE produtos ADD COLUMN aliquota_imposto REAL NULL",
                 "ALTER TABLE produtos ADD COLUMN csosn VARCHAR(5)",
-                "ALTER TABLE produtos ADD COLUMN pis VARCHAR(5)"
+                "ALTER TABLE produtos ADD COLUMN pis VARCHAR(5)",
+                "ALTER TABLE produtos ADD COLUMN local TEXT NULL"
             };
             bool hasErrors = false;
 
@@ -586,6 +588,9 @@ MainWindow::MainWindow(QWidget *parent)
     // ajustar tamanho colunas
     // coluna descricao
     ui->Tview_Produtos->setColumnWidth(2, 750);
+    //preco
+    ui->Tview_Produtos->setColumnWidth(3, 90);
+
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
     ui->Tview_Produtos->setColumnWidth(4,110);
@@ -593,10 +598,14 @@ MainWindow::MainWindow(QWidget *parent)
     // ações para menu de contexto tabela produtos
     actionMenuAlterarProd = new QAction(this);
     actionMenuDeletarProd = new QAction(this);
+    actionSetLocalProd = new QAction(this);
+    actionSetLocalProd->setText("Adicionar Local Produto");
+    connect(actionSetLocalProd,SIGNAL(triggered(bool)),this,SLOT(setLocalProd()));
 
     actionMenuDeletarProd->setText("Deletar Produto");
     actionMenuDeletarProd->setIcon(iconDelete);
     connect(actionMenuDeletarProd,SIGNAL(triggered(bool)),this,SLOT(on_Btn_Delete_clicked()));
+
 
     actionMenuAlterarProd->setText("Alterar Produto");
     actionMenuAlterarProd->setIcon(iconAlterarProduto);
@@ -1087,11 +1096,13 @@ void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
 
     if(!ui->Tview_Produtos->currentIndex().isValid())
         return;
+
     QMenu menu(this);
     QMenu *imprimirMenu = new QMenu("Imprimir Etiqueta Código de Barra", this);
 
     menu.addAction(actionMenuAlterarProd);
     menu.addAction(actionMenuDeletarProd);
+    menu.addAction(actionSetLocalProd);
     imprimirMenu->setIcon(iconImpressora);
     imprimirMenu->addAction(actionMenuPrintBarCode1);
     imprimirMenu->addAction(actionMenuPrintBarCode3);
@@ -1153,5 +1164,52 @@ void MainWindow::on_Btn_Clientes_clicked()
 
 void MainWindow::atualizarTableviewComQuery(QString &query){
     model->setQuery(query);
+}
+void MainWindow::setLocalProd(){
+    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
+
+    if (!selectedIndexes.isEmpty()) {
+        int selectedRow = selectedIndexes.first().row();
+        QModelIndex idIndex = ui->Tview_Produtos->model()->index(selectedRow, 0);
+        QModelIndex localIndex = ui->Tview_Produtos->model()->index(selectedRow, 14);
+
+        int id = ui->Tview_Produtos->model()->data(idIndex).toInt();
+        QString local = ui->Tview_Produtos->model()->data(localIndex).toString();
+        QSqlQuery query;
+        QStringList sugestoes;
+        if(!db.isOpen()){
+            db.open();
+        }
+        if (query.exec("SELECT DISTINCT local FROM produtos WHERE local IS NOT NULL AND TRIM(local) != ''")) {
+            while (query.next()) {
+                sugestoes << query.value(0).toString();
+            }
+        } else {
+            qDebug() << "Erro ao executar query de locais:" << query.lastError().text();
+        }
+
+        LeditDialog dialog(this);
+        dialog.setLabelText("Informe o local do produto:");
+        dialog.setLineEditText(local);
+        dialog.Ledit_info->setMaxLength(20);
+        dialog.setCompleterSuggestions(sugestoes);
+
+        if (dialog.exec() == QDialog::Accepted) {
+            QString novoLocal = dialog.getLineEditText();
+            qDebug() << "Novo local para ID" << id << ":" << novoLocal;
+
+            query.prepare("UPDATE produtos SET local = :novolocal WHERE id = :id ");
+            query.bindValue(":novolocal", novoLocal);
+            query.bindValue(":id", id);
+            if(!query.exec()){
+                qDebug() << "falhou ao executar query update local";
+            }
+            atualizarTableview();
+            emit localSetado();
+
+        }
+        db.close();
+    }
 }
 

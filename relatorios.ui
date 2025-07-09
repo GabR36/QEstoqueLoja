@@ -94,7 +94,7 @@ background-color:rgb(170, 170, 170);
             <string notr="true">font: 700 10pt &quot;Ubuntu&quot;;</string>
            </property>
            <property name="text">
-            <string>Tipo de relatório:</string>
+            <string>Tipo de Relatório:</string>
            </property>
           </widget>
          </item>
@@ -130,6 +130,11 @@ background-color:rgb(170, 170, 170);
                <string>Nota Fiscal Valores</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>Produtos que geram mais Lucro</string>
+              </property>
+             </item>
             </widget>
            </item>
            <item>
@@ -138,7 +143,7 @@ background-color:rgb(170, 170, 170);
               <string notr="true"/>
              </property>
              <property name="currentIndex">
-              <number>4</number>
+              <number>5</number>
              </property>
              <widget class="QWidget" name="page">
               <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -233,6 +238,13 @@ background-color:rgb(170, 170, 170);
               <layout class="QVBoxLayout" name="verticalLayout_19">
                <item>
                 <widget class="QComboBox" name="CBox_AnoNfValor"/>
+               </item>
+              </layout>
+             </widget>
+             <widget class="QWidget" name="page_8">
+              <layout class="QVBoxLayout" name="verticalLayout_20">
+               <item>
+                <widget class="QComboBox" name="CBox_AnoProdutoLucro"/>
                </item>
               </layout>
              </widget>

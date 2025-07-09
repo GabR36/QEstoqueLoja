@@ -1375,6 +1375,7 @@ void relatorios::on_tabWidget_tabBarClicked(int index)
             configurarJanelaTopProdutosVendas();
             configurarJanelaFormasPagamentoAno();
             configurarJanelaNFValor();
+            configurarJanelaProdutoLucroValor();
 
         }else{
             QMessageBox::warning(this, "Acesso contido", "você deve vender algum produto antes de "
@@ -1497,3 +1498,101 @@ void relatorios::configurarJanelaNFValor(){
 
 }
 
+QMap<QString, float> relatorios::produtosMaisLucrativosAno(const QString &ano) {
+    QMap<QString, float> produtosLucro;
+
+    QSqlQuery query;
+    query.prepare(R"(
+        SELECT
+            p.descricao,
+            SUM(pv.quantidade * (pv.preco_vendido * (IFNULL(p.porcent_lucro, 0) / 100.0))) AS lucro_total
+        FROM produtos_vendidos pv
+        JOIN produtos p ON pv.id_produto = p.id
+        JOIN vendas2 v ON pv.id_venda = v.id
+        WHERE strftime('%Y', v.data_hora) = :ano
+        GROUP BY p.descricao
+        ORDER BY lucro_total DESC
+        LIMIT 10
+    )");
+
+    query.bindValue(":ano", ano);
+
+    if (query.exec()) {
+        while (query.next()) {
+            QString descricaoProduto = query.value(0).toString();
+            float lucro = query.value(1).toFloat();
+            produtosLucro[descricaoProduto] = lucro;
+        }
+    } else {
+        qDebug() << "Erro ao buscar produtos mais lucrativos:" << query.lastError().text();
+    }
+
+    return produtosLucro;
+}
+
+void relatorios::configurarJanelaProdutoLucroValor(){
+    ui->CBox_AnoProdutoLucro->addItems(buscarAnosDisponiveis());
+    // Conectando o ComboBox de ano para atualizar o gráfico
+    connect(ui->CBox_AnoProdutoLucro, &QComboBox::currentTextChanged, this, [=](const QString &anoSelecionado){
+        QMap<QString, float> valoresProduto = produtosMaisLucrativosAno(anoSelecionado);
+        if (valoresProduto.isEmpty()) {
+            QMessageBox::information(this, "Sem dados", "Não há vendas registradas para esse ano.");
+            return; // ou pode limpar o gráfico, se quiser
+        }
+        // Criando o gráfico de barras
+        QBarSet *set = new QBarSet("Lucro");
+        QStringList categorias;
+
+        for (auto it = valoresProduto.constBegin(); it != valoresProduto.constEnd(); ++it) {
+            categorias << it.key();         // nome do produto
+            *set << it.value();             // lucro
+        }
+
+
+        QBarSeries *series = new QBarSeries();
+        series->append(set);
+
+        connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
+            if (status) {
+                QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
+            }
+        });
+
+        QChart *chart = new QChart();
+        chart->addSeries(series);
+        chart->setTitle("TOP 10 produtos que mais geraram lucro - Ano " + anoSelecionado);
+        chart->setAnimationOptions(QChart::SeriesAnimations);
+
+        QBarCategoryAxis *axisX = new QBarCategoryAxis();
+        axisX->append(categorias);
+        chart->addAxis(axisX, Qt::AlignBottom);
+        series->attachAxis(axisX);
+
+        QValueAxis *axisY = new QValueAxis();
+        axisY->setRange(0, *std::max_element(valoresProduto.begin(), valoresProduto.end()));
+        chart->addAxis(axisY, Qt::AlignLeft);
+        series->attachAxis(axisY);
+
+        QChartView *chartView = new QChartView(chart);
+        chartView->setRenderHint(QPainter::Antialiasing);
+
+        QWidget* paginaGrafico = ui->Stacked_Vendas->widget(5); // página
+        QLayout* layoutPagina = paginaGrafico->layout();
+
+
+        if (!layoutPagina) {
+            layoutPagina = new QVBoxLayout(paginaGrafico);
+            paginaGrafico->setLayout(layoutPagina);
+        }
+
+        // Limpando e adicionando o gráfico na página 0
+        QLayoutItem *item;
+        while ((item = layoutPagina->takeAt(1)) != nullptr) {
+            delete item->widget();
+            delete item;
+        }
+        layoutPagina->addWidget(chartView);
+
+    });
+    emit ui->CBox_AnoProdutoLucro->currentTextChanged(ui->CBox_AnoProdutoLucro->currentText());
+}

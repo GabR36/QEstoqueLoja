@@ -72,7 +72,7 @@ void AlterarCliente::on_Btn_Ok_clicked()
     nome = ui->Ledit_Nome->text();
     email = ui->Ledit_Email->text();
     telefone = ui->Ledit_Telefone->text();
-    endereco = ui->Ledit_Cpf->text();
+    endereco = ui->Ledit_Endereco->text();
     cpf = ui->Ledit_Cpf->text();
     dataNasc = ui->Ledit_DataNascimento->text();
     bool ehPf;

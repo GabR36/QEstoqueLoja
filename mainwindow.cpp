@@ -543,6 +543,14 @@ MainWindow::MainWindow(QWidget *parent)
                     qDebug() << "Erro ao atualizar un_comercial:" << query.lastError().text();
                     hasErrors = true;
                 }
+                if (!query.exec("UPDATE produtos SET csosn = '102'")) {
+                    qDebug() << "Erro ao atualizar csosn:" << query.lastError().text();
+                    hasErrors = true;
+                }
+                if (!query.exec("UPDATE produtos SET pis = '49'")) {
+                    qDebug() << "Erro ao atualizar pis:" << query.lastError().text();
+                    hasErrors = true;
+                }
             }
 
             // Atualizar versão do schema se tudo correu bem

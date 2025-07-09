@@ -17,6 +17,8 @@ NfceVenda::NfceVenda(QObject *parent)
     if(fiscalValues.value("emit_nf") == "1"){
         configurar();
     }
+
+
 }
 
 NfceVenda::~NfceVenda()
@@ -337,10 +339,15 @@ void NfceVenda::det_produto(const int &i)
     double valorTotalProd = produto[4].toDouble();
     QString codigoBarra = produto[5].toString();
     QString uCom = produto[6].toString();
-    QString ncm = produto[7].toString();
+    QString ncm;
+    if(produto[7] == ""){
+        ncm = "00000000";
+    }else{
+        ncm = produto[7].toString();
+    }
+
     // QString cest = produto[8].toString();
     // double aliquotaImp = produto[9].toDouble();
-
     float descontoProduto = descontoProd[i];
     qDebug() << "produto(" << i <<")" << desc;
 

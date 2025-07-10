@@ -16,6 +16,7 @@
 #include <QCompleter>
 #include <QStringListModel>
 #include "inserircliente.h"
+#include "infojanelaprod.h"
 
 
 venda::venda(QWidget *parent) :
@@ -167,7 +168,8 @@ venda::venda(QWidget *parent) :
         ui->Lbl_TpAmb->setText("🟠 Amb: Homologação");
         ui->Lbl_TpAmb->setStyleSheet("color: white; background-color: orange; font-weight: bold; padding: 4px; border-radius: 5px;");
     }
-
+    connect(ui->Tview_Produtos, &QTableView::doubleClicked,
+            this, &venda::verProd);
 
 }
 void venda::atualizarTotalProduto() {
@@ -611,4 +613,23 @@ void venda::on_Btn_NovoCliente_clicked()
     connect(inserirCliente, &InserirCliente::clienteInserido, this, &venda::selecionarClienteNovo);
     inserirCliente->show();
 }
+int venda::getIdProdSelected(){
+    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
+
+    if (!selectedIndexes.isEmpty()) {
+        int selectedRow = selectedIndexes.first().row();
+        QModelIndex idIndex = ui->Tview_Produtos->model()->index(selectedRow, 0);
+
+        int id = ui->Tview_Produtos->model()->data(idIndex).toInt();
+        return id;
+    }
+}
+
+void venda::verProd(){
+    int id = getIdProdSelected();
+    InfoJanelaProd *janelaProd = new InfoJanelaProd(this, id);
+    janelaProd->show();
+}
+
 

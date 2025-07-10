@@ -1435,7 +1435,7 @@ void relatorios::configurarJanelaNFValor(){
     connect(ui->CBox_AnoNfValor, &QComboBox::currentTextChanged, this, [=](const QString &anoSelecionado){
             QMap<QString, float> valoresNf = buscarValoresNfAno(anoSelecionado);
             if (valoresNf.isEmpty()) {
-                QMessageBox::information(this, "Sem dados", "Não há vendas registradas para esse ano.");
+                QMessageBox::information(this, "Sem dados", "Não há Notas Fiscais registradas para esse ano.");
                 return; // ou pode limpar o gráfico, se quiser
             }
             // Criando o gráfico de barras

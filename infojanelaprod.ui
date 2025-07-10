@@ -11,9 +11,54 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Informação Produto</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+
+#InfoJanelaProd{
+background-color: rgb(199, 199, 199);
+background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(199, 199, 199, 255), stop:1 rgba(170, 170, 170, 255));
+
+}
+QPushButton{
+background-color: rgb(43, 132, 191);
+color: rgb(255, 255, 255);
+font-size: 15px;
+border-radius: 13px;
+
+}
+
+QPushButton:hover{
+	background-color: rgb(13, 92, 161);
+}
+QPushButton:pressed{
+	
+color: rgb(255, 255, 255);
+	background-color: rgb(153, 193, 241);
+font-size: 15px;
+border-radius: 13px;
+}
+QGroupBox{
+background-color:rgb(170, 170, 170);
+	font: 700 9pt &quot;Segoe UI&quot;;
+	font-size: 15px;
+}
+</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <property name="leftMargin">
+    <number>20</number>
+   </property>
+   <property name="topMargin">
+    <number>15</number>
+   </property>
+   <property name="rightMargin">
+    <number>20</number>
+   </property>
+   <property name="bottomMargin">
+    <number>15</number>
+   </property>
    <item>
     <widget class="QLabel" name="label_14">
      <property name="styleSheet">
@@ -40,6 +85,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
+       </property>
        <property name="text">
         <string>ID:</string>
        </property>
@@ -63,6 +111,9 @@
          <width>100</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
        </property>
        <property name="text">
         <string>Código de Barras:</string>
@@ -88,6 +139,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
+       </property>
        <property name="text">
         <string>Descrição:</string>
        </property>
@@ -111,6 +165,9 @@
          <width>130</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
        </property>
        <property name="text">
         <string>Unidade Comercial:</string>
@@ -136,6 +193,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
+       </property>
        <property name="text">
         <string>Quantidade:</string>
        </property>
@@ -159,6 +219,9 @@
          <width>100</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
        </property>
        <property name="text">
         <string>Local :</string>
@@ -190,6 +253,9 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="styleSheet">
+           <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
+          </property>
           <property name="text">
            <string>Preço Fornecedor:</string>
           </property>
@@ -214,6 +280,9 @@
             <height>16777215</height>
            </size>
           </property>
+          <property name="styleSheet">
+           <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
+          </property>
           <property name="text">
            <string>Porcentagem Lucro:</string>
           </property>
@@ -237,6 +306,9 @@
             <width>100</width>
             <height>16777215</height>
            </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
           </property>
           <property name="text">
            <string>Preço Final:</string>
@@ -265,6 +337,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
+       </property>
        <property name="text">
         <string>NCM:</string>
        </property>
@@ -289,8 +364,12 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
+       </property>
        <property name="text">
-        <string>Aliquota Presumida:</string>
+        <string>Aliquota 
+Presumida:</string>
        </property>
       </widget>
      </item>
@@ -312,6 +391,9 @@
          <width>100</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
        </property>
        <property name="text">
         <string>CSOSN:</string>
@@ -337,6 +419,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
+       </property>
        <property name="text">
         <string>PIS/COFINS:</string>
        </property>
@@ -360,6 +445,9 @@
          <width>30</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
        </property>
        <property name="text">
         <string>Nf:</string>

@@ -21,6 +21,8 @@ private:
     QSqlDatabase db;
 
     void configurar();
+    int getIdProdSelected();
+    void verProd();
 };
 
 #endif // PRODUTOTABLEVIEW_H

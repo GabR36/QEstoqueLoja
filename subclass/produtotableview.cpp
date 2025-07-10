@@ -3,6 +3,7 @@
 #include "../delegateprecof2.h"
 #include "../customdelegate.h"
 #include <QSqlError>
+#include "../infojanelaprod.h"
 
 ProdutoTableView::ProdutoTableView(QWidget *parent) : QTableView(parent)
 {
@@ -53,9 +54,31 @@ void ProdutoTableView::configurar()
     setSelectionMode(QAbstractItemView::SingleSelection);  // Seleciona apenas um item por vez
     setSelectionBehavior(QAbstractItemView::SelectRows);  // Seleciona linhas inteiras
 
+    connect(this, &QTableView::doubleClicked,
+            this, &ProdutoTableView::verProd);
 
 }
 QSqlQueryModel *ProdutoTableView::getModel(){
     return model;
 
 }
+int ProdutoTableView::getIdProdSelected(){
+    QItemSelectionModel *selectionModel = this->selectionModel();
+    QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
+
+    if (!selectedIndexes.isEmpty()) {
+        int selectedRow = selectedIndexes.first().row();
+        QModelIndex idIndex = model->index(selectedRow, 0);
+
+        int id = model->data(idIndex).toInt();
+        return id;
+    }
+}
+void ProdutoTableView::verProd(){
+    int id = getIdProdSelected();
+    InfoJanelaProd *janelaProd = new InfoJanelaProd(this, id);
+    janelaProd->show();
+}
+
+
+

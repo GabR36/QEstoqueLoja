@@ -1206,6 +1206,7 @@ void MainWindow::setLocalProd(){
         }
 
         LeditDialog dialog(this);
+        dialog.setWindowTitle("Inserir Texto");
         dialog.setLabelText("Informe o local do produto:");
         dialog.setLineEditText(local);
         dialog.Ledit_info->setMaxLength(20);
@@ -1245,5 +1246,6 @@ void MainWindow::verProd(){
     InfoJanelaProd *janelaProd = new InfoJanelaProd(this, id);
     janelaProd->show();
 }
+
 
 

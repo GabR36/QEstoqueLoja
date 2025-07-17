@@ -49,6 +49,8 @@ venda::venda(QWidget *parent) :
     ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(2,delegateLockCol2);
     DelegateQuant *delegateQuant = new DelegateQuant(this);
     ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(1,delegateQuant);
+    DelegateLockCol *delegateLockCol3 = new DelegateLockCol(4,this);
+    ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(4,delegateLockCol3);
 
 
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
@@ -58,6 +60,7 @@ venda::venda(QWidget *parent) :
     modeloSelecionados->setHorizontalHeaderItem(1, new QStandardItem("Quantidade Vendida"));
     modeloSelecionados->setHorizontalHeaderItem(2, new QStandardItem("Descrição"));
     modeloSelecionados->setHorizontalHeaderItem(3, new QStandardItem("Preço Unitário Vendido"));
+    modeloSelecionados->setHorizontalHeaderItem(4, new QStandardItem("Total"));
     ui->Tview_ProdutosSelecionados->setModel(modeloSelecionados);
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = modeloProdutos->index(0, 0);
@@ -75,10 +78,17 @@ venda::venda(QWidget *parent) :
     ui->Tview_Produtos->setColumnWidth(2, 260);
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
+
+
+    ui->Tview_ProdutosSelecionados->setColumnWidth(0, 70);
     // coluna quantidade vendida
-    ui->Tview_ProdutosSelecionados->setColumnWidth(1, 180);
+    ui->Tview_ProdutosSelecionados->setColumnWidth(1, 130);
     // coluna descricao
-    ui->Tview_ProdutosSelecionados->setColumnWidth(2, 250);
+    ui->Tview_ProdutosSelecionados->setColumnWidth(2, 300);
+    ui->Tview_ProdutosSelecionados->setColumnWidth(3, 160);
+    ui->Tview_ProdutosSelecionados->setColumnWidth(4, 200);
+
+
 
    // ui->Tview_ProdutosSelecionados->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
@@ -189,7 +199,7 @@ void venda::atualizarTotalProduto() {
         // Atualiza o valor na coluna 4
         modeloSelecionados->setData(
             modeloSelecionados->index(row, 4),
-            QString::number(totalproduto, 'f', 2) // 2 casas decimais
+            portugues.toString(totalproduto, 'f', 2) // 2 casas decimais
             );
     }
 }
@@ -310,7 +320,12 @@ void venda::on_Btn_SelecionarProduto_clicked()
     itemPreco->setData(precoProduto, Qt::EditRole);  // valor bruto
     itemPreco->setText(portugues.toString(precoProduto, 'f', 2)); // texto formatado
 
-    modeloSelecionados->appendRow({new QStandardItem(idProduto), itemQuantidade, new QStandardItem(descProduto), itemPreco});
+    QStandardItem *itemTotal = new QStandardItem();
+    itemTotal->setData(precoProduto, Qt::EditRole);
+    itemTotal->setText(portugues.toString(precoProduto, 'f', 2));
+
+    modeloSelecionados->appendRow({new QStandardItem(idProduto), itemQuantidade,
+                                   new QStandardItem(descProduto), itemPreco, itemTotal});
     // mostrar total
     ui->Lbl_Total->setText(Total());
 }
@@ -472,7 +487,7 @@ void venda::on_Btn_Aceitar_clicked()
     QList<QList<QVariant>> rowDataList;
     for (int row = 0; row < modeloSelecionados->rowCount(); ++row){
         QList<QVariant> rowData;
-        for (int col = 0; col < modeloSelecionados->columnCount(); col++){
+        for (int col = 0; col < modeloSelecionados->columnCount() - 1; col++){
             QModelIndex index = modeloSelecionados->index(row, col);
             rowData.append(modeloSelecionados->data(index));
         }

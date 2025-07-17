@@ -1040,7 +1040,7 @@ void relatorios::atualizarTotalProduto() {
         // Atualiza o valor na coluna 4
         modeloSelecionados->setData(
             modeloSelecionados->index(row, 4),
-            QString::number(totalproduto, 'f', 2) // 2 casas decimais
+            portugues.toString(totalproduto, 'f', 2) // 2 casas decimais
             );
     }
 }

@@ -10,6 +10,7 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
     fiscalValues = Configuracao::get_All_Fiscal_Values();
     empresaValues = Configuracao::get_All_Empresa_Values();
     this->idCliente = idCliente;
+    ui->CBox_ModeloEmit->setVisible(true);
 
 
         if(!db.open()){
@@ -29,10 +30,7 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
             }
         }
 
-        connect(this, &pagamentoVenda::gerarEnviarNf, &nota, &NfceVenda::onReqGerarEnviar);
-        connect(&nota, &NfceVenda::retWSChange, this, &pagamentoVenda::onRetWSChange);
-        connect(&nota, &NfceVenda::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
-        connect(&nota, &NfceVenda::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
+
 
 
 
@@ -50,6 +48,12 @@ void pagamentoVenda::onRetWSChange(const QString &webServices){
         waitDialog->setMessage(webServices);
     }
 
+}
+void pagamentoVenda::onRetLote(const QString &lote)
+{
+    if (waitDialog) {
+        waitDialog->setMessage(lote);
+    }
 }
 
 void pagamentoVenda::onRetStatusServico(const QString &status){
@@ -90,12 +94,20 @@ void pagamentoVenda::verificarErroNf(const CppNFe *cppnfe){
                       "tp_amb, xml_path, valor_total, atualizado_em, id_venda) "
                       "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :valortotal, :atualizado_em, :id_venda)");
         query.bindValue(":cstat", cStatMessage);
-        query.bindValue(":nnf", QString::number(nota.getNNF()));
-        query.bindValue(":serie", QString::number(nota.getSerie()));
+        if(ui->CBox_ModeloEmit->currentIndex() == 0){
+            query.bindValue(":nnf", QString::number(notaNFCe.getNNF()));
+            query.bindValue(":serie", QString::number(notaNFCe.getSerie()));
+            query.bindValue(":xml_path", notaNFCe.getXmlPath());
+            query.bindValue(":valortotal", QString::number(notaNFCe.getVNF(),'f', 2));
+        }else if(ui->CBox_ModeloEmit->currentIndex() == 1){
+            query.bindValue(":nnf", QString::number(notaNFe.getNNF()));
+            query.bindValue(":serie", QString::number(notaNFe.getSerie()));
+            query.bindValue(":xml_path", notaNFe.getXmlPath());
+            query.bindValue(":valortotal", QString::number(notaNFe.getVNF(),'f', 2));
+        }
+
         query.bindValue(":modelo", "65");
         query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
-        query.bindValue(":xml_path", nota.getXmlPath());
-        query.bindValue(":valortotal", QString::number(nota.getVNF(),'f', 2));
         query.bindValue(":atualizado_em", dataIngles.toString("yyyy-MM-dd hh:mm:ss"));
         query.bindValue(":id_venda", idVenda);
         qDebug() << "idvenda: " << idVenda;
@@ -280,13 +292,37 @@ void pagamentoVenda::terminarPagamento(){
 
         waitDialog->setMessage("Aguardando resposta do servidor...");
         waitDialog->show();
-        nota.setCliente(cpf, ehPfCliente);
-        nota.setProdutosVendidos(rowDataList, emitTodosNf);
-        nota.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
-        emit gerarEnviarNf();
-        emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
+        if(ui->CBox_ModeloEmit->currentIndex() == 0){
+            connect(this, &pagamentoVenda::gerarEnviarNf, &notaNFCe, &NfceVenda::onReqGerarEnviar);
+            connect(&notaNFCe, &NfceVenda::retWSChange, this, &pagamentoVenda::onRetWSChange);
+            connect(&notaNFCe, &NfceVenda::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
+            connect(&notaNFCe, &NfceVenda::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
+            connect(&notaNFCe, &NfceVenda::retLote, this, &pagamentoVenda::onRetLote);
 
-        verificarErroNf(this->nota.getCppNFe());
+
+            notaNFCe.setCliente(cpf, ehPfCliente);
+            notaNFCe.setProdutosVendidos(rowDataList, emitTodosNf);
+            notaNFCe.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
+            emit gerarEnviarNf();
+            emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
+
+            verificarErroNf(this->notaNFCe.getCppNFe());
+        }else if(ui->CBox_ModeloEmit->currentIndex() == 1){
+            connect(this, &pagamentoVenda::gerarEnviarNf, &notaNFe, &NFeVenda::onReqGerarEnviar);
+            connect(&notaNFe, &NFeVenda::retWSChange, this, &pagamentoVenda::onRetWSChange);
+            connect(&notaNFe, &NFeVenda::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
+            connect(&notaNFe, &NFeVenda::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
+            connect(&notaNFe, &NFeVenda::retLote, this, &pagamentoVenda::onRetLote);
+
+            notaNFe.setCliente(cpf, ehPfCliente);
+            notaNFe.setProdutosVendidos(rowDataList, emitTodosNf);
+            notaNFe.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
+            emit gerarEnviarNf();
+            emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
+
+            verificarErroNf(this->notaNFe.getCppNFe());
+        }
+
     }
     emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
 

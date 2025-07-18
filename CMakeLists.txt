@@ -104,6 +104,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         util/NFUtilidades.cpp
         subclass/leditdialog.h subclass/leditdialog.cpp
         infojanelaprod.h infojanelaprod.cpp infojanelaprod.ui
+        nota/nfevenda.h nota/nfevenda.cpp
 
 
 

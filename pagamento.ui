@@ -449,16 +449,30 @@ font-size: 15px;
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>350</x>
-     <y>360</y>
+     <y>350</y>
      <width>205</width>
-     <height>77</height>
+     <height>106</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <widget class="QComboBox" name="CBox_ModeloEmit">
+      <item>
+       <property name="text">
+        <string>Emitir NFC-e</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Emitir NF-e</string>
+       </property>
+      </item>
+     </widget>
+    </item>
     <item>
      <widget class="QRadioButton" name="RadioBtn_EmitNfApenas">
       <property name="text">

@@ -4,6 +4,7 @@
 #include "pagamento.h"
 #include "venda.h"
 #include "nota/nfcevenda.h"
+#include "nota/nfevenda.h"
 #include <CppBrasil/NFe/CppNFe>
 #include <CppBrasil/DanfeQtRPT/CppDanfeQtRPT>
 #include <qtrpt.h>
@@ -21,7 +22,8 @@ public:
 private:
     void terminarPagamento() override;
     int idCliente;
-    NfceVenda nota;
+    NfceVenda notaNFCe;
+    NFeVenda notaNFe;
     WaitDialog* waitDialog = nullptr;
     QString erroNf;
     QString idVenda;
@@ -40,6 +42,7 @@ protected:
     void verificarErroNf(const CppNFe *cppnfe);
     void onRetStatusServico(const QString &status);
     void onRetLote(const QString &lote);
+
 };
 
 #endif // PAGAMENTOVENDA_H

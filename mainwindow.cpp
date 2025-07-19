@@ -518,7 +518,15 @@ MainWindow::MainWindow(QWidget *parent)
                 "ALTER TABLE produtos ADD COLUMN aliquota_imposto REAL NULL",
                 "ALTER TABLE produtos ADD COLUMN csosn VARCHAR(5)",
                 "ALTER TABLE produtos ADD COLUMN pis VARCHAR(5)",
-                "ALTER TABLE produtos ADD COLUMN local TEXT NULL"
+                "ALTER TABLE produtos ADD COLUMN local TEXT NULL",
+                "ALTER TABLE clientes ADD COLUMN numero_end VARCHAR(10)",
+                "ALTER TABLE clientes ADD COLUMN bairro TEXT",
+                "ALTER TABLE clientes ADD COLUMN xMun TEXT",
+                "ALTER TABLE clientes ADD COLUMN cMun TEXT",
+                "ALTER TABLE clientes ADD COLUMN uf VARCHAR(3)",
+                "ALTER TABLE clientes ADD COLUMN cep TEXT",
+                "ALTER TABLE clientes ADD COLUMN indIEDest REAL",
+                "ALTER TABLE clientes ADD COLUMN ie TEXT"
             };
             bool hasErrors = false;
 
@@ -528,6 +536,10 @@ MainWindow::MainWindow(QWidget *parent)
                     hasErrors = true;
                 }
             }
+
+
+
+
             // Só atualiza as colunas se todas foram criadas com sucesso
 
             if (!hasErrors) {

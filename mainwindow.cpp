@@ -471,10 +471,16 @@ MainWindow::MainWindow(QWidget *parent)
             if(!query.exec("INSERT INTO config (key, value) VALUES ('emit_nf', '0')")){
                 qDebug() << "nao inserir config emitnf";
             }
-            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_homolog', '1')")){
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_homolog', '0')")){
                 qDebug() << "nao inserir config nnfhomo";
             }
-            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_prod', '1')")){
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_prod', '0')")){
+                qDebug() << "nao inserir config nnfprod";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_homolog_nfe', '0')")){
+                qDebug() << "nao inserir config nnfprod";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_prod_nfe', '0')")){
                 qDebug() << "nao inserir config nnfprod";
             }
             if(!query.exec("INSERT INTO config (key, value) VALUES ('ncm_padrao', '00000000')")){

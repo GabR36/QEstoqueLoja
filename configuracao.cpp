@@ -69,6 +69,9 @@ Configuracao::Configuracao(QWidget *parent)
     ui->CheckBox_emitNf->setChecked(configValues.value("emit_nf") == "1");
     ui->Ledit_NNfHomolog->setText(configValues.value("nnf_homolog", ""));
     ui->Ledit_NNfProd->setText(configValues.value("nnf_prod", ""));
+    ui->Ledit_NNFProdNFe->setText(configValues.value("nnf_prod_nfe", ""));
+    ui->Ledit_NNfHomologNFe->setText(configValues.value("nnf_homolog_nfe", ""));
+
     //produto
     ui->Ledit_NCMProd->setText(configValues.value("ncm_padrao", ""));
     ui->Ledit_CSOSNProd->setText(configValues.value("csosn_padrao", ""));
@@ -110,7 +113,8 @@ void Configuracao::on_Btn_Aplicar_clicked()
     QString nomeEmpresa, nomeFant, enderecoEmpresa, numeroEmpresa, bairroEmpresa, cepEmpresa, emailEmpresa,
         cnpjEmpresa, telEmpresa, lucro, debito, credito, cidadeEmpresa, estadoEmpresa, logoEmpresa, regimeTrib, tpAmb,
         idCsc, csc, pastaSchema, pastaCertificadoAc, certificado, senhaCertificado, cUf, cMun, iEstad, cnpjRT, nomeRT,
-        emailRt, foneRt, idCSRT, hasCsrt, nnfHomolog, nnfProd, csosnPadrao, ncmPadrao, cestPadrao, pisPadrao;
+        emailRt, foneRt, idCSRT, hasCsrt, nnfHomolog, nnfProd, csosnPadrao, ncmPadrao, cestPadrao, pisPadrao,
+        nnfHomologNfe, nnfProdNfe;
     bool emitNf;
     // converter para notacao americana para armazenar no banco de dados
     nomeEmpresa = ui->Ledt_NomeEmpresa->text().trimmed();
@@ -152,6 +156,9 @@ void Configuracao::on_Btn_Aplicar_clicked()
     ncmPadrao = ui->Ledit_NCMProd->text().trimmed();
     cestPadrao = ui->LEdit_CESTProd->text().trimmed();
     pisPadrao = ui->Ledit_PISProd->text().trimmed();
+    nnfProdNfe = ui->Ledit_NNFProdNFe->text().trimmed();
+    nnfHomologNfe = ui->Ledit_NNfHomologNFe->text().trimmed();
+
 
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";
@@ -318,6 +325,14 @@ void Configuracao::on_Btn_Aplicar_clicked()
     query.bindValue(":value", pisPadrao);
     query.bindValue(":key", "pis_padrao");
     query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", nnfProdNfe);
+    query.bindValue(":key", "nnf_prod_nfe");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", nnfHomologNfe);
+    query.bindValue(":key", "nnf_homolog_nfe");
+    query.exec();
 
 
     db.close();
@@ -450,7 +465,9 @@ QMap<QString, QString> Configuracao::get_All_Fiscal_Values() {
         "hash_csrt",
         "emit_nf",
         "nnf_homolog",
-        "nnf_prod"
+        "nnf_prod",
+        "nnf_homolog_nfe",
+        "nnf_prod_nfe"
     };
 
     // Montar a query com placeholders

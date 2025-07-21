@@ -1229,7 +1229,7 @@ int NFeVenda::getProximoNNF(){
     }
 
     int tpAmb = fiscalValues.value("tp_amb").toInt(); // 1 = produção, 0 = homologação
-    QString chaveConfig = (tpAmb == 0) ? "nnf_homolog" : "nnf_prod";
+    QString chaveConfig = (tpAmb == 0) ? "nnf_homolog_nfe" : "nnf_prod_nfe";
     QSqlQuery query;
     query.prepare(
         "SELECT nnf FROM notas_fiscais "

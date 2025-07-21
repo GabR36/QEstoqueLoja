@@ -108,14 +108,16 @@ void pagamentoVenda::verificarErroNf(const CppNFe *cppnfe){
             query.bindValue(":serie", QString::number(notaNFCe.getSerie()));
             query.bindValue(":xml_path", notaNFCe.getXmlPath());
             query.bindValue(":valortotal", QString::number(notaNFCe.getVNF(),'f', 2));
+            query.bindValue(":modelo", "65");
         }else if(ui->CBox_ModeloEmit->currentIndex() == 1){
             query.bindValue(":nnf", QString::number(notaNFe.getNNF()));
             query.bindValue(":serie", QString::number(notaNFe.getSerie()));
             query.bindValue(":xml_path", notaNFe.getXmlPath());
             query.bindValue(":valortotal", QString::number(notaNFe.getVNF(),'f', 2));
+            query.bindValue(":modelo", "55");
         }
 
-        query.bindValue(":modelo", "65");
+
         query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
         query.bindValue(":atualizado_em", dataIngles.toString("yyyy-MM-dd hh:mm:ss"));
         query.bindValue(":id_venda", idVenda);

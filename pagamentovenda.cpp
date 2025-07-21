@@ -12,28 +12,36 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
     this->idCliente = idCliente;
     ui->CBox_ModeloEmit->setVisible(true);
 
-
-        if(!db.open()){
-            qDebug() << "erro bd cliente";
-        }else{
-            QSqlQuery query;
-            query.prepare("SELECT cpf, eh_pf FROM clientes WHERE id = :idcliente");
-            query.bindValue(":idcliente", idCliente);
-            if (!query.exec()) {
-                qDebug() << "cliente nao encontrado";
-            }
-            while(query.next()) {
-                QString cpf = query.value(0).toString();
-                bool ehPf = query.value(1).toBool();
-                ui->Ledit_CpfCnpjCliente->setText(cpf);
-                ehPfCliente = ehPf;
-            }
+    //pega os dados do cliente necessários
+    if(!db.open()){
+        qDebug() << "erro bd cliente";
+    }else{
+        QSqlQuery query;
+        query.prepare("SELECT cpf, eh_pf, nome, email, telefone, endereco, "
+                      "numero_end, bairro, xMun, cMun, uf, cep, indIEDest, ie"
+                      "  FROM clientes WHERE id = :idcliente");
+        query.bindValue(":idcliente", idCliente);
+        if (!query.exec()) {
+            qDebug() << "cliente nao encontrado";
         }
-
-
-
-
-
+        while(query.next()) {
+            cpfCli = query.value(0).toString();
+            ehPfCli = query.value(1).toBool();
+            nomeCli = query.value(2).toString();
+            emailCli = query.value(3).toString();
+            telefoneCli = query.value(4).toString();
+            enderecoCli = query.value(5).toString();
+            numeroCli = query.value(6).toString();
+            bairroCli = query.value(7).toString();
+            xMunCli = query.value(8).toString();
+            cMunCli = query.value(9).toString();
+            ufCli = query.value(10).toString();
+            cepCli = query.value(11).toString();
+            indIeCLi = query.value(12).toInt();
+            ieCli = query.value(13).toString();
+        }
+    }
+    ui->Ledit_CpfCnpjCliente->setText(cpfCli);
 }
 void pagamentoVenda::onErrorOccurred(const QString &error){
     if (waitDialog) {
@@ -52,6 +60,7 @@ void pagamentoVenda::onRetWSChange(const QString &webServices){
 void pagamentoVenda::onRetLote(const QString &lote)
 {
     if (waitDialog) {
+        waitDialog->allowClose();
         waitDialog->setMessage(lote);
     }
 }
@@ -142,6 +151,19 @@ void pagamentoVenda::terminarPagamento(){
     else{
         desconto = descontoInicial;
     }
+
+
+    //se emitir NFE
+
+    if(ui->CBox_ModeloEmit->currentIndex() == 1 && (nomeCli.isEmpty() ||
+        emailCli.isEmpty() ||
+        enderecoCli.isEmpty() || cpfCli.isEmpty() || numeroCli.isEmpty() ||
+        bairroCli.isEmpty() || xMunCli.isEmpty() || cMunCli.isEmpty() ||
+        ufCli.isEmpty() || cepCli.isEmpty())){
+        QMessageBox::warning(this,"Erro", "Cliente com dados incompletos!");
+        return;
+    }
+
     if(ui->RadioBtn_EmitNfTodos->isChecked()){
         emitTodosNf = true;
     }else{
@@ -172,11 +194,11 @@ void pagamentoVenda::terminarPagamento(){
     }
     QString cpf = ui->Ledit_CpfCnpjCliente->text().trimmed();
     if(cpf != ""){
-        if (ehPfCliente == true && cpf.length() != 11){
+        if (ehPfCli == true && cpf.length() != 11){
             QMessageBox::warning(this, "Erro", "Por favor, insira um cpf com 11 digitos.");
             return;
         }
-        if (ehPfCliente == false && cpf.length() != 14){
+        if (ehPfCli == false && cpf.length() != 14){
             QMessageBox::warning(this, "Erro", "Por favor, insira um cnpj com 14 digitos.");
             return;
         }
@@ -300,7 +322,7 @@ void pagamentoVenda::terminarPagamento(){
             connect(&notaNFCe, &NfceVenda::retLote, this, &pagamentoVenda::onRetLote);
 
 
-            notaNFCe.setCliente(cpf, ehPfCliente);
+            notaNFCe.setCliente(cpf, ehPfCli);
             notaNFCe.setProdutosVendidos(rowDataList, emitTodosNf);
             notaNFCe.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
             emit gerarEnviarNf();
@@ -314,7 +336,8 @@ void pagamentoVenda::terminarPagamento(){
             connect(&notaNFe, &NFeVenda::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
             connect(&notaNFe, &NFeVenda::retLote, this, &pagamentoVenda::onRetLote);
 
-            notaNFe.setCliente(cpf, ehPfCliente);
+            notaNFe.setCliente(ehPfCli, cpfCli, nomeCli, indIeCLi, emailCli, enderecoCli,
+            numeroCli, bairroCli, cMunCli, xMunCli, ufCli, cepCli, ieCli);
             notaNFe.setProdutosVendidos(rowDataList, emitTodosNf);
             notaNFe.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
             emit gerarEnviarNf();

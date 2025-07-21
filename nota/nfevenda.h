@@ -17,13 +17,17 @@ public:
 
     void setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool emitirTodos);
     void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco, float taxa);
-    void setCliente(QString cpf, bool ehPf);
     int getNNF();
     int getSerie();
     QString getXmlPath();
     int getProximoNNF();
     float getVNF();
     ~NFeVenda();
+    void setCliente(bool ehPf, QString cpf, QString nome,
+                    int indiedest, QString email, QString lgr,
+                    QString nro, QString bairro, QString cmun,
+                    QString xmun, QString uf, QString cep, QString ie);
+
 private:
     CppNFe *m_nfe;
     QMap<QString, QString> fiscalValues;
@@ -41,8 +45,10 @@ private:
     int nNf = 1;
     int serieNf = 1;
     float taxaPercentual = 0.0;
-    QString nomeCliente, cpfCliente;
-    bool ehPfCliente = false;
+    QString nomeCli, cpfCli, emailCli, lgrCli, nroCli, bairroCli,
+        cmunCli, xmunCli, ufCli, cepCli, ieCli;
+    bool ehPfCli = false;
+    int indiedestCli = 0;
     QSqlDatabase db = QSqlDatabase::database();
     bool emitirApenasNf = false;
 

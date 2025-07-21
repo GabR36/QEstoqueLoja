@@ -37,7 +37,7 @@ void NfceVenda::configurar()
     m_nfe->configuracoes->set_TipoEmissao(TpEmis::Normal);
     m_nfe->configuracoes->set_IdCSC(fiscalValues.value("id_csc"));
     m_nfe->configuracoes->set_CSC(fiscalValues.value("csc"));
-    m_nfe->configuracoes->set_indicadorSincrono(IndSinc::Nao);
+    m_nfe->configuracoes->set_indicadorSincrono(IndSinc::Sim);
 
 //arquivos
 #if defined(Q_OS_LINUX)

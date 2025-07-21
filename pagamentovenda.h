@@ -27,7 +27,10 @@ private:
     WaitDialog* waitDialog = nullptr;
     QString erroNf;
     QString idVenda;
-    bool ehPfCliente = false;
+    QString nomeCli, emailCli, telefoneCli, enderecoCli, cpfCli, numeroCli, bairroCli,
+        xMunCli, cMunCli, ufCli, cepCli, ieCli;
+    int indIeCLi = 0;
+    bool ehPfCli = false;
     QMap<QString, QString> fiscalValues;
     QMap<QString, QString> empresaValues;
     bool emitTodosNf = false;

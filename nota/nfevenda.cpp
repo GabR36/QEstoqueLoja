@@ -252,38 +252,54 @@ void NFeVenda::emite()
 
 void NFeVenda::dest()
 {
-    if(ehPfCliente == false && cpfCliente != ""){
-        m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CNPJ(cpfCliente); //PARA PESSOA JURIDICA
+    if(ehPfCli == false && cpfCli != ""){
+        m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CNPJ(cpfCli); //PARA PESSOA JURIDICA
     }
 
-    if(ehPfCliente == true && cpfCliente != ""){
-        m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CPF(cpfCliente); //PARA PESSOA FISICA
+    if(ehPfCli == true && cpfCli != ""){
+        m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CPF(cpfCli); //PARA PESSOA FISICA
 
     }
-    if(fiscalValues.value("tp_amb") == "0" && cpfCliente != ""){
+    if(fiscalValues.value("tp_amb") == "0" && cpfCli != ""){
         m_nfe->notafiscal->NFe->obj->infNFe->dest->set_xNome("NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL");
     }
     // m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CPF(""); //PARA PESSOA FISICA
     // //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_idEstrangeiro("ID ESTRANGEIRO")
-     m_nfe->notafiscal->NFe->obj->infNFe->dest->set_xNome("Rafael");
-     m_nfe->notafiscal->NFe->obj->infNFe->dest->set_indIEDest(IndIEDest::NaoContribuinte);
-    // //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_IE("IE");
+     m_nfe->notafiscal->NFe->obj->infNFe->dest->set_xNome(nomeCli);
+
+    switch (indiedestCli) {
+    case 0:
+        m_nfe->notafiscal->NFe->obj->infNFe->dest->set_indIEDest(IndIEDest::NaoContribuinte);
+        break;
+    case 1:
+        m_nfe->notafiscal->NFe->obj->infNFe->dest->set_indIEDest(IndIEDest::ContribuinteICMS);
+        m_nfe->notafiscal->NFe->obj->infNFe->dest->set_IE(ieCli);
+        break;
+    case 2:
+        m_nfe->notafiscal->NFe->obj->infNFe->dest->set_indIEDest(IndIEDest::ContribuinteIsento);
+        m_nfe->notafiscal->NFe->obj->infNFe->dest->set_IE(ieCli);
+        break;
+    default:
+        qDebug() << "Valor indIEDest inválido:" << indiedestCli;
+        // Opcional: Definir um padrão seguro
+        m_nfe->notafiscal->NFe->obj->infNFe->dest->set_indIEDest(IndIEDest::NaoContribuinte);
+        break;
+    }
     // //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_ISUF("suframa");
     // //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_IM("insc municipal");
-     m_nfe->notafiscal->NFe->obj->infNFe->dest->set_email("email@.com");
+     m_nfe->notafiscal->NFe->obj->infNFe->dest->set_email(emailCli);
     // //Endereço
-     m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xLgr("rua");
-     m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_nro(1234); //numero interio
+     m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xLgr(lgrCli);
+     m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_nro(nroCli.toInt()); //numero interio
     // //m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xCpl("complemento");
-     m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xBairro("BAIRRO");
-     m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_cMun(4118600); //CODIGO DO MUNICÍPIO
-     m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xMun("NOME DA CIDADE");
-     m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_UF("PR");
-     m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_CEP(84630000); //NUMERO INTEIRO
+     m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xBairro(bairroCli);
+     m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_cMun(cmunCli.toInt()); //CODIGO DO MUNICÍPIO
+     m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xMun(xmunCli);
+     m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_UF(ufCli);
+     m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_CEP(cepCli.toInt()); //NUMERO INTEIRO
      m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_cPais(1058); //BRASIL
      m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xPais("1058");
      //m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_fone("1231231"); //STRING
-
 
 }
 
@@ -1332,9 +1348,23 @@ float NFeVenda::corrigirTaxa(float taxaAntiga, float desconto){
     taxaNova = (valorTotalProdutos - desconto) * taxaConvertida + desconto;
     return ((taxaNova/valorTotalProdutos) - 1) * 100;
 }
-void NFeVenda::setCliente(QString cpf, bool ehPf){
-    cpfCliente = cpf;
-    ehPfCliente = ehPf;
+void NFeVenda::setCliente(bool ehPf, QString cpf, QString nome, int indiedest,
+QString email, QString lgr, QString nro, QString bairro, QString cmun, QString xmun,
+QString uf, QString cep, QString ie){
+
+    cpfCli = cpf;
+    ehPfCli = ehPf;
+    nomeCli = nome;
+    indiedestCli = indiedest;
+    emailCli = email;
+    lgrCli = lgr;
+    nroCli = nro;
+    bairroCli = bairro;
+    cmunCli = cmun;
+    xmunCli = xmun;
+    ufCli = uf;
+    cepCli = cep;
+    ieCli = ie;
 
 }
 bool NFeVenda::isValidGTIN(const QString& gtin) {

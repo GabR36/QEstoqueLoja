@@ -162,7 +162,7 @@ void pagamentoVenda::terminarPagamento(){
         enderecoCli.isEmpty() || cpfCli.isEmpty() || numeroCli.isEmpty() ||
         bairroCli.isEmpty() || xMunCli.isEmpty() || cMunCli.isEmpty() ||
         ufCli.isEmpty() || cepCli.isEmpty())){
-        QMessageBox::warning(this,"Erro", "Cliente com dados incompletos!");
+        QMessageBox::warning(this,"Erro", "Cliente com dados incompletos para emitir NF-E");
         return;
     }
 

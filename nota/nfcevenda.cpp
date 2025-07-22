@@ -578,9 +578,9 @@ void NfceVenda::det_imposto(const int &i)
 
     //Grupo Q. PIS
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->PIS->set_CST(ConvNF::strToCstPIS(pis));
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->PIS->set_vBC(0.00);
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->PIS->set_pPIS(0.00);
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->PIS->set_vPIS(0.00);
+    // m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->PIS->set_vBC(0.00);
+    // m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->PIS->set_pPIS(0.00);
+    // m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->PIS->set_vPIS(0.00);
 
 
     /*
@@ -595,9 +595,9 @@ void NfceVenda::det_imposto(const int &i)
 
     //Grupo S. COFINS
     m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->COFINS->set_CST(ConvNF::strToCstCOFINS(pis));
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->COFINS->set_vBC(0.00);
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->COFINS->set_pCOFINS(0.00);
-    m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->COFINS->set_vCOFINS(0.00);
+    // m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->COFINS->set_vBC(0.00);
+    // m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->COFINS->set_pCOFINS(0.00);
+    // m_nfe->notafiscal->NFe->obj->infNFe->det->obj->imposto->COFINS->set_vCOFINS(0.00);
 
     /*
     //Grupo T. COFINS ST

@@ -11,9 +11,11 @@ AlterarCliente::AlterarCliente(QWidget *parent, QString id)
     setWindowFlags(Qt::Tool);
 
     qDebug() << "id alterar cliente: " + id;
-    //validadores
+
+    //aplicar validators
     QIntValidator *intValidator = new QIntValidator(1, 999999, this);
     ui->Ledit_Numero->setValidator(intValidator);
+    //ui->Ledit_Telefone->setValidator(intValidator);
     QRegularExpression rx("[A-Za-zÀ-ÿ\\s]{1,50}");
     QRegularExpressionValidator *textValidator = new QRegularExpressionValidator(rx, this);
     ui->Ledit_Bairro->setValidator(textValidator);
@@ -34,6 +36,31 @@ AlterarCliente::AlterarCliente(QWidget *parent, QString id)
     QRegularExpressionValidator *ieValidator =
         new QRegularExpressionValidator(QRegularExpression("\\d{0,14}"), this);
     ui->Ledit_IE->setValidator(ieValidator);
+
+    QRegularExpressionValidator *sohLetraValidator =
+        new QRegularExpressionValidator(QRegularExpression("^[A-Za-zÀ-ÿ ]{1,30}$"), this);    ui->Ledit_Bairro->setValidator(sohLetraValidator);
+    ui->Ledit_Municipio->setValidator(sohLetraValidator);
+    QRegularExpressionValidator *emailValidator =
+        new QRegularExpressionValidator(
+            QRegularExpression("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"),this);
+    ui->Ledit_Email->setValidator(emailValidator);
+    QRegularExpressionValidator *cnpjValidator =
+        new QRegularExpressionValidator(
+            QRegularExpression("^\\d{14}$"),
+            this
+            );
+    ui->Ledit_Cpf->setValidator(cnpjValidator);
+
+
+
+    ui->Ledit_DataNascimento->setInputMask("99/99/9999");
+
+    //max lenght
+    ui->Ledit_Telefone->setMaxLength(12);
+    ui->Ledit_Cpf->setMaxLength(15);
+    ui->Ledit_Nome->setMaxLength(30);
+    ui->Ledit_Endereco->setMaxLength(30);
+    ui->Ledit_Email->setMaxLength(30);
 
     // obter as informações do cliente para colocar nos linedits
     if(!db.open()){
@@ -136,6 +163,52 @@ void AlterarCliente::on_Btn_Ok_clicked()
     cep = ui->Ledit_CEP->text().trimmed();
     ie = ui->Ledit_IE->text().trimmed();
     iedest = ui->CBox_IndIEDest->currentIndex();
+    // Verificação do Nome (Único campo obrigatório)
+    if (nome.isEmpty()) {
+        QMessageBox::warning(this, "Erro", "Por favor, insira um nome.");
+        return;
+    }
+
+    // Validação do CPF (Apenas se o campo não estiver vazio)
+    if (!cpf.isEmpty() && (cpf.length() != 11 || !cpf.toLongLong()) && ui->RadioB_Pfisica->isChecked()) {
+        QMessageBox::warning(this, "Erro", "CPF inválido! Insira um CPF com 11 números.");
+        return;
+    }
+    // Validação do CPF (Apenas se o campo não estiver vazio)
+    if (!cpf.isEmpty() && (cpf.length() != 14 || !cpf.toLongLong()) && ui->RadioB_Pjuridica->isChecked()) {
+        QMessageBox::warning(this, "Erro", "cnpj inválido! Insira um cnpj com 14 números.");
+        return;
+    }
+
+    // Validação do Email (Apenas se o campo não estiver vazio)
+    if (!email.isEmpty()) {
+        QRegularExpression emailRegex(R"((\w+)(\.\w+)*@(\w+)((\.\w+)+))");
+        if (!emailRegex.match(email).hasMatch()) {
+            QMessageBox::warning(this, "Erro", "Email inválido! Insira um email válido.");
+            return;
+        }
+    }
+
+    // Validação do Telefone (Apenas se o campo não estiver vazio)
+    if (!telefone.isEmpty() && (telefone.length() < 10 || !telefone.toLongLong())) {
+        QMessageBox::warning(this, "Erro", "Telefone inválido! Insira um número de telefone válido.");
+        return;
+    }
+
+    // Validação da Data de Nascimento (Apenas se o campo não estiver vazio)
+    if (!dataNasc.isEmpty()) {
+        QRegularExpression dataRegex(R"(^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/\d{4}$)");
+        if (!dataRegex.match(dataNasc).hasMatch()) {
+            QMessageBox::warning(this, "Erro", "Data de nascimento inválida! Use o formato dd/MM/yyyy.");
+            return;
+        }
+    }
+    if((ui->CBox_IndIEDest->currentIndex() == 1 || ui->CBox_IndIEDest->currentIndex() == 2)
+        && ui->Ledit_IE->text().isEmpty()){
+        QMessageBox::warning(this, "Erro", "Inscrição Estadual precisa ser preenchida"
+                                           " quando IndIeDest = contribuinte");
+        return;
+    }
 
 
 
@@ -174,8 +247,8 @@ void AlterarCliente::on_Btn_Ok_clicked()
         }
 
         db.close();
+        QMessageBox::information(this, "Sucesso", "Cliente alterado com sucesso!");
         emit clienteAtualizado();
-
         this->close();
     }
 }

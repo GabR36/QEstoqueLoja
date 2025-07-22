@@ -16,6 +16,7 @@ InserirCliente::InserirCliente(QWidget *parent)
     //aplicar validators
     QIntValidator *intValidator = new QIntValidator(1, 999999, this);
     ui->Ledit_Numero->setValidator(intValidator);
+    //ui->Ledit_Telefone->setValidator(intValidator);
     QRegularExpression rx("[A-Za-zÀ-ÿ\\s]{1,50}");
     QRegularExpressionValidator *textValidator = new QRegularExpressionValidator(rx, this);
     ui->Ledit_Bairro->setValidator(textValidator);
@@ -36,6 +37,31 @@ InserirCliente::InserirCliente(QWidget *parent)
     QRegularExpressionValidator *ieValidator =
         new QRegularExpressionValidator(QRegularExpression("\\d{0,14}"), this);
     ui->Ledit_IE->setValidator(ieValidator);
+
+    QRegularExpressionValidator *sohLetraValidator =
+        new QRegularExpressionValidator(QRegularExpression("^[A-Za-zÀ-ÿ ]{1,30}$"), this);    ui->Ledit_Bairro->setValidator(sohLetraValidator);
+    ui->Ledit_Municipio->setValidator(sohLetraValidator);
+    QRegularExpressionValidator *emailValidator =
+        new QRegularExpressionValidator(
+            QRegularExpression("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"),this);
+    ui->Ledit_Email->setValidator(emailValidator);
+    QRegularExpressionValidator *cnpjValidator =
+        new QRegularExpressionValidator(
+            QRegularExpression("^\\d{14}$"),
+            this
+            );
+    ui->Ledit_Cpf->setValidator(cnpjValidator);
+
+
+
+    ui->Ledit_DataNascimento->setInputMask("99/99/9999");
+
+    //max lenght
+    ui->Ledit_Telefone->setMaxLength(12);
+    ui->Ledit_Cpf->setMaxLength(15);
+    ui->Ledit_Nome->setMaxLength(30);
+    ui->Ledit_Endereco->setMaxLength(30);
+    ui->Ledit_Email->setMaxLength(30);
 
 
 }
@@ -112,6 +138,12 @@ void InserirCliente::on_Btn_Inserir_clicked()
             QMessageBox::warning(this, "Erro", "Data de nascimento inválida! Use o formato dd/MM/yyyy.");
             return;
         }
+    }
+    if((ui->CBox_IndIEDest->currentIndex() == 1 || ui->CBox_IndIEDest->currentIndex() == 2)
+            && ui->Ledit_IE->text().isEmpty()){
+        QMessageBox::warning(this, "Erro", "Inscrição Estadual precisa ser preenchida"
+                                           " quando IndIeDest = contribuinte");
+        return;
     }
 
     // Inserir no banco de dados

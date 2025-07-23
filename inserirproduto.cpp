@@ -36,6 +36,7 @@ InserirProduto::InserirProduto(QWidget *parent)
     ui->Ledit_PrecoFinal->setValidator(DoubleValidador);
     ui->Ledit_Quant->setValidator(DoubleValidador);
     ui->Ledit_PrecoFornecedor->setValidator(DoubleValidador);
+    ui->Ledit_Aliquota->setValidator(DoubleValidador);
     ui->Ledit_NCM->installEventFilter(this);
 
     QRegularExpression ncmRegex("^\\d{0,8}$");  // até 8 dígitos
@@ -132,6 +133,10 @@ void InserirProduto::on_Btn_Enviar_clicked()
     csosn = ui->Ledit_CSOSN->text();
     pis = ui->Ledit_PIS->text();
 
+    if(descProduto.isEmpty()){
+        QMessageBox::warning(this, "Erro", "O campo 'Descrição' não pode estar vazio.");
+        return;
+    }
     if (percentLucro.trimmed().isEmpty()) {
         QMessageBox::warning(this, "Erro", "O campo 'Percentual de Lucro' não pode estar vazio.");
         ui->Ledit_PercentualLucro->setFocus();

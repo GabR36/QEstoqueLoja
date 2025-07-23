@@ -47,8 +47,6 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
-        ${CMAKE_CURRENT_SOURCE_DIR}/nota/nota.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/nota/nota.h
         ${TS_FILES}
 )
 

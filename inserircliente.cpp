@@ -39,7 +39,8 @@ InserirCliente::InserirCliente(QWidget *parent)
     ui->Ledit_IE->setValidator(ieValidator);
 
     QRegularExpressionValidator *sohLetraValidator =
-        new QRegularExpressionValidator(QRegularExpression("^[A-Za-zÀ-ÿ ]{1,30}$"), this);    ui->Ledit_Bairro->setValidator(sohLetraValidator);
+        new QRegularExpressionValidator(QRegularExpression("^[A-Za-zÀ-ÿ ]{1,30}$"), this);
+    ui->Ledit_Bairro->setValidator(sohLetraValidator);
     ui->Ledit_Municipio->setValidator(sohLetraValidator);
     QRegularExpressionValidator *emailValidator =
         new QRegularExpressionValidator(

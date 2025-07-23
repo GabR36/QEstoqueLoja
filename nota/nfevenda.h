@@ -51,6 +51,10 @@ private:
     int indiedestCli = 0;
     QSqlDatabase db = QSqlDatabase::database();
     bool emitirApenasNf = false;
+    typedef struct{
+        QString nome;
+        int id;
+    }cliente;
 
 
 

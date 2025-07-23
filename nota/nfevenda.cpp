@@ -1352,7 +1352,6 @@ void NFeVenda::setCliente(bool ehPf, QString cpf, QString nome, int indiedest,
 QString email, QString lgr, QString nro, QString bairro, QString cmun, QString xmun,
 QString uf, QString cep, QString ie){
 
-    cpfCli = cpf;
     ehPfCli = ehPf;
     nomeCli = nome;
     indiedestCli = indiedest;

@@ -100,6 +100,33 @@ Configuracao::Configuracao(QWidget *parent)
     ui->LEdit_CESTProd->setValidator(new QRegularExpressionValidator(cestRegex, this));
     ui->Ledit_NCMProd->setValidator(new QRegularExpressionValidator(ncmRegex, this));
     ui->Ledit_PISProd->setValidator(validatorUint);
+
+    QRegularExpression sohNumeroRegex("^[0-9]*$");
+    ui->Ledit_NNfHomolog->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
+    ui->Ledit_NNfProd->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
+    ui->Ledit_NNfHomologNFe->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
+    ui->Ledit_NNFProdNFe->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
+    ui->Ledit_Idcsc->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
+    ui->Ledt_CUf->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
+    ui->Ledt_IE->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
+    ui->Ledt_CMun->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
+    ui->Ledt_CnpjRespTec->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
+    ui->Ledt_FoneRespTec->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
+
+    ui->Ledt_NumeroEnd->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
+    ui->Ledt_Cep->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
+    ui->Ledt_TelEmpresa->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
+    ui->Ledt_CnpjEmpresa->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
+
+
+
+
+
+
+
+
+
+
 }
 
 Configuracao::~Configuracao()

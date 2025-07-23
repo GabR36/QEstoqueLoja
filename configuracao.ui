@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -40,7 +40,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledt_NomeEmpresa"/>
+          <widget class="QLineEdit" name="Ledt_NomeEmpresa">
+           <property name="maxLength">
+            <number>30</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -54,7 +58,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledt_NomeFantasia"/>
+          <widget class="QLineEdit" name="Ledt_NomeFantasia">
+           <property name="maxLength">
+            <number>30</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -68,7 +76,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledt_EnderecoEmpresa"/>
+          <widget class="QLineEdit" name="Ledt_EnderecoEmpresa">
+           <property name="maxLength">
+            <number>30</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -82,7 +94,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledt_NumeroEnd"/>
+          <widget class="QLineEdit" name="Ledt_NumeroEnd">
+           <property name="maxLength">
+            <number>15</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -96,7 +112,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledt_Bairro"/>
+          <widget class="QLineEdit" name="Ledt_Bairro">
+           <property name="maxLength">
+            <number>30</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -110,7 +130,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledt_Cep"/>
+          <widget class="QLineEdit" name="Ledt_Cep">
+           <property name="maxLength">
+            <number>15</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -124,7 +148,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledt_CidadeEmpresa"/>
+          <widget class="QLineEdit" name="Ledt_CidadeEmpresa">
+           <property name="maxLength">
+            <number>30</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -156,7 +184,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledt_TelEmpresa"/>
+          <widget class="QLineEdit" name="Ledt_TelEmpresa">
+           <property name="maxLength">
+            <number>15</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -170,7 +202,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledt_CnpjEmpresa"/>
+          <widget class="QLineEdit" name="Ledt_CnpjEmpresa">
+           <property name="maxLength">
+            <number>15</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -184,7 +220,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledt_EmailEmpresa"/>
+          <widget class="QLineEdit" name="Ledt_EmailEmpresa">
+           <property name="maxLength">
+            <number>25</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -237,7 +277,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="Ledt_LucroEmpresa"/>
+            <widget class="QLineEdit" name="Ledt_LucroEmpresa">
+             <property name="maxLength">
+              <number>4</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -251,7 +295,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="Ledt_debito"/>
+            <widget class="QLineEdit" name="Ledt_debito">
+             <property name="maxLength">
+              <number>4</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -265,7 +313,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="Ledt_credito"/>
+            <widget class="QLineEdit" name="Ledt_credito">
+             <property name="maxLength">
+              <number>4</number>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -305,7 +357,7 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-269</y>
             <width>492</width>
             <height>752</height>
            </rect>
@@ -337,7 +389,11 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="Ledit_NNfHomologNFe"/>
+                 <widget class="QLineEdit" name="Ledit_NNfHomologNFe">
+                  <property name="maxLength">
+                   <number>7</number>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -351,7 +407,11 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="Ledit_NNFProdNFe"/>
+                 <widget class="QLineEdit" name="Ledit_NNFProdNFe">
+                  <property name="maxLength">
+                   <number>7</number>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -365,7 +425,11 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="Ledit_NNfHomolog"/>
+                 <widget class="QLineEdit" name="Ledit_NNfHomolog">
+                  <property name="maxLength">
+                   <number>7</number>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -379,7 +443,11 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="Ledit_NNfProd"/>
+                 <widget class="QLineEdit" name="Ledit_NNfProd">
+                  <property name="maxLength">
+                   <number>7</number>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -422,7 +490,11 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="Ledit_Idcsc"/>
+              <widget class="QLineEdit" name="Ledit_Idcsc">
+               <property name="maxLength">
+                <number>10</number>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>
@@ -436,7 +508,11 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="Ledit_Csc"/>
+              <widget class="QLineEdit" name="Ledit_Csc">
+               <property name="maxLength">
+                <number>35</number>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>
@@ -541,6 +617,9 @@
              </item>
              <item>
               <widget class="QLineEdit" name="Ledit_CertificadoSenha">
+               <property name="maxLength">
+                <number>25</number>
+               </property>
                <property name="echoMode">
                 <enum>QLineEdit::EchoMode::Password</enum>
                </property>
@@ -558,7 +637,11 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="Ledt_CUf"/>
+              <widget class="QLineEdit" name="Ledt_CUf">
+               <property name="maxLength">
+                <number>10</number>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>
@@ -572,7 +655,11 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="Ledt_CMun"/>
+              <widget class="QLineEdit" name="Ledt_CMun">
+               <property name="maxLength">
+                <number>20</number>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>
@@ -586,7 +673,11 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="Ledt_IE"/>
+              <widget class="QLineEdit" name="Ledt_IE">
+               <property name="maxLength">
+                <number>25</number>
+               </property>
+              </widget>
              </item>
             </layout>
            </item>
@@ -606,7 +697,11 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="Ledt_CnpjRespTec"/>
+                 <widget class="QLineEdit" name="Ledt_CnpjRespTec">
+                  <property name="maxLength">
+                   <number>20</number>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -620,7 +715,11 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="Ledt_NomeRespTec"/>
+                 <widget class="QLineEdit" name="Ledt_NomeRespTec">
+                  <property name="maxLength">
+                   <number>30</number>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -634,7 +733,11 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="Ledt_EmailRespTec"/>
+                 <widget class="QLineEdit" name="Ledt_EmailRespTec">
+                  <property name="maxLength">
+                   <number>30</number>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -648,7 +751,11 @@
                  </widget>
                 </item>
                 <item>
-                 <widget class="QLineEdit" name="Ledt_FoneRespTec"/>
+                 <widget class="QLineEdit" name="Ledt_FoneRespTec">
+                  <property name="maxLength">
+                   <number>20</number>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </item>
@@ -665,6 +772,9 @@
                  <widget class="QLineEdit" name="Ledt_IdCsrtRespTec">
                   <property name="enabled">
                    <bool>false</bool>
+                  </property>
+                  <property name="maxLength">
+                   <number>20</number>
                   </property>
                  </widget>
                 </item>
@@ -683,6 +793,9 @@
                  <widget class="QLineEdit" name="Ledt_HashCsrtRespTec">
                   <property name="enabled">
                    <bool>false</bool>
+                  </property>
+                  <property name="maxLength">
+                   <number>20</number>
                   </property>
                  </widget>
                 </item>
@@ -712,7 +825,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledit_NCMProd"/>
+          <widget class="QLineEdit" name="Ledit_NCMProd">
+           <property name="maxLength">
+            <number>20</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -726,7 +843,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledit_CSOSNProd"/>
+          <widget class="QLineEdit" name="Ledit_CSOSNProd">
+           <property name="maxLength">
+            <number>20</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -740,7 +861,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="Ledit_PISProd"/>
+          <widget class="QLineEdit" name="Ledit_PISProd">
+           <property name="maxLength">
+            <number>10</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -754,7 +879,11 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="LEdit_CESTProd"/>
+          <widget class="QLineEdit" name="LEdit_CESTProd">
+           <property name="maxLength">
+            <number>20</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>

@@ -2,6 +2,7 @@
 #include "../configuracao.h"
 #include <QSqlQuery>
 #include <QRegularExpression>
+#include <QSqlError>
 
 NfceVenda::NfceVenda(QObject *parent)
     : QObject{parent}, m_nfe{new CppNFe}
@@ -43,7 +44,7 @@ void NfceVenda::configurar()
 #if defined(Q_OS_LINUX)
     m_nfe->configuracoes->arquivos->set_caminhoSchema(fiscalValues.value("caminho_schema"));
 #elif defined(Q_OS_WIN)
-    m_nfe->configuracoes->arquivos->set_caminhoSchema(fiscalValues.value("caminho_schema");
+    m_nfe->configuracoes->arquivos->set_caminhoSchema(fiscalValues.value("caminho_schema"));
 #endif
 
     //salvar
@@ -92,10 +93,14 @@ void NfceVenda::configurar()
     m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasilv12.crt");
     qDebug() << fiscalValues.value("caminho_certac") + "/ICP-Brasilv12.crt";
 #elif defined(Q_OS_WIN)
-    m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasil.crt");
-    m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasilv2.crt");
+    m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasilv4.crt");
     m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasilv5.crt");
+    m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasilv6.crt");
+    m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasilv7.crt");
     m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasilv10.crt");
+    m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasilv11.crt");
+    m_nfe->configuracoes->certificado->addCaminhoCertificadoAC(fiscalValues.value("caminho_certac") + "/ICP-Brasilv12.crt");
+    qDebug() << fiscalValues.value("caminho_certac") + "/ICP-Brasilv12.crt";;
 #endif
 
     if (!m_nfe->configuracoes->certificado->carregarCertificado())
@@ -657,7 +662,10 @@ void NfceVenda::det_obsItem()
 
 void NfceVenda::total()
 {
-    double totalGeral,vSeg,vFrete,totalTributo = 0.0;
+    double totalGeral = 0;
+    double vSeg = 0;
+    double vFrete = 0;
+    double totalTributo = 0;
 
     for (const QList<QVariant>& produto : listaProdutos) {
         if (produto.size() >= 5) { // índice 4 é o valor total

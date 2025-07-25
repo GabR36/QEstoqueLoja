@@ -1,5 +1,6 @@
 #include "nfevenda.h"
 #include "../configuracao.h"
+#include <QSqlError>
 
 NFeVenda::NFeVenda(QObject *parent)
     : QObject{parent}, m_nfe{new CppNFe}
@@ -39,7 +40,7 @@ void NFeVenda::configurar()
 #if defined(Q_OS_LINUX)
     m_nfe->configuracoes->arquivos->set_caminhoSchema(fiscalValues.value("caminho_schema"));
 #elif defined(Q_OS_WIN)
-    m_nfe->configuracoes->arquivos->set_caminhoSchema(fiscalValues.value("caminho_schema");
+    m_nfe->configuracoes->arquivos->set_caminhoSchema(fiscalValues.value("caminho_schema"));
 #endif
 
     //salvar

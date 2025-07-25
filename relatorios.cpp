@@ -43,7 +43,7 @@ relatorios::relatorios(QWidget *parent)
 
     connect(ui->CBox_EstoqueMain, QOverload<int>::of(&QComboBox::currentIndexChanged),
             ui->Stacked_Estoque, &QStackedWidget::setCurrentIndex);
-
+    qDebug() << QCoreApplication::applicationDirPath() + "/reports/orcamentoReport.xml";
     configurarOrcamentoEstoque();
 
 }
@@ -1162,6 +1162,7 @@ void relatorios::on_Ledit_PesquisaProduto_textChanged(const QString &arg1)
 
 void relatorios::on_Btn_Terminar_clicked()
 {
+    qDebug() << "entro no botao";
     int idCliente = validarCliente(true);
     if (idCliente < 0) { // Se retornou algum código de erro
         return;
@@ -1230,8 +1231,8 @@ void relatorios::on_Btn_Terminar_clicked()
 
     QString observacao = ui->Tedit_Obs->toPlainText();
 
-    QtRPT *report = new QtRPT(this);
-    qDebug() << QCoreApplication::applicationDirPath();
+    QtRPT *report = new QtRPT(nullptr);
+    qDebug() << QCoreApplication::applicationDirPath() + "/reports/orcamentoReport.xml";
     report->loadReport(QCoreApplication::applicationDirPath() + "/reports/orcamentoReport.xml");
 
 

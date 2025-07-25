@@ -2,6 +2,7 @@
 #include "ui_infojanelaprod.h"
 #include <QDebug>
 #include <QSqlQuery>
+#include <QSqlError>
 
 InfoJanelaProd::InfoJanelaProd(QWidget *parent, int id)
     : QDialog(parent)

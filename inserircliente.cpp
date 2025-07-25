@@ -21,6 +21,8 @@ InserirCliente::InserirCliente(QWidget *parent)
     QRegularExpressionValidator *textValidator = new QRegularExpressionValidator(rx, this);
     ui->Ledit_Bairro->setValidator(textValidator);
     ui->Ledit_Municipio->setValidator(textValidator);
+    QRegularExpression sohNumeroRegex("^[0-9]*$");
+    QRegularExpressionValidator *soNumeroValidator = new QRegularExpressionValidator(sohNumeroRegex, this);
 
     QRegularExpressionValidator *ibgeValidator =
         new QRegularExpressionValidator(QRegularExpression("\\d{7}"), this);
@@ -52,6 +54,7 @@ InserirCliente::InserirCliente(QWidget *parent)
             this
             );
     ui->Ledit_Cpf->setValidator(cnpjValidator);
+    ui->Ledit_Telefone->setValidator(soNumeroValidator);
 
 
 
@@ -132,14 +135,6 @@ void InserirCliente::on_Btn_Inserir_clicked()
         return;
     }
 
-    // Validação da Data de Nascimento (Apenas se o campo não estiver vazio)
-    if (!dataNasc.isEmpty()) {
-        QRegularExpression dataRegex(R"(^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/\d{4}$)");
-        if (!dataRegex.match(dataNasc).hasMatch()) {
-            QMessageBox::warning(this, "Erro", "Data de nascimento inválida! Use o formato dd/MM/yyyy.");
-            return;
-        }
-    }
     if((ui->CBox_IndIEDest->currentIndex() == 1 || ui->CBox_IndIEDest->currentIndex() == 2)
             && ui->Ledit_IE->text().isEmpty()){
         QMessageBox::warning(this, "Erro", "Inscrição Estadual precisa ser preenchida"

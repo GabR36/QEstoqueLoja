@@ -670,7 +670,10 @@ void NFeVenda::det_obsItem()
 
 void NFeVenda::total()
 {
-    double totalGeral,vSeg,vFrete,totalTributo = 0.0;
+    double totalGeral = 0.0;
+    double vSeg = 0.0;
+    double vFrete = 0.0;
+    double totalTributo = 0.0;
 
     for (const QList<QVariant>& produto : listaProdutos) {
         if (produto.size() >= 5) { // índice 4 é o valor total
@@ -1365,6 +1368,8 @@ QString uf, QString cep, QString ie){
     ufCli = uf;
     cepCli = cep;
     ieCli = ie;
+    cpfCli = cpf;
+    qDebug() << cpfCli << ehPfCli;
 
 }
 bool NFeVenda::isValidGTIN(const QString& gtin) {

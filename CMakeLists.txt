@@ -27,7 +27,7 @@ if (CMAKE_SYSTEM MATCHES "Linux")
     )
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     include_directories(
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/build/Debug/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/build/Release/include
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/include
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/OpenSSL3.1.3/include
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libiconv-for-Windows/include
@@ -154,10 +154,10 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/OpenSSL3.1.3/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libiconv-for-Windows/lib64/Release
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/build/Debug/lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/build/Release/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libxml2-v2.11.5/lib
-        #${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/bin/debug/lib
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/QtRptProject3.0/lib/debug/lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/bin/release/lib
+        #${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/QtRptProject3.0/lib/debug/lib
     )
     target_link_libraries(QEstoqueLoja  PRIVATE CppNFe QtRPT CppDanfeQtRPT libcrypto libssl libiconv libxml2 zdll)
 

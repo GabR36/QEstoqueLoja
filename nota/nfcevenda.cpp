@@ -1342,6 +1342,7 @@ float NfceVenda::corrigirTaxa(float taxaAntiga, float desconto){
 void NfceVenda::setCliente(QString cpf, bool ehPf){
     cpfCliente = cpf;
     ehPfCliente = ehPf;
+    qDebug() << cpfCliente << ehPfCliente;
 
 }
 bool NfceVenda::isValidGTIN(const QString& gtin) {

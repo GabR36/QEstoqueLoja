@@ -10,7 +10,13 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
     fiscalValues = Configuracao::get_All_Fiscal_Values();
     empresaValues = Configuracao::get_All_Empresa_Values();
     this->idCliente = idCliente;
-    ui->CBox_ModeloEmit->setVisible(true);
+    //mostra as opçoes relacionadas a nf e
+    if(fiscalValues.value("emit_nf") == "1"){
+        ui->FrameNF->setVisible(true);
+
+    }else{
+        ui->FrameNF->setVisible(false);
+    }
 
     //pega os dados do cliente necessários
     if(!db.open()){

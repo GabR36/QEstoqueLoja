@@ -449,65 +449,85 @@ font-size: 15px;
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget">
+  <widget class="QFrame" name="FrameNF">
    <property name="geometry">
     <rect>
-     <x>350</x>
-     <y>350</y>
-     <width>205</width>
-     <height>106</height>
+     <x>340</x>
+     <y>320</y>
+     <width>211</width>
+     <height>131</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QComboBox" name="CBox_ModeloEmit">
-      <item>
-       <property name="text">
-        <string>Emitir NFC-e</string>
+   <property name="frameShape">
+    <enum>QFrame::Shape::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Shadow::Raised</enum>
+   </property>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>201</width>
+      <height>121</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QComboBox" name="CBox_ModeloEmit">
+         <item>
+          <property name="text">
+           <string>Emitir NFC-e</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Emitir NF-e</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="RadioBtn_EmitNfApenas">
+         <property name="text">
+          <string>Emitir NF apenas para itens NF</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="RadioBtn_EmitNfTodos">
+         <property name="text">
+          <string>Emitir NF para todos produtos</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="CheckImprimirCNF">
+       <property name="autoFillBackground">
+        <bool>false</bool>
        </property>
-      </item>
-      <item>
        <property name="text">
-        <string>Emitir NF-e</string>
+        <string>Imprimir cupom </string>
        </property>
-      </item>
-     </widget>
-    </item>
-    <item>
-     <widget class="QRadioButton" name="RadioBtn_EmitNfApenas">
-      <property name="text">
-       <string>Emitir NF apenas para itens NF</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QRadioButton" name="RadioBtn_EmitNfTodos">
-      <property name="text">
-       <string>Emitir NF para todos produtos</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QCheckBox" name="CheckImprimirCNF">
-      <property name="autoFillBackground">
-       <bool>false</bool>
-      </property>
-      <property name="text">
-       <string>Imprimir cupom </string>
-      </property>
-      <property name="icon">
-       <iconset resource="Imagens/recursosImg.qrc">
-        <normaloff>:/QEstoqueLOja/document-print.svg</normaloff>:/QEstoqueLOja/document-print.svg</iconset>
-      </property>
-      <property name="tristate">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-   </layout>
+       <property name="icon">
+        <iconset resource="Imagens/recursosImg.qrc">
+         <normaloff>:/QEstoqueLOja/document-print.svg</normaloff>:/QEstoqueLOja/document-print.svg</iconset>
+       </property>
+       <property name="tristate">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
  </widget>
  <customwidgets>

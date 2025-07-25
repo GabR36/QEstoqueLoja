@@ -186,6 +186,14 @@ void Configuracao::on_Btn_Aplicar_clicked()
     nnfProdNfe = ui->Ledit_NNFProdNFe->text().trimmed();
     nnfHomologNfe = ui->Ledit_NNfHomologNFe->text().trimmed();
 
+    if(emitNf == true && (ui->Lbl_CertificadoPath->text().isEmpty() ||
+        senhaCertificado.isEmpty() || csc.isEmpty() || idCsc.isEmpty())){
+        QMessageBox::warning(this, "Erro", "Se for emitir notas fsicais deve preencher"
+                                           "todos os dados");
+        return;
+
+    }
+
 
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";

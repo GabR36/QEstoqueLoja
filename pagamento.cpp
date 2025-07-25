@@ -25,7 +25,7 @@ pagamento::pagamento(QString total, QString cliente, QString data, QWidget *pare
     ui->label_8->hide();
     ui->Ledit_Taxa->hide();
 
-    ui->CBox_ModeloEmit->setVisible(false);
+    ui->FrameNF->setVisible(false);
 
     // valores padrao
     ui->Ledit_Recebido->setText(totalGlobal);

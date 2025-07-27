@@ -30,6 +30,7 @@
 #include  "inserirproduto.h"
 #include "subclass/leditdialog.h"
 #include "infojanelaprod.h"
+#include <QStandardPaths>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -39,13 +40,26 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
 
+    // Configura o nome do aplicativo (importante para definir a pasta no Linux)
+    QCoreApplication::setApplicationName("QEstoqueLoja");
 
-    // criar banco de dados e tabela se não foi ainda.
+    QString dbPath;
 
-    // verificar versao do esquema de banco de dados e aplicar as atualizacoes
-    // necessárias
+#if defined(Q_OS_LINUX)
+    // Linux: ~/.local/share/QEstoqueLoja/estoque.db
+    dbPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/estoque.db";
 
-    db.setDatabaseName("estoque.db");
+#elif defined(Q_OS_WIN)
+    // Windows: %APPDATA%\QEstoqueLoja\estoque.db
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir dir(appDataPath);
+    if (!dir.exists()) {
+        dir.mkpath(".");  // Cria a pasta se não existir
+    }
+    dbPath = appDataPath + "/estoque.db";
+#endif
+
+    db.setDatabaseName(dbPath);
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";
     }

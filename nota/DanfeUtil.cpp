@@ -1,6 +1,7 @@
 #include "DanfeUtil.h"
 #include <QSqlQuery>
 #include "../configuracao.h"
+#include <QStandardPaths>
 
 DanfeUtil::DanfeUtil(QObject *parent)
     : QObject{parent}
@@ -8,7 +9,9 @@ DanfeUtil::DanfeUtil(QObject *parent)
     caminhoReportNFe = QDir::currentPath() + "/reports/DANFE-NFe.xml";
     caminhoReportNFCe = QDir::currentPath() + "/reports/DANFE-NFCe.xml";
     empresaValues = Configuracao::get_All_Empresa_Values();
-    caminhoLogo = empresaValues.value("caminho_logo_empresa");
+    QString caminhoCompletoLogo = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
+                              "/imagens/" + QFileInfo(empresaValues.value("caminho_logo_empresa")).fileName();
+    caminhoLogo = caminhoCompletoLogo;
 }
 bool DanfeUtil::abrirDanfe(int idVenda){
     if(!db.open()){
@@ -42,6 +45,7 @@ bool DanfeUtil::abrirDanfe(int idVenda){
 void DanfeUtil::imprimirDanfe(const CppNFe *cppnfe){
 
     CppDanfeQtRPT danfe(cppnfe, 0);
+
     danfe.caminhoLogo(caminhoLogo);
     if (cppnfe->notafiscal->retorno->protNFe->items->count() > 0)
     {

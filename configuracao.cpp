@@ -8,6 +8,7 @@
 #include <QVariant>
 #include <QDebug>
 #include "util/NfUtilidades.h"
+#include <QStandardPaths>
 
 Configuracao::Configuracao(QWidget *parent)
     : QWidget(parent)
@@ -394,33 +395,42 @@ void Configuracao::on_Btn_LogoEmpresa_clicked()
     if (caminhoOriginal.isEmpty())
         return;
 
-    // Criar diretório de destino se não existir
-    QString pastaDestino = QCoreApplication::applicationDirPath() + "/imagens";
+    // Obter o diretório de dados do aplicativo (mesmo local do estoque.db)
+    QString dataDir;
+
+#if defined(Q_OS_LINUX)
+    dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#elif defined(Q_OS_WIN)
+    dataDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+#endif
+
+    // Criar subdiretório para imagens
+    QString pastaImagens = dataDir + "/imagens";
     QDir dir;
-    if (!dir.exists(pastaDestino)) {
-        dir.mkpath(pastaDestino);
+    if (!dir.exists(pastaImagens)) {
+        dir.mkpath(pastaImagens);
     }
 
-    // Copiar arquivo para o diretório do projeto com um nome único
+    // Preparar novo caminho com nome único
     QFileInfo info(caminhoOriginal);
-    QString nomeArquivo = info.fileName();
-    QString novoCaminho = pastaDestino + "/" + nomeArquivo;
+    QString novoCaminho = pastaImagens + "/" + info.fileName();
 
-    // Verifica se já existe um arquivo com esse nome e adiciona sufixo se necessário
+    // Evitar sobreposição de arquivos
     int contador = 1;
     while (QFile::exists(novoCaminho)) {
-        novoCaminho = pastaDestino + "/" + info.baseName() + "_" + QString::number(contador++) + "." + info.completeSuffix();
+        novoCaminho = pastaImagens + "/" + info.baseName() + "_" + QString::number(contador++) + "." + info.completeSuffix();
     }
 
-    // Copiar o arquivo
+    // Copiar a imagem
     if (QFile::copy(caminhoOriginal, novoCaminho)) {
-        // Atualiza o line edit com o novo caminho
-        QString caminhoRelativo = "imagens/" + QFileInfo(novoCaminho).fileName();
-        ui->Ledt_LogoEmpresa->setText(caminhoRelativo);
+        // Armazenar apenas o nome do arquivo ou caminho relativo
+        //ui->Ledt_LogoEmpresa->setText(QFileInfo(novoCaminho).fileName());
+
+        // Alternativa: armazenar caminho relativo à pasta de imagens
+         ui->Ledt_LogoEmpresa->setText("imagens/" + QFileInfo(novoCaminho).fileName());
     } else {
         QMessageBox::warning(this, "Erro", "Não foi possível copiar a imagem.");
     }
-
 }
 
 

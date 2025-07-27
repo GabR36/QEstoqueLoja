@@ -30,6 +30,7 @@
 #include <QSqlRecord>
 #include <QSql>
 #include "configuracao.h"
+#include <QStandardPaths>
 //#include <QDebug>;
 
 relatorios::relatorios(QWidget *parent)
@@ -1298,11 +1299,27 @@ void relatorios::on_Btn_Terminar_clicked()
 
         if(paramname == "imgLogo"){
 
+            QString caminhoCompleto = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
+                                      "/imagens/" + QFileInfo(caminhoLogo).fileName();
 
-            auto *img = new QImage(QCoreApplication::applicationDirPath() + "/" + caminhoLogo);
-            //qDebug() << QCoreApplication::applicationDirPath() + "/" + caminhoLogo;
-            paramvalue = *img;
+            // 2. Verificar se o arquivo existe ANTES de carregar
+            if (!QFile::exists(caminhoCompleto)) {
+                qDebug() << "Erro: Arquivo não encontrado:" << caminhoCompleto;
+                // Carregar uma imagem padrão ou tratar o erro
+                return;
+            }
 
+            // 3. Carregar a imagem com tratamento de erro
+            QImage img(caminhoCompleto);
+            if (img.isNull()) {
+                qDebug() << "Erro ao carregar imagem:" << caminhoCompleto;
+                // Verifique:
+                // - Se o arquivo não está corrompido
+                // - Se o formato é suportado (try .png, .jpg)
+            } else {
+                paramvalue = img;  // Atribuição segura
+                qDebug() << "Imagem carregada com sucesso. Dimensões:" << img.size();
+            }
 
         }
     });

@@ -3,7 +3,8 @@
 ## Descriçao
 
 Software simples ERP para controlar o estoque de lojas pequenas com
-funções de pesquisa de preço, registro de vendas, cadastro de
+funções de *emissão de nota fiscal eletrônica (NF-e) e NFC-e para
+regime simples nacional*, pesquisa de preço, registro de vendas, cadastro de
 produtos, relatório de lucro e valor vendido, PDV, código de barras,
 vendas a prazo, gráficos, impressão de etiquetas, orçamento e mais.
 
@@ -12,6 +13,16 @@ servidores ou dependencias, atualmente, funciona em apenas um
 computador, sem sincronização de dados.
 
 Feito em Qt framework e SQLite para o banco de dados.
+
+## Instalação
+
+Para windows, disponibilizamos instaladores para cada versão, na parte
+das [releases do github](https://github.com/GabR36/QEstoqueLoja/releases).
+
+Para Linux, por enquanto, é preciso compilar o código. Para isso
+instale o Qt6, com módulos QtChart, e as bibliotecas
+[libCppNFe](https://github.com/cppbr/cppbrasil/tree/5e219001fe6700890f55290621e2465023ae0f37)(está
+no submodulo lib-externas).
 
 ## Motivações e Futuro
 
@@ -27,15 +38,6 @@ O "Paradigma de programação" usado é o de "fazer as coisas
 funcionarem", se algo estiver funcionando ele será aceito. A ideia é
 se é algo bom é adicionado, o código pode ser melhorado com o
 tempo. Seguindo os ideiais da metodologia Ágil.
-
-## Instalação
-
-Para windows, disponibilizamos instaladores para cada versão, na parte
-das releases do github. Você pode acessar a página
-[aqui](https://github.com/GabR36/QEstoqueLoja/releases)
-
-Para Linux, por enquanto, é preciso compilar o código. Para isso
-instale o Qt6, com módulos QtChart, e as bibliotecas QtRpt e Libxml.
 
 ## Capturas de Tela
 

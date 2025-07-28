@@ -10,6 +10,9 @@ pagamentoAPrazo::pagamentoAPrazo(QString id_venda, QString total, QString client
     ui->Ledit_Desconto->setVisible(false);
     ui->label_9->setVisible(false);
     ui->CheckPorcentagem->setVisible(false);
+    ui->Ledit_CpfCnpjCliente->setEnabled(false);
+    ui->RadioBtn_EmitNfApenas->setVisible(false);
+    ui->RadioBtn_EmitNfTodos->setVisible(false);
 }
 
 pagamentoAPrazo::~pagamentoAPrazo()

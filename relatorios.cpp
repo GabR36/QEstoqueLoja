@@ -29,6 +29,8 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QSql>
+#include "configuracao.h"
+#include <QStandardPaths>
 //#include <QDebug>;
 
 relatorios::relatorios(QWidget *parent)
@@ -38,10 +40,11 @@ relatorios::relatorios(QWidget *parent)
     ui->setupUi(this);
     ui->tabWidget->setCurrentIndex(1);
     ui->Stacked_Estoque->setCurrentIndex(3);
+    fiscalValues = Configuracao::get_All_Fiscal_Values();
 
     connect(ui->CBox_EstoqueMain, QOverload<int>::of(&QComboBox::currentIndexChanged),
             ui->Stacked_Estoque, &QStackedWidget::setCurrentIndex);
-
+    qDebug() << QCoreApplication::applicationDirPath() + "/reports/orcamentoReport.xml";
     configurarOrcamentoEstoque();
 
 }
@@ -1038,7 +1041,7 @@ void relatorios::atualizarTotalProduto() {
         // Atualiza o valor na coluna 4
         modeloSelecionados->setData(
             modeloSelecionados->index(row, 4),
-            QString::number(totalproduto, 'f', 2) // 2 casas decimais
+            portugues.toString(totalproduto, 'f', 2) // 2 casas decimais
             );
     }
 }
@@ -1077,12 +1080,18 @@ void relatorios::on_Btn_AddProd_clicked()
     QString descProduto = descVariant.toString();
 
     // preco com notação BR
-    QString precoProduto = portugues.toString(precoVariant.toFloat());
+    float precoProduto = precoVariant.toFloat();
+    QStandardItem *itemPreco = new QStandardItem();
+    itemPreco->setData(precoProduto, Qt::EditRole);  // valor bruto
+    itemPreco->setText(portugues.toString(precoProduto, 'f', 2)); // texto formatado
 
     // montar os itens da nova linha
     QStandardItem *itemQuantidade = new QStandardItem("1");
-    QStandardItem *itemPreco = new QStandardItem(precoProduto);
-    QStandardItem *itemTotal = new QStandardItem(precoProduto);
+
+    QStandardItem *itemTotal = new QStandardItem();
+    itemTotal->setData(precoProduto, Qt::EditRole);
+    itemTotal->setText(portugues.toString(precoProduto, 'f', 2));
+
 
     modeloSelecionados->appendRow({
         new QStandardItem(idProduto),
@@ -1154,6 +1163,7 @@ void relatorios::on_Ledit_PesquisaProduto_textChanged(const QString &arg1)
 
 void relatorios::on_Btn_Terminar_clicked()
 {
+    qDebug() << "entro no botao";
     int idCliente = validarCliente(true);
     if (idCliente < 0) { // Se retornou algum código de erro
         return;
@@ -1222,8 +1232,8 @@ void relatorios::on_Btn_Terminar_clicked()
 
     QString observacao = ui->Tedit_Obs->toPlainText();
 
-    QtRPT *report = new QtRPT(this);
-    qDebug() << QCoreApplication::applicationDirPath();
+    QtRPT *report = new QtRPT(nullptr);
+    qDebug() << QCoreApplication::applicationDirPath() + "/reports/orcamentoReport.xml";
     report->loadReport(QCoreApplication::applicationDirPath() + "/reports/orcamentoReport.xml");
 
 
@@ -1289,11 +1299,27 @@ void relatorios::on_Btn_Terminar_clicked()
 
         if(paramname == "imgLogo"){
 
+            QString caminhoCompleto = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
+                                      "/imagens/" + QFileInfo(caminhoLogo).fileName();
 
-            auto *img = new QImage(QCoreApplication::applicationDirPath() + "/" + caminhoLogo);
-            //qDebug() << QCoreApplication::applicationDirPath() + "/" + caminhoLogo;
-            paramvalue = *img;
+            // 2. Verificar se o arquivo existe ANTES de carregar
+            if (!QFile::exists(caminhoCompleto)) {
+                qDebug() << "Erro: Arquivo não encontrado:" << caminhoCompleto;
+                // Carregar uma imagem padrão ou tratar o erro
+                return;
+            }
 
+            // 3. Carregar a imagem com tratamento de erro
+            QImage img(caminhoCompleto);
+            if (img.isNull()) {
+                qDebug() << "Erro ao carregar imagem:" << caminhoCompleto;
+                // Verifique:
+                // - Se o arquivo não está corrompido
+                // - Se o formato é suportado (try .png, .jpg)
+            } else {
+                paramvalue = img;  // Atribuição segura
+                qDebug() << "Imagem carregada com sucesso. Dimensões:" << img.size();
+            }
 
         }
     });
@@ -1366,6 +1392,8 @@ void relatorios::on_tabWidget_tabBarClicked(int index)
             configurarJanelaValorVendas();
             configurarJanelaTopProdutosVendas();
             configurarJanelaFormasPagamentoAno();
+            configurarJanelaNFValor();
+            configurarJanelaProdutoLucroValor();
 
         }else{
             QMessageBox::warning(this, "Acesso contido", "você deve vender algum produto antes de "
@@ -1391,4 +1419,198 @@ void relatorios::on_Tview_ProdutosSelec_customContextMenuRequested(const QPoint 
 
     menu.exec(ui->Tview_ProdutosSelec->viewport()->mapToGlobal(pos));
 }
+QMap<QString, float> relatorios::buscarValoresNfAno(const QString &ano) {
 
+    QMap<QString, float> valores;
+    QString tpamb = fiscalValues.value("tp_amb");
+    qDebug() << ano;
+    QSqlQuery query;
+    query.prepare("SELECT strftime('%m', atualizado_em) AS mes, SUM(valor_total) "
+                  "FROM notas_fiscais "
+                  "WHERE (strftime('%Y', atualizado_em) = :ano "
+                  "AND (cstat = '100' OR cstat = '150')) AND tp_amb = :tpamb "
+                  "GROUP BY mes");
+    query.bindValue(":ano", ano);
+    query.bindValue(":tpamb", tpamb);
+
+    if (query.exec()) {
+        while (query.next()) {
+            QString mes = query.value(0).toString(); // "01", "02", ..., "12"
+            float valor = query.value(1).toFloat();
+            valores[mes] = valor;
+        }
+    } else {
+        qDebug() << "Erro ao buscar valores das NFs por ano:" << query.lastError().text();
+    }
+
+    return valores;
+}
+
+void relatorios::configurarJanelaNFValor(){
+
+    ui->CBox_AnoNfValor->addItems(buscarAnosDisponiveis());
+    // Conectando o ComboBox de ano para atualizar o gráfico
+    connect(ui->CBox_AnoNfValor, &QComboBox::currentTextChanged, this, [=](const QString &anoSelecionado){
+            QMap<QString, float> valoresNf = buscarValoresNfAno(anoSelecionado);
+            if (valoresNf.isEmpty()) {
+                QMessageBox::information(this, "Sem dados", "Não há Notas Fiscais registradas para esse ano.");
+                return; // ou pode limpar o gráfico, se quiser
+            }
+            // Criando o gráfico de barras
+            QBarSet *set = new QBarSet("Valor de Notas Fiscais emitidas");
+            QStringList categorias;
+
+            for (int i = 1; i <= 12; ++i) {
+                QString mes = QString("%1").arg(i, 2, 10, QChar('0'));
+                categorias << mes;
+                *set << valoresNf.value(mes, 0);
+            }
+
+            QBarSeries *series = new QBarSeries();
+            series->append(set);
+
+            connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
+                if (status) {
+                    QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
+                }
+            });
+
+            QChart *chart = new QChart();
+            chart->addSeries(series);
+            chart->setTitle("Valor Emitididos em Nota Fiscal - Ano " + anoSelecionado);
+            chart->setAnimationOptions(QChart::SeriesAnimations);
+
+            QBarCategoryAxis *axisX = new QBarCategoryAxis();
+            axisX->append(categorias);
+            chart->addAxis(axisX, Qt::AlignBottom);
+            series->attachAxis(axisX);
+
+            QValueAxis *axisY = new QValueAxis();
+            axisY->setRange(0, *std::max_element(valoresNf.begin(), valoresNf.end()));
+            chart->addAxis(axisY, Qt::AlignLeft);
+            series->attachAxis(axisY);
+
+            QChartView *chartView = new QChartView(chart);
+            chartView->setRenderHint(QPainter::Antialiasing);
+
+            QWidget* paginaGrafico = ui->Stacked_Vendas->widget(4); // página
+            QLayout* layoutPagina = paginaGrafico->layout();
+
+
+            if (!layoutPagina) {
+                layoutPagina = new QVBoxLayout(paginaGrafico);
+                paginaGrafico->setLayout(layoutPagina);
+            }
+
+            // Limpando e adicionando o gráfico na página 0
+            QLayoutItem *item;
+            while ((item = layoutPagina->takeAt(1)) != nullptr) {
+                delete item->widget();
+                delete item;
+            }
+            layoutPagina->addWidget(chartView);
+
+    });
+     emit ui->CBox_AnoNfValor->currentTextChanged(ui->CBox_AnoNfValor->currentText());
+
+
+}
+
+QMap<QString, float> relatorios::produtosMaisLucrativosAno(const QString &ano) {
+    QMap<QString, float> produtosLucro;
+
+    QSqlQuery query;
+    query.prepare(R"(
+        SELECT
+            p.descricao,
+            SUM(pv.quantidade * (pv.preco_vendido * (IFNULL(p.porcent_lucro, 0) / 100.0))) AS lucro_total
+        FROM produtos_vendidos pv
+        JOIN produtos p ON pv.id_produto = p.id
+        JOIN vendas2 v ON pv.id_venda = v.id
+        WHERE strftime('%Y', v.data_hora) = :ano
+        GROUP BY p.descricao
+        ORDER BY lucro_total DESC
+        LIMIT 10
+    )");
+
+    query.bindValue(":ano", ano);
+
+    if (query.exec()) {
+        while (query.next()) {
+            QString descricaoProduto = query.value(0).toString();
+            float lucro = query.value(1).toFloat();
+            produtosLucro[descricaoProduto] = lucro;
+        }
+    } else {
+        qDebug() << "Erro ao buscar produtos mais lucrativos:" << query.lastError().text();
+    }
+
+    return produtosLucro;
+}
+
+void relatorios::configurarJanelaProdutoLucroValor(){
+    ui->CBox_AnoProdutoLucro->addItems(buscarAnosDisponiveis());
+    // Conectando o ComboBox de ano para atualizar o gráfico
+    connect(ui->CBox_AnoProdutoLucro, &QComboBox::currentTextChanged, this, [=](const QString &anoSelecionado){
+        QMap<QString, float> valoresProduto = produtosMaisLucrativosAno(anoSelecionado);
+        if (valoresProduto.isEmpty()) {
+            QMessageBox::information(this, "Sem dados", "Não há vendas registradas para esse ano.");
+            return; // ou pode limpar o gráfico, se quiser
+        }
+        // Criando o gráfico de barras
+        QBarSet *set = new QBarSet("Lucro");
+        QStringList categorias;
+
+        for (auto it = valoresProduto.constBegin(); it != valoresProduto.constEnd(); ++it) {
+            categorias << it.key();         // nome do produto
+            *set << it.value();             // lucro
+        }
+
+
+        QBarSeries *series = new QBarSeries();
+        series->append(set);
+
+        connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
+            if (status) {
+                QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
+            }
+        });
+
+        QChart *chart = new QChart();
+        chart->addSeries(series);
+        chart->setTitle("TOP 10 produtos que mais geraram lucro - Ano " + anoSelecionado);
+        chart->setAnimationOptions(QChart::SeriesAnimations);
+
+        QBarCategoryAxis *axisX = new QBarCategoryAxis();
+        axisX->append(categorias);
+        chart->addAxis(axisX, Qt::AlignBottom);
+        series->attachAxis(axisX);
+
+        QValueAxis *axisY = new QValueAxis();
+        axisY->setRange(0, *std::max_element(valoresProduto.begin(), valoresProduto.end()));
+        chart->addAxis(axisY, Qt::AlignLeft);
+        series->attachAxis(axisY);
+
+        QChartView *chartView = new QChartView(chart);
+        chartView->setRenderHint(QPainter::Antialiasing);
+
+        QWidget* paginaGrafico = ui->Stacked_Vendas->widget(5); // página
+        QLayout* layoutPagina = paginaGrafico->layout();
+
+
+        if (!layoutPagina) {
+            layoutPagina = new QVBoxLayout(paginaGrafico);
+            paginaGrafico->setLayout(layoutPagina);
+        }
+
+        // Limpando e adicionando o gráfico na página 0
+        QLayoutItem *item;
+        while ((item = layoutPagina->takeAt(1)) != nullptr) {
+            delete item->widget();
+            delete item;
+        }
+        layoutPagina->addWidget(chartView);
+
+    });
+    emit ui->CBox_AnoProdutoLucro->currentTextChanged(ui->CBox_AnoProdutoLucro->currentText());
+}

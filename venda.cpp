@@ -16,6 +16,7 @@
 #include <QCompleter>
 #include <QStringListModel>
 #include "inserircliente.h"
+#include "infojanelaprod.h"
 
 
 venda::venda(QWidget *parent) :
@@ -48,6 +49,8 @@ venda::venda(QWidget *parent) :
     ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(2,delegateLockCol2);
     DelegateQuant *delegateQuant = new DelegateQuant(this);
     ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(1,delegateQuant);
+    DelegateLockCol *delegateLockCol3 = new DelegateLockCol(4,this);
+    ui->Tview_ProdutosSelecionados->setItemDelegateForColumn(4,delegateLockCol3);
 
 
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
@@ -57,6 +60,7 @@ venda::venda(QWidget *parent) :
     modeloSelecionados->setHorizontalHeaderItem(1, new QStandardItem("Quantidade Vendida"));
     modeloSelecionados->setHorizontalHeaderItem(2, new QStandardItem("Descrição"));
     modeloSelecionados->setHorizontalHeaderItem(3, new QStandardItem("Preço Unitário Vendido"));
+    modeloSelecionados->setHorizontalHeaderItem(4, new QStandardItem("Total"));
     ui->Tview_ProdutosSelecionados->setModel(modeloSelecionados);
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = modeloProdutos->index(0, 0);
@@ -74,10 +78,17 @@ venda::venda(QWidget *parent) :
     ui->Tview_Produtos->setColumnWidth(2, 260);
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
+
+
+    ui->Tview_ProdutosSelecionados->setColumnWidth(0, 70);
     // coluna quantidade vendida
-    ui->Tview_ProdutosSelecionados->setColumnWidth(1, 180);
+    ui->Tview_ProdutosSelecionados->setColumnWidth(1, 130);
     // coluna descricao
-    ui->Tview_ProdutosSelecionados->setColumnWidth(2, 250);
+    ui->Tview_ProdutosSelecionados->setColumnWidth(2, 300);
+    ui->Tview_ProdutosSelecionados->setColumnWidth(3, 160);
+    ui->Tview_ProdutosSelecionados->setColumnWidth(4, 200);
+
+
 
    // ui->Tview_ProdutosSelecionados->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
@@ -129,7 +140,6 @@ venda::venda(QWidget *parent) :
         // Define o primeiro item da lista como texto do QLineEdit
         ui->Ledit_Cliente->setText(clientesComId.first());
 
-        // Opcional: selecionar apenas o nome (se quiser destacar parte do texto)
         // Isso depende do formato que você está usando ("Nome (ID: 123)")
         QString primeiroCliente = clientesComId.first();
         int posInicioNome = 0;
@@ -157,6 +167,20 @@ venda::venda(QWidget *parent) :
         validarCliente(true); // Mostra mensagens para o usuário
     });
 
+    fiscalValues = Configuracao::get_All_Fiscal_Values();
+    QString tipoAmb = fiscalValues.value("tp_amb");
+    QString emitirNf = fiscalValues.value("emit_nf");
+
+    if (tipoAmb == "1" && emitirNf == "1") {
+        ui->Lbl_TpAmb->setText("🟢 Amb: Produção");
+        ui->Lbl_TpAmb->setStyleSheet("color: white; background-color: green; font-weight: bold; padding: 4px; border-radius: 5px;");
+    } else if(emitirNf == "1"){
+        ui->Lbl_TpAmb->setText("🟠 Amb: Homologação");
+        ui->Lbl_TpAmb->setStyleSheet("color: white; background-color: orange; font-weight: bold; padding: 4px; border-radius: 5px;");
+    }
+    connect(ui->Tview_Produtos, &QTableView::doubleClicked,
+            this, &venda::verProd);
+
 }
 void venda::atualizarTotalProduto() {
     for (int row = 0; row < modeloSelecionados->rowCount(); ++row) {
@@ -175,7 +199,7 @@ void venda::atualizarTotalProduto() {
         // Atualiza o valor na coluna 4
         modeloSelecionados->setData(
             modeloSelecionados->index(row, 4),
-            QString::number(totalproduto, 'f', 2) // 2 casas decimais
+            portugues.toString(totalproduto, 'f', 2) // 2 casas decimais
             );
     }
 }
@@ -287,16 +311,21 @@ void venda::on_Btn_SelecionarProduto_clicked()
     QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
     QString idProduto = idVariant.toString();
     QString descProduto = descVariant.toString();
-    // preco com notacao br
-    QString precoProduto = portugues.toString(precoVariant.toFloat());
+
+    float precoProduto = precoVariant.toFloat();
     // mostrar na tabela Selecionados
     QStandardItem *itemQuantidade = new QStandardItem("1");
     //itemQuantidade->setEditable(true);
+    QStandardItem *itemPreco = new QStandardItem();
+    itemPreco->setData(precoProduto, Qt::EditRole);  // valor bruto
+    itemPreco->setText(portugues.toString(precoProduto, 'f', 2)); // texto formatado
 
-    QStandardItem *itemPreco = new QStandardItem(precoProduto);
-   // itemPreco->setEditable(true);
+    QStandardItem *itemTotal = new QStandardItem();
+    itemTotal->setData(precoProduto, Qt::EditRole);
+    itemTotal->setText(portugues.toString(precoProduto, 'f', 2));
 
-    modeloSelecionados->appendRow({new QStandardItem(idProduto), itemQuantidade, new QStandardItem(descProduto), itemPreco});
+    modeloSelecionados->appendRow({new QStandardItem(idProduto), itemQuantidade,
+                                   new QStandardItem(descProduto), itemPreco, itemTotal});
     // mostrar total
     ui->Lbl_Total->setText(Total());
 }
@@ -458,7 +487,7 @@ void venda::on_Btn_Aceitar_clicked()
     QList<QList<QVariant>> rowDataList;
     for (int row = 0; row < modeloSelecionados->rowCount(); ++row){
         QList<QVariant> rowData;
-        for (int col = 0; col < modeloSelecionados->columnCount(); col++){
+        for (int col = 0; col < modeloSelecionados->columnCount() - 1; col++){
             QModelIndex index = modeloSelecionados->index(row, col);
             rowData.append(modeloSelecionados->data(index));
         }
@@ -599,4 +628,23 @@ void venda::on_Btn_NovoCliente_clicked()
     connect(inserirCliente, &InserirCliente::clienteInserido, this, &venda::selecionarClienteNovo);
     inserirCliente->show();
 }
+int venda::getIdProdSelected(){
+    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
+
+    if (!selectedIndexes.isEmpty()) {
+        int selectedRow = selectedIndexes.first().row();
+        QModelIndex idIndex = ui->Tview_Produtos->model()->index(selectedRow, 0);
+
+        int id = ui->Tview_Produtos->model()->data(idIndex).toInt();
+        return id;
+    }
+}
+
+void venda::verProd(){
+    int id = getIdProdSelected();
+    InfoJanelaProd *janelaProd = new InfoJanelaProd(this, id);
+    janelaProd->show();
+}
+
 

@@ -27,6 +27,11 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QSql>
+#include  "inserirproduto.h"
+#include "subclass/leditdialog.h"
+#include "infojanelaprod.h"
+#include <QStandardPaths>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -35,13 +40,26 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
 
+    // Configura o nome do aplicativo (importante para definir a pasta no Linux)
+    QCoreApplication::setApplicationName("QEstoqueLoja");
 
-    // criar banco de dados e tabela se não foi ainda.
+    QString dbPath;
 
-    // verificar versao do esquema de banco de dados e aplicar as atualizacoes
-    // necessárias
+#if defined(Q_OS_LINUX)
+    // Linux: ~/.local/share/QEstoqueLoja/estoque.db
+    dbPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/estoque.db";
 
-    db.setDatabaseName("estoque.db");
+#elif defined(Q_OS_WIN)
+    // Windows: %APPDATA%\QEstoqueLoja\estoque.db
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QDir dir(appDataPath);
+    if (!dir.exists()) {
+        dir.mkpath(".");  // Cria a pasta se não existir
+    }
+    dbPath = appDataPath + "/estoque.db";
+#endif
+
+    db.setDatabaseName(dbPath);
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";
     }
@@ -98,9 +116,10 @@ MainWindow::MainWindow(QWidget *parent)
     }
     query.finish();
     qDebug() << dbSchemaVersion;
+    financeiroValues = Configuracao::get_All_Financeiro_Values();
 
     // a versão mais recente do esquema do banco de dados
-    int dbSchemaLastVersion = 4;
+    int dbSchemaLastVersion = 5;
 
     while (dbSchemaVersion < dbSchemaLastVersion){
         // selecionar a atualizacao conforme a versao atual do banco de dados
@@ -374,6 +393,224 @@ MainWindow::MainWindow(QWidget *parent)
 
             break;
         }
+        case 4:
+        {
+            db.open();
+
+            // comecar transacao
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+            }
+
+            QSqlQuery query;
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nfant_empresa', '')")){
+                qDebug() << "nao inserir config nfant_empresa";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('numero_empresa', '')")){
+                qDebug() << "nao inserir config numero_empresa";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('bairro_empresa', '')")){
+                qDebug() << "nao inserir config bairro_empresa";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('cep_empresa', '')")){
+                qDebug() << "nao inserir config cep_empresa";
+            }
+
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('regime_trib', '')")){
+                qDebug() << "nao inserir config regime_trib";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('tp_amb', '')")){
+                qDebug() << "nao inserir config tp_amb";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('id_csc', '')")){
+                qDebug() << "nao inserir config id_csc";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('csc', '')")){
+                qDebug() << "nao inserir config csc";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('caminho_schema', '')")){
+                qDebug() << "nao inserir config caminho_schema";
+            }
+
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('caminho_certac', '')")){
+                qDebug() << "nao inserir config caminho_certac";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('caminho_certificado', '')")){
+                qDebug() << "nao inserir config caminho_certificado";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('senha_certificado', '')")){
+                qDebug() << "nao inserir config senha_certificado";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('cuf', '')")){
+                qDebug() << "nao inserir config cuf";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('cmun', '')")){
+                qDebug() << "nao inserir config cmun";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('iest', '')")){
+                qDebug() << "nao inserir config iest";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('cnpj_rt', '')")){
+                qDebug() << "nao inserir config cnpj_rt";
+            }
+
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nome_rt', '')")){
+                qDebug() << "nao inserir config nome_rt";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('email_rt', '')")){
+                qDebug() << "nao inserir config email_rt";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('fone_rt', '')")){
+                qDebug() << "nao inserir config fone_rt";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('id_csrt', '')")){
+                qDebug() << "nao inserir config id_cst";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('hash_csrt', '')")){
+                qDebug() << "nao inserir config hash_csrt";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('emit_nf', '0')")){
+                qDebug() << "nao inserir config emitnf";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_homolog', '0')")){
+                qDebug() << "nao inserir config nnfhomo";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_prod', '0')")){
+                qDebug() << "nao inserir config nnfprod";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_homolog_nfe', '0')")){
+                qDebug() << "nao inserir config nnfprod";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('nnf_prod_nfe', '0')")){
+                qDebug() << "nao inserir config nnfprod";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('ncm_padrao', '00000000')")){
+                qDebug() << "nao inserir config ncm_prod";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('csosn_padrao', '102')")){
+                qDebug() << "nao inserir config csosn_padrao";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('pis_padrao', '49')")){
+                qDebug() << "nao inserir config pis_padrao";
+            }
+            if(!query.exec("INSERT INTO config (key, value) VALUES ('cest_padrao', '')")){
+                qDebug() << "nao inserir config cest_padrao";
+            }
+
+            if (!query.exec(
+                    "CREATE TABLE IF NOT EXISTS notas_fiscais ("
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    "cstat TEXT, "
+                    "nnf INTEGER NOT NULL, "
+                    "serie TEXT NOT NULL, "
+                    "modelo TEXT NOT NULL DEFAULT '65',"
+                    "tp_amb BOOLEAN, "
+                    "xml_path TEXT, "
+                    "valor_total DECIMAL(10,2), "
+                    "atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP, "
+                    "id_venda INTEGER, "
+                    "FOREIGN KEY (id_venda) REFERENCES vendas2(id)"
+                    ")"
+                    )) {
+                qDebug() << "Erro ao criar tabela notas_fiscais:" << query.lastError().text();
+            }
+
+            // Adicionar colunas à tabela produtos
+            QStringList alterStatements = {
+                "ALTER TABLE produtos ADD COLUMN un_comercial TEXT",
+                "ALTER TABLE produtos ADD COLUMN preco_fornecedor DECIMAL(10,2) NULL",
+                "ALTER TABLE produtos ADD COLUMN porcent_lucro REAL",
+                "ALTER TABLE produtos ADD COLUMN ncm VARCHAR(8) DEFAULT '00000000'",
+                "ALTER TABLE produtos ADD COLUMN cest TEXT NULL",
+                "ALTER TABLE produtos ADD COLUMN aliquota_imposto REAL NULL",
+                "ALTER TABLE produtos ADD COLUMN csosn VARCHAR(5)",
+                "ALTER TABLE produtos ADD COLUMN pis VARCHAR(5)",
+                "ALTER TABLE produtos ADD COLUMN local TEXT NULL",
+                "ALTER TABLE clientes ADD COLUMN numero_end VARCHAR(10)",
+                "ALTER TABLE clientes ADD COLUMN bairro TEXT",
+                "ALTER TABLE clientes ADD COLUMN xMun TEXT",
+                "ALTER TABLE clientes ADD COLUMN cMun TEXT",
+                "ALTER TABLE clientes ADD COLUMN uf VARCHAR(3)",
+                "ALTER TABLE clientes ADD COLUMN cep TEXT",
+                "ALTER TABLE clientes ADD COLUMN indIEDest REAL",
+                "ALTER TABLE clientes ADD COLUMN ie TEXT"
+            };
+            bool hasErrors = false;
+
+            foreach (const QString &sql, alterStatements) {
+                if (!query.exec(sql)) {
+                    qDebug() << "Erro ao executar:" << sql << ":" << query.lastError().text();
+                    hasErrors = true;
+                }
+            }
+
+
+
+
+            // Só atualiza as colunas se todas foram criadas com sucesso
+
+            if (!hasErrors) {
+
+                query.prepare("UPDATE produtos SET porcent_lucro = :porcent");
+                query.bindValue(":porcent", financeiroValues.value("porcent_lucro"));
+                if (!query.exec()) {
+                    qDebug() << "Erro ao atualizar porcent_lucro:" << query.lastError().text();
+                    hasErrors = true;
+                }
+
+                if (!query.exec("UPDATE produtos SET un_comercial = 'UN'")) {
+                    qDebug() << "Erro ao atualizar un_comercial:" << query.lastError().text();
+                    hasErrors = true;
+                }
+                if (!query.exec("UPDATE produtos SET csosn = '102'")) {
+                    qDebug() << "Erro ao atualizar csosn:" << query.lastError().text();
+                    hasErrors = true;
+                }
+                if (!query.exec("UPDATE produtos SET pis = '49'")) {
+                    qDebug() << "Erro ao atualizar pis:" << query.lastError().text();
+                    hasErrors = true;
+                }
+            }
+
+            // Atualizar versão do schema se tudo correu bem
+            if (!hasErrors) {
+                if (!query.exec("PRAGMA user_version = 5")) {
+                    qDebug() << "Erro ao atualizar user_version:" << query.lastError().text();
+                    hasErrors = true;
+                }
+            }
+
+            // Finalizar transação
+            if (!hasErrors) {
+                if (!db.commit()) {
+                    qDebug() << "Error: unable to commit transaction";
+                    db.rollback();
+                } else {
+                    dbSchemaVersion = 5;
+                }
+            } else {
+                db.rollback();
+                qDebug() << "Transação revertida devido a erros";
+            }
+
+            db.close();
+
+            dbSchemaVersion = 5;
+        }
+
         }
     }
     qDebug() << dbSchemaVersion;
@@ -381,38 +618,38 @@ MainWindow::MainWindow(QWidget *parent)
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
-    ui->groupBox->setVisible(false);
-     ui->Ledit_Pesquisa->installEventFilter(this);
+    ui->Ledit_Pesquisa->installEventFilter(this);
     atualizarTableview();
     db.close();
     //
-    ui->Ledit_Barras->setFocus();
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = model->index(0, 0);
     ui->Tview_Produtos->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
-     ui->Ledit_Desc->setMaxLength(120);
 
     // ajustar tamanho colunas
     // coluna descricao
     ui->Tview_Produtos->setColumnWidth(2, 750);
+    //preco
+    ui->Tview_Produtos->setColumnWidth(3, 90);
+
     // coluna quantidade
     ui->Tview_Produtos->setColumnWidth(1, 85);
     ui->Tview_Produtos->setColumnWidth(4,110);
 
-
-    // validadores para os campos
-    QDoubleValidator *DoubleValidador = new QDoubleValidator(0.0, 9999.99, 2);
-    ui->Ledit_Preco->setValidator(DoubleValidador);
-    ui->Ledit_Quantidade->setValidator(DoubleValidador);
-
-
     // ações para menu de contexto tabela produtos
     actionMenuAlterarProd = new QAction(this);
     actionMenuDeletarProd = new QAction(this);
+    actionSetLocalProd = new QAction(this);
+    actionVerProduto = new QAction(this);
+    actionSetLocalProd->setText("Adicionar Local Produto");
+    actionVerProduto->setText("Ver Produto");
+    connect(actionSetLocalProd,SIGNAL(triggered(bool)),this,SLOT(setLocalProd()));
+    connect(actionVerProduto, SIGNAL(triggered(bool)),this,SLOT(verProd()));
 
     actionMenuDeletarProd->setText("Deletar Produto");
     actionMenuDeletarProd->setIcon(iconDelete);
     connect(actionMenuDeletarProd,SIGNAL(triggered(bool)),this,SLOT(on_Btn_Delete_clicked()));
+
 
     actionMenuAlterarProd->setText("Alterar Produto");
     actionMenuAlterarProd->setIcon(iconAlterarProduto);
@@ -433,6 +670,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     setarIconesJanela();
 
+    connect(ui->Tview_Produtos, &QTableView::doubleClicked,
+            this, &MainWindow::verProd);
 
 
 }
@@ -468,79 +707,6 @@ void MainWindow::atualizarTableview(){
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC");
     db.close();
 }
-
-void MainWindow::on_Btn_Enviar_clicked()
-{
-    QString quantidadeProduto, descProduto, precoProduto, barrasProduto;
-    bool nfProduto;
-    quantidadeProduto = ui->Ledit_Quantidade->text();
-    descProduto = normalizeText(ui->Ledit_Desc->text());
-    precoProduto = ui->Ledit_Preco->text();
-    barrasProduto = ui->Ledit_Barras->text();
-    nfProduto = ui->Check_Nf->isChecked();
-
-    // Converta o texto para um número
-    bool conversionOk;
-    bool conversionOkQuant;
-    double price = portugues.toDouble(precoProduto, &conversionOk);
-    qDebug() << price;
-    // quantidade precisa ser transformada com ponto para ser armazenada no db
-    quantidadeProduto = QString::number(portugues.toFloat(quantidadeProduto, &conversionOkQuant));
-
-    // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
-    if (conversionOk && price >= 0)
-    {
-        if (conversionOkQuant){
-            // guardar no banco de dados o valor notado em local da linguagem
-            precoProduto = QString::number(price, 'f', 2);
-            qDebug() << precoProduto;
-            // verificar se o codigo de barras ja existe
-            if (!verificarCodigoBarras()){
-                // adicionar ao banco de dados
-                if(!db.open()){
-                    qDebug() << "erro ao abrir banco de dados. botao enviar.";
-                }
-                QSqlQuery query;
-
-                query.prepare("INSERT INTO produtos (quantidade, descricao, preco, codigo_barras, nf) VALUES (:valor1, :valor2, :valor3, :valor4, :valor5)");
-                query.bindValue(":valor1", quantidadeProduto);
-                query.bindValue(":valor2", descProduto);
-                query.bindValue(":valor3", precoProduto);
-                query.bindValue(":valor4", barrasProduto);
-                query.bindValue(":valor5", nfProduto);
-                if (query.exec()) {
-                    qDebug() << "Inserção bem-sucedida!";
-                } else {
-                    qDebug() << "Erro na inserção: ";
-                }
-                atualizarTableview();
-                db.close();
-
-                // limpar campos para nova inserçao
-                ui->Ledit_Desc->clear();
-                ui->Ledit_Quantidade->clear();
-                ui->Ledit_Preco->clear();
-                ui->Ledit_Barras->clear();
-                ui->Check_Nf->setChecked(false);
-                ui->Ledit_Barras->setFocus();
-            }
-        }
-        else {
-            // a quantidade é invalida
-            QMessageBox::warning(this, "Erro", "Por favor, insira uma quantiade válida.");
-            ui->Ledit_Quantidade->setFocus();
-        }
-    }
-    else
-    {
-        // Exiba uma mensagem de erro se o preço não for válido
-        QMessageBox::warning(this, "Erro", "Por favor, insira um preço válido.");
-        ui->Ledit_Preco->clear();
-    }
-
-
-}
-
 
 
 void MainWindow::on_Btn_Delete_clicked()
@@ -689,21 +855,43 @@ void MainWindow::on_Btn_Alterar_clicked()
     QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
     QVariant barrasVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 4));
     QVariant nfVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 5));
+    QVariant uCom = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 6));
+    QVariant precoForn = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 7));
+    QVariant porcentLucro = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 8));
+    QVariant ncm = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 9));
+    QVariant cest = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 10));
+    QVariant aliquotaImp = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 11));
+    QVariant csosn = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 12));
+    QVariant pis = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 13));
+
+
     QString productId = idVariant.toString();
     QString productQuant = portugues.toString(quantVariant.toFloat());
     QString productDesc = descVariant.toString();
     QString productPreco = portugues.toString(precoVariant.toFloat());
     QString productBarras = barrasVariant.toString();
     bool productNf = nfVariant.toBool();
+    QString productUCom = uCom.toString();
+    QString produtoPrecoForn = portugues.toString(precoForn.toFloat());
+    QString productPorcentLucro = portugues.toString(porcentLucro.toFloat());
+    QString productNCM = ncm.toString();
+    QString productCEST = cest.toString();
+    QString productAliquotaImp = portugues.toString(aliquotaImp.toFloat());
+    QString productPis = pis.toString();
+    QString productCsosn = csosn.toString();
+
     qDebug() << productId;
     qDebug() << productPreco;
     // criar janela
     AlterarProduto *alterar = new AlterarProduto;
     alterar->janelaPrincipal = this;
     alterar->idAlt = productId;
-    alterar->TrazerInfo(productDesc, productQuant, productPreco, productBarras, productNf);
+    alterar->TrazerInfo(productDesc, productQuant, productPreco, productBarras, productNf, productUCom,
+    produtoPrecoForn, productPorcentLucro, productNCM, productCEST, productAliquotaImp, productCsosn, productPis);
     alterar->setWindowModality(Qt::ApplicationModal);
     alterar->show();
+    connect(alterar, &AlterarProduto::produtoAlterado, this,
+            &MainWindow::atualizarTableview);
     }else{
         QMessageBox::warning(this,"Erro","Selecione um produto antes de alterar!");
     }
@@ -719,6 +907,7 @@ void MainWindow::on_Btn_Venda_clicked()
 
     vendas->show();
 
+
 }
 
 
@@ -730,45 +919,6 @@ void MainWindow::on_Btn_Relatorios_clicked()
     relatorios1->show();
 }
 
-void MainWindow::on_Ledit_Barras_returnPressed()
-{
-    // verificar se o codigo de barras existe
-    verificarCodigoBarras();
-    ui->Ledit_Desc->setFocus();
-}
-
-bool MainWindow::verificarCodigoBarras(){
-    QString barrasProduto = ui->Ledit_Barras->text();
-    // verificar se o codigo de barras ja existe
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao enviar.";
-    }
-    QSqlQuery query;
-
-    query.prepare("SELECT COUNT(*) FROM produtos WHERE codigo_barras = :codigoBarras");
-    query.bindValue(":codigoBarras", barrasProduto);
-    if (!query.exec()) {
-        qDebug() << "Erro na consulta: contagem codigo barras";
-    }
-    query.next();
-    bool barrasExiste = query.value(0).toInt() > 0 && barrasProduto != "";
-    qDebug() << barrasProduto;
-
-    if (barrasExiste){
-        // codigo de barras existe, mostrar mensagem e
-        // mostrar registro na tabela
-        QMessageBox::warning(this, "Erro", "Esse código de barras já foi registrado.\n" + barrasProduto );
-        if(!db.open()){
-            qDebug() << "erro ao abrir banco de dados. codigo de barras existente";
-        }
-        model->setQuery("SELECT * FROM produtos WHERE codigo_barras = '" + barrasProduto + "'");
-        db.close();
-        return true;
-    }
-    else{
-        return false;
-    }
-}
 void MainWindow::imprimirEtiqueta1(){
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
@@ -947,14 +1097,13 @@ void MainWindow::on_actionRealizar_Venda_triggered()
 
 void MainWindow::on_Btn_AddProd_clicked()
 {
-    ui->groupBox->setVisible(!ui->groupBox->isVisible());
-    if(!ui->groupBox->isVisible()){
-        ui->Tview_Produtos->setColumnWidth(2, 750);
 
-    }else{
-        ui->Tview_Produtos->setColumnWidth(2, 350);
-
-    }
+    InserirProduto *addProdJanela = new InserirProduto;
+    addProdJanela->show();
+    connect(addProdJanela, &InserirProduto::codigoBarrasExistenteSignal,
+            this, &MainWindow::atualizarTableviewComQuery);
+    connect(addProdJanela, &InserirProduto::produtoInserido, this,
+            &MainWindow::atualizarTableview);
 }
 
 bool MainWindow::eventFilter(QObject *obj, QEvent *event)
@@ -994,11 +1143,14 @@ void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
 
     if(!ui->Tview_Produtos->currentIndex().isValid())
         return;
+
     QMenu menu(this);
     QMenu *imprimirMenu = new QMenu("Imprimir Etiqueta Código de Barra", this);
 
     menu.addAction(actionMenuAlterarProd);
     menu.addAction(actionMenuDeletarProd);
+    menu.addAction(actionSetLocalProd);
+    menu.addAction(actionVerProduto);
     imprimirMenu->setIcon(iconImpressora);
     imprimirMenu->addAction(actionMenuPrintBarCode1);
     imprimirMenu->addAction(actionMenuPrintBarCode3);
@@ -1008,12 +1160,6 @@ void MainWindow::on_Tview_Produtos_customContextMenuRequested(const QPoint &pos)
 }
 
 
-
-void MainWindow::on_Btn_GerarCodBarras_clicked()
-{
-    ui->Ledit_Barras->setText(gerarNumero());
-
-}
 
 
 void MainWindow::on_actionTodos_Produtos_triggered()
@@ -1044,7 +1190,7 @@ void MainWindow::on_actionApenas_NF_triggered()
 
 void MainWindow::on_actionConfig_triggered()
 {
-    Config *configuracao = new Config();
+    Configuracao *configuracao = new Configuracao();
     configuracao->show();
 }
 
@@ -1063,4 +1209,75 @@ void MainWindow::on_Btn_Clientes_clicked()
     clientes->setWindowModality(Qt::ApplicationModal);
     clientes->show();
 }
+
+void MainWindow::atualizarTableviewComQuery(QString &query){
+    model->setQuery(query);
+}
+void MainWindow::setLocalProd(){
+    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
+
+    if (!selectedIndexes.isEmpty()) {
+        int selectedRow = selectedIndexes.first().row();
+        QModelIndex idIndex = ui->Tview_Produtos->model()->index(selectedRow, 0);
+        QModelIndex localIndex = ui->Tview_Produtos->model()->index(selectedRow, 14);
+
+        int id = ui->Tview_Produtos->model()->data(idIndex).toInt();
+        QString local = ui->Tview_Produtos->model()->data(localIndex).toString();
+        QSqlQuery query;
+        QStringList sugestoes;
+        if(!db.isOpen()){
+            db.open();
+        }
+        if (query.exec("SELECT DISTINCT local FROM produtos WHERE local IS NOT NULL AND TRIM(local) != ''")) {
+            while (query.next()) {
+                sugestoes << query.value(0).toString();
+            }
+        } else {
+            qDebug() << "Erro ao executar query de locais:" << query.lastError().text();
+        }
+
+        LeditDialog dialog(this);
+        dialog.setWindowTitle("Inserir Texto");
+        dialog.setLabelText("Informe o local do produto:");
+        dialog.setLineEditText(local);
+        dialog.Ledit_info->setMaxLength(20);
+        dialog.setCompleterSuggestions(sugestoes);
+
+        if (dialog.exec() == QDialog::Accepted) {
+            QString novoLocal = dialog.getLineEditText();
+            qDebug() << "Novo local para ID" << id << ":" << novoLocal;
+
+            query.prepare("UPDATE produtos SET local = :novolocal WHERE id = :id ");
+            query.bindValue(":novolocal", novoLocal);
+            query.bindValue(":id", id);
+            if(!query.exec()){
+                qDebug() << "falhou ao executar query update local";
+            }
+            atualizarTableview();
+            emit localSetado();
+
+        }
+        db.close();
+    }
+}
+int MainWindow::getIdProdSelected(){
+    QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
+    QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
+
+    if (!selectedIndexes.isEmpty()) {
+        int selectedRow = selectedIndexes.first().row();
+        QModelIndex idIndex = ui->Tview_Produtos->model()->index(selectedRow, 0);
+
+        int id = ui->Tview_Produtos->model()->data(idIndex).toInt();
+        return id;
+    }
+}
+void MainWindow::verProd(){
+    int id = getIdProdSelected();
+    InfoJanelaProd *janelaProd = new InfoJanelaProd(this, id);
+    janelaProd->show();
+}
+
+
 

@@ -46,6 +46,8 @@ protected:
     QString totalGeral();
     void atualizarTotalProduto();
     bool existeProdutoVendido();
+    QMap<QString,QString> fiscalValues;
+    QMap<QString, float> produtosMaisLucrativosAno(const QString &ano);
 private slots:
     void on_Btn_PdfGen_clicked();
 
@@ -88,6 +90,9 @@ private:
     QPair<QString, int> extrairNomeId(const QString &texto);
     bool verificarNomeIdCliente(const QString &nome, int id);
     void selecionarClienteNovo();
+    void configurarJanelaNFValor();
+    QMap<QString, float> buscarValoresNfAno(const QString &ano);
+    void configurarJanelaProdutoLucroValor();
 };
 
 #endif // RELATORIOS_H

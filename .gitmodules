@@ -1,0 +1,3 @@
+[submodule "libs-externas/cppbrasil"]
+	path = libs-externas/cppbrasil
+	url = https://github.com/cppbr/cppbrasil

@@ -3,6 +3,14 @@
 
 #include "pagamento.h"
 #include "venda.h"
+#include "nota/nfcevenda.h"
+#include "nota/nfevenda.h"
+#include <CppBrasil/NFe/CppNFe>
+#include <CppBrasil/DanfeQtRPT/CppDanfeQtRPT>
+#include <qtrpt.h>
+#include "subclass/waitdialog.h"
+#include <qmap.h>
+
 
 class pagamentoVenda : public pagamento
 {
@@ -10,11 +18,33 @@ class pagamentoVenda : public pagamento
 public:
     explicit pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString total, QString cliente, QString data, int idCliente, QWidget *parent = nullptr);
     QList<QList<QVariant>> rowDataList;
-
+    void imprimirDANFE(const CppNFe *cppnfe);
 private:
     void terminarPagamento() override;
     int idCliente;
+    NfceVenda notaNFCe;
+    NFeVenda notaNFe;
+    WaitDialog* waitDialog = nullptr;
+    QString erroNf;
+    QString idVenda;
+    QString nomeCli, emailCli, telefoneCli, enderecoCli, cpfCli, numeroCli, bairroCli,
+        xMunCli, cMunCli, ufCli, cepCli, ieCli;
+    int indIeCLi = 0;
+    bool ehPfCli = false;
+    QMap<QString, QString> fiscalValues;
+    QMap<QString, QString> empresaValues;
+    bool emitTodosNf = false;
 
+signals:
+    void gerarEnviarNf();
+
+
+protected:
+    void onRetWSChange(const QString &webServices);
+    void onErrorOccurred(const QString &error);
+    void verificarErroNf(const CppNFe *cppnfe);
+    void onRetStatusServico(const QString &status);
+    void onRetLote(const QString &lote);
 
 };
 

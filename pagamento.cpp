@@ -205,3 +205,15 @@ void pagamento::on_CheckPorcentagem_stateChanged(int arg1)
     descontoTaxa();
 }
 
+
+void pagamento::on_CBox_ModeloEmit_currentIndexChanged(int index)
+{
+    if(index == 2){
+        ui->RadioBtn_EmitNfApenas->setVisible(false);
+        ui->RadioBtn_EmitNfTodos->setVisible(false);
+    }else{
+        ui->RadioBtn_EmitNfApenas->setVisible(true);
+        ui->RadioBtn_EmitNfTodos->setVisible(true);
+    }
+}
+

@@ -314,15 +314,15 @@ void pagamentoVenda::terminarPagamento(){
 
     db.close();
     if(fiscalValues.value("emit_nf") == "1"){ // se a config estiver ativada para emitir
-        if (!waitDialog) {
-            waitDialog = new WaitDialog(this);
-        }
 
-
-
-        waitDialog->setMessage("Aguardando resposta do servidor...");
-        waitDialog->show();
         if(ui->CBox_ModeloEmit->currentIndex() == 0){
+
+            if (!waitDialog) {
+                waitDialog = new WaitDialog(this);
+            }
+            waitDialog->setMessage("Aguardando resposta do servidor...");
+            waitDialog->show();
+
             connect(this, &pagamentoVenda::gerarEnviarNf, &notaNFCe, &NfceVenda::onReqGerarEnviar);
             connect(&notaNFCe, &NfceVenda::retWSChange, this, &pagamentoVenda::onRetWSChange);
             connect(&notaNFCe, &NfceVenda::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
@@ -338,6 +338,13 @@ void pagamentoVenda::terminarPagamento(){
 
             verificarErroNf(this->notaNFCe.getCppNFe());
         }else if(ui->CBox_ModeloEmit->currentIndex() == 1){
+
+            if (!waitDialog) {
+                waitDialog = new WaitDialog(this);
+            }
+            waitDialog->setMessage("Aguardando resposta do servidor...");
+            waitDialog->show();
+
             connect(this, &pagamentoVenda::gerarEnviarNf, &notaNFe, &NFeVenda::onReqGerarEnviar);
             connect(&notaNFe, &NFeVenda::retWSChange, this, &pagamentoVenda::onRetWSChange);
             connect(&notaNFe, &NFeVenda::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
@@ -352,10 +359,11 @@ void pagamentoVenda::terminarPagamento(){
             emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
 
             verificarErroNf(this->notaNFe.getCppNFe());
+        }else if(ui->CBox_ModeloEmit->currentIndex() == 2){
+            emit pagamentoConcluido();
         }
 
     }
-    emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
 
     // fechar as janelas
     this->close();

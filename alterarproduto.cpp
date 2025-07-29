@@ -111,13 +111,17 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
         ui->Ledit_AltPercentualLucro->setFocus();
         return;
     }
-    if (ncm.trimmed().isEmpty() && nf) {
+    if(precoForn.trimmed().isEmpty()){
+        precoForn = "";
+    }else{
+        precoForn = QString::number(portugues.toDouble(precoForn));
+    }
+    if ((ncm.trimmed().isEmpty() && nf) || (ncm.length() != 8 && nf)) {
         QMessageBox::StandardButton reply = QMessageBox::question(
             this,
             "Aviso",
-            "O campo NCM está vazio.\n"
+            "O campo NCM está errado.\n"
             "Produtos sem NCM não poderão ser utilizados na emissão de nota fiscal.\n"
-            "Tente utilizar uma das sugestões de NCM clicando no campo.\n\n"
             "Deseja salvar o produto mesmo assim?",
             QMessageBox::Yes | QMessageBox::No
             );
@@ -126,11 +130,6 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
             ui->Ledit_AltNCM->setFocus();
             return; // cancela o envio
         }
-    }
-    if(precoForn.trimmed().isEmpty()){
-        precoForn = "";
-    }else{
-        precoForn = QString::number(portugues.toDouble(precoForn));
     }
     porcentLucro = QString::number(portugues.toFloat(porcentLucro));
     aliquotaImp = QString::number(portugues.toFloat(aliquotaImp));

@@ -142,13 +142,12 @@ void InserirProduto::on_Btn_Enviar_clicked()
         ui->Ledit_PercentualLucro->setFocus();
         return;
     }
-    if (ncm.trimmed().isEmpty() && nfProduto) {
+    if ((ncm.trimmed().isEmpty() && nfProduto) || (ncm.length() != 8 && nfProduto)) {
         QMessageBox::StandardButton reply = QMessageBox::question(
             this,
             "Aviso",
-            "O campo NCM está vazio.\n"
+            "O campo NCM está errado.\n"
             "Produtos sem NCM não poderão ser utilizados na emissão de nota fiscal.\n"
-            "Tente utilizar uma das sugestões de NCM clicando no campo.\n\n"
             "Deseja salvar o produto mesmo assim?",
             QMessageBox::Yes | QMessageBox::No
             );

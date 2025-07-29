@@ -269,7 +269,6 @@ void pagamentoVenda::terminarPagamento(){
     query.bindValue(":valor10", QString::number(idCliente));
     if(forma_pagamento == "Prazo"){
         query.bindValue(":valor11", "0");
-
     }else{
         query.bindValue(":valor11", "1");
 
@@ -316,7 +315,15 @@ void pagamentoVenda::terminarPagamento(){
     if(fiscalValues.value("emit_nf") == "1"){ // se a config estiver ativada para emitir
 
         if(ui->CBox_ModeloEmit->currentIndex() == 0){
-
+            if(existeItensComNcmVazio(rowDataList, emitTodosNf)){
+               QMessageBox::StandardButton resposta;
+                resposta = QMessageBox::question(this,
+                "Atenção", "Existem produtos com NCM vazio ou igual a '0000000', Deseja continuar mesmo assim?",
+                                                QMessageBox::Yes | QMessageBox::No);
+               if(resposta == QMessageBox::No){
+                    return;
+               }
+            }
             if (!waitDialog) {
                 waitDialog = new WaitDialog(this);
             }
@@ -338,7 +345,15 @@ void pagamentoVenda::terminarPagamento(){
 
             verificarErroNf(this->notaNFCe.getCppNFe());
         }else if(ui->CBox_ModeloEmit->currentIndex() == 1){
-
+            if(existeItensComNcmVazio(rowDataList, emitTodosNf)){
+                QMessageBox::StandardButton resposta;
+                resposta = QMessageBox::question(this,
+                                                 "Atenção", "Existem produtos com NCM vazio ou igual a '0000000', Deseja continuar mesmo assim?",
+                                                 QMessageBox::Yes | QMessageBox::No);
+                if(resposta == QMessageBox::No){
+                    return;
+                }
+            }
             if (!waitDialog) {
                 waitDialog = new WaitDialog(this);
             }
@@ -368,4 +383,45 @@ void pagamentoVenda::terminarPagamento(){
     // fechar as janelas
     this->close();
 
+}
+bool pagamentoVenda::existeItensComNcmVazio(QList<QList<QVariant>> listaProdutos, bool somenteNf) {
+    QSqlQuery query;
+    db.open();
+
+    for (const QList<QVariant> &produto : listaProdutos) {
+        if (produto.isEmpty())
+            continue;
+
+        QVariant idProduto = produto.at(0);
+
+        QString sql = "SELECT ncm, nf FROM produtos WHERE id = :id";
+        query.prepare(sql);
+        query.bindValue(":id", idProduto);
+
+        if (!query.exec()) {
+            qWarning() << "Erro ao consultar produto ID" << idProduto << ":" << query.lastError().text();
+            continue;
+        }
+
+        if (query.next()) {
+            QString ncm = query.value("ncm").toString().trimmed();
+            bool nf = query.value("nf").toBool();
+
+            if (somenteNf && !nf) {
+                // pula este produto, pois nf não é true
+                continue;
+            }
+
+            if (ncm.isEmpty() || ncm == "00000000") {
+                qDebug() << "Produto ID" << idProduto << "com NCM inválido:" << ncm;
+                db.close();
+                return true;
+            }
+        } else {
+            qWarning() << "Produto ID" << idProduto << "não encontrado no banco de dados.";
+        }
+    }
+
+    db.close();
+    return false;
 }

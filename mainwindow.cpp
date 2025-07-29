@@ -1253,7 +1253,7 @@ void MainWindow::setLocalProd(){
         dialog.setWindowTitle("Inserir Texto");
         dialog.setLabelText("Informe o local do produto:");
         dialog.setLineEditText(local);
-        dialog.Ledit_info->setMaxLength(20);
+        dialog.Ledit_info->setMaxLength(60);
         dialog.setCompleterSuggestions(sugestoes);
 
         if (dialog.exec() == QDialog::Accepted) {

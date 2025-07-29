@@ -63,9 +63,9 @@ InserirCliente::InserirCliente(QWidget *parent)
     //max lenght
     ui->Ledit_Telefone->setMaxLength(12);
     ui->Ledit_Cpf->setMaxLength(15);
-    ui->Ledit_Nome->setMaxLength(30);
-    ui->Ledit_Endereco->setMaxLength(30);
-    ui->Ledit_Email->setMaxLength(30);
+    ui->Ledit_Nome->setMaxLength(70);
+    ui->Ledit_Endereco->setMaxLength(60);
+    ui->Ledit_Email->setMaxLength(60);
 
 
 }

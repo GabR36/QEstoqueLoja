@@ -165,7 +165,12 @@ void InserirProduto::on_Btn_Enviar_clicked()
     qDebug() << price;
     // quantidade precisa ser transformada com ponto para ser armazenada no db
     quantidadeProduto = QString::number(portugues.toFloat(quantidadeProduto, &conversionOkQuant));
-    precoFornecedor = QString::number(portugues.toDouble(precoFornecedor));
+    if(precoFornecedor.trimmed().isEmpty()){
+        precoFornecedor = "";
+    }else{
+        precoFornecedor = QString::number(portugues.toDouble(precoFornecedor));
+
+    }
     percentLucro = QString::number(portugues.toFloat(percentLucro));
     aliquotaIcms = QString::number(portugues.toFloat(aliquotaIcms));
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero

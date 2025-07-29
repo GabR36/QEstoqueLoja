@@ -127,7 +127,11 @@ void AlterarProduto::on_Btn_AltAceitar_accepted()
             return; // cancela o envio
         }
     }
-    precoForn = QString::number(portugues.toDouble(precoForn));
+    if(precoForn.trimmed().isEmpty()){
+        precoForn = "";
+    }else{
+        precoForn = QString::number(portugues.toDouble(precoForn));
+    }
     porcentLucro = QString::number(portugues.toFloat(porcentLucro));
     aliquotaImp = QString::number(portugues.toFloat(aliquotaImp));
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero

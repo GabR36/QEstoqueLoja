@@ -9,6 +9,7 @@
 #include <CppBrasil/NFe/ConvNF>
 #include <QLocale>
 #include <QSqlDatabase>
+#include <QStandardPaths>
 
 class NfceVenda : public QObject
 {
@@ -30,7 +31,7 @@ private:
     CppNFe *m_nfe;
     QMap<QString, QString> fiscalValues;
     QMap<QString, QString> empresaValues;
-    QString caminhoXml = QCoreApplication::applicationDirPath() + "/xmlNf";
+    QString caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/xmlNf";
     QList<QList<QVariant>>listaProdutos;
     int quantProds = 0;
     QVector<float> vTotTribProduto;

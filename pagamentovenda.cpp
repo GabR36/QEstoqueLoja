@@ -2,6 +2,7 @@
 #include "subclass/waitdialog.h"
 #include <QTimer>
 #include "configuracao.h"
+#include <QSqlError>
 pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString total, QString cliente, QString data, int idCliente, QWidget *parent)
     : pagamento(total, cliente, data, parent)
 {
@@ -246,6 +247,16 @@ void pagamentoVenda::terminarPagamento(){
         return;
     }
 
+    if(existeItensComNcmVazio(rowDataList, emitTodosNf) && fiscalValues.value("emit_nf") == "1"){
+        QMessageBox::StandardButton resposta;
+        resposta = QMessageBox::question(this,
+                                         "Atenção", "Existem produtos com NCM vazio ou igual a '0000000', Deseja continuar mesmo assim?",
+                                         QMessageBox::Yes | QMessageBox::No);
+        if(resposta == QMessageBox::No){
+            return;
+        }
+    }
+
 
 
     query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, "
@@ -315,15 +326,7 @@ void pagamentoVenda::terminarPagamento(){
     if(fiscalValues.value("emit_nf") == "1"){ // se a config estiver ativada para emitir
 
         if(ui->CBox_ModeloEmit->currentIndex() == 0){
-            if(existeItensComNcmVazio(rowDataList, emitTodosNf)){
-               QMessageBox::StandardButton resposta;
-                resposta = QMessageBox::question(this,
-                "Atenção", "Existem produtos com NCM vazio ou igual a '0000000', Deseja continuar mesmo assim?",
-                                                QMessageBox::Yes | QMessageBox::No);
-               if(resposta == QMessageBox::No){
-                    return;
-               }
-            }
+
             if (!waitDialog) {
                 waitDialog = new WaitDialog(this);
             }
@@ -341,19 +344,9 @@ void pagamentoVenda::terminarPagamento(){
             notaNFCe.setProdutosVendidos(rowDataList, emitTodosNf);
             notaNFCe.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
             emit gerarEnviarNf();
-            emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
 
             verificarErroNf(this->notaNFCe.getCppNFe());
         }else if(ui->CBox_ModeloEmit->currentIndex() == 1){
-            if(existeItensComNcmVazio(rowDataList, emitTodosNf)){
-                QMessageBox::StandardButton resposta;
-                resposta = QMessageBox::question(this,
-                                                 "Atenção", "Existem produtos com NCM vazio ou igual a '0000000', Deseja continuar mesmo assim?",
-                                                 QMessageBox::Yes | QMessageBox::No);
-                if(resposta == QMessageBox::No){
-                    return;
-                }
-            }
             if (!waitDialog) {
                 waitDialog = new WaitDialog(this);
             }
@@ -371,15 +364,13 @@ void pagamentoVenda::terminarPagamento(){
             notaNFe.setProdutosVendidos(rowDataList, emitTodosNf);
             notaNFe.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
             emit gerarEnviarNf();
-            emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
 
             verificarErroNf(this->notaNFe.getCppNFe());
         }else if(ui->CBox_ModeloEmit->currentIndex() == 2){
-            emit pagamentoConcluido();
         }
 
     }
-
+    emit pagamentoConcluido();
     // fechar as janelas
     this->close();
 
@@ -414,7 +405,6 @@ bool pagamentoVenda::existeItensComNcmVazio(QList<QList<QVariant>> listaProdutos
 
             if (ncm.isEmpty() || ncm == "00000000") {
                 qDebug() << "Produto ID" << idProduto << "com NCM inválido:" << ncm;
-                db.close();
                 return true;
             }
         } else {
@@ -422,6 +412,5 @@ bool pagamentoVenda::existeItensComNcmVazio(QList<QList<QVariant>> listaProdutos
         }
     }
 
-    db.close();
     return false;
 }

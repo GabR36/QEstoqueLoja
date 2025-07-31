@@ -914,7 +914,7 @@ void MainWindow::on_Btn_Alterar_clicked()
 void MainWindow::on_Btn_Venda_clicked()
 {
     Vendas *vendas = new Vendas;
-    vendas->setWindowModality(Qt::ApplicationModal);
+    //vendas->setWindowModality(Qt::ApplicationModal);
     connect(vendas, &Vendas::vendaConcluidaVendas, this, &MainWindow::atualizarTableview);
 
     vendas->show();

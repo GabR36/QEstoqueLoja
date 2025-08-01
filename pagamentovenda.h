@@ -34,7 +34,7 @@ private:
     QMap<QString, QString> fiscalValues;
     QMap<QString, QString> empresaValues;
     bool emitTodosNf = false;
-
+    bool existeItensComNcmVazio(QList<QList<QVariant> > listaProdutos, bool somenteNf);
 signals:
     void gerarEnviarNf();
 
@@ -45,7 +45,6 @@ protected:
     void verificarErroNf(const CppNFe *cppnfe);
     void onRetStatusServico(const QString &status);
     void onRetLote(const QString &lote);
-
 };
 
 #endif // PAGAMENTOVENDA_H

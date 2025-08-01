@@ -49,7 +49,7 @@ InfoJanelaProd::InfoJanelaProd(QWidget *parent, int id)
     ui->Lbl_NCM->setText(ncm);
     if(nf){
         ui->Lbl_Nf->setText("Sim");
-    }{
+    }else{
         ui->Lbl_Nf->setText("Não");
     }
     ui->Lbl_AliquotaICMS->setText(aliquotaIcms);

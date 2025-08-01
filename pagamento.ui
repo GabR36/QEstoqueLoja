@@ -464,13 +464,13 @@ font-size: 15px;
    <property name="frameShadow">
     <enum>QFrame::Shadow::Raised</enum>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>201</width>
-      <height>121</height>
+      <width>207</width>
+      <height>135</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -486,6 +486,11 @@ font-size: 15px;
          <item>
           <property name="text">
            <string>Emitir NF-e</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Não Emitir NF</string>
           </property>
          </item>
         </widget>

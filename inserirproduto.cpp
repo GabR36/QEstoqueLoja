@@ -142,13 +142,12 @@ void InserirProduto::on_Btn_Enviar_clicked()
         ui->Ledit_PercentualLucro->setFocus();
         return;
     }
-    if (ncm.trimmed().isEmpty() && nfProduto) {
+    if ((ncm.trimmed().isEmpty() && nfProduto) || (ncm.length() != 8 && nfProduto)) {
         QMessageBox::StandardButton reply = QMessageBox::question(
             this,
             "Aviso",
-            "O campo NCM está vazio.\n"
+            "O campo NCM está errado.\n"
             "Produtos sem NCM não poderão ser utilizados na emissão de nota fiscal.\n"
-            "Tente utilizar uma das sugestões de NCM clicando no campo.\n\n"
             "Deseja salvar o produto mesmo assim?",
             QMessageBox::Yes | QMessageBox::No
             );
@@ -165,7 +164,12 @@ void InserirProduto::on_Btn_Enviar_clicked()
     qDebug() << price;
     // quantidade precisa ser transformada com ponto para ser armazenada no db
     quantidadeProduto = QString::number(portugues.toFloat(quantidadeProduto, &conversionOkQuant));
-    precoFornecedor = QString::number(portugues.toDouble(precoFornecedor));
+    if(precoFornecedor.trimmed().isEmpty()){
+        precoFornecedor = "";
+    }else{
+        precoFornecedor = QString::number(portugues.toDouble(precoFornecedor));
+
+    }
     percentLucro = QString::number(portugues.toFloat(percentLucro));
     aliquotaIcms = QString::number(portugues.toFloat(aliquotaIcms));
     // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero

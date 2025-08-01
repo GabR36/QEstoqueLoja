@@ -189,7 +189,7 @@ void Configuracao::on_Btn_Aplicar_clicked()
 
     if(emitNf == true && (ui->Lbl_CertificadoPath->text().isEmpty() ||
         senhaCertificado.isEmpty() || csc.isEmpty() || idCsc.isEmpty())){
-        QMessageBox::warning(this, "Erro", "Se for emitir notas fsicais deve preencher"
+        QMessageBox::warning(this, "Erro", "Se for emitir notas fiscais deve preencher "
                                            "todos os dados");
         return;
 

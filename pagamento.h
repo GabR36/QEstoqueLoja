@@ -43,6 +43,8 @@ private slots:
 
     void on_CheckPorcentagem_stateChanged(int arg1);
 
+    void on_CBox_ModeloEmit_currentIndexChanged(int index);
+
 protected:
     float obterValorFinal(QString taxa, QString desconto);
     void descontoTaxa();

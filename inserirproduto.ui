@@ -94,7 +94,7 @@ background-color:rgb(170, 170, 170);
       <string notr="true"/>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -313,7 +313,7 @@ Comercial:</string>
         <string>NF</string>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
       </widget>
       <widget class="QWidget" name="layoutWidget">

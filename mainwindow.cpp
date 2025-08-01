@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget *parent)
 #if defined(Q_OS_LINUX)
     // Linux: ~/.local/share/QEstoqueLoja/estoque.db
     dbPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/estoque.db";
-
+    qDebug() << dbPath;
 #elif defined(Q_OS_WIN)
     // Windows: %APPDATA%\QEstoqueLoja\estoque.db
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -60,6 +60,13 @@ MainWindow::MainWindow(QWidget *parent)
 #endif
 
     db.setDatabaseName(dbPath);
+    QFileInfo dbFileInfo(dbPath);
+    QDir dbDir = dbFileInfo.dir();
+    if (!dbDir.exists()) {
+        if (!dbDir.mkpath(".")) {
+            qDebug() << "Erro ao criar diretório para o banco de dados:" << dbDir.path();
+        }
+    }
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados.";
     }
@@ -872,7 +879,12 @@ void MainWindow::on_Btn_Alterar_clicked()
     QString productBarras = barrasVariant.toString();
     bool productNf = nfVariant.toBool();
     QString productUCom = uCom.toString();
-    QString produtoPrecoForn = portugues.toString(precoForn.toFloat());
+    QString produtoPrecoForn;
+    if(precoForn.toString().trimmed().isEmpty()){
+        produtoPrecoForn = "";
+    }else{
+        produtoPrecoForn = portugues.toString(precoForn.toFloat());
+    }
     QString productPorcentLucro = portugues.toString(porcentLucro.toFloat());
     QString productNCM = ncm.toString();
     QString productCEST = cest.toString();
@@ -1241,7 +1253,7 @@ void MainWindow::setLocalProd(){
         dialog.setWindowTitle("Inserir Texto");
         dialog.setLabelText("Informe o local do produto:");
         dialog.setLineEditText(local);
-        dialog.Ledit_info->setMaxLength(20);
+        dialog.Ledit_info->setMaxLength(60);
         dialog.setCompleterSuggestions(sugestoes);
 
         if (dialog.exec() == QDialog::Accepted) {

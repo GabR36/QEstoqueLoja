@@ -2,6 +2,7 @@
 #include "subclass/waitdialog.h"
 #include <QTimer>
 #include "configuracao.h"
+#include <QSqlError>
 pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString total, QString cliente, QString data, int idCliente, QWidget *parent)
     : pagamento(total, cliente, data, parent)
 {
@@ -246,6 +247,16 @@ void pagamentoVenda::terminarPagamento(){
         return;
     }
 
+    if(existeItensComNcmVazio(rowDataList, emitTodosNf) && fiscalValues.value("emit_nf") == "1"){
+        QMessageBox::StandardButton resposta;
+        resposta = QMessageBox::question(this,
+                                         "Atenção", "Existem produtos com NCM vazio ou igual a '0000000', Deseja continuar mesmo assim?",
+                                         QMessageBox::Yes | QMessageBox::No);
+        if(resposta == QMessageBox::No){
+            return;
+        }
+    }
+
 
 
     query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, "
@@ -269,7 +280,6 @@ void pagamentoVenda::terminarPagamento(){
     query.bindValue(":valor10", QString::number(idCliente));
     if(forma_pagamento == "Prazo"){
         query.bindValue(":valor11", "0");
-
     }else{
         query.bindValue(":valor11", "1");
 
@@ -314,15 +324,15 @@ void pagamentoVenda::terminarPagamento(){
 
     db.close();
     if(fiscalValues.value("emit_nf") == "1"){ // se a config estiver ativada para emitir
-        if (!waitDialog) {
-            waitDialog = new WaitDialog(this);
-        }
 
-
-
-        waitDialog->setMessage("Aguardando resposta do servidor...");
-        waitDialog->show();
         if(ui->CBox_ModeloEmit->currentIndex() == 0){
+
+            if (!waitDialog) {
+                waitDialog = new WaitDialog(this);
+            }
+            waitDialog->setMessage("Aguardando resposta do servidor...");
+            waitDialog->show();
+
             connect(this, &pagamentoVenda::gerarEnviarNf, &notaNFCe, &NfceVenda::onReqGerarEnviar);
             connect(&notaNFCe, &NfceVenda::retWSChange, this, &pagamentoVenda::onRetWSChange);
             connect(&notaNFCe, &NfceVenda::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
@@ -334,10 +344,15 @@ void pagamentoVenda::terminarPagamento(){
             notaNFCe.setProdutosVendidos(rowDataList, emitTodosNf);
             notaNFCe.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
             emit gerarEnviarNf();
-            emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
 
             verificarErroNf(this->notaNFCe.getCppNFe());
         }else if(ui->CBox_ModeloEmit->currentIndex() == 1){
+            if (!waitDialog) {
+                waitDialog = new WaitDialog(this);
+            }
+            waitDialog->setMessage("Aguardando resposta do servidor...");
+            waitDialog->show();
+
             connect(this, &pagamentoVenda::gerarEnviarNf, &notaNFe, &NFeVenda::onReqGerarEnviar);
             connect(&notaNFe, &NFeVenda::retWSChange, this, &pagamentoVenda::onRetWSChange);
             connect(&notaNFe, &NFeVenda::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
@@ -349,15 +364,53 @@ void pagamentoVenda::terminarPagamento(){
             notaNFe.setProdutosVendidos(rowDataList, emitTodosNf);
             notaNFe.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
             emit gerarEnviarNf();
-            emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
 
             verificarErroNf(this->notaNFe.getCppNFe());
+        }else if(ui->CBox_ModeloEmit->currentIndex() == 2){
         }
 
     }
-    emit pagamentoConcluido(); // sinal para outras janelas atualizarem...
-
+    emit pagamentoConcluido();
     // fechar as janelas
     this->close();
 
+}
+bool pagamentoVenda::existeItensComNcmVazio(QList<QList<QVariant>> listaProdutos, bool somenteNf) {
+    QSqlQuery query;
+    db.open();
+
+    for (const QList<QVariant> &produto : listaProdutos) {
+        if (produto.isEmpty())
+            continue;
+
+        QVariant idProduto = produto.at(0);
+
+        QString sql = "SELECT ncm, nf FROM produtos WHERE id = :id";
+        query.prepare(sql);
+        query.bindValue(":id", idProduto);
+
+        if (!query.exec()) {
+            qWarning() << "Erro ao consultar produto ID" << idProduto << ":" << query.lastError().text();
+            continue;
+        }
+
+        if (query.next()) {
+            QString ncm = query.value("ncm").toString().trimmed();
+            bool nf = query.value("nf").toBool();
+
+            if (somenteNf && !nf) {
+                // pula este produto, pois nf não é true
+                continue;
+            }
+
+            if (ncm.isEmpty() || ncm == "00000000") {
+                qDebug() << "Produto ID" << idProduto << "com NCM inválido:" << ncm;
+                return true;
+            }
+        } else {
+            qWarning() << "Produto ID" << idProduto << "não encontrado no banco de dados.";
+        }
+    }
+
+    return false;
 }

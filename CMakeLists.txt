@@ -39,14 +39,16 @@ endif()
 
 
 set(TS_FILES QEstoqueLoja_pt_BR.ts)
+if(CMAKE_SYSTEM MATCHES "Windows")
 
-include(FetchContent)
-FetchContent_Declare(
-  zint
-  GIT_REPOSITORY https://github.com/zint/zint.git
-  GIT_TAG master # Você pode substituir por uma versão específica, se desejar
-)
-FetchContent_MakeAvailable(zint)
+    include(FetchContent)
+    FetchContent_Declare(
+    zint
+    GIT_REPOSITORY https://github.com/zint/zint.git
+    GIT_TAG master # Você pode substituir por uma versão específica, se desejar
+    )
+    FetchContent_MakeAvailable(zint)
+endif()
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp
@@ -184,35 +186,27 @@ install(TARGETS QEstoqueLoja
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-# Define APPDATA_DIR de acordo com o SO
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(XDG_DATA_HOME "$ENV{XDG_DATA_HOME}")
-    if(NOT XDG_DATA_HOME)
-        set(XDG_DATA_HOME "$ENV{HOME}/.local/share")
+# --- Definir APPDATA_DIR corretamente ---
+if (WIN32)
+    # Roaming AppData
+    file(TO_CMAKE_PATH "$ENV{APPDATA}" APPDATA_PATH)
+    set(APPDATA_DIR "${APPDATA_PATH}/QEstoqueLoja")
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    if (DEFINED ENV{XDG_DATA_HOME} AND NOT "$ENV{XDG_DATA_HOME}" STREQUAL "")
+        set(APPDATA_DIR "$ENV{XDG_DATA_HOME}/QEstoqueLoja")
+    else()
+        set(APPDATA_DIR "$ENV{HOME}/.local/share/QEstoqueLoja")
     endif()
-    set(APPDATA_DIR "${XDG_DATA_HOME}/QEstoqueLoja")
-elseif (WIN32)
-    set(APPDATA_DIR "$ENV{LOCALAPPDATA}/QEstoqueLoja")
 endif()
 
-# Função para copiar arquivos apenas se forem diferentes
-function(copy_dir_if_different SRC_DIR DEST_DIR)
-    file(GLOB FILES "${SRC_DIR}/*")
-    foreach(FILE ${FILES})
-        get_filename_component(FILENAME ${FILE} NAME)
-        add_custom_command(TARGET QEstoqueLoja POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E make_directory "${DEST_DIR}"
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FILE}" "${DEST_DIR}/${FILENAME}"
-        )
-    endforeach()
-endfunction()
-
-# Copiar reports
-copy_dir_if_different("${CMAKE_SOURCE_DIR}/reports" "${APPDATA_DIR}/reports")
-
-# Copiar recursos
-copy_dir_if_different("${CMAKE_SOURCE_DIR}/recursos" "${APPDATA_DIR}/recursos")
-
+# --- Copiar diretórios fixos ---
+add_custom_command(TARGET QEstoqueLoja POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${APPDATA_DIR}/reports"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/reports" "${APPDATA_DIR}/reports"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${APPDATA_DIR}/recursos"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/recursos" "${APPDATA_DIR}/recursos"
+    COMMENT "Copiando reports e recursos para ${APPDATA_DIR}"
+)
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(QEstoqueLoja)
 endif()

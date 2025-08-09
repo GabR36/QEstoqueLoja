@@ -903,7 +903,7 @@ void MainWindow::on_Btn_Alterar_clicked()
     alterar->setWindowModality(Qt::ApplicationModal);
     alterar->show();
     connect(alterar, &AlterarProduto::produtoAlterado, this,
-            &MainWindow::atualizarTableview);
+            &MainWindow::on_Btn_Pesquisa_clicked);
     }else{
         QMessageBox::warning(this,"Erro","Selecione um produto antes de alterar!");
     }
@@ -914,7 +914,7 @@ void MainWindow::on_Btn_Alterar_clicked()
 void MainWindow::on_Btn_Venda_clicked()
 {
     Vendas *vendas = new Vendas;
-    vendas->setWindowModality(Qt::ApplicationModal);
+    //vendas->setWindowModality(Qt::ApplicationModal);
     connect(vendas, &Vendas::vendaConcluidaVendas, this, &MainWindow::atualizarTableview);
 
     vendas->show();

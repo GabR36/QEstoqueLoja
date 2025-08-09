@@ -20,7 +20,7 @@
 
 
 venda::venda(QWidget *parent) :
-    QDialog(parent),
+    QWidget(parent),
     ui(new Ui::venda)
 {
     ui->setupUi(this);

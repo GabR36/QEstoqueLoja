@@ -2,11 +2,12 @@
 #include <QTextStream>
 #include <QDebug>
 #include <QCoreApplication>
+#include <QStandardPaths>
 
 IbptUtil::IbptUtil(QObject *parent)
     : QObject{parent}
 {
-    caminhoArquivoTabela = QCoreApplication::applicationDirPath() + "/recursos/TabelaIBPTaxPR25.1.F.csv";
+    caminhoArquivoTabela = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/recursos/TabelaIBPTaxPR25.1.F.csv";
     tabela.setFileName(caminhoArquivoTabela);
 
     if (!tabela.open(QIODevice::ReadOnly | QIODevice::Text)) {

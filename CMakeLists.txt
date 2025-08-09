@@ -184,70 +184,39 @@ install(TARGETS QEstoqueLoja
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-if (CMAKE_SYSTEM MATCHES "Linux")
-    # Caminho do arquivo de origem
-    set(ARQUIVO_ORIGEM "${CMAKE_SOURCE_DIR}/reports/*")
-
-    # Caminho do diretório de destino (ao lado do executável no diretório de build)
-    set(DIRETORIO_DESTINO "${CMAKE_CURRENT_BINARY_DIR}/reports")
-
-    # Copiar o arquivo após a compilação
-    add_custom_command(TARGET QEstoqueLoja POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${DIRETORIO_DESTINO}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ARQUIVO_ORIGEM}" "${DIRETORIO_DESTINO}"
-        COMMENT "Copiando orcamentoReport.xml para a pasta do executável"
-    )
-
-    # Caminho do arquivo de origem
-    set(ARQUIVOS_RECURSOS "${CMAKE_SOURCE_DIR}/recursos/*")
-
-    # Caminho do diretório de destino (ao lado do executável no diretório de build)
-    set(DIRETORIO_DESTINO_RECURSOS "${CMAKE_CURRENT_BINARY_DIR}/recursos")
-
-    # Copiar o arquivo após a compilação
-    add_custom_command(TARGET QEstoqueLoja POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${DIRETORIO_DESTINO_RECURSOS}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ARQUIVOS_RECURSOS}" "${DIRETORIO_DESTINO_RECURSOS}"
-        COMMENT "Copiando para a pasta do executável"
-    )
+# Define APPDATA_DIR de acordo com o SO
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    set(XDG_DATA_HOME "$ENV{XDG_DATA_HOME}")
+    if(NOT XDG_DATA_HOME)
+        set(XDG_DATA_HOME "$ENV{HOME}/.local/share")
+    endif()
+    set(APPDATA_DIR "${XDG_DATA_HOME}/QEstoqueLoja")
+elseif (WIN32)
+    set(APPDATA_DIR "$ENV{LOCALAPPDATA}/QEstoqueLoja")
 endif()
-if (CMAKE_SYSTEM MATCHES "Windows")
-    # Pega todos os arquivos da pasta reports
-    file(GLOB REPORT_FILES "${CMAKE_SOURCE_DIR}/reports/*")
 
-    # Cria o diretório de destino
-    add_custom_command(TARGET QEstoqueLoja POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/reports"
-    )
-
-    # Loop para adicionar cópia de cada arquivo
-    foreach(REPORT_FILE ${REPORT_FILES})
-        get_filename_component(REPORT_FILENAME ${REPORT_FILE} NAME)
+# Função para copiar arquivos apenas se forem diferentes
+function(copy_dir_if_different SRC_DIR DEST_DIR)
+    file(GLOB FILES "${SRC_DIR}/*")
+    foreach(FILE ${FILES})
+        get_filename_component(FILENAME ${FILE} NAME)
         add_custom_command(TARGET QEstoqueLoja POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${REPORT_FILE}"
-                    "${CMAKE_CURRENT_BINARY_DIR}/reports/${REPORT_FILENAME}"
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${DEST_DIR}"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${FILE}" "${DEST_DIR}/${FILENAME}"
         )
     endforeach()
+endfunction()
 
-    # Pega todos os arquivos da pasta recursos
-    file(GLOB RECURSOS_FILES "${CMAKE_SOURCE_DIR}/recursos/*")
+# Copiar reports
+copy_dir_if_different("${CMAKE_SOURCE_DIR}/reports" "${APPDATA_DIR}/reports")
 
-    # Cria o diretório de destino
-    add_custom_command(TARGET QEstoqueLoja POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/recursos"
-    )
+# Copiar recursos
+copy_dir_if_different("${CMAKE_SOURCE_DIR}/recursos" "${APPDATA_DIR}/recursos")
 
-    # Loop para adicionar cópia de cada arquivo
-    foreach(RECURSOS_FILE ${RECURSOS_FILES})
-        get_filename_component(RECURSOS_FILENAME ${RECURSOS_FILE} NAME)
-        add_custom_command(TARGET QEstoqueLoja POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${RECURSOS_FILE}"
-                    "${CMAKE_CURRENT_BINARY_DIR}/recursos/${RECURSOS_FILENAME}"
-        )
-    endforeach()
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(QEstoqueLoja)
 endif()
+
 
 
 if(QT_VERSION_MAJOR EQUAL 6)

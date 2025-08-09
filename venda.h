@@ -1,7 +1,6 @@
 #ifndef VENDA_H
 #define VENDA_H
 
-#include <QDialog>
 #include <QVector>
 #include <QSqlDatabase>
 #include <QStandardItemModel>
@@ -14,7 +13,7 @@ namespace Ui {
 class venda;
 }
 
-class venda : public QDialog
+class venda : public QWidget
 {
     Q_OBJECT
 

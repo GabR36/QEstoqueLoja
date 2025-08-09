@@ -133,7 +133,7 @@ Vendas::~Vendas()
 void Vendas::on_Btn_InserirVenda_clicked()
 {
     venda *inserirVenda = new venda;
-    inserirVenda->setWindowModality(Qt::ApplicationModal);
+    //inserirVenda->setWindowModality(Qt::ApplicationModal);
     connect(inserirVenda, &venda::vendaConcluida, this, &Vendas::vendaConcluidaVendas);
     connect(inserirVenda, &venda::vendaConcluida, this, &Vendas::atualizarTabelas);
 

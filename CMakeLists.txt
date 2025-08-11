@@ -48,6 +48,10 @@ if(CMAKE_SYSTEM MATCHES "Windows")
     GIT_TAG master # Você pode substituir por uma versão específica, se desejar
     )
     FetchContent_MakeAvailable(zint)
+elseif(CMAKE_SYSTEM MATCHES "Linux")
+    find_package(PNG)
+    find_library(ZINT_LIBRARIES NAMES zint)
+
 endif()
 set(PROJECT_SOURCES
         main.cpp
@@ -185,6 +189,16 @@ install(TARGETS QEstoqueLoja
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+# Instalar ícone
+install(FILES Imagens/QEstoqueLOja/QeLogo256.png
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/256x256/apps
+    RENAME qestoqueloja.png
+)
+
+# Instalar arquivo .desktop
+install(FILES qestoqueloja.desktop
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications
 )
 # --- Definir APPDATA_DIR corretamente ---
 if (WIN32)

@@ -247,7 +247,8 @@ void pagamentoVenda::terminarPagamento(){
         return;
     }
 
-    if(existeItensComNcmVazio(rowDataList, emitTodosNf) && fiscalValues.value("emit_nf") == "1"){
+    if((existeItensComNcmVazio(rowDataList, emitTodosNf)) && (fiscalValues.value("emit_nf") == "1")
+        && (ui->CBox_ModeloEmit->currentIndex() != 2)){
         QMessageBox::StandardButton resposta;
         resposta = QMessageBox::question(this,
                                          "Atenção", "Existem produtos com NCM vazio ou igual a '0000000', Deseja continuar mesmo assim?",

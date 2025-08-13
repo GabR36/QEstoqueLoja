@@ -21,8 +21,7 @@ if (CMAKE_SYSTEM MATCHES "Linux")
     include_directories(
         /usr/include/libxml2
         /usr/include/QtRPT
-        # /usr/include/CppBrasil
-        # /usr/include/openssl
+        /usr/include/CppBrasil
 
     )
 elseif (CMAKE_SYSTEM MATCHES "Windows")
@@ -200,6 +199,15 @@ install(FILES Imagens/QEstoqueLOja/QeLogo256.png
 install(FILES qestoqueloja.desktop
     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications
 )
+# Instalar schemas XML e CSVs no caminho de dados compartilhados
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/recursos/
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/QEstoqueLoja/recursos
+)
+
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/reports/
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/QEstoqueLoja/reports
+)
+
 # --- Definir APPDATA_DIR corretamente ---
 if (WIN32)
     # Roaming AppData

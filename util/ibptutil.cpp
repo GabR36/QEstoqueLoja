@@ -3,11 +3,34 @@
 #include <QDebug>
 #include <QCoreApplication>
 #include <QStandardPaths>
+#include <QFileInfo>
 
 IbptUtil::IbptUtil(QObject *parent)
     : QObject{parent}
 {
-    caminhoArquivoTabela = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/recursos/TabelaIBPTaxPR25.1.F.csv";
+    QStringList dataLocations = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
+    bool found = false;
+
+    for (const QString &basePath : dataLocations) {
+        QString candidate = basePath + "/QEstoqueLoja/recursos/TabelaIBPTaxPR25.1.F.csv";
+        qDebug() << "Verificando:" << candidate;
+        if (QFileInfo::exists(candidate)) {
+            caminhoArquivoTabela = candidate;
+            found = true;
+            break;
+        }
+    }
+
+    if (!found) {
+        qWarning() << "Arquivo TabelaIBPTaxPR25.1.F.csv não encontrado em nenhum dos caminhos padrão.";
+    } else {
+        qDebug() << "Arquivo encontrado em:" << caminhoArquivoTabela;
+        QFile arquivo(caminhoArquivoTabela);
+        if (!arquivo.open(QIODevice::ReadOnly)) {
+            qWarning() << "Falha ao abrir o arquivo:" << arquivo.errorString();
+        }
+    }
+    //caminhoArquivoTabela = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/recursos/TabelaIBPTaxPR25.1.F.csv";
     tabela.setFileName(caminhoArquivoTabela);
 
     if (!tabela.open(QIODevice::ReadOnly | QIODevice::Text)) {

@@ -21,8 +21,7 @@ if (CMAKE_SYSTEM MATCHES "Linux")
     include_directories(
         /usr/include/libxml2
         /usr/include/QtRPT
-        # /usr/include/CppBrasil
-        # /usr/include/openssl
+        /usr/include/CppBrasil
 
     )
 elseif (CMAKE_SYSTEM MATCHES "Windows")
@@ -39,14 +38,20 @@ endif()
 
 
 set(TS_FILES QEstoqueLoja_pt_BR.ts)
+if(CMAKE_SYSTEM MATCHES "Windows")
 
-include(FetchContent)
-FetchContent_Declare(
-  zint
-  GIT_REPOSITORY https://github.com/zint/zint.git
-  GIT_TAG master # Você pode substituir por uma versão específica, se desejar
-)
-FetchContent_MakeAvailable(zint)
+    include(FetchContent)
+    FetchContent_Declare(
+    zint
+    GIT_REPOSITORY https://github.com/zint/zint.git
+    GIT_TAG master # Você pode substituir por uma versão específica, se desejar
+    )
+    FetchContent_MakeAvailable(zint)
+elseif(CMAKE_SYSTEM MATCHES "Linux")
+    find_package(PNG)
+    find_library(ZINT_LIBRARIES NAMES zint)
+
+endif()
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp
@@ -184,70 +189,50 @@ install(TARGETS QEstoqueLoja
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
-if (CMAKE_SYSTEM MATCHES "Linux")
-    # Caminho do arquivo de origem
-    set(ARQUIVO_ORIGEM "${CMAKE_SOURCE_DIR}/reports/*")
+# Instalar ícone
+install(FILES Imagens/QEstoqueLOja/QeLogo256.png
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/256x256/apps
+    RENAME qestoqueloja.png
+)
 
-    # Caminho do diretório de destino (ao lado do executável no diretório de build)
-    set(DIRETORIO_DESTINO "${CMAKE_CURRENT_BINARY_DIR}/reports")
+# Instalar arquivo .desktop
+install(FILES qestoqueloja.desktop
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/applications
+)
+# Instalar schemas XML e CSVs no caminho de dados compartilhados
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/recursos/
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/QEstoqueLoja/recursos
+)
 
-    # Copiar o arquivo após a compilação
-    add_custom_command(TARGET QEstoqueLoja POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${DIRETORIO_DESTINO}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ARQUIVO_ORIGEM}" "${DIRETORIO_DESTINO}"
-        COMMENT "Copiando orcamentoReport.xml para a pasta do executável"
-    )
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/reports/
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/QEstoqueLoja/reports
+)
 
-    # Caminho do arquivo de origem
-    set(ARQUIVOS_RECURSOS "${CMAKE_SOURCE_DIR}/recursos/*")
-
-    # Caminho do diretório de destino (ao lado do executável no diretório de build)
-    set(DIRETORIO_DESTINO_RECURSOS "${CMAKE_CURRENT_BINARY_DIR}/recursos")
-
-    # Copiar o arquivo após a compilação
-    add_custom_command(TARGET QEstoqueLoja POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${DIRETORIO_DESTINO_RECURSOS}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ARQUIVOS_RECURSOS}" "${DIRETORIO_DESTINO_RECURSOS}"
-        COMMENT "Copiando para a pasta do executável"
-    )
+# --- Definir APPDATA_DIR corretamente ---
+if (WIN32)
+    # Roaming AppData
+    file(TO_CMAKE_PATH "$ENV{APPDATA}" APPDATA_PATH)
+    set(APPDATA_DIR "${APPDATA_PATH}/QEstoqueLoja")
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    if (DEFINED ENV{XDG_DATA_HOME} AND NOT "$ENV{XDG_DATA_HOME}" STREQUAL "")
+        set(APPDATA_DIR "$ENV{XDG_DATA_HOME}/QEstoqueLoja")
+    else()
+        set(APPDATA_DIR "$ENV{HOME}/.local/share/QEstoqueLoja")
+    endif()
 endif()
-if (CMAKE_SYSTEM MATCHES "Windows")
-    # Pega todos os arquivos da pasta reports
-    file(GLOB REPORT_FILES "${CMAKE_SOURCE_DIR}/reports/*")
 
-    # Cria o diretório de destino
-    add_custom_command(TARGET QEstoqueLoja POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/reports"
-    )
-
-    # Loop para adicionar cópia de cada arquivo
-    foreach(REPORT_FILE ${REPORT_FILES})
-        get_filename_component(REPORT_FILENAME ${REPORT_FILE} NAME)
-        add_custom_command(TARGET QEstoqueLoja POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${REPORT_FILE}"
-                    "${CMAKE_CURRENT_BINARY_DIR}/reports/${REPORT_FILENAME}"
-        )
-    endforeach()
-
-    # Pega todos os arquivos da pasta recursos
-    file(GLOB RECURSOS_FILES "${CMAKE_SOURCE_DIR}/recursos/*")
-
-    # Cria o diretório de destino
-    add_custom_command(TARGET QEstoqueLoja POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_CURRENT_BINARY_DIR}/recursos"
-    )
-
-    # Loop para adicionar cópia de cada arquivo
-    foreach(RECURSOS_FILE ${RECURSOS_FILES})
-        get_filename_component(RECURSOS_FILENAME ${RECURSOS_FILE} NAME)
-        add_custom_command(TARGET QEstoqueLoja POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${RECURSOS_FILE}"
-                    "${CMAKE_CURRENT_BINARY_DIR}/recursos/${RECURSOS_FILENAME}"
-        )
-    endforeach()
+# --- Copiar diretórios fixos ---
+add_custom_command(TARGET QEstoqueLoja POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${APPDATA_DIR}/reports"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/reports" "${APPDATA_DIR}/reports"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${APPDATA_DIR}/recursos"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/recursos" "${APPDATA_DIR}/recursos"
+    COMMENT "Copiando reports e recursos para ${APPDATA_DIR}"
+)
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(QEstoqueLoja)
 endif()
+
 
 
 if(QT_VERSION_MAJOR EQUAL 6)

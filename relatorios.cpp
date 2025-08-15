@@ -44,7 +44,6 @@ relatorios::relatorios(QWidget *parent)
 
     connect(ui->CBox_EstoqueMain, QOverload<int>::of(&QComboBox::currentIndexChanged),
             ui->Stacked_Estoque, &QStackedWidget::setCurrentIndex);
-    qDebug() << QCoreApplication::applicationDirPath() + "/reports/orcamentoReport.xml";
     configurarOrcamentoEstoque();
 
 }
@@ -1233,8 +1232,21 @@ void relatorios::on_Btn_Terminar_clicked()
     QString observacao = ui->Tedit_Obs->toPlainText();
 
     QtRPT *report = new QtRPT(nullptr);
-    qDebug() << QCoreApplication::applicationDirPath() + "/reports/orcamentoReport.xml";
-    report->loadReport(QCoreApplication::applicationDirPath() + "/reports/orcamentoReport.xml");
+
+    QStringList dataLocations = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
+    bool found = false;
+    QString reportPath;
+
+    for (const QString &basePath : dataLocations) {
+        QString candidate = basePath + "/QEstoqueLoja/reports/orcamentoReport.xml";
+        qDebug() << "Verificando:" << candidate;
+        if (QFileInfo::exists(candidate)) {
+            reportPath = candidate;
+            found = true;
+            break;
+        }
+    }
+    report->loadReport(reportPath);
 
 
     connect(report, &QtRPT::setDSInfo, [&](DataSetInfo &dsinfo){

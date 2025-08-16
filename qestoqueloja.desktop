@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=QEstoqueLoja
+Comment=Sistema de gerenciamento de estoque para loja
+Exec=QEstoqueLoja
+Icon=qestoqueloja
+Terminal=false
+Categories=Office;Database;Qt;

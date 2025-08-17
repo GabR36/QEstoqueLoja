@@ -16,13 +16,29 @@ Feito em Qt framework e SQLite para o banco de dados.
 
 ## Instalação
 
-Para windows, disponibilizamos instaladores para cada versão, na parte
-das [releases do github](https://github.com/GabR36/QEstoqueLoja/releases).
+Disponibilizamos instaladores para Windows e Linux (Debian e Linux
+Mint) na página de [releases do repositório](https://github.com/GabR36/QEstoqueLoja/releases).
 
-Para Linux, por enquanto, é preciso compilar o código. Para isso
-instale o Qt6, com módulos QtChart, e as bibliotecas
-[libCppNFe](https://github.com/cppbr/cppbrasil/tree/5e219001fe6700890f55290621e2465023ae0f37)(está
+# Compilação
+
+## Dependências
+
+- cmake,
+- qt6-declarative-dev,
+- qt6-charts-dev,
+- qt6-base-dev,
+- qt6-tools-dev,
+- libzint-dev,
+- [libCppNFe](https://github.com/cppbr/cppbrasil/tree/5e219001fe6700890f55290621e2465023ae0f37)(está
 no submodulo lib-externas).
+
+## Cmake
+
+```
+mkdir build
+cmake -S . -B build
+cmake --build build
+```
 
 ## Motivações e Futuro
 

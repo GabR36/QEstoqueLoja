@@ -180,7 +180,7 @@ venda::venda(QWidget *parent) :
     }
     connect(ui->Tview_Produtos, &QTableView::doubleClicked,
             this, &venda::verProd);
-
+    ui->Ledit_Pesquisa->setFocus();
 }
 void venda::atualizarTotalProduto() {
     for (int row = 0; row < modeloSelecionados->rowCount(); ++row) {

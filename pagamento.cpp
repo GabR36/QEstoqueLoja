@@ -26,6 +26,9 @@ pagamento::pagamento(QString total, QString cliente, QString data, QWidget *pare
     ui->Ledit_Taxa->hide();
 
     ui->FrameNF->setVisible(false);
+    ui->Ledit_NNF->setVisible(false);
+    ui->Lbl_NNF->setVisible(false);
+
 
     // valores padrao
     ui->Ledit_Recebido->setText(totalGlobal);
@@ -39,6 +42,8 @@ pagamento::pagamento(QString total, QString cliente, QString data, QWidget *pare
     ui->Ledit_Taxa->setValidator(validador);
     ui->Ledit_Recebido->setValidator(validador);
     ui->Ledit_Desconto->setValidator(validador);
+    QIntValidator *validadorInt = new QIntValidator();
+    ui->Ledit_NNF->setValidator(validadorInt);
 }
 
 pagamento::~pagamento()

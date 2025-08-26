@@ -14,9 +14,15 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
     //mostra as opçoes relacionadas a nf e
     if(fiscalValues.value("emit_nf") == "1"){
         ui->FrameNF->setVisible(true);
+        ui->Ledit_NNF->setVisible(true);
+        ui->Lbl_NNF->setVisible(true);
+        ui->Ledit_NNF->setText(QString::number(notaNFCe.getProximoNNF()));
 
     }else{
         ui->FrameNF->setVisible(false);
+        ui->Ledit_NNF->setVisible(false);
+        ui->Lbl_NNF->setVisible(false);
+
     }
 
     //pega os dados do cliente necessários
@@ -49,6 +55,32 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
         }
     }
     ui->Ledit_CpfCnpjCliente->setText(cpfCli);
+
+}
+
+void pagamentoVenda::on_CBox_ModeloEmit_currentIndexChanged(int index)
+{
+    if(index == 0){
+        ui->Ledit_NNF->setText(QString::number(notaNFCe.getProximoNNF()));
+        ui->RadioBtn_EmitNfApenas->setVisible(true);
+        ui->RadioBtn_EmitNfTodos->setVisible(true);
+        ui->Ledit_NNF->setVisible(true);
+        ui->Lbl_NNF->setVisible(true);
+    }else if(index == 1){
+        ui->Ledit_NNF->setText(QString::number(notaNFe.getProximoNNF()));
+        ui->RadioBtn_EmitNfApenas->setVisible(true);
+        ui->RadioBtn_EmitNfTodos->setVisible(true);
+        ui->Ledit_NNF->setVisible(true);
+        ui->Lbl_NNF->setVisible(true);
+    }
+    else if(index == 2){
+        ui->RadioBtn_EmitNfApenas->setVisible(false);
+        ui->RadioBtn_EmitNfTodos->setVisible(false);
+        ui->Ledit_NNF->setVisible(false);
+        ui->Lbl_NNF->setVisible(false);
+    }else{
+
+    }
 }
 void pagamentoVenda::onErrorOccurred(const QString &error){
     if (waitDialog) {
@@ -340,7 +372,7 @@ void pagamentoVenda::terminarPagamento(){
             connect(&notaNFCe, &NfceVenda::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
             connect(&notaNFCe, &NfceVenda::retLote, this, &pagamentoVenda::onRetLote);
 
-
+            notaNFCe.setNNF(ui->Ledit_NNF->text().toInt());
             notaNFCe.setCliente(cpf, ehPfCli);
             notaNFCe.setProdutosVendidos(rowDataList, emitTodosNf);
             notaNFCe.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
@@ -360,6 +392,7 @@ void pagamentoVenda::terminarPagamento(){
             connect(&notaNFe, &NFeVenda::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
             connect(&notaNFe, &NFeVenda::retLote, this, &pagamentoVenda::onRetLote);
 
+            notaNFe.setNNF(ui->Ledit_NNF->text().toInt());
             notaNFe.setCliente(ehPfCli, cpfCli, nomeCli, indIeCLi, emailCli, enderecoCli,
             numeroCli, bairroCli, cMunCli, xMunCli, ufCli, cepCli, ieCli);
             notaNFe.setProdutosVendidos(rowDataList, emitTodosNf);

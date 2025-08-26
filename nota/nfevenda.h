@@ -28,6 +28,7 @@ public:
                     QString nro, QString bairro, QString cmun,
                     QString xmun, QString uf, QString cep, QString ie);
 
+    void setNNF(int nnf);
 private:
     CppNFe *m_nfe;
     QMap<QString, QString> fiscalValues;

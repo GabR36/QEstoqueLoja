@@ -9,7 +9,7 @@ NfceVenda::NfceVenda(QObject *parent)
 {
     fiscalValues = Configuracao::get_All_Fiscal_Values();
     empresaValues = Configuracao::get_All_Empresa_Values();
-    nNf = getProximoNNF();
+    //nNf = getProximoNNF();
 
     connect(m_nfe, &CppNFe::wsChange, this, &NfceVenda::onWSChange);
     //connect(m_nfe, SIGNAL(errorOccurred(QString)), this, SIGNAL(errorOccurred(QString)));
@@ -27,6 +27,9 @@ NfceVenda::~NfceVenda()
     delete m_nfe;
 }
 
+void NfceVenda::setNNF(int nnf){
+    nNf = nnf;
+}
 
 void NfceVenda::configurar()
 {

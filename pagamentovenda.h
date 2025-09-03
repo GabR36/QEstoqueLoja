@@ -37,6 +37,7 @@ private:
     QMap<QString, QString> empresaValues;
     bool emitTodosNf = false;
     bool existeItensComNcmVazio(QList<QList<QVariant> > listaProdutos, bool somenteNf);
+    bool existeProdutosComNF(QList<QList<QVariant> > listaProdutos);
 signals:
     void gerarEnviarNf();
 

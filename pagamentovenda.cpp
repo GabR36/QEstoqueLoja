@@ -204,11 +204,18 @@ void pagamentoVenda::terminarPagamento(){
         QMessageBox::warning(this,"Erro", "Cliente com dados incompletos para emitir NF-E");
         return;
     }
-
+    bool okEmitir = true;
     if(ui->RadioBtn_EmitNfTodos->isChecked()){
         emitTodosNf = true;
     }else{
         emitTodosNf = false;
+    }
+    if(!emitTodosNf && !existeProdutosComNF(rowDataList) ){
+        okEmitir = false;
+        QMessageBox::warning(this,"Atenção", "Não foram encontrados produtos NF na venda, "
+                                              "portanto não será emitido nota");
+    }else{
+        okEmitir = true;
     }
     // validar line edits
 
@@ -279,7 +286,7 @@ void pagamentoVenda::terminarPagamento(){
         return;
     }
 
-    if((existeItensComNcmVazio(rowDataList, emitTodosNf)) && (fiscalValues.value("emit_nf") == "1")
+    if((existeItensComNcmVazio(rowDataList, emitTodosNf)) && (fiscalValues.value("emit_nf") == "1" && okEmitir)
         && (ui->CBox_ModeloEmit->currentIndex() != 2)){
         QMessageBox::StandardButton resposta;
         resposta = QMessageBox::question(this,
@@ -356,7 +363,7 @@ void pagamentoVenda::terminarPagamento(){
     }
 
     db.close();
-    if(fiscalValues.value("emit_nf") == "1"){ // se a config estiver ativada para emitir
+    if(fiscalValues.value("emit_nf") == "1" && okEmitir){ // se a config estiver ativada para emitir
 
         if(ui->CBox_ModeloEmit->currentIndex() == 0){
 
@@ -447,4 +454,38 @@ bool pagamentoVenda::existeItensComNcmVazio(QList<QList<QVariant>> listaProdutos
     }
 
     return false;
+}
+bool pagamentoVenda::existeProdutosComNF(QList<QList<QVariant>> listaProdutos){
+    QSqlQuery query;
+    db.open();
+    int quantidadeProdutosNF = 0;
+
+    for (const QList<QVariant> &produto : listaProdutos) {
+        if (produto.isEmpty())
+            continue;
+        QVariant idProduto = produto.at(0);
+
+        QString sql = "SELECT nf FROM produtos WHERE id = :id";
+        query.prepare(sql);
+        query.bindValue(":id", idProduto);
+
+        if (!query.exec()) {
+            qWarning() << "Erro ao consultar produto ID" << idProduto << ":" << query.lastError().text();
+            continue;
+        }
+        if (query.next()) {
+            bool nf = query.value("nf").toBool();
+
+            if (nf) {
+                quantidadeProdutosNF++;
+            }
+        } else {
+            qWarning() << "Produto ID" << idProduto << "não encontrado no banco de dados.";
+        }
+    }
+    if(quantidadeProdutosNF > 0){
+        return true;
+    }else{
+        return false;
+    }
 }

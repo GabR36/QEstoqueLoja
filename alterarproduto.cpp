@@ -40,6 +40,8 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
     for (int i = 0; i < unidadesComerciaisCount; ++i) {
         ui->CBox_AltUCom->addItem(unidadesComerciais[i]);
     }
+    //desativa campo cest
+    ui->Ledit_AltCEST->setEnabled(false);
 
 }
 

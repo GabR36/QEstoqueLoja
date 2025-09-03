@@ -48,6 +48,9 @@ InserirProduto::InserirProduto(QWidget *parent)
     ui->Ledit_PIS->setValidator(intValidador);
     util = new IbptUtil(this);
 
+    //desativa campo CEST
+    ui->Ledit_CEST->setEnabled(false);
+
 }
 
 InserirProduto::~InserirProduto()

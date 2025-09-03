@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -358,8 +358,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>487</width>
-            <height>742</height>
+            <width>492</width>
+            <height>752</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -880,6 +880,9 @@
          </item>
          <item>
           <widget class="QLineEdit" name="LEdit_CESTProd">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="maxLength">
             <number>20</number>
            </property>

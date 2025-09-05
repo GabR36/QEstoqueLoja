@@ -583,9 +583,16 @@ font-size: 15px;</string>
     </property>
     <addaction name="actionConfig"/>
    </widget>
+   <widget class="QMenu" name="menuAjuda">
+    <property name="title">
+     <string>Ajuda</string>
+    </property>
+    <addaction name="actionDocumenta_o"/>
+   </widget>
    <addaction name="menuEditar"/>
    <addaction name="menuVendas"/>
    <addaction name="menuGerarrelat_rios"/>
+   <addaction name="menuAjuda"/>
   </widget>
   <action name="actionteste">
    <property name="text">
@@ -629,6 +636,11 @@ font-size: 15px;</string>
   <action name="actionConfig">
    <property name="text">
     <string>Configurações</string>
+   </property>
+  </action>
+  <action name="actionDocumenta_o">
+   <property name="text">
+    <string>Documentação</string>
    </property>
   </action>
  </widget>

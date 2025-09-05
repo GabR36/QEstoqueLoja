@@ -9,6 +9,7 @@
 #include <QDebug>
 #include "util/NfUtilidades.h"
 #include <QStandardPaths>
+#include "util/helppage.h"
 
 Configuracao::Configuracao(QWidget *parent)
     : QWidget(parent)
@@ -692,5 +693,14 @@ QMap<QString, QString> Configuracao::get_All_Produto_Values(){
     }
 
     return result;
+}
+
+
+void Configuracao::on_label_35_linkActivated(const QString &link)
+{
+    if (link == "help") {
+        HelpPage *help = new HelpPage(this);
+        help->show();
+    }
 }
 

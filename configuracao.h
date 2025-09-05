@@ -37,6 +37,8 @@ private slots:
 
     void on_Btn_CertficadoAcPath_clicked();
 
+    void on_label_35_linkActivated(const QString &link);
+
 private:
     Ui::Config *ui;
     QSqlDatabase db = QSqlDatabase::database();

@@ -1297,7 +1297,7 @@ void MainWindow::verProd(){
 
 void MainWindow::on_actionDocumenta_o_triggered()
 {
-    HelpPage *page = new HelpPage();
+    HelpPage *page = new HelpPage(this, "");
     page->show();
 }
 

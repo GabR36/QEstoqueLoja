@@ -699,7 +699,7 @@ QMap<QString, QString> Configuracao::get_All_Produto_Values(){
 void Configuracao::on_label_35_linkActivated(const QString &link)
 {
     if (link == "help") {
-        HelpPage *help = new HelpPage(this);
+        HelpPage *help = new HelpPage(this, "fiscal");
         help->show();
     }
 }

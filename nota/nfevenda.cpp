@@ -7,7 +7,7 @@ NFeVenda::NFeVenda(QObject *parent)
 {
     fiscalValues = Configuracao::get_All_Fiscal_Values();
     empresaValues = Configuracao::get_All_Empresa_Values();
-    nNf = getProximoNNF();
+    //nNf = getProximoNNF();
 
     connect(m_nfe, &CppNFe::wsChange, this, &NFeVenda::onWSChange);
     //connect(m_nfe, SIGNAL(errorOccurred(QString)), this, SIGNAL(errorOccurred(QString)));
@@ -21,6 +21,9 @@ NFeVenda::NFeVenda(QObject *parent)
 NFeVenda::~NFeVenda()
 {
     delete m_nfe;
+}
+void NFeVenda::setNNF(int nnf){
+    nNf = nnf;
 }
 
 

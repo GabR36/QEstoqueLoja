@@ -31,6 +31,7 @@
 #include "subclass/leditdialog.h"
 #include "infojanelaprod.h"
 #include <QStandardPaths>
+#include "util/helppage.h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -1292,4 +1293,11 @@ void MainWindow::verProd(){
 }
 
 
+
+
+void MainWindow::on_actionDocumenta_o_triggered()
+{
+    HelpPage *page = new HelpPage(this, "");
+    page->show();
+}
 

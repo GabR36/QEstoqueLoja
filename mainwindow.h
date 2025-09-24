@@ -84,6 +84,8 @@ private slots:
     void verProd();
 
 
+    void on_actionDocumenta_o_triggered();
+
 private:
     Ui::MainWindow *ui;
     bool verificarCodigoBarras();

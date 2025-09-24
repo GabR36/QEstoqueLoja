@@ -19,6 +19,8 @@ public:
     explicit pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString total, QString cliente, QString data, int idCliente, QWidget *parent = nullptr);
     QList<QList<QVariant>> rowDataList;
     void imprimirDANFE(const CppNFe *cppnfe);
+private slots:
+    void on_CBox_ModeloEmit_currentIndexChanged(int index) override;
 private:
     void terminarPagamento() override;
     int idCliente;
@@ -35,6 +37,7 @@ private:
     QMap<QString, QString> empresaValues;
     bool emitTodosNf = false;
     bool existeItensComNcmVazio(QList<QList<QVariant> > listaProdutos, bool somenteNf);
+    bool existeProdutosComNF(QList<QList<QVariant> > listaProdutos);
 signals:
     void gerarEnviarNf();
 

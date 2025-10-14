@@ -114,6 +114,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         infojanelaprod.h infojanelaprod.cpp infojanelaprod.ui
         nota/nfevenda.h nota/nfevenda.cpp
         util/helppage.h util/helppage.cpp util/helppage.ui
+        nota/acbrmanager.h nota/acbrmanager.cpp
+        nota/ACBrNFe.h nota/ACBrNFe.cpp
+        nota/ACBrNFeImport.h
+        nota/nfceacbr.h nota/nfceacbr.cpp
 
 
 

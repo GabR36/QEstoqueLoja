@@ -10,7 +10,7 @@
 #include <qtrpt.h>
 #include "subclass/waitdialog.h"
 #include <qmap.h>
-
+#include "nota/nfceacbr.h"
 
 class pagamentoVenda : public pagamento
 {
@@ -24,6 +24,7 @@ private slots:
 private:
     void terminarPagamento() override;
     int idCliente;
+    NfceACBR *nfce;
     NfceVenda notaNFCe;
     NFeVenda notaNFe;
     WaitDialog* waitDialog = nullptr;

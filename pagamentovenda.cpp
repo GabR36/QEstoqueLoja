@@ -3,10 +3,13 @@
 #include <QTimer>
 #include "configuracao.h"
 #include <QSqlError>
+
 pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString total, QString cliente, QString data, int idCliente, QWidget *parent)
     : pagamento(total, cliente, data, parent)
 {
 
+    nfce = new NfceACBR(this);
+    // // QMessageBox::warning(this,"Erro",nfce->getVersaoLib());
     rowDataList = listaProdutos;
     fiscalValues = Configuracao::get_All_Fiscal_Values();
     empresaValues = Configuracao::get_All_Empresa_Values();
@@ -16,7 +19,7 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
         ui->FrameNF->setVisible(true);
         ui->Ledit_NNF->setVisible(true);
         ui->Lbl_NNF->setVisible(true);
-        ui->Ledit_NNF->setText(QString::number(notaNFCe.getProximoNNF()));
+        ui->Ledit_NNF->setText(QString::number(nfce->getProximoNNF()));
 
     }else{
         ui->FrameNF->setVisible(false);
@@ -61,7 +64,7 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
 void pagamentoVenda::on_CBox_ModeloEmit_currentIndexChanged(int index)
 {
     if(index == 0){
-        ui->Ledit_NNF->setText(QString::number(notaNFCe.getProximoNNF()));
+        ui->Ledit_NNF->setText(QString::number(nfce->getProximoNNF()));
         ui->RadioBtn_EmitNfApenas->setVisible(true);
         ui->RadioBtn_EmitNfTodos->setVisible(true);
         ui->Ledit_NNF->setVisible(true);
@@ -143,7 +146,7 @@ void pagamentoVenda::verificarErroNf(const CppNFe *cppnfe){
                       "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :valortotal, :atualizado_em, :id_venda)");
         query.bindValue(":cstat", cStatMessage);
         if(ui->CBox_ModeloEmit->currentIndex() == 0){
-            query.bindValue(":nnf", QString::number(notaNFCe.getNNF()));
+            query.bindValue(":nnf", QString::number(1));//nfce->getNNF()));
             query.bindValue(":serie", QString::number(notaNFCe.getSerie()));
             query.bindValue(":xml_path", notaNFCe.getXmlPath());
             query.bindValue(":valortotal", QString::number(notaNFCe.getVNF(),'f', 2));
@@ -370,22 +373,25 @@ void pagamentoVenda::terminarPagamento(){
             if (!waitDialog) {
                 waitDialog = new WaitDialog(this);
             }
+            nfce->setNNF(ui->Ledit_NNF->text().toInt());
+            nfce->setCliente(cpf, ehPfCli);
+            nfce->setProdutosVendidos(rowDataList, emitTodosNf);
+            nfce->setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
             waitDialog->setMessage("Aguardando resposta do servidor...");
             waitDialog->show();
+            waitDialog->allowClose();
+            waitDialog->setMessage(nfce->gerarEnviar());
 
-            connect(this, &pagamentoVenda::gerarEnviarNf, &notaNFCe, &NfceVenda::onReqGerarEnviar);
-            connect(&notaNFCe, &NfceVenda::retWSChange, this, &pagamentoVenda::onRetWSChange);
-            connect(&notaNFCe, &NfceVenda::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
-            connect(&notaNFCe, &NfceVenda::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
-            connect(&notaNFCe, &NfceVenda::retLote, this, &pagamentoVenda::onRetLote);
+            // connect(this, &pagamentoVenda::gerarEnviarNf, &notaNFCe, &NfceVenda::onReqGerarEnviar);
+            // connect(&notaNFCe, &NfceVenda::retWSChange, this, &pagamentoVenda::onRetWSChange);
+            // connect(&notaNFCe, &NfceVenda::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
+            // connect(&notaNFCe, &NfceVenda::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
+            // connect(&notaNFCe, &NfceVenda::retLote, this, &pagamentoVenda::onRetLote);
 
-            notaNFCe.setNNF(ui->Ledit_NNF->text().toInt());
-            notaNFCe.setCliente(cpf, ehPfCli);
-            notaNFCe.setProdutosVendidos(rowDataList, emitTodosNf);
-            notaNFCe.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
-            emit gerarEnviarNf();
 
-            verificarErroNf(this->notaNFCe.getCppNFe());
+
+
+            // verificarErroNf(this->notaNFCe.getCppNFe());
         }else if(ui->CBox_ModeloEmit->currentIndex() == 1){
             if (!waitDialog) {
                 waitDialog = new WaitDialog(this);

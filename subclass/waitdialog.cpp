@@ -5,7 +5,7 @@
 
 WaitDialog::WaitDialog(QWidget* parent)
     : QDialog(parent) {
-    setWindowTitle("Processando...");
+    setWindowTitle("Janela de espera");
     setModal(true);
     setWindowModality(Qt::ApplicationModal);
     setMinimumSize(400, 100);

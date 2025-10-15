@@ -24,6 +24,8 @@ public:
     int getNNF();
     int getSerie();
     QString gerarEnviar();
+    QString getXmlPath();
+    double getVNF();
 private:
     ACBrNFe *nfce;
     QSqlDatabase db;

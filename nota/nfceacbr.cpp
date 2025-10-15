@@ -17,6 +17,7 @@ NfceACBR::NfceACBR(QObject *parent)
     cnpjEmit = empresaValues.value("cnpj_empresa").toStdString();
     //valores padrao
     serieNf = "1";
+    tpEmis = 1;
 
     caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/xmlNf";
     nfce->LimparLista();//evita acumular notas
@@ -29,6 +30,22 @@ int NfceACBR::getNNF(){
 int NfceACBR::getSerie(){
     return serieNf.toInt();
 }
+QString NfceACBR::getXmlPath(){
+    std::string raw = nfce->GetPath(0);
+
+    // Remove caracteres nulos (caso GetPath tenha buffer fixo)
+    raw.erase(std::find(raw.begin(), raw.end(), '\0'), raw.end());
+    QString path = QString::fromStdString(raw).trimmed();
+
+    raw = cnf;
+    raw.erase(std::find(raw.begin(), raw.end(), '\0'), raw.end());
+    QString cnfString = QString::fromStdString(raw).trimmed();
+    QString ret = QString("%1/%2-nfe.xml")
+                      .arg(path, cnfString);
+
+    return ret;
+}
+
 
 QString NfceACBR::getVersaoLib(){
     return QString::fromStdString(nfce->Versao());
@@ -73,6 +90,10 @@ int NfceACBR::getProximoNNF(){
     }
 
 
+}
+
+double NfceACBR::getVNF(){
+    return vNf;
 }
 
 void NfceACBR::setNNF(int nNF){
@@ -357,14 +378,19 @@ void NfceACBR::carregarConfig(){
         nfce->ConfigGravarValor("NFe", "Ambiente", tpAmb);
 
             // // CONFIGURAÇÕES DE ARQUIVO
-        // nfce->ConfigGravarValor("NFe", "SalvarArq", "1");
-        // nfce->ConfigGravarValor("NFe", "SepararPorCNPJ", "1");
-        // nfce->ConfigGravarValor("NFe", "SepararPorModelo", "1");
-        // nfce->ConfigGravarValor("NFe", "SepararPorAno", "1");
-        // nfce->ConfigGravarValor("NFe", "SepararPorMes", "1");
-        // nfce->ConfigGravarValor("NFe", "SalvarEvento", "1");
-        // nfce->ConfigGravarValor("NFe", "PathNFe", caminhoXml.toStdString());
-        // nfce->ConfigGravarValor("NFe", "PathEvento", caminhoXml.toStdString());
+
+        nfce->ConfigGravarValor("NFe", "PathSalvar", caminhoXml.toStdString());
+        nfce->ConfigGravarValor("NFe", "AdicionarLiteral", "1");
+        nfce->ConfigGravarValor("NFe", "SepararPorCNPJ", "1");
+        nfce->ConfigGravarValor("NFe", "SepararPorModelo", "1");
+        nfce->ConfigGravarValor("NFe", "SepararPorAno", "1");
+        nfce->ConfigGravarValor("NFe", "SepararPorMes", "1");
+        nfce->ConfigGravarValor("NFe", "SalvarApenasNFeProcessadas", "1");
+        nfce->ConfigGravarValor("NFe", "PathNFe", caminhoXml.toStdString());
+
+        //sistema
+        nfce->ConfigGravarValor("Sistema", "Nome", "QEstoqueLoja");
+        nfce->ConfigGravarValor("Sistema", "Versao", "2.1.0");
 
         //     // CONFIGURAÇÕES DE CONEXÃO
         //     // nfce->ConfigGravarValor("NFe", "Timeout", "30000");
@@ -376,7 +402,7 @@ void NfceACBR::carregarConfig(){
         //     // nfce->ConfigGravarValor("DANFENFCe", "ImprimeItens", "1");
         //     // nfce->ConfigGravarValor("DANFENFCe", "ViaConsumidor", "1");
         //     // nfce->ConfigGravarValor("DANFENFCe", "FormatarNumeroDocumento", "1");
-
+            nfce->ConfigGravar("");
             qDebug() << "Configurações salvas no arquivo acbrlib.ini";
 
 }
@@ -398,11 +424,11 @@ void NfceACBR::ide()
     }
     cnf = nfce->GerarChave(
         std::stoi(cuf), numeroAleatorio8dig, mod,
-        1, std::stoi(nnf), tpEmis, data, cnpjEmit
+        serieNf.toInt(), std::stoi(nnf), tpEmis, data, cnpjEmit
         );
     std::string tpAmbIde = (tpAmb == "1") ? "2" : "1";
     qDebug() << "TPAMBIDE:" << tpAmbIde + "tpamb:" << tpAmb;
-
+    qDebug() << "cnf:" <<  std::to_string(numeroAleatorio8dig);
 
     ini << "[Identificacao]\n";
     ini << "cUF=" << cuf << "\n";
@@ -711,30 +737,32 @@ QString NfceACBR::gerarEnviar(){
     try {
         nfce->CarregarINI(ini.str());
         nfce->Assinar();
-        nfce->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
+        // nfce->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
 
         nfce->Validar();
 
         std::string retorno = nfce->Enviar(1, false, true, false);
         QString ret = QString::fromUtf8(retorno.c_str());
+        qDebug() << "nfce getpath: " << nfce->GetPath(0);
+        qDebug() << "nfce chave: " << cnf;
 
         qDebug() << "Retorno SEFAZ:" << ret;
-
-        if (ret.contains("Autorizado", Qt::CaseInsensitive)) {
-            nfce->GravarXml(0, "xml_autorizado_nota_"+ nnf + ".xml", "./xml");
-            try {
-                nfce->Imprimir("", 1, "", true, std::nullopt, std::nullopt, std::nullopt);
-            } catch (std::exception &e) {
-                qDebug() << "Erro ao imprimir:" << e.what();
-            }
-            return "Nota " + QString::fromStdString(nnf) + " autorizada com sucesso!\n\n" + ret;
-        }
-        else if (ret.contains("Rejeitado", Qt::CaseInsensitive)) {
-            return "Nota " + QString::fromStdString(nnf) + " rejeitada pela SEFAZ:\n\n" + ret;
-        }
-        else {
-            return "Retorno da SEFAZ:\n\n" + ret;
-        }
+        return ret;
+        // if (ret.contains("Autorizado", Qt::CaseInsensitive)) {
+        //     // nfce->GravarXml(0, "xml_autorizado_nota_"+ nnf + ".xml", "./xml");
+        //     try {
+        //         nfce->Imprimir("", 1, "", true, std::nullopt, std::nullopt, std::nullopt);
+        //     } catch (std::exception &e) {
+        //         qDebug() << "Erro ao imprimir:" << e.what();
+        //     }
+        //     return "Nota " + QString::fromStdString(nnf) + " autorizada com sucesso!\n\n" + ret;
+        // }
+        // else if (ret.contains("Rejeitado", Qt::CaseInsensitive)) {
+        //     return "Nota " + QString::fromStdString(nnf) + " rejeitada pela SEFAZ:\n\n" + ret;
+        // }
+        // else {
+        //     return "Retorno da SEFAZ:\n\n" + ret;
+        // }
     }
     catch (std::exception &e) {
         qDebug() << "Erro std::exception:" << e.what();

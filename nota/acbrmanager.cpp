@@ -1,13 +1,16 @@
 #include "acbrmanager.h"
 #include <QDebug>
+#include <QStandardPaths>
 
 std::unique_ptr<AcbrManager> AcbrManager::m_instance = nullptr;
 
 AcbrManager::AcbrManager(QObject *parent)
     : QObject(parent)
 {
+    QString configLibPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+                            + "/acbr_config.ini";
     qDebug() << "Inicializando ACBrLibNFe...";
-    m_nfe = std::make_unique<ACBrNFe>("acbr_lib.ini", "");
+    m_nfe = std::make_unique<ACBrNFe>(configLibPath.toStdString(), "");
     qDebug() << "Versão da ACBrLib:" << QString::fromStdString(m_nfe->Versao());
 }
 

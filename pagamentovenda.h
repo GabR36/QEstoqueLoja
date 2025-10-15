@@ -37,8 +37,11 @@ private:
     QMap<QString, QString> fiscalValues;
     QMap<QString, QString> empresaValues;
     bool emitTodosNf = false;
+    QString cStat, xMotivo, msg, nProt;
     bool existeItensComNcmVazio(QList<QList<QVariant> > listaProdutos, bool somenteNf);
     bool existeProdutosComNF(QList<QList<QVariant> > listaProdutos);
+    QString enviarNfce(NfceACBR *nfce);
+    void salvarNfceBD(NfceACBR *nfce);
 signals:
     void gerarEnviarNf();
 

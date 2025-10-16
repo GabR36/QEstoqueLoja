@@ -125,6 +125,11 @@ MainWindow::MainWindow(QWidget *parent)
     query.finish();
     qDebug() << dbSchemaVersion;
     financeiroValues = Configuracao::get_All_Financeiro_Values();
+    empresaValues = Configuracao::get_All_Empresa_Values();
+    fiscalValues = Configuracao::get_All_Fiscal_Values();
+
+    //pega o ponteiro do singleton para usar a lib acbr
+    acbr = AcbrManager::instance()->nfe();
 
     // a versão mais recente do esquema do banco de dados
     int dbSchemaLastVersion = 5;
@@ -1205,6 +1210,8 @@ void MainWindow::on_actionConfig_triggered()
 {
     Configuracao *configuracao = new Configuracao();
     configuracao->show();
+    connect(configuracao, &Configuracao::alterouConfig, this,
+            &MainWindow::atualizarConfigAcbr);
 }
 
 
@@ -1292,12 +1299,93 @@ void MainWindow::verProd(){
     janelaProd->show();
 }
 
-
-
-
 void MainWindow::on_actionDocumenta_o_triggered()
 {
     HelpPage *page = new HelpPage(this, "");
     page->show();
+}
+
+void MainWindow::atualizarConfigAcbr(){
+    qDebug() << "=== CARREGANDO CONFIGURAÇÕES ACBR ===";
+    QString caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
+                         "/xmlNf";
+
+    QDir dir;
+    if(!dir.exists(caminhoXml)){
+        dir.mkpath(caminhoXml);
+    }
+
+    // LIMPAR strings antes de usar
+    auto cleanStr = [](const QString& str) -> std::string {
+        std::string result = str.toStdString();
+        result.erase(std::remove(result.begin(), result.end(), '\0'), result.end());
+        return result.empty() ? "" : result;
+    };
+
+    std::string certificadoPath = cleanStr(fiscalValues.value("caminho_certificado"));
+    std::string certificadoSenha = cleanStr(fiscalValues.value("senha_certificado"));
+    std::string uf = cleanStr(empresaValues.value("estado_empresa"));
+    std::string schemaPath = cleanStr(fiscalValues.value("caminho_schema"));
+    std::string idCsc = cleanStr(fiscalValues.value("id_csc"));
+    std::string csc = cleanStr(fiscalValues.value("csc"));
+    std::string tpAmb = (fiscalValues.value("tp_amb") == "0" ? "1" : "0");
+
+    qDebug() << "Certificado:" << QString::fromStdString(certificadoPath);
+    qDebug() << "UF:" << QString::fromStdString(uf);
+    qDebug() << "Schema:" << QString::fromStdString(schemaPath);
+    qDebug() << "Ambiente:" << QString::fromStdString(tpAmb);
+
+
+    //     // LIMPAR lista
+    // nfce->LimparLista();
+
+
+
+    //     // CONFIGURAÇÕES PRINCIPAIS - DFe
+    acbr->ConfigGravarValor("DFe", "ArquivoPFX", certificadoPath);
+    acbr->ConfigGravarValor("DFe", "Senha", certificadoSenha);
+    acbr->ConfigGravarValor("DFe", "UF", uf);
+    acbr->ConfigGravarValor("DFe", "SSLHttpLib", "3");
+    acbr->ConfigGravarValor("DFe", "SSLCryptLib", "1");
+    acbr->ConfigGravarValor("DFe", "SSLXmlSignLib", "4");
+
+    // //     // CONFIGURAÇÕES NFe
+    acbr->ConfigGravarValor("NFe", "PathSchemas", schemaPath);
+    acbr->ConfigGravarValor("NFe", "IdCSC", idCsc);
+    acbr->ConfigGravarValor("NFe", "CSC", csc);
+    acbr->ConfigGravarValor("NFe", "ModeloDF", "1");  // NFCe
+    acbr->ConfigGravarValor("NFe", "VersaoDF", "3");
+    acbr->ConfigGravarValor("NFe", "VersaoQRCode", "3");
+    acbr->ConfigGravarValor("NFe", "FormaEmissao", "0");
+    acbr->ConfigGravarValor("NFe", "Ambiente", tpAmb);
+
+    // // CONFIGURAÇÕES DE ARQUIVO
+
+    acbr->ConfigGravarValor("NFe", "PathSalvar", caminhoXml.toStdString());
+    acbr->ConfigGravarValor("NFe", "AdicionarLiteral", "1");
+    acbr->ConfigGravarValor("NFe", "SepararPorCNPJ", "1");
+    acbr->ConfigGravarValor("NFe", "SepararPorModelo", "1");
+    acbr->ConfigGravarValor("NFe", "SepararPorAno", "1");
+    acbr->ConfigGravarValor("NFe", "SepararPorMes", "1");
+    acbr->ConfigGravarValor("NFe", "SalvarApenasNFeProcessadas", "1");
+    acbr->ConfigGravarValor("NFe", "PathNFe", caminhoXml.toStdString());
+
+    //sistema
+    acbr->ConfigGravarValor("Sistema", "Nome", "QEstoqueLoja");
+    acbr->ConfigGravarValor("Sistema", "Versao", "2.1.0");
+
+    //     // CONFIGURAÇÕES DE CONEXÃO
+    //     // nfce->ConfigGravarValor("NFe", "Timeout", "30000");
+    //     // nfce->ConfigGravarValor("NFe", "Tentativas", "5");
+    //     // nfce->ConfigGravarValor("NFe", "IntervaloTentativas", "1000");
+
+    //     // // CONFIGURAÇÕES DANFE NFCe
+    //     // nfce->ConfigGravarValor("DANFENFCe", "TipoRelatorioBobina", "0");
+    //     // nfce->ConfigGravarValor("DANFENFCe", "ImprimeItens", "1");
+    //     // nfce->ConfigGravarValor("DANFENFCe", "ViaConsumidor", "1");
+    //     // nfce->ConfigGravarValor("DANFENFCe", "FormatarNumeroDocumento", "1");
+    acbr->ConfigGravar("");
+    qDebug() << "Configurações salvas no arquivo acbrlib.ini";
+
 }
 

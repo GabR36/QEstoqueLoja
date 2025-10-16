@@ -43,6 +43,8 @@ private:
     Ui::Config *ui;
     QSqlDatabase db = QSqlDatabase::database();
     QLocale portugues;
+signals:
+    void alterouConfig();
 };
 
 #endif // CONFIGURACAO_H

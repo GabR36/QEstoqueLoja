@@ -18,10 +18,11 @@ NfceACBR::NfceACBR(QObject *parent)
     //valores padrao
     serieNf = "1";
     tpEmis = 1;
+    tpAmb = (fiscalValues.value("tp_amb") == "0" ? "1" : "0");
 
     caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/xmlNf";
     nfce->LimparLista();//evita acumular notas
-    carregarConfig();
+    //carregarConfig();
 }
 
 int NfceACBR::getNNF(){
@@ -324,89 +325,6 @@ void NfceACBR::aplicarAcrescimoProporcional(float taxaPercentual)
     }
 }
 
-void NfceACBR::carregarConfig(){
-
-        qDebug() << "=== CARREGANDO CONFIGURAÇÕES ACBR ===";
-
-        QDir dir;
-        if(!dir.exists(caminhoXml)){
-            dir.mkpath(caminhoXml);
-        }
-
-        // LIMPAR strings antes de usar
-        auto cleanStr = [](const QString& str) -> std::string {
-            std::string result = str.toStdString();
-            result.erase(std::remove(result.begin(), result.end(), '\0'), result.end());
-            return result.empty() ? "" : result;
-        };
-
-        std::string certificadoPath = cleanStr(fiscalValues.value("caminho_certificado"));
-        std::string certificadoSenha = cleanStr(fiscalValues.value("senha_certificado"));
-        std::string uf = cleanStr(empresaValues.value("estado_empresa"));
-        std::string schemaPath = cleanStr(fiscalValues.value("caminho_schema"));
-        std::string idCsc = cleanStr(fiscalValues.value("id_csc"));
-        std::string csc = cleanStr(fiscalValues.value("csc"));
-        tpAmb = (fiscalValues.value("tp_amb") == "0" ? "1" : "0");
-
-        qDebug() << "Certificado:" << QString::fromStdString(certificadoPath);
-        qDebug() << "UF:" << QString::fromStdString(uf);
-        qDebug() << "Schema:" << QString::fromStdString(schemaPath);
-        qDebug() << "Ambiente:" << QString::fromStdString(tpAmb);
-
-
-        //     // LIMPAR lista
-        // nfce->LimparLista();
-
-
-
-        //     // CONFIGURAÇÕES PRINCIPAIS - DFe
-        nfce->ConfigGravarValor("DFe", "ArquivoPFX", certificadoPath);
-        nfce->ConfigGravarValor("DFe", "Senha", certificadoSenha);
-        nfce->ConfigGravarValor("DFe", "UF", uf);
-        nfce->ConfigGravarValor("DFe", "SSLHttpLib", "3");
-        nfce->ConfigGravarValor("DFe", "SSLCryptLib", "1");
-        nfce->ConfigGravarValor("DFe", "SSLXmlSignLib", "4");
-
-        // //     // CONFIGURAÇÕES NFe
-        nfce->ConfigGravarValor("NFe", "PathSchemas", schemaPath);
-        nfce->ConfigGravarValor("NFe", "IdCSC", idCsc);
-        nfce->ConfigGravarValor("NFe", "CSC", csc);
-        nfce->ConfigGravarValor("NFe", "ModeloDF", "1");  // NFCe
-        nfce->ConfigGravarValor("NFe", "VersaoDF", "3");
-        nfce->ConfigGravarValor("NFe", "VersaoQRCode", "3");
-        nfce->ConfigGravarValor("NFe", "FormaEmissao", "0");
-        nfce->ConfigGravarValor("NFe", "Ambiente", tpAmb);
-
-            // // CONFIGURAÇÕES DE ARQUIVO
-
-        nfce->ConfigGravarValor("NFe", "PathSalvar", caminhoXml.toStdString());
-        nfce->ConfigGravarValor("NFe", "AdicionarLiteral", "1");
-        nfce->ConfigGravarValor("NFe", "SepararPorCNPJ", "1");
-        nfce->ConfigGravarValor("NFe", "SepararPorModelo", "1");
-        nfce->ConfigGravarValor("NFe", "SepararPorAno", "1");
-        nfce->ConfigGravarValor("NFe", "SepararPorMes", "1");
-        nfce->ConfigGravarValor("NFe", "SalvarApenasNFeProcessadas", "1");
-        nfce->ConfigGravarValor("NFe", "PathNFe", caminhoXml.toStdString());
-
-        //sistema
-        nfce->ConfigGravarValor("Sistema", "Nome", "QEstoqueLoja");
-        nfce->ConfigGravarValor("Sistema", "Versao", "2.1.0");
-
-        //     // CONFIGURAÇÕES DE CONEXÃO
-        //     // nfce->ConfigGravarValor("NFe", "Timeout", "30000");
-        //     // nfce->ConfigGravarValor("NFe", "Tentativas", "5");
-        //     // nfce->ConfigGravarValor("NFe", "IntervaloTentativas", "1000");
-
-        //     // // CONFIGURAÇÕES DANFE NFCe
-        //     // nfce->ConfigGravarValor("DANFENFCe", "TipoRelatorioBobina", "0");
-        //     // nfce->ConfigGravarValor("DANFENFCe", "ImprimeItens", "1");
-        //     // nfce->ConfigGravarValor("DANFENFCe", "ViaConsumidor", "1");
-        //     // nfce->ConfigGravarValor("DANFENFCe", "FormatarNumeroDocumento", "1");
-            nfce->ConfigGravar("");
-            qDebug() << "Configurações salvas no arquivo acbrlib.ini";
-
-}
-
 
 void NfceACBR::ide()
 {
@@ -487,6 +405,7 @@ void NfceACBR::dest()
     if (cpfCliente != "") {
         ini << "[Destinatario]\n";
         ini << "CNPJCPF=" << cpfCliente.toStdString() << "\n";
+        ini << "indIEDest=9\n";
     }
 
     if (fiscalValues.value("tp_amb") == "0" && cpfCliente != "") {
@@ -737,7 +656,7 @@ QString NfceACBR::gerarEnviar(){
     try {
         nfce->CarregarINI(ini.str());
         nfce->Assinar();
-        // nfce->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
+         nfce->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
 
         nfce->Validar();
 
@@ -748,21 +667,8 @@ QString NfceACBR::gerarEnviar(){
 
         qDebug() << "Retorno SEFAZ:" << ret;
         return ret;
-        // if (ret.contains("Autorizado", Qt::CaseInsensitive)) {
-        //     // nfce->GravarXml(0, "xml_autorizado_nota_"+ nnf + ".xml", "./xml");
-        //     try {
-        //         nfce->Imprimir("", 1, "", true, std::nullopt, std::nullopt, std::nullopt);
-        //     } catch (std::exception &e) {
-        //         qDebug() << "Erro ao imprimir:" << e.what();
-        //     }
-        //     return "Nota " + QString::fromStdString(nnf) + " autorizada com sucesso!\n\n" + ret;
-        // }
-        // else if (ret.contains("Rejeitado", Qt::CaseInsensitive)) {
-        //     return "Nota " + QString::fromStdString(nnf) + " rejeitada pela SEFAZ:\n\n" + ret;
-        // }
-        // else {
-        //     return "Retorno da SEFAZ:\n\n" + ret;
-        // }
+        //nfce->Imprimir("", 1, "", true, std::nullopt, std::nullopt, std::nullopt);
+
     }
     catch (std::exception &e) {
         qDebug() << "Erro std::exception:" << e.what();

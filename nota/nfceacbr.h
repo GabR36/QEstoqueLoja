@@ -51,7 +51,6 @@ private:
     float taxaPercentual;
     double totalGeral;
 
-    void carregarConfig();
     void ide();
     void emite();
     void dest();

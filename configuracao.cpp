@@ -373,6 +373,7 @@ void Configuracao::on_Btn_Aplicar_clicked()
 
 
     db.close();
+    emit alterouConfig();
 
     this->close();
 }

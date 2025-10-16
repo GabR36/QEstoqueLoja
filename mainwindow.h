@@ -12,6 +12,7 @@
 #include <QKeyEvent>
 #include "configuracao.h"
 #include "subclass/customlineedit.h"
+#include "nota/acbrmanager.h"
 
 
 //#include "vendas.h"
@@ -88,6 +89,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    ACBrNFe *acbr;
     bool verificarCodigoBarras();
     QSet<QString> generatedNumbers;
     QAction* actionMenuAlterarProd;
@@ -97,11 +99,14 @@ private:
     QAction* actionMenuPrintBarCode3;
     QAction* actionVerProduto;
     QMap<QString, QString> financeiroValues;
+    QMap<QString, QString> fiscalValues;
+    QMap<QString, QString> empresaValues;
 
 
     void setarIconesJanela();
     //QModelIndex selected_index;
 
+    void atualizarConfigAcbr();
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
     int getIdProdSelected();

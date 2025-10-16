@@ -1329,11 +1329,12 @@ void MainWindow::atualizarConfigAcbr(){
     std::string idCsc = cleanStr(fiscalValues.value("id_csc"));
     std::string csc = cleanStr(fiscalValues.value("csc"));
     std::string tpAmb = (fiscalValues.value("tp_amb") == "0" ? "1" : "0");
-
+    QString caminhoCompletoLogo = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
+                                  "/imagens/" + QFileInfo(empresaValues.value("caminho_logo_empresa")).fileName();
     qDebug() << "Certificado:" << QString::fromStdString(certificadoPath);
     qDebug() << "UF:" << QString::fromStdString(uf);
     qDebug() << "Schema:" << QString::fromStdString(schemaPath);
-    qDebug() << "Ambiente:" << QString::fromStdString(tpAmb);
+    qDebug() << "CaminhoCompletoLogo:" << caminhoCompletoLogo;
 
 
     //     // LIMPAR lista
@@ -1379,7 +1380,9 @@ void MainWindow::atualizarConfigAcbr(){
     //     // nfce->ConfigGravarValor("NFe", "Tentativas", "5");
     //     // nfce->ConfigGravarValor("NFe", "IntervaloTentativas", "1000");
 
-    //     // // CONFIGURAÇÕES DANFE NFCe
+        // // CONFIGURAÇÕES DANFE NFCe
+    acbr->ConfigGravarValor("DANFE", "PathLogo", caminhoCompletoLogo.toStdString());
+
     //     // nfce->ConfigGravarValor("DANFENFCe", "TipoRelatorioBobina", "0");
     //     // nfce->ConfigGravarValor("DANFENFCe", "ImprimeItens", "1");
     //     // nfce->ConfigGravarValor("DANFENFCe", "ViaConsumidor", "1");

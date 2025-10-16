@@ -3,10 +3,10 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include <QLocale>
-#include <CppBrasil/NFe/CppNFe>
-#include <CppBrasil/DanfeQtRPT/CppDanfeQtRPT>
 #include <qtrpt.h>
 #include <QMap>
+#include <../nota/acbrmanager.h>
+
 
 class DanfeUtil : public QObject
 {
@@ -14,7 +14,7 @@ class DanfeUtil : public QObject
 public:
     explicit DanfeUtil(QObject *parent = nullptr);
     bool abrirDanfe(int idVenda);
-    void imprimirDanfe(const CppNFe *cppnfe);
+    void imprimirDanfe(const ACBrNFe *nf);
     void setCaminhoLogo(QString logo);
 private:
     QSqlDatabase db = QSqlDatabase::database();

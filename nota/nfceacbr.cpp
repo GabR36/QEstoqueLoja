@@ -656,7 +656,7 @@ QString NfceACBR::gerarEnviar(){
     try {
         nfce->CarregarINI(ini.str());
         nfce->Assinar();
-         nfce->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
+         // nfce->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
 
         nfce->Validar();
 

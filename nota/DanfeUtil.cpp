@@ -43,43 +43,15 @@ bool DanfeUtil::abrirDanfe(int idVenda){
     if (xmlPath.isEmpty()) {
         return false;
     }
+    auto nf = AcbrManager::instance()->nfe();
+    nf->LimparLista();
+    nf->CarregarXML(xmlPath.toStdString());
 
-    // Usar smart pointer para gerenciar a memória
-    QScopedPointer<CppNFe> _nfe(new CppNFe);
-    if(!_nfe->notafiscal->loadFromFile(xmlPath)){
-        qDebug() << "erro ao load from file";
-        return false;
-    }
-
-    imprimirDanfe(_nfe.data()); // Passa o ponteiro bruto (safe porque ainda está no escopo)
+    imprimirDanfe(nf);
     return true;
 }
-void DanfeUtil::imprimirDanfe(const CppNFe *cppnfe){
-
-    CppDanfeQtRPT danfe(cppnfe, 0);
-
-    danfe.caminhoLogo(caminhoLogo);
-    if (cppnfe->notafiscal->retorno->protNFe->items->count() > 0)
-    {
-        if ((cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 100) ||
-            (cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 150))
-        {
-            if (cppnfe->notafiscal->NFe->items->value(0)->infNFe->ide->get_mod() == ModeloDF::NFe)
-                danfe.caminhoArquivo(caminhoReportNFe);
-            else
-                danfe.caminhoArquivo(caminhoReportNFCe);
-
-            danfe.print();
-        }
-    } else
-    {
-        if (cppnfe->notafiscal->NFe->items->value(0)->infNFe->ide->get_mod() == ModeloDF::NFe)
-            danfe.caminhoArquivo(caminhoReportNFe);
-        else
-            danfe.caminhoArquivo(caminhoReportNFCe);
-
-        danfe.print();
-    }
+void DanfeUtil::imprimirDanfe(const ACBrNFe *nf){
+    nf->Imprimir("", 1, "", true, true, std::nullopt, std::nullopt);
 }
 void DanfeUtil::setCaminhoLogo(QString logo){
     caminhoLogo = logo;

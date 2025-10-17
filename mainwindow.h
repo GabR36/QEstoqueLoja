@@ -30,7 +30,7 @@ class MainWindow : public QMainWindow
 public:
 
 
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    QSqlDatabase db;
     QSqlQueryModel* model = new QSqlQueryModel;
     void atualizarTableview();
     void imprimirEtiqueta(int quant, QString codBar = "1", QString desc = "null",  QString preco = "");

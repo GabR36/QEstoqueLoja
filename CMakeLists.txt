@@ -104,7 +104,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         inserircliente.h inserircliente.cpp inserircliente.ui
         subclass/produtotableview.h subclass/produtotableview.cpp
         subclass/waitdialog.h subclass/waitdialog.cpp
-        nota/nfcevenda.h nota/nfcevenda.cpp
+
         inserirproduto.h inserirproduto.cpp inserirproduto.ui
         util/NfUtilidades.h
         util/ibptutil.h util/ibptutil.cpp
@@ -112,13 +112,14 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         util/NFUtilidades.cpp
         subclass/leditdialog.h subclass/leditdialog.cpp
         infojanelaprod.h infojanelaprod.cpp infojanelaprod.ui
-        nota/nfevenda.h nota/nfevenda.cpp
+
         util/helppage.h util/helppage.cpp util/helppage.ui
         nota/acbrmanager.h nota/acbrmanager.cpp
         nota/ACBrNFe.h nota/ACBrNFe.cpp
         nota/ACBrNFeImport.h
         nota/nfceacbr.h nota/nfceacbr.cpp
         nota/nfeacbr.h nota/nfeacbr.cpp
+        schemamanager.h schemamanager.cpp
 
 
 

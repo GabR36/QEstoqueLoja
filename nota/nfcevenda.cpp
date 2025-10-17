@@ -174,6 +174,7 @@ void NfceVenda::infNFe()
     infRespTec();
 }
 
+
 void NfceVenda::ide()
 {
     m_nfe->notafiscal->NFe->obj->infNFe->ide->set_cUF(fiscalValues.value("cuf").toInt());

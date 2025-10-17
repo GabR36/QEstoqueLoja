@@ -3,14 +3,10 @@
 
 #include "pagamento.h"
 #include "venda.h"
-#include "nota/nfcevenda.h"
-#include "nota/nfevenda.h"
-#include <CppBrasil/NFe/CppNFe>
-#include <CppBrasil/DanfeQtRPT/CppDanfeQtRPT>
-#include <qtrpt.h>
 #include "subclass/waitdialog.h"
 #include <qmap.h>
 #include "nota/nfceacbr.h"
+#include "nota/nfeacbr.h"
 
 class pagamentoVenda : public pagamento
 {
@@ -18,15 +14,13 @@ class pagamentoVenda : public pagamento
 public:
     explicit pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString total, QString cliente, QString data, int idCliente, QWidget *parent = nullptr);
     QList<QList<QVariant>> rowDataList;
-    void imprimirDANFE(const CppNFe *cppnfe);
 private slots:
     void on_CBox_ModeloEmit_currentIndexChanged(int index) override;
 private:
     void terminarPagamento() override;
     int idCliente;
     NfceACBR *nfce;
-    NfceVenda notaNFCe;
-    NFeVenda notaNFe;
+    NfeACBR *nfe;
     WaitDialog* waitDialog = nullptr;
     QString erroNf;
     QString idVenda;
@@ -42,16 +36,14 @@ private:
     bool existeProdutosComNF(QList<QList<QVariant> > listaProdutos);
     QString enviarNfce(NfceACBR *nfce);
     void salvarNfceBD(NfceACBR *nfce);
+    QString enviarNfe(NfeACBR *nfe);
+    void salvarNfceBD(NfeACBR *nfe);
 signals:
     void gerarEnviarNf();
 
 
 protected:
-    void onRetWSChange(const QString &webServices);
-    void onErrorOccurred(const QString &error);
-    void verificarErroNf(const CppNFe *cppnfe);
-    void onRetStatusServico(const QString &status);
-    void onRetLote(const QString &lote);
+
 };
 
 #endif // PAGAMENTOVENDA_H

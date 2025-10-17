@@ -1,15 +1,15 @@
-#include "nfceacbr.h"
+#include "nfeacbr.h"
 #include "../configuracao.h"
 #include <QStandardPaths>
 #include <qdir.h>
 #include <fstream>
 #include <qrandom.h>
 
-NfceACBR::NfceACBR(QObject *parent)
+NfeACBR::NfeACBR(QObject *parent)
     : QObject{parent}
 {
     //pega o ponteiro da lib acbr do singleton
-    nfce = AcbrManager::instance()->nfe();
+    nfe = AcbrManager::instance()->nfe();
     db = QSqlDatabase::database();
     fiscalValues = Configuracao::get_All_Fiscal_Values();
     empresaValues = Configuracao::get_All_Empresa_Values();
@@ -21,18 +21,18 @@ NfceACBR::NfceACBR(QObject *parent)
     tpAmb = (fiscalValues.value("tp_amb") == "0" ? "1" : "0");
 
     caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/xmlNf";
-    nfce->LimparLista();//evita acumular notas
-    //carregarConfig();
+    nfe->LimparLista();//evita acumular notas
+
 }
 
-int NfceACBR::getNNF(){
+int NfeACBR::getNNF(){
     return std::stoi(nnf);
 }
-int NfceACBR::getSerie(){
+int NfeACBR::getSerie(){
     return serieNf.toInt();
 }
-QString NfceACBR::getXmlPath(){
-    std::string raw = nfce->GetPath(0);
+QString NfeACBR::getXmlPath(){
+    std::string raw = nfe->GetPath(0);
 
     // Remove caracteres nulos (caso GetPath tenha buffer fixo)
     raw.erase(std::find(raw.begin(), raw.end(), '\0'), raw.end());
@@ -48,11 +48,11 @@ QString NfceACBR::getXmlPath(){
 }
 
 
-QString NfceACBR::getVersaoLib(){
-    return QString::fromStdString(nfce->Versao());
+QString NfeACBR::getVersaoLib(){
+    return QString::fromStdString(nfe->Versao());
 }
 
-int NfceACBR::getProximoNNF(){
+int NfeACBR::getProximoNNF(){
     if (!db.open()) {
         qDebug() << "Erro ao abrir banco de dados em getProximoNNF";
         return -1;
@@ -67,7 +67,7 @@ int NfceACBR::getProximoNNF(){
         "ORDER BY nnf DESC "
         "LIMIT 1"
         );
-    query.bindValue(":modelo", "65");             // NFC-e
+    query.bindValue(":modelo", "55");             // NF-e
     query.bindValue(":serie", serieNf);           // série
     query.bindValue(":tp_amb", tpAmb);            // ambiente atual
 
@@ -93,23 +93,38 @@ int NfceACBR::getProximoNNF(){
 
 }
 
-double NfceACBR::getVNF(){
+double NfeACBR::getVNF(){
     return vNf;
 }
 
-void NfceACBR::setNNF(int nNF){
+void NfeACBR::setNNF(int nNF){
     qDebug() << "Setando NNF para:" << nNF;
     nnf = std::to_string(nNF);
     qDebug() << "NNF após set:" << QString::fromStdString(nnf);
 }
 
-void NfceACBR::setCliente(QString cpf, bool ehPf){
-    cpfCliente = cpf;
-    ehPfCliente = ehPf;
-    qDebug() << cpfCliente << ehPfCliente;
+void NfeACBR::setCliente(bool ehPf, QString cpf, QString nome, int indiedest,
+                          QString email, QString lgr, QString nro, QString bairro, QString cmun, QString xmun,
+                          QString uf, QString cep, QString ie){
+
+    ehPfCli = ehPf;
+    nomeCli = nome;
+    indiedestCli = indiedest;
+    emailCli = email;
+    lgrCli = lgr;
+    nroCli = nro;
+    bairroCli = bairro;
+    cmunCli = cmun;
+    xmunCli = xmun;
+    ufCli = uf;
+    cepCli = cep;
+    ieCli = ie;
+    cpfCli = cpf;
+    qDebug() << cpfCli << ehPfCli;
+
 }
 
-bool NfceACBR::isValidGTIN(const QString& gtin) {
+bool NfeACBR::isValidGTIN(const QString& gtin) {
     QString clean = gtin.trimmed();
 
     // Verifica se é numérico e tamanho válido
@@ -127,7 +142,7 @@ bool NfceACBR::isValidGTIN(const QString& gtin) {
     return dv == clean.right(1).toInt();
 }
 
-void NfceACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool emitirTodos){
+void NfeACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool emitirTodos){
     if (!db.open()) {
         qDebug() << "não abriu bd setprodutosvendidos";
         return;
@@ -211,7 +226,7 @@ void NfceACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool
     listaProdutos = produtosFiltrados;
 }
 
-float NfceACBR::corrigirTaxa(float taxaAntiga, float desconto){
+float NfeACBR::corrigirTaxa(float taxaAntiga, float desconto){
     float taxaConvertida = (taxaAntiga / 100) + 1;
     float taxaNova = 0.0;
     float valorTotalProdutos = 0.0;
@@ -223,7 +238,7 @@ float NfceACBR::corrigirTaxa(float taxaAntiga, float desconto){
 }
 
 
-void NfceACBR::aplicarDescontoTotal(float descontoTotal) {
+void NfeACBR::aplicarDescontoTotal(float descontoTotal) {
     descontoProd.clear();  // Limpa o vetor, caso já tenha valores anteriores
 
     double totalGeral = 0.0;
@@ -254,7 +269,7 @@ void NfceACBR::aplicarDescontoTotal(float descontoTotal) {
     }
 }
 
-void NfceACBR::setPagamentoValores(QString formaPag, float desconto,float recebido, float troco, float taxa){
+void NfeACBR::setPagamentoValores(QString formaPag, float desconto,float recebido, float troco, float taxa){
     if(formaPag == "Prazo"){
         indPagNf = "1";
         tPagNf = "15";
@@ -283,7 +298,7 @@ void NfceACBR::setPagamentoValores(QString formaPag, float desconto,float recebi
 
 }
 
-void NfceACBR::aplicarAcrescimoProporcional(float taxaPercentual)
+void NfeACBR::aplicarAcrescimoProporcional(float taxaPercentual)
 {
     double totalOriginal = 0.0;
     for (const QList<QVariant>& produto : listaProdutos) {
@@ -324,23 +339,21 @@ void NfceACBR::aplicarAcrescimoProporcional(float taxaPercentual)
         ultimo[3] = novoUnit;
     }
 }
-
-void NfceACBR::carregarConfig(){
-    nfce->ConfigGravarValor("NFe", "ModeloDF", "1");  // NFe = 0
-    nfce->ConfigGravarValor("NFe", "VersaoDF", "3");
-    nfce->ConfigGravarValor("NFe", "VersaoQRCode", "3");
-    nfce->ConfigGravarValor("NFe", "FormaEmissao", "0");
-    nfce->ConfigGravarValor("NFe", "Ambiente", tpAmb);
+void NfeACBR::carregarConfig(){
+    nfe->ConfigGravarValor("NFe", "ModeloDF", "0");  // NFe = 0
+    nfe->ConfigGravarValor("NFe", "VersaoDF", "3");
+    nfe->ConfigGravarValor("NFe", "VersaoQRCode", "3");
+    nfe->ConfigGravarValor("NFe", "FormaEmissao", "0");
+    nfe->ConfigGravarValor("NFe", "Ambiente", tpAmb);
 }
 
 
-
-void NfceACBR::ide()
+void NfeACBR::ide()
 {
     cuf = fiscalValues.value("cuf").toStdString();
     std::string data = QDateTime::currentDateTime().toString("dd/MM/yyyy").toStdString();
     std::string dataHora = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm").toStdString();
-    mod = 65;
+    mod = 55;
     int numeroAleatorio8dig = QRandomGenerator::global()->bounded(10000000, 99999999);
     if (nnf == "") {
         qDebug() << "Erro: NNF não foi definido!";
@@ -349,7 +362,7 @@ void NfceACBR::ide()
         qDebug() << "NNF foi definido!";
 
     }
-    cnf = nfce->GerarChave(
+    cnf = nfe->GerarChave(
         std::stoi(cuf), numeroAleatorio8dig, mod,
         serieNf.toInt(), std::stoi(nnf), tpEmis, data, cnpjEmit
         );
@@ -360,7 +373,7 @@ void NfceACBR::ide()
     ini << "[Identificacao]\n";
     ini << "cUF=" << cuf << "\n";
     ini << "tpAmb=" << tpAmbIde << "\n";
-    ini << "mod=" << mod << "\n";
+    ini << "mod=" << QString::number(mod).toStdString() << "\n";
     ini << "serie=" << serieNf.toStdString() << "\n";
     ini << "nNF=" << nnf << "\n";
     ini << "cNF=" << std::to_string(numeroAleatorio8dig) << "\n";
@@ -370,12 +383,12 @@ void NfceACBR::ide()
     ini << "finNFe=1\n";
     ini << "indFinal=1\n";
     ini << "indPres=1\n";
-    ini << "tpImp=4\n";
+    ini << "tpImp=1\n"; //nfe
     ini << "procEmi=0\n";
     ini << "verProc=1.0\n\n";
 }
 
-void NfceACBR::emite()
+void NfeACBR::emite()
 {
     std::string xNome = empresaValues.value("nome_empresa").toStdString();
     std::string xFant = empresaValues.value("nfant_empresa").toStdString();
@@ -407,25 +420,64 @@ void NfceACBR::emite()
     ini << "Fone=" << fone << "\n\n";
 }
 
-void NfceACBR::dest()
+void NfeACBR::dest()
 {
-
-
-    if (cpfCliente != "") {
+    qDebug() << "cpfclie nfe: " << cpfCli;
+    if(ehPfCli == false && cpfCli != ""){
         ini << "[Destinatario]\n";
-        ini << "CNPJCPF=" << cpfCliente.toStdString() << "\n";
-        ini << "indIEDest=9\n";
+        ini << "CNPJCPF=" << cpfCli.toStdString() << "\n";
     }
 
-    if (fiscalValues.value("tp_amb") == "0" && cpfCliente != "") {
+    if(ehPfCli == true && cpfCli != ""){
+        ini << "[Destinatario]\n";
+        ini << "CNPJCPF=" << cpfCli.toStdString() << "\n";
+    }
+    if(fiscalValues.value("tp_amb") == "0" && cpfCli != ""){
         ini << "xNome=NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL\n";
     }
+    // m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CPF(""); //PARA PESSOA FISICA
+    // //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_idEstrangeiro("ID ESTRANGEIRO")
+    ini << "xNome=" << nomeCli.toStdString() << "\n";
+
+
+    switch (indiedestCli) {
+    case 0:
+        ini << "indIEDest=" << "9" << "\n";    //nao contribuinte
+        break;
+    case 1:
+        ini << "indIEDest=" << "1" << "\n";    // contribuinte
+        ini << "IE=" << ieCli.toStdString() << "\n";    // contribuinte
+        break;
+    case 2:
+        ini << "indIEDest=" << "2" << "\n";    // contribuinte
+        ini << "IE=" << ieCli.toStdString() << "\n";    // contribuinte
+        break;
+    default:
+        qDebug() << "Valor indIEDest inválido:" << indiedestCli;
+        // Opcional: Definir um padrão seguro
+        ini << "indIEDest=" << "9" << "\n";    //nao contribuinte
+        break;
+    }
+
+    ini << "Email=" << emailCli.toStdString() << "\n";
+    // //Endereço
+    ini << "xLgr=" << lgrCli.toStdString() << "\n";
+    ini << "nro=" << nroCli.toStdString() << "\n";
+    // //m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xCpl("complemento");
+    ini << "xBairro=" << bairroCli.toStdString() << "\n";
+    ini << "cMun=" << cmunCli.toStdString() << "\n";
+    ini << "xMun=" << xmunCli.toStdString() << "\n";
+    ini << "UF=" << ufCli.toStdString() << "\n";
+    ini << "CEP=" << cepCli.toStdString() << "\n";
+    ini << "cPais=" << "1058" << "\n";
+    ini << "xPais=" << "Brasil" << "\n";
+    // ini << "Fone=" << .toStdString() << "\n";
 
     ini << "\n";
 }
 
 
-void NfceACBR::carregarProds()
+void NfeACBR::carregarProds()
 {
     aplicarDescontoTotal(descontoNf);
     aplicarAcrescimoProporcional(taxaPercentual);
@@ -518,7 +570,7 @@ void NfceACBR::carregarProds()
     }
 }
 
-void NfceACBR::total()
+void NfeACBR::total()
 {
     totalGeral = 0.0;
     double vSeg = 0.0;
@@ -570,13 +622,13 @@ void NfceACBR::total()
 }
 
 
-void NfceACBR::transp()
+void NfeACBR::transp()
 {
     ini << "[Transportador]\n";
     ini << "modFrete=9\n\n";
 }
 
-void NfceACBR::pag()
+void NfeACBR::pag()
 {
     if (emitirApenasNf) {
         vPagNf = vNf;
@@ -614,7 +666,7 @@ void NfceACBR::pag()
     ini << "vTroco=" << QString::number(trocoNf, 'f', 2).replace('.', ',').toStdString() << "\n\n";
 }
 
-void NfceACBR::infRespTec()
+void NfeACBR::infRespTec()
 {
     std::string cnpjRT = fiscalValues.value("cnpj_rt").toStdString();
     std::string xContato = fiscalValues.value("nome_rt").toStdString();
@@ -628,7 +680,7 @@ void NfceACBR::infRespTec()
     ini << "fone=" << foneRT << "\n\n";
 }
 
-void NfceACBR::ibscbsTotais()
+void NfeACBR::ibscbsTotais()
 {
     ini << "[IBSCBSTot]\n";
     ini << "vBCIBSCBS=" << QString::number(totalGeral, 'f', 2).replace('.', ',').toStdString() << "\n\n";
@@ -644,7 +696,7 @@ void NfceACBR::ibscbsTotais()
     ini << "vCredPresCondSus=0,00\n\n";
 }
 
-QString NfceACBR::gerarEnviar(){
+QString NfeACBR::gerarEnviar(){
 
     ini.str("");  // Limpar conteúdo anterior
     ini.clear();
@@ -663,16 +715,16 @@ QString NfceACBR::gerarEnviar(){
     ibscbsTotais();
 
     try {
-        nfce->CarregarINI(ini.str());
-        nfce->Assinar();
-         // nfce->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
+        nfe->CarregarINI(ini.str());
+        nfe->Assinar();
+            // nfe->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
 
-        nfce->Validar();
+        nfe->Validar();
 
-        std::string retorno = nfce->Enviar(1, false, true, false);
+        std::string retorno = nfe->Enviar(1, false, true, false);
         QString ret = QString::fromUtf8(retorno.c_str());
-        qDebug() << "nfce getpath: " << nfce->GetPath(0);
-        qDebug() << "nfce chave: " << cnf;
+        qDebug() << "nfe getpath: " << nfe->GetPath(0);
+        qDebug() << "nfe chave: " << cnf;
 
         qDebug() << "Retorno SEFAZ:" << ret;
         return ret;

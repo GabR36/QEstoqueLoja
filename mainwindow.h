@@ -17,7 +17,7 @@
 
 //#include "vendas.h"
 
-
+#define VERSAO_QE "2.1.0"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

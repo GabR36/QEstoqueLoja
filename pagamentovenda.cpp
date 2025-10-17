@@ -9,6 +9,8 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
 {
 
     nfce = new NfceACBR(this);
+    nfe = new NfeACBR(this);
+
     // // QMessageBox::warning(this,"Erro",nfce->getVersaoLib());
     rowDataList = listaProdutos;
     fiscalValues = Configuracao::get_All_Fiscal_Values();
@@ -70,7 +72,7 @@ void pagamentoVenda::on_CBox_ModeloEmit_currentIndexChanged(int index)
         ui->Ledit_NNF->setVisible(true);
         ui->Lbl_NNF->setVisible(true);
     }else if(index == 1){
-        ui->Ledit_NNF->setText(QString::number(notaNFe.getProximoNNF()));
+        ui->Ledit_NNF->setText(QString::number(nfe->getProximoNNF()));
         ui->RadioBtn_EmitNfApenas->setVisible(true);
         ui->RadioBtn_EmitNfTodos->setVisible(true);
         ui->Ledit_NNF->setVisible(true);
@@ -85,33 +87,7 @@ void pagamentoVenda::on_CBox_ModeloEmit_currentIndexChanged(int index)
 
     }
 }
-void pagamentoVenda::onErrorOccurred(const QString &error){
-    if (waitDialog) {
-        waitDialog->allowClose();
-        waitDialog->setMessageErro(error);
-    }
-   // erroNf = error;
-}
 
-void pagamentoVenda::onRetWSChange(const QString &webServices){
-    if (waitDialog) {
-        waitDialog->setMessage(webServices);
-    }
-
-}
-void pagamentoVenda::onRetLote(const QString &lote)
-{
-    if (waitDialog) {
-        waitDialog->allowClose();
-        waitDialog->setMessage(lote);
-    }
-}
-
-void pagamentoVenda::onRetStatusServico(const QString &status){
-    if (waitDialog) {
-        waitDialog->setMessage(status);
-    }
-}
 
 QString pagamentoVenda::enviarNfce(NfceACBR *nfce){
     QString retorno = nfce->gerarEnviar();
@@ -147,6 +123,67 @@ QString pagamentoVenda::enviarNfce(NfceACBR *nfce){
     }
 }
 
+QString pagamentoVenda::enviarNfe(NfeACBR *nfe){
+    QString retorno = nfe->gerarEnviar();
+
+    if (retorno.isEmpty()) {
+        return "Erro: Nenhum retorno do ACBr";
+    }
+
+    QStringList linhas = retorno.split('\n', Qt::SkipEmptyParts);
+
+    for (const QString &linha : linhas) {
+        if (linha.startsWith("CStat="))
+            cStat = linha.section('=', 1);
+        else if (linha.startsWith("XMotivo="))
+            xMotivo = linha.section('=', 1);
+        else if (linha.startsWith("Msg="))
+            msg = linha.section('=', 1);
+        else if (linha.startsWith("NProt=") || linha.startsWith("nProt="))
+            nProt = linha.section('=', 1);
+    }
+
+    if (cStat == "100") {
+        // Nota autorizada
+        return QString("Nota Autorizada!\n cStat:%1 \n motivo:%2 \n protocolo:%3")
+            .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo, nProt);
+    } else if (!cStat.isEmpty()) {
+        // Nota rejeitada ou duplicada
+        return QString("Nota Rejeitada \ncStat:%1 \nmotivo:%2")
+            .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo);
+    } else {
+        // Resposta inesperada
+        return QString("Erro: Resposta inesperada do ACBr \n-> %1").arg(retorno.left(200));
+    }
+}
+
+void pagamentoVenda::salvarNfceBD(NfeACBR *nfe){
+
+    if(!db.open()){
+        qDebug() << "erro ao abrir banco de dados. salvar nfce banco.";
+    }
+    QSqlQuery query;
+    QDateTime dataIngles = portugues.toDateTime(dataGlobal, "dd-MM-yyyy hh:mm:ss");
+
+    query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
+                  "tp_amb, xml_path, valor_total, atualizado_em, id_venda) "
+                  "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :valortotal, :atualizado_em, :id_venda)");
+    query.bindValue(":cstat", cStat);
+    query.bindValue(":nnf", QString::number(nfe->getNNF()));
+    query.bindValue(":serie", QString::number(nfe->getSerie()));
+    query.bindValue(":xml_path", nfe->getXmlPath());
+    query.bindValue(":valortotal", QString::number(nfe->getVNF()));
+    query.bindValue(":modelo", "55");
+    query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
+    query.bindValue(":atualizado_em", dataIngles.toString("yyyy-MM-dd hh:mm:ss"));
+    query.bindValue(":id_venda", idVenda);
+    qDebug() << "idvenda: " << idVenda;
+    if (query.exec()) {
+        qDebug() << "Salvou nota no banco!";
+    }
+
+}
+
 void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
 
     if(!db.open()){
@@ -172,66 +209,6 @@ void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
         qDebug() << "Salvou nota no banco!";
     }
 
-}
-
-void pagamentoVenda::verificarErroNf(const CppNFe *cppnfe){
-    if (cppnfe->notafiscal->retorno->protNFe->items->count() > 0)
-    {
-        QString cStatMessage;
-        if ((cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 100) ||
-            (cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat() == 150))
-        {
-
-            cStatMessage = QString::number(cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat());
-            waitDialog->setMessage("Sucesso!\n Status:" + cStatMessage);
-            waitDialog->allowClose();
-
-            QTimer::singleShot(2000, waitDialog, &WaitDialog::close); //fecha depois de 2 segundos
-            //imprimirDANFE(this->nota.getCppNFe());
-        }else{
-            QString cStatMessage = QString::number(cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_cStat());
-            QString msg = "ERRO:\n" + cppnfe->notafiscal->retorno->protNFe->items->value(0)->get_xMotivo() +
-                          "\n" +"cstat: " + cStatMessage ;
-            qDebug() << "Erro nf:" << msg;
-            waitDialog->setMessage(msg);
-            waitDialog->allowClose();
-            //QTimer::singleShot(2000, waitDialog, &QDialog::close);
-        }
-        if(!db.open()){
-            qDebug() << "erro ao abrir banco de dados. botao sucesso nota.";
-        }
-        QSqlQuery query;
-        QDateTime dataIngles = portugues.toDateTime(dataGlobal, "dd-MM-yyyy hh:mm:ss");
-
-        query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
-                      "tp_amb, xml_path, valor_total, atualizado_em, id_venda) "
-                      "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :valortotal, :atualizado_em, :id_venda)");
-        query.bindValue(":cstat", cStatMessage);
-        if(ui->CBox_ModeloEmit->currentIndex() == 0){
-            query.bindValue(":nnf", QString::number(1));//nfce->getNNF()));
-            query.bindValue(":serie", QString::number(notaNFCe.getSerie()));
-            query.bindValue(":xml_path", notaNFCe.getXmlPath());
-            query.bindValue(":valortotal", QString::number(notaNFCe.getVNF(),'f', 2));
-            query.bindValue(":modelo", "65");
-        }else if(ui->CBox_ModeloEmit->currentIndex() == 1){
-            query.bindValue(":nnf", QString::number(notaNFe.getNNF()));
-            query.bindValue(":serie", QString::number(notaNFe.getSerie()));
-            query.bindValue(":xml_path", notaNFe.getXmlPath());
-            query.bindValue(":valortotal", QString::number(notaNFe.getVNF(),'f', 2));
-            query.bindValue(":modelo", "55");
-        }
-
-
-        query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
-        query.bindValue(":atualizado_em", dataIngles.toString("yyyy-MM-dd hh:mm:ss"));
-        query.bindValue(":id_venda", idVenda);
-        qDebug() << "idvenda: " << idVenda;
-        if (query.exec()) {
-            qDebug() << "Salvou nota no banco!";
-        }
-    } else{
-
-    }
 }
 
 void pagamentoVenda::terminarPagamento(){
@@ -453,23 +430,21 @@ void pagamentoVenda::terminarPagamento(){
             if (!waitDialog) {
                 waitDialog = new WaitDialog(this);
             }
+
+            nfe->setNNF(ui->Ledit_NNF->text().toInt());
+            nfe->setCliente(ehPfCli, cpfCli, nomeCli, indIeCLi, emailCli, enderecoCli,
+                            numeroCli, bairroCli, cMunCli, xMunCli, ufCli, cepCli, ieCli);
+            nfe->setProdutosVendidos(rowDataList, emitTodosNf);
+            nfe->setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
+
             waitDialog->setMessage("Aguardando resposta do servidor...");
             waitDialog->show();
-
-            connect(this, &pagamentoVenda::gerarEnviarNf, &notaNFe, &NFeVenda::onReqGerarEnviar);
-            connect(&notaNFe, &NFeVenda::retWSChange, this, &pagamentoVenda::onRetWSChange);
-            connect(&notaNFe, &NFeVenda::errorOccurred, this, &pagamentoVenda::onErrorOccurred);
-            connect(&notaNFe, &NFeVenda::retStatusServico, this, &pagamentoVenda::onRetStatusServico);
-            connect(&notaNFe, &NFeVenda::retLote, this, &pagamentoVenda::onRetLote);
-
-            notaNFe.setNNF(ui->Ledit_NNF->text().toInt());
-            notaNFe.setCliente(ehPfCli, cpfCli, nomeCli, indIeCLi, emailCli, enderecoCli,
-            numeroCli, bairroCli, cMunCli, xMunCli, ufCli, cepCli, ieCli);
-            notaNFe.setProdutosVendidos(rowDataList, emitTodosNf);
-            notaNFe.setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
-            emit gerarEnviarNf();
-
-            verificarErroNf(this->notaNFe.getCppNFe());
+            waitDialog->allowClose();
+            waitDialog->setMessage(enviarNfe(nfe));
+            if(cStat == "100" || cStat == "150"){
+                salvarNfceBD(nfe); //salva nfe no banco
+                QTimer::singleShot(1500, waitDialog, &WaitDialog::close); //fecha depois de 2 seg
+            }
         }else if(ui->CBox_ModeloEmit->currentIndex() == 2){
         }
 

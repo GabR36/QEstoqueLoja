@@ -1,5 +1,5 @@
-#ifndef NFCEACBR_H
-#define NFCEACBR_H
+#ifndef NFEACBR_H
+#define NFEACBR_H
 
 #include <QObject>
 #include "acbrmanager.h"
@@ -10,15 +10,14 @@
 #include <QLocale>
 #include <sstream>
 
-class NfceACBR : public QObject
+class NfeACBR : public QObject
 {
     Q_OBJECT
 public:
-    explicit NfceACBR(QObject *parent = nullptr);
+    explicit NfeACBR(QObject *parent = nullptr);
     QString getVersaoLib();
     int getProximoNNF();
     void setNNF(int nNF);
-    void setCliente(QString cpf, bool ehPf);
     void setProdutosVendidos(QList<QList<QVariant> > produtosVendidos, bool emitirTodos);
     void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco, float taxa);
     int getNNF();
@@ -26,8 +25,10 @@ public:
     QString gerarEnviar();
     QString getXmlPath();
     double getVNF();
+    void setCliente(bool ehPf, QString cpf, QString nome, int indiedest, QString email, QString lgr, QString nro, QString bairro, QString cmun, QString xmun, QString uf, QString cep, QString ie);
+
 private:
-    ACBrNFe *nfce;
+    ACBrNFe *nfe;
     QSqlDatabase db;
     QLocale portugues;
     std::stringstream ini;
@@ -50,6 +51,10 @@ private:
     QString indPagNf,tPagNf;
     float taxaPercentual;
     double totalGeral;
+    QString nomeCli, cpfCli, emailCli, lgrCli, nroCli, bairroCli,
+        cmunCli, xmunCli, ufCli, cepCli, ieCli;
+    bool ehPfCli = false;
+    int indiedestCli = 0;
 
     void carregarConfig();
     void ide();
@@ -71,4 +76,4 @@ private:
 signals:
 };
 
-#endif // NFCEACBR_H
+#endif // NFEACBR_H

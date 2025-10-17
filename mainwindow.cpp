@@ -1373,7 +1373,7 @@ void MainWindow::atualizarConfigAcbr(){
 
     //sistema
     acbr->ConfigGravarValor("Sistema", "Nome", "QEstoqueLoja");
-    acbr->ConfigGravarValor("Sistema", "Versao", "2.1.0");
+    acbr->ConfigGravarValor("Sistema", "Versao", VERSAO_QE);
 
     //     // CONFIGURAÇÕES DE CONEXÃO
     //     // nfce->ConfigGravarValor("NFe", "Timeout", "30000");

@@ -118,6 +118,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         nota/ACBrNFe.h nota/ACBrNFe.cpp
         nota/ACBrNFeImport.h
         nota/nfceacbr.h nota/nfceacbr.cpp
+        nota/nfeacbr.h nota/nfeacbr.cpp
 
 
 

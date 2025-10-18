@@ -19,14 +19,17 @@ public:
     int getProximoNNF();
     void setNNF(int nNF);
     void setProdutosVendidos(QList<QList<QVariant> > produtosVendidos, bool emitirTodos);
-    void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco, float taxa);
+    void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco,
+                             float taxa);
     int getNNF();
     int getSerie();
     QString gerarEnviar();
     QString getXmlPath();
     double getVNF();
-    void setCliente(bool ehPf, QString cpf, QString nome, int indiedest, QString email, QString lgr, QString nro, QString bairro, QString cmun, QString xmun, QString uf, QString cep, QString ie);
-
+    void setCliente(bool ehPf, QString cpf, QString nome, int indiedest, QString email,
+                    QString lgr, QString nro, QString bairro, QString cmun, QString xmun,
+                    QString uf, QString cep, QString ie);
+    QString getChaveNf();
 private:
     ACBrNFe *nfe;
     QSqlDatabase db;

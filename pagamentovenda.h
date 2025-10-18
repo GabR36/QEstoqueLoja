@@ -14,6 +14,7 @@ class pagamentoVenda : public pagamento
 public:
     explicit pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString total, QString cliente, QString data, int idCliente, QWidget *parent = nullptr);
     QList<QList<QVariant>> rowDataList;
+
 private slots:
     void on_CBox_ModeloEmit_currentIndexChanged(int index) override;
 private:
@@ -37,7 +38,7 @@ private:
     QString enviarNfce(NfceACBR *nfce);
     void salvarNfceBD(NfceACBR *nfce);
     QString enviarNfe(NfeACBR *nfe);
-    void salvarNfceBD(NfeACBR *nfe);
+    void salvarNfeBD(NfeACBR *nfe);
 signals:
     void gerarEnviarNf();
 

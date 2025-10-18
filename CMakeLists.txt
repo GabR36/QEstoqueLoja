@@ -14,14 +14,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set(CMAKE_PREFIX_PATH "C:/Qt/6.6.2/mingw_64/lib/cmake")
 
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Qml Xml Svg Network Core)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Qml Xml Svg Network Core)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core)
 
 if (CMAKE_SYSTEM MATCHES "Linux")
     include_directories(
-        /usr/include/libxml2
         /usr/include/QtRPT
-        /usr/include/CppBrasil
 
     )
 elseif (CMAKE_SYSTEM MATCHES "Windows")
@@ -154,14 +152,14 @@ else()
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 target_link_libraries(QEstoqueLoja PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::Sql Qt6::PrintSupport
-    zint Qt6::Charts QtRPT Qt6::Xml Qt6::Qml Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Svg
-    Qt${QT_VERSION_MAJOR}::Core
+    zint Qt6::Charts QtRPT Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Xml
+     Qt${QT_VERSION_MAJOR}::Qml
 )
 
 #target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lxml2)
 
 if (CMAKE_SYSTEM MATCHES "Linux")
-    target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lCppDanfeQtRPT -lxml2 -lCppNFe -lcrypto -lssl -lz)
+    target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lz)
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     target_link_directories(QEstoqueLoja PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/lib
@@ -172,7 +170,7 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/bin/release/lib
         #${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/QtRptProject3.0/lib/debug/lib
     )
-    target_link_libraries(QEstoqueLoja  PRIVATE CppNFe QtRPT CppDanfeQtRPT libcrypto libssl libiconv libxml2 zdll)
+    target_link_libraries(QEstoqueLoja  PRIVATE QtRPT zdll)
 
 endif()
 

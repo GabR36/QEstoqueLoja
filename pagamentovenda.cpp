@@ -157,7 +157,7 @@ QString pagamentoVenda::enviarNfe(NfeACBR *nfe){
     }
 }
 
-void pagamentoVenda::salvarNfceBD(NfeACBR *nfe){
+void pagamentoVenda::salvarNfeBD(NfeACBR *nfe){
 
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. salvar nfce banco.";
@@ -166,8 +166,11 @@ void pagamentoVenda::salvarNfceBD(NfeACBR *nfe){
     QDateTime dataIngles = portugues.toDateTime(dataGlobal, "dd-MM-yyyy hh:mm:ss");
 
     query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
-                  "tp_amb, xml_path, valor_total, atualizado_em, id_venda) "
-                  "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :valortotal, :atualizado_em, :id_venda)");
+                  "tp_amb, xml_path, valor_total, atualizado_em, id_venda, cnpjemit,"
+                  "chnfe, nprot) "
+                  "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, "
+                  ":valortotal, :atualizado_em, :id_venda, :cnpjemit, :chnfe, "
+                  ":nprot )");
     query.bindValue(":cstat", cStat);
     query.bindValue(":nnf", QString::number(nfe->getNNF()));
     query.bindValue(":serie", QString::number(nfe->getSerie()));
@@ -177,6 +180,10 @@ void pagamentoVenda::salvarNfceBD(NfeACBR *nfe){
     query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
     query.bindValue(":atualizado_em", dataIngles.toString("yyyy-MM-dd hh:mm:ss"));
     query.bindValue(":id_venda", idVenda);
+    query.bindValue(":cnpjemit", empresaValues.value("cnpj_empresa"));
+    query.bindValue(":chnfe", nfe->getChaveNf());
+    query.bindValue(":nprot", nProt);
+
     qDebug() << "idvenda: " << idVenda;
     if (query.exec()) {
         qDebug() << "Salvou nota no banco!";
@@ -193,8 +200,11 @@ void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
     QDateTime dataIngles = portugues.toDateTime(dataGlobal, "dd-MM-yyyy hh:mm:ss");
 
     query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
-                  "tp_amb, xml_path, valor_total, atualizado_em, id_venda) "
-                  "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :valortotal, :atualizado_em, :id_venda)");
+                  "tp_amb, xml_path, valor_total, atualizado_em, id_venda, cnpjemit,"
+                  "chnfe, nprot) "
+                  "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, "
+                  ":valortotal, :atualizado_em, :id_venda, :cnpjemit, :chnfe, "
+                  ":nprot )");
     query.bindValue(":cstat", cStat);
     query.bindValue(":nnf", QString::number(nfce->getNNF()));
     query.bindValue(":serie", QString::number(nfce->getSerie()));
@@ -204,6 +214,10 @@ void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
     query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
     query.bindValue(":atualizado_em", dataIngles.toString("yyyy-MM-dd hh:mm:ss"));
     query.bindValue(":id_venda", idVenda);
+    query.bindValue(":cnpjemit", empresaValues.value("cnpj_empresa"));
+    query.bindValue(":chnfe", nfce->getChaveNf());
+    query.bindValue(":nprot", nProt);
+
     qDebug() << "idvenda: " << idVenda;
     if (query.exec()) {
         qDebug() << "Salvou nota no banco!";
@@ -442,7 +456,7 @@ void pagamentoVenda::terminarPagamento(){
             waitDialog->allowClose();
             waitDialog->setMessage(enviarNfe(nfe));
             if(cStat == "100" || cStat == "150"){
-                salvarNfceBD(nfe); //salva nfe no banco
+                salvarNfeBD(nfe); //salva nfe no banco
                 QTimer::singleShot(1500, waitDialog, &WaitDialog::close); //fecha depois de 2 seg
             }
         }else if(ui->CBox_ModeloEmit->currentIndex() == 2){

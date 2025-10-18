@@ -20,12 +20,14 @@ public:
     void setNNF(int nNF);
     void setCliente(QString cpf, bool ehPf);
     void setProdutosVendidos(QList<QList<QVariant> > produtosVendidos, bool emitirTodos);
-    void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco, float taxa);
+    void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco,
+                             float taxa);
     int getNNF();
     int getSerie();
     QString gerarEnviar();
     QString getXmlPath();
     double getVNF();
+    QString getChaveNf();
 private:
     ACBrNFe *nfce;
     QSqlDatabase db;

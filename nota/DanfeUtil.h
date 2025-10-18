@@ -3,7 +3,6 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include <QLocale>
-#include <qtrpt.h>
 #include <QMap>
 #include <../nota/acbrmanager.h>
 

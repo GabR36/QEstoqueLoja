@@ -31,6 +31,14 @@ int NfceACBR::getNNF(){
 int NfceACBR::getSerie(){
     return serieNf.toInt();
 }
+
+QString NfceACBR::getChaveNf(){
+    std::string raw = cnf;
+    raw.erase(std::find(raw.begin(), raw.end(), '\0'), raw.end());
+    QString cnfString = QString::fromStdString(raw).trimmed();
+    return cnfString;
+}
+
 QString NfceACBR::getXmlPath(){
     std::string raw = nfce->GetPath(0);
 

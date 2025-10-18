@@ -28,6 +28,12 @@ NfeACBR::NfeACBR(QObject *parent)
 int NfeACBR::getNNF(){
     return std::stoi(nnf);
 }
+QString NfeACBR::getChaveNf(){
+    std::string raw = cnf;
+    raw.erase(std::find(raw.begin(), raw.end(), '\0'), raw.end());
+    QString cnfString = QString::fromStdString(raw).trimmed();
+    return cnfString;
+}
 int NfeACBR::getSerie(){
     return serieNf.toInt();
 }

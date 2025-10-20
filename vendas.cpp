@@ -14,6 +14,7 @@
 #include "delegatepago.h"
 #include "delegateprecof2.h"
 #include "nota/DanfeUtil.h"
+#include "nota/cancelnf.h"
 
 
 Vendas::Vendas(QWidget *parent, int idCliente) :
@@ -285,10 +286,148 @@ void Vendas::LabelLucro(QString whereQueryData, QString whereQueryPrazo, QString
     db.close();
 }
 
-// void Vendas::LabelLucro(){
-//     // para ser chamada sem argumentos
-//     LabelLucro(QString());
-// }
+int Vendas::getNfId(int id_venda) {
+    QSqlQuery query;
+
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir banco de dados.";
+        return -1;
+    }
+
+    query.prepare("SELECT id FROM notas_fiscais WHERE id_venda = :idvenda");
+    query.bindValue(":idvenda", id_venda);
+
+    if (!query.exec()) {
+        qDebug() << "Erro ao executar query:" << query.lastError().text();
+        return -1;
+    }
+
+    if (query.next()) { // Move para o primeiro registro (se houver)
+        return query.value(0).toInt(); // Retorna o primeiro campo (id)
+    } else {
+        qDebug() << "Nenhum registro encontrado para id_venda =" << id_venda;
+        return -1;
+    }
+}
+
+QString Vendas::salvarEvento(QString retorno, int id_nf)
+{
+    if(!db.open()){
+        qDebug() << "Erro ao abrir banco de dados (salvarEvento)";
+        return "Erro: Banco de dados não aberto";
+    }
+
+    QString tipo_evento, cstat, justificativa, codigo, xml_path, nprot;
+    int id_lote = 1;
+
+    // Usa QRegularExpression para extrair dados do texto
+    QRegularExpression rx_idlote("idLote=(\\d+)");
+    QRegularExpression rx_tpEvento("tpEvento=(\\d+)");
+    QRegularExpression rx_xEvento("xEvento=([^\n]+)");
+    QRegularExpression rx_nProt("nProt=(\\d+)");
+    QRegularExpression rx_xJust("xJust=([^<\n]+)");
+    QRegularExpression rx_arquivo("arquivo=([^\n]+)");
+    QRegularExpression rx_cstat("CStat=(\\d+)");
+    QRegularExpression rx_dh("dhRegEvento=(\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}:\\d{2})");
+    QRegularExpression rx_xMotivo("XMotivo=([^\n]+)");
+
+
+    auto match = rx_idlote.match(retorno);
+    if (match.hasMatch()) id_lote = match.captured(1).toInt();
+
+    // match = rx_cstat.match(retorno);
+    // if (match.hasMatch()) cstat = match.captured(1).trimmed();
+
+    match = rx_tpEvento.match(retorno);
+    if (match.hasMatch()) codigo = match.captured(1).trimmed();
+
+    match = rx_xEvento.match(retorno);
+    if (match.hasMatch()) tipo_evento = match.captured(1).trimmed();
+
+    match = rx_nProt.match(retorno);
+    if (match.hasMatch()) nprot = match.captured(1).trimmed();
+
+    match = rx_xJust.match(retorno);
+    if (match.hasMatch()) justificativa = match.captured(1).trimmed();
+
+    match = rx_arquivo.match(retorno);
+    if (match.hasMatch()) xml_path = match.captured(1).trimmed();
+
+    match = rx_dh.match(retorno);
+
+    QDateTime dataIngles;
+    if (match.hasMatch()) {
+        QString dataStr = match.captured(1);
+        dataIngles = QDateTime::fromString(dataStr, "dd/MM/yyyy HH:mm:ss");
+    } else {
+        // Se não achar, usa a data atual
+        dataIngles = QDateTime::currentDateTime();
+    }
+
+    // match = rx_xMotivo.match(retorno);
+    // if (match.hasMatch()) {
+    //     xMotivo = match.captured(1).trimmed();
+    // }
+
+    QRegularExpressionMatchIterator it = rx_cstat.globalMatch(retorno);
+    while (it.hasNext()) {
+        QRegularExpressionMatch m = it.next();
+        cstat = m.captured(1).trimmed(); // sobrescreve até o último
+    }
+
+    QString xMotivo;
+    it = rx_xMotivo.globalMatch(retorno);
+    while (it.hasNext()) {
+        QRegularExpressionMatch m = it.next();
+        xMotivo = m.captured(1).trimmed(); // sobrescreve até o último
+    }
+    // Debug opcional
+    qDebug() << "Evento:" << tipo_evento << "| Prot:" << nprot << "| CStat:" << cstat;
+
+    if(cstat.trimmed() == "135"){
+        QString dataFormatada = dataIngles.toString("yyyy-MM-dd HH:mm:ss");
+        // Grava no banco
+        QSqlQuery query;
+        query.prepare(R"(
+            INSERT INTO eventos_fiscais
+            (tipo_evento, id_lote, cstat, justificativa, codigo, xml_path, nprot, id_nf, atualizado_em)
+            VALUES (:tipo_evento, :id_lote, :cstat, :justificativa, :codigo, :xml_path, :nprot, :id_nf,
+     :atualizado_em)
+        )");
+
+
+        query.bindValue(":tipo_evento", tipo_evento);
+        query.bindValue(":id_lote", id_lote);
+        query.bindValue(":cstat", cstat);
+        query.bindValue(":justificativa", justificativa);
+        query.bindValue(":codigo", codigo);
+        query.bindValue(":xml_path", xml_path);
+        query.bindValue(":nprot", nprot);
+        query.bindValue(":id_nf", id_nf);
+        query.bindValue(":atualizado_em", dataFormatada);
+
+        if(!query.exec()){
+            qDebug() << "Erro ao inserir evento fiscal:" << query.lastError().text();
+            return "Erro ao salvar evento no banco";
+        }
+
+        query.prepare("UPDATE notas_fiscais SET cstat = :novocstat WHERE id = :idnf ");
+        query.bindValue(":novocstat", cstat);
+        query.bindValue(":idnf", id_nf);
+        if(!query.exec()){
+            qDebug() << "Erro ao atualizar cstat da nota cancelada:" << query.lastError().text();
+        }
+
+        return "Evento cancelamento salvo com sucesso!";
+    }else{
+        QString msgErro = QString("Erro ao processar evento. \nCStat: %1").arg(cstat);
+        if (!xMotivo.isEmpty())
+            msgErro += QString("\nMotivo: %1").arg(xMotivo);
+
+        qDebug() << msgErro;
+        return msgErro;
+    }
+}
 
 
 void Vendas::on_Btn_DeletarVenda_clicked()
@@ -314,6 +453,30 @@ void Vendas::on_Btn_DeletarVenda_clicked()
         );
     // Verifica a resposta do usuário
     if (resposta == QMessageBox::Yes) {
+
+        //se existe nf com o id da venda
+        if(getNfId(productId.toInt()) != -1){
+            qDebug() << "getnfid" << getNfId(productId.toInt());
+            QMessageBox::StandardButton respostaNf;
+            respostaNf = QMessageBox::question(
+                nullptr,
+                "Confirmação",
+                "Deseja cancelar a Nota Fiscal referente a essa venda?:\n\n",
+                QMessageBox::Yes | QMessageBox::No
+                );
+            if(respostaNf == QMessageBox::Yes){
+                int idNf = getNfId(productId.toInt());
+                cancelNf *evento = new cancelNf(this, idNf);
+                QString retorno = evento->gerarEnviar();
+                QString msg = salvarEvento(retorno, idNf);
+                QMessageBox::information(this, "Aviso", msg);
+                if (!msg.contains("sucesso", Qt::CaseInsensitive)) {
+                    return;
+                }
+            }else{
+                //nao cancela a nf mas tenta deletar a venda msm assim
+            }
+        }
 
         // remover registro do banco de dados
         if(!db.open()){

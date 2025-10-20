@@ -167,10 +167,10 @@ void pagamentoVenda::salvarNfeBD(NfeACBR *nfe){
 
     query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
                   "tp_amb, xml_path, valor_total, atualizado_em, id_venda, cnpjemit,"
-                  "chnfe, nprot) "
+                  "chnfe, nprot, cuf) "
                   "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, "
                   ":valortotal, :atualizado_em, :id_venda, :cnpjemit, :chnfe, "
-                  ":nprot )");
+                  ":nprot, :cuf)");
     query.bindValue(":cstat", cStat);
     query.bindValue(":nnf", QString::number(nfe->getNNF()));
     query.bindValue(":serie", QString::number(nfe->getSerie()));
@@ -183,6 +183,8 @@ void pagamentoVenda::salvarNfeBD(NfeACBR *nfe){
     query.bindValue(":cnpjemit", empresaValues.value("cnpj_empresa"));
     query.bindValue(":chnfe", nfe->getChaveNf());
     query.bindValue(":nprot", nProt);
+    query.bindValue(":cuf", fiscalValues.value("cuf"));
+
 
     qDebug() << "idvenda: " << idVenda;
     if (query.exec()) {
@@ -201,10 +203,10 @@ void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
 
     query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
                   "tp_amb, xml_path, valor_total, atualizado_em, id_venda, cnpjemit,"
-                  "chnfe, nprot) "
+                  "chnfe, nprot, cuf) "
                   "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, "
                   ":valortotal, :atualizado_em, :id_venda, :cnpjemit, :chnfe, "
-                  ":nprot )");
+                  ":nprot, :cuf )");
     query.bindValue(":cstat", cStat);
     query.bindValue(":nnf", QString::number(nfce->getNNF()));
     query.bindValue(":serie", QString::number(nfce->getSerie()));
@@ -217,6 +219,7 @@ void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
     query.bindValue(":cnpjemit", empresaValues.value("cnpj_empresa"));
     query.bindValue(":chnfe", nfce->getChaveNf());
     query.bindValue(":nprot", nProt);
+    query.bindValue(":cuf", fiscalValues.value("cuf"));
 
     qDebug() << "idvenda: " << idVenda;
     if (query.exec()) {

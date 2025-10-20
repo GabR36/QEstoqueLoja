@@ -803,6 +803,9 @@ void MainWindow::atualizarConfigAcbr(){
     acbr->ConfigGravarValor("NFe", "SepararPorMes", "1");
     acbr->ConfigGravarValor("NFe", "SalvarApenasNFeProcessadas", "1");
     acbr->ConfigGravarValor("NFe", "PathNFe", caminhoXml.toStdString());
+    acbr->ConfigGravarValor("NFe", "SalvarEvento", "1");
+    acbr->ConfigGravarValor("NFe", "PathEvento", caminhoXml.toStdString());
+
 
     //sistema
     acbr->ConfigGravarValor("Sistema", "Nome", "QEstoqueLoja");

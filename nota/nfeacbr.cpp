@@ -69,7 +69,7 @@ int NfeACBR::getProximoNNF(){
     QSqlQuery query;
     query.prepare(
         "SELECT nnf FROM notas_fiscais "
-        "WHERE cstat IN (100, 150) AND modelo = :modelo AND serie = :serie AND tp_amb = :tp_amb "
+        "WHERE modelo = :modelo AND serie = :serie AND tp_amb = :tp_amb "
         "ORDER BY nnf DESC "
         "LIMIT 1"
         );

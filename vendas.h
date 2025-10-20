@@ -34,6 +34,7 @@ public:
 
 
     void AtualizarTabelasSinal();
+    int getNfId(int id_venda);
 public slots:
     void imprimirReciboVendaSelec(QString id); //precisa ser slot :(
 
@@ -79,6 +80,8 @@ private:
     void mostrarVendasCliente(int idCliente);
     int IDCLIENTE = 0;
     void abrirDanfeXml(QString id_Venda);
+    QString dataGlobal;
+    QString salvarEvento(QString retorno, int id_nf);
 signals:
     void vendaConcluidaVendas();
     void pagamentosConcluidos();

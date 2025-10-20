@@ -588,7 +588,12 @@ void SchemaManager::update() {
             QStringList alterStatements = {
                 "ALTER TABLE notas_fiscais ADD COLUMN cnpjemit TEXT",
                 "ALTER TABLE notas_fiscais ADD COLUMN chnfe TEXT",
-                "ALTER TABLE notas_fiscais ADD COLUMN nprot TEXT"
+                "ALTER TABLE notas_fiscais ADD COLUMN nprot TEXT",
+                "ALTER TABLE notas_fiscais ADD COLUMN cuf TEXT",
+                "CREATE TABLE eventos_fiscais(id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT, tipo_evento TEXT,"
+                "id_lote INTEGER, cstat TEXT, justificativa TEXT, codigo TEXT, xml_path TEXT,"
+                "nprot TEXT, id_nf INTEGER, atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY "
+                "(id_nf) REFERENCES notas_fiscais(id))"
             };
 
             foreach (const QString &sql, alterStatements) {

@@ -18,6 +18,11 @@ Configuracao::Configuracao(QWidget *parent)
     ui->setupUi(this);
     ui->tabWidget->setCurrentIndex(0); // começa na tab Empresa
 
+    ui->Btn_CertficadoAcPath->setVisible(false);
+    ui->Lbl_CertificadoAcPath->setVisible(false);
+    ui->LEdit_CESTProd->setVisible(false);
+    ui->Lbl_CestProd->setVisible(false);
+
 
 
     // colocar os valores do banco de dados nos line edits
@@ -69,6 +74,7 @@ Configuracao::Configuracao(QWidget *parent)
     ui->Ledt_debito->setText(portugues.toString(configValues.value("taxa_debito", "").toFloat()));
     ui->Ledt_credito->setText(portugues.toString(configValues.value("taxa_credito", "").toFloat()));
     ui->CheckBox_emitNf->setChecked(configValues.value("emit_nf") == "1");
+    ui->CheckBox_usarIbs->setChecked(configValues.value("usar_ibs") == "1");
     ui->Ledit_NNfHomolog->setText(configValues.value("nnf_homolog", ""));
     ui->Ledit_NNfProd->setText(configValues.value("nnf_prod", ""));
     ui->Ledit_NNFProdNFe->setText(configValues.value("nnf_prod_nfe", ""));
@@ -144,7 +150,7 @@ void Configuracao::on_Btn_Aplicar_clicked()
         idCsc, csc, pastaSchema, pastaCertificadoAc, certificado, senhaCertificado, cUf, cMun, iEstad, cnpjRT, nomeRT,
         emailRt, foneRt, idCSRT, hasCsrt, nnfHomolog, nnfProd, csosnPadrao, ncmPadrao, cestPadrao, pisPadrao,
         nnfHomologNfe, nnfProdNfe;
-    bool emitNf;
+    bool emitNf, usarIbs;
     // converter para notacao americana para armazenar no banco de dados
     nomeEmpresa = ui->Ledt_NomeEmpresa->text().trimmed();
     nomeFant = ui->Ledt_NomeFantasia->text().trimmed();
@@ -179,6 +185,7 @@ void Configuracao::on_Btn_Aplicar_clicked()
     idCSRT = ui->Ledt_IdCsrtRespTec->text().trimmed();
     hasCsrt = ui->Ledt_HashCsrtRespTec->text().trimmed();
     emitNf = ui->CheckBox_emitNf->isChecked();
+    usarIbs = ui->CheckBox_usarIbs->isChecked();
     nnfHomolog = ui->Ledit_NNfHomolog->text().trimmed();
     nnfProd = ui->Ledit_NNfProd->text().trimmed();
     csosnPadrao = ui->Ledit_CSOSNProd->text().trimmed();
@@ -337,6 +344,10 @@ void Configuracao::on_Btn_Aplicar_clicked()
     query.prepare("UPDATE config set value = :value WHERE key = :key");
     query.bindValue(":value", emitNf);
     query.bindValue(":key", "emit_nf");
+    query.exec();
+    query.prepare("UPDATE config set value = :value WHERE key = :key");
+    query.bindValue(":value", usarIbs);
+    query.bindValue(":key", "usar_ibs");
     query.exec();
     query.prepare("UPDATE config set value = :value WHERE key = :key");
     query.bindValue(":value", nnfHomolog);
@@ -514,7 +525,8 @@ QMap<QString, QString> Configuracao::get_All_Fiscal_Values() {
         "nnf_homolog",
         "nnf_prod",
         "nnf_homolog_nfe",
-        "nnf_prod_nfe"
+        "nnf_prod_nfe",
+        "usar_ibs"
     };
 
     // Montar a query com placeholders

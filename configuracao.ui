@@ -359,7 +359,7 @@
             <x>0</x>
             <y>0</y>
             <width>492</width>
-            <height>804</height>
+            <height>831</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -388,6 +388,13 @@ border-radius: 0px;</string>
             <widget class="QCheckBox" name="CheckBox_emitNf">
              <property name="text">
               <string>Emitir Notas Fiscais</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="CheckBox_usarIbs">
+             <property name="text">
+              <string>Usar IBS</string>
              </property>
             </widget>
            </item>
@@ -857,7 +864,7 @@ border-radius: 0px;</string>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_36">
          <item>
-          <widget class="QLabel" name="label_30">
+          <widget class="QLabel" name="Lbl_Csosn">
            <property name="text">
             <string>CSOSN Padrão:</string>
            </property>
@@ -893,7 +900,7 @@ border-radius: 0px;</string>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_38">
          <item>
-          <widget class="QLabel" name="label_32">
+          <widget class="QLabel" name="Lbl_CestProd">
            <property name="text">
             <string>CEST Padrão:</string>
            </property>

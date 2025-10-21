@@ -13,6 +13,9 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
     ui->setupUi(this);
     util->setParent(this);
 
+    ui->Lbl_AltCEST->setVisible(false);
+    ui->Ledit_AltCEST->setVisible(false);
+
     ui->tabWidget->setCurrentIndex(0);
     // validadores para os campos
     QDoubleValidator *DoubleValidador = new QDoubleValidator(0.0, 9999.99, 2);

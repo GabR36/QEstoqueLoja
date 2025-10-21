@@ -52,6 +52,7 @@ private:
     QString indPagNf,tPagNf;
     float taxaPercentual;
     double totalGeral;
+    bool usarIBS;
 
     void carregarConfig();
     void ide();

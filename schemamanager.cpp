@@ -593,7 +593,8 @@ void SchemaManager::update() {
                 "CREATE TABLE eventos_fiscais(id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT, tipo_evento TEXT,"
                 "id_lote INTEGER, cstat TEXT, justificativa TEXT, codigo TEXT, xml_path TEXT,"
                 "nprot TEXT, id_nf INTEGER, atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY "
-                "(id_nf) REFERENCES notas_fiscais(id))"
+                "(id_nf) REFERENCES notas_fiscais(id))",
+                "INSERT INTO config (key, value) VALUES ('usar_ibs', '0')"
             };
 
             foreach (const QString &sql, alterStatements) {

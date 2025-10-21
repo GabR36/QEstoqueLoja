@@ -16,6 +16,10 @@ InserirProduto::InserirProduto(QWidget *parent)
 {
     ui->setupUi(this);
     ui->tabWidget->setCurrentIndex(0);
+
+    ui->Lbl_CEST->setVisible(false);
+    ui->Ledit_CEST->setVisible(false);
+
     financeiroValues = Configuracao::get_All_Financeiro_Values();
     produtoValues = Configuracao::get_All_Produto_Values();
     ui->Ledit_CBarras->setFocus();

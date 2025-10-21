@@ -58,6 +58,7 @@ private:
         cmunCli, xmunCli, ufCli, cepCli, ieCli;
     bool ehPfCli = false;
     int indiedestCli = 0;
+    bool usarIBS;
 
     void carregarConfig();
     void ide();

@@ -23,6 +23,8 @@ NfeACBR::NfeACBR(QObject *parent)
     caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/xmlNf";
     nfe->LimparLista();//evita acumular notas
 
+    usarIBS = fiscalValues.value("usar_ibs").toInt();
+
 }
 
 int NfeACBR::getNNF(){
@@ -554,25 +556,27 @@ void NfeACBR::carregarProds()
         ini << "pCOFINS=0.00\n";
         ini << "vCOFINS=0.00\n\n";
 
-        ini << secIBS << "\n";
-        ini << "CST=000\n";
-        ini << "cClassTrib=000001\n\n";
+        if(usarIBS){
+            ini << secIBS << "\n";
+            ini << "CST=000\n";
+            ini << "cClassTrib=000001\n\n";
 
-        ini << secGIBS << "\n";
-        ini << "vBC=" << vProd.toStdString() << "\n";
-        ini << "vIBS=0.00\n\n";
+            ini << secGIBS << "\n";
+            ini << "vBC=" << vProd.toStdString() << "\n";
+            ini << "vIBS=0.00\n\n";
 
-        ini << secGIBSUF << "\n";
-        ini << "pIBSUF=0.00\n";
-        ini << "vIBSUF=0.00\n\n";
+            ini << secGIBSUF << "\n";
+            ini << "pIBSUF=0.00\n";
+            ini << "vIBSUF=0.00\n\n";
 
-        ini << secGIBSMUN << "\n";
-        ini << "pIBSMun=0.00\n";
-        ini << "vIBSMun=0.00\n\n";
+            ini << secGIBSMUN << "\n";
+            ini << "pIBSMun=0.00\n";
+            ini << "vIBSMun=0.00\n\n";
 
-        ini << secGCBS << "\n";
-        ini << "pCBS=0.00\n";
-        ini << "vCBS=0.00\n\n";
+            ini << secGCBS << "\n";
+            ini << "pCBS=0.00\n";
+            ini << "vCBS=0.00\n\n";
+        }
     }
 }
 
@@ -612,19 +616,21 @@ void NfeACBR::total()
     ini << "vNF=" << QString::number(vNf, 'f', 2).replace('.', ',').toStdString() << "\n";
     ini << "vFCP=0,00\n";
     ini << "vTotTrib=" << QString::number(totalTributo, 'f', 2).replace('.', ',').toStdString() << "\n\n";
+    if(usarIBS){
+        ini << "[IBSCBSTot]\n";
+        ini << "vBCIBSCBS=" << QString::number(totalGeral, 'f', 2).replace('.', ',').toStdString() << "\n\n";
 
-    ini << "[IBSCBSTot]\n";
-    ini << "vBCIBSCBS=" << QString::number(totalGeral, 'f', 2).replace('.', ',').toStdString() << "\n\n";
+        ini << "[gIBS]\n";
+        ini << "vIBS=0,00\n";
+        ini << "vCredPres=0,00\n";
+        ini << "vCredPresCondSus=0,00\n\n";
 
-    ini << "[gIBS]\n";
-    ini << "vIBS=0,00\n";
-    ini << "vCredPres=0,00\n";
-    ini << "vCredPresCondSus=0,00\n\n";
+        ini << "[gCBSTot]\n";
+        ini << "vCBS=0,00\n";
+        ini << "vCredPres=0,00\n";
+        ini << "vCredPresCondSus=0,00\n\n";
+    }
 
-    ini << "[gCBSTot]\n";
-    ini << "vCBS=0,00\n";
-    ini << "vCredPres=0,00\n";
-    ini << "vCredPresCondSus=0,00\n\n";
 }
 
 
@@ -718,7 +724,9 @@ QString NfeACBR::gerarEnviar(){
     transp();
     pag();
     infRespTec();
-    ibscbsTotais();
+    if(usarIBS){
+        ibscbsTotais();
+    }
 
     try {
         nfe->CarregarINI(ini.str());

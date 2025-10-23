@@ -594,7 +594,10 @@ void SchemaManager::update() {
                 "id_lote INTEGER, cstat TEXT, justificativa TEXT, codigo TEXT, xml_path TEXT,"
                 "nprot TEXT, id_nf INTEGER, atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY "
                 "(id_nf) REFERENCES notas_fiscais(id))",
-                "INSERT INTO config (key, value) VALUES ('usar_ibs', '0')"
+                "INSERT INTO config (key, value) VALUES ('usar_ibs', '0')",
+                "ALTER TABLE notas_fiscais ADD COLUMN finalidade TEXT",
+                "ALTER TABLE notas_fiscais ADD COLUMN saida BOOL",
+                "ALTER TABLE notas_fiscais ADD COLUMN id_nf_ref INTEGER"
             };
 
             foreach (const QString &sql, alterStatements) {

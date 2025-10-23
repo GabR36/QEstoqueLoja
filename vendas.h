@@ -9,6 +9,7 @@
 #include <QLocale>
 #include "entradasvendasprazo.h"
 #include "nota/DanfeUtil.h"
+#include "nota/nfeacbr.h"
 
 
 namespace Ui {
@@ -82,6 +83,7 @@ private:
     void abrirDanfeXml(QString id_Venda);
     QString dataGlobal;
     QString salvarEvento(QString retorno, int id_nf);
+    QString salvarDevolucaoNf(QString retornoEnvio, int idnf, NfeACBR *devolNfe);
 signals:
     void vendaConcluidaVendas();
     void pagamentosConcluidos();

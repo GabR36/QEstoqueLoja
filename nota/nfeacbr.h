@@ -14,7 +14,7 @@ class NfeACBR : public QObject
 {
     Q_OBJECT
 public:
-    explicit NfeACBR(QObject *parent = nullptr);
+    explicit NfeACBR(QObject *parent = nullptr, bool saida = 1, bool devolucao = 0);
     QString getVersaoLib();
     int getProximoNNF();
     void setNNF(int nNF);
@@ -30,6 +30,10 @@ public:
                     QString lgr, QString nro, QString bairro, QString cmun, QString xmun,
                     QString uf, QString cep, QString ie);
     QString getChaveNf();
+    void setNfRef(QString chnfe);
+    QString getTpAmb();
+    QString getCnpjEmit();
+    QString getCuf();
 private:
     ACBrNFe *nfe;
     QSqlDatabase db;
@@ -60,8 +64,19 @@ private:
     int indiedestCli = 0;
     bool usarIBS;
 
+    QString natOp,tpNf,finNfe,cfop, refNfe;
+
+    enum tipoNota{
+        saidaNormal,
+        devolucaoVenda,
+        devolucaoFornecedor,
+    };
+
+    tipoNota tipo;
+
     void carregarConfig();
     void ide();
+    void nfRef();
     void emite();
     void dest();
     void carregarProds();

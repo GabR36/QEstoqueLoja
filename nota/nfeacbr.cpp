@@ -5,7 +5,7 @@
 #include <fstream>
 #include <qrandom.h>
 
-NfeACBR::NfeACBR(QObject *parent)
+NfeACBR::NfeACBR(QObject *parent, bool saida, bool devolucao)
     : QObject{parent}
 {
     //pega o ponteiro da lib acbr do singleton
@@ -13,6 +13,25 @@ NfeACBR::NfeACBR(QObject *parent)
     db = QSqlDatabase::database();
     fiscalValues = Configuracao::get_All_Fiscal_Values();
     empresaValues = Configuracao::get_All_Empresa_Values();
+
+
+    // se a nota é de devolução e entrada
+    if(!saida && devolucao){
+
+        tipo = devolucaoVenda;
+        natOp = "Retorno de mercadoria de venda varejo";
+        tpNf = "0"; //entrada = 0
+        finNfe = "4"; //devolucao = 4
+        cfop = "1202";
+        tPagNf = "90";
+    }else if(saida && !devolucao){                          //se a nota é venda de mercadoria normal
+        tipo = saidaNormal;
+        natOp = "Venda de Mercadoria Adquirida";
+        tpNf = "1"; //saida = 1
+        finNfe = "1"; //nfe normal = 1
+        cfop = "5102";
+        tPagNf = "01"; //01 = dinheiro, usar setpagamento
+    }
 
     cnpjEmit = empresaValues.value("cnpj_empresa").toStdString();
     //valores padrao
@@ -25,6 +44,10 @@ NfeACBR::NfeACBR(QObject *parent)
 
     usarIBS = fiscalValues.value("usar_ibs").toInt();
 
+}
+
+void NfeACBR::setNfRef(QString chnfe){
+    refNfe = chnfe;
 }
 
 int NfeACBR::getNNF(){
@@ -100,7 +123,19 @@ int NfeACBR::getProximoNNF(){
 
 
 }
+QString NfeACBR::getCnpjEmit(){
+    return QString::fromStdString(cnpjEmit);
+}
 
+QString NfeACBR::getTpAmb(){
+    QString tpAmbBD = (QString::fromStdString(tpAmb) == "1" ? "0" : "1");
+
+    return tpAmbBD;
+}
+
+QString NfeACBR::getCuf(){
+    return QString::fromStdString(cuf);
+}
 double NfeACBR::getVNF(){
     return vNf;
 }
@@ -157,7 +192,7 @@ void NfeACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool 
     }
     emitirApenasNf = !emitirTodos;
 
-    QList<QList<QVariant>> produtosFiltrados; // nova lista filtrada
+    QList<QList<QVariant>> produtosFiltrados;
 
     for (int i = 0; i < produtosVendidos.size(); ++i) {
         QList<QVariant> produto = produtosVendidos[i];
@@ -169,27 +204,32 @@ void NfeACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool 
         if (!nfQuery.exec() || !nfQuery.next()) {
             qWarning() << "Erro ao consultar campo 'nf' do produto ID:" << produto[0].toString()
             << nfQuery.lastError().text();
-            continue; // pula esse produto
+            continue;
         }
 
         int nf = nfQuery.value("nf").toInt();
         if (!emitirTodos && nf != 1) {
-            continue; // ignora se não for para emitir todos e nf != 1
+            continue;
         }
 
-        // [1] quantidade, [3] valor unitário
-        QString quantidadeStr = QString::number(portugues.toFloat(produto[1].toString()));
-        QString valorUnitarioStr = QString::number(portugues.toFloat(produto[3].toString()));
+        // CORREÇÃO: Converter diretamente de string com vírgula para double
+        QString quantidadeStr = produto[1].toString();
+        QString valorUnitarioStr = produto[3].toString();
+
+        // Remove formatação e converte para double
+        quantidadeStr.replace(',', '.');
+        valorUnitarioStr.replace(',', '.');
 
         double quantidade = quantidadeStr.toDouble();
         double valorUnitario = valorUnitarioStr.toDouble();
         double valorTotal = quantidade * valorUnitario;
 
+        // Atualiza com os valores numéricos
         produto[1] = quantidade;
         produto[3] = valorUnitario;
         produto.append(QVariant(valorTotal)); // [4] valor total
 
-        // Consulta dados adicionais do produto
+        // ... resto do código igual
         QSqlQuery query;
         query.prepare("SELECT codigo_barras, un_comercial, ncm, cest, csosn, pis,"
                       " aliquota_imposto FROM produtos WHERE id = :idprod");
@@ -202,7 +242,8 @@ void NfeACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool 
             QString cest = query.value("cest").toString();
             QString csosn = query.value("csosn").toString();
             QString pis = query.value("pis").toString();
-            double aliquotaImposto   = query.value("aliquota_imposto").toDouble();
+            double aliquotaImposto = query.value("aliquota_imposto").toDouble();
+
             if (!isValidGTIN(codigoBarras)) {
                 codigoBarras = "SEM GTIN";
             }
@@ -211,22 +252,22 @@ void NfeACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool 
             produto.append(ncm);               // [7]
             produto.append(cest);              // [8]
             produto.append(aliquotaImposto);   // [9]
-            produto.append(csosn); //[10]
-            produto.append(pis);//[11]
+            produto.append(csosn);             // [10]
+            produto.append(pis);               // [11]
         } else {
             qWarning() << "Produto ID não encontrado ou erro ao consultar:" << produto[0].toString()
                        << query.lastError().text();
 
-            produto.append("");      // codigo_barras
-            produto.append("");      // un_comercial
-            produto.append("");      // ncm
-            produto.append("");      // cest
-            produto.append(0.0);     // aliquota_imposto
-            produto.append("");//csosn
-            produto.append("");//pis
+            produto.append("");                // [5] codigo_barras
+            produto.append("");                // [6] un_comercial
+            produto.append("");                // [7] ncm
+            produto.append("");                // [8] cest
+            produto.append(0.0);               // [9] aliquota_imposto
+            produto.append("");                // [10] csosn
+            produto.append("");                // [11] pis
         }
 
-        produtosFiltrados.append(produto); // adiciona produto processado
+        produtosFiltrados.append(produto);
     }
 
     quantProds = produtosFiltrados.size();
@@ -386,14 +427,19 @@ void NfeACBR::ide()
     ini << "nNF=" << nnf << "\n";
     ini << "cNF=" << std::to_string(numeroAleatorio8dig) << "\n";
     ini << "dhEmi=" << dataHora << "\n";
-    ini << "natOp=VENDA AO CONSUMIDOR\n";
-    ini << "tpNF=1\n";
-    ini << "finNFe=1\n";
+    ini << "natOp=" << natOp.toStdString() << "\n";
+    ini << "tpNF=" << tpNf.toStdString() << "\n";
+    ini << "finNFe=" << finNfe.toStdString() << "\n";
     ini << "indFinal=1\n";
     ini << "indPres=1\n";
     ini << "tpImp=1\n"; //nfe
     ini << "procEmi=0\n";
     ini << "verProc=1.0\n\n";
+}
+
+void NfeACBR::nfRef(){
+    ini << "[NFRef001]\n";
+    ini << "refNFe=" << refNfe.toStdString() << "\n";
 }
 
 void NfeACBR::emite()
@@ -430,58 +476,96 @@ void NfeACBR::emite()
 
 void NfeACBR::dest()
 {
-    qDebug() << "cpfclie nfe: " << cpfCli;
-    if(ehPfCli == false && cpfCli != ""){
+    if(tipo == devolucaoVenda){
+        std::string xNome = empresaValues.value("nome_empresa").toStdString();
+        std::string xFant = empresaValues.value("nfant_empresa").toStdString();
+        std::string ie = fiscalValues.value("iest").toStdString();
+        std::string xLgr = empresaValues.value("endereco_empresa").toStdString();
+        std::string nro = empresaValues.value("numero_empresa").toStdString();
+        std::string cMun = fiscalValues.value("cmun").toStdString();
+        std::string xMun = empresaValues.value("cidade_empresa").toStdString();
+        std::string uf = empresaValues.value("estado_empresa").toStdString();
+        std::string fone = empresaValues.value("telefone_empresa").toStdString();
+        std::string xBairro = empresaValues.value("bairro_empresa").toStdString();
+        std::string cep = empresaValues.value("cep_empresa").toStdString();
+
         ini << "[Destinatario]\n";
-        ini << "CNPJCPF=" << cpfCli.toStdString() << "\n";
+        ini << "CNPJCPF=" << cnpjEmit << "\n";
+        ini << "xNome=" << xNome << "\n";
+        ini << "xFant=" << xFant << "\n";
+        ini << "IE=" << ie << "\n";
+
+        ini << "IEST=\n";
+        ini << "IM=\n";
+
+        ini << "CRT=1\n";
+        ini << "xLgr=" << xLgr << "\n";
+        ini << "nro=" << nro << "\n";
+        ini << "xBairro=" << xBairro << "\n";
+        ini << "cMun=" << cMun << "\n";
+        ini << "xMun=" << xMun << "\n";
+        ini << "CEP=" << cep << "\n";
+        ini << "UF=" << uf << "\n";
+        ini << "cPais=1058\n";
+        ini << "xPais=BRASIL\n";
+        ini << "Fone=" << fone << "\n\n";
+
+    }else{
+        qDebug() << "cpfclie nfe: " << cpfCli;
+        if(ehPfCli == false && cpfCli != ""){
+            ini << "[Destinatario]\n";
+            ini << "CNPJCPF=" << cpfCli.toStdString() << "\n";
+        }
+
+        if(ehPfCli == true && cpfCli != ""){
+            ini << "[Destinatario]\n";
+            ini << "CNPJCPF=" << cpfCli.toStdString() << "\n";
+        }
+        if(fiscalValues.value("tp_amb") == "0" && cpfCli != ""){
+            ini << "xNome=NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL\n";
+        }
+        // m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CPF(""); //PARA PESSOA FISICA
+        // //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_idEstrangeiro("ID ESTRANGEIRO")
+        ini << "xNome=" << nomeCli.toStdString() << "\n";
+
+
+        switch (indiedestCli) {
+        case 0:
+            ini << "indIEDest=" << "9" << "\n";    //nao contribuinte
+            break;
+        case 1:
+            ini << "indIEDest=" << "1" << "\n";    // contribuinte
+            ini << "IE=" << ieCli.toStdString() << "\n";    // contribuinte
+            break;
+        case 2:
+            ini << "indIEDest=" << "2" << "\n";    // contribuinte
+            ini << "IE=" << ieCli.toStdString() << "\n";    // contribuinte
+            break;
+        default:
+            qDebug() << "Valor indIEDest inválido:" << indiedestCli;
+            // Opcional: Definir um padrão seguro
+            ini << "indIEDest=" << "9" << "\n";    //nao contribuinte
+            break;
+        }
+
+        ini << "Email=" << emailCli.toStdString() << "\n";
+        // //Endereço
+        ini << "xLgr=" << lgrCli.toStdString() << "\n";
+        ini << "nro=" << nroCli.toStdString() << "\n";
+        // //m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xCpl("complemento");
+        ini << "xBairro=" << bairroCli.toStdString() << "\n";
+        ini << "cMun=" << cmunCli.toStdString() << "\n";
+        ini << "xMun=" << xmunCli.toStdString() << "\n";
+        ini << "UF=" << ufCli.toStdString() << "\n";
+        ini << "CEP=" << cepCli.toStdString() << "\n";
+        ini << "cPais=" << "1058" << "\n";
+        ini << "xPais=" << "Brasil" << "\n";
+        // ini << "Fone=" << .toStdString() << "\n";
+
+        ini << "\n";
+
     }
 
-    if(ehPfCli == true && cpfCli != ""){
-        ini << "[Destinatario]\n";
-        ini << "CNPJCPF=" << cpfCli.toStdString() << "\n";
-    }
-    if(fiscalValues.value("tp_amb") == "0" && cpfCli != ""){
-        ini << "xNome=NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL\n";
-    }
-    // m_nfe->notafiscal->NFe->obj->infNFe->dest->set_CPF(""); //PARA PESSOA FISICA
-    // //m_nfe->notafiscal->NFe->obj->infNFe->dest->set_idEstrangeiro("ID ESTRANGEIRO")
-    ini << "xNome=" << nomeCli.toStdString() << "\n";
-
-
-    switch (indiedestCli) {
-    case 0:
-        ini << "indIEDest=" << "9" << "\n";    //nao contribuinte
-        break;
-    case 1:
-        ini << "indIEDest=" << "1" << "\n";    // contribuinte
-        ini << "IE=" << ieCli.toStdString() << "\n";    // contribuinte
-        break;
-    case 2:
-        ini << "indIEDest=" << "2" << "\n";    // contribuinte
-        ini << "IE=" << ieCli.toStdString() << "\n";    // contribuinte
-        break;
-    default:
-        qDebug() << "Valor indIEDest inválido:" << indiedestCli;
-        // Opcional: Definir um padrão seguro
-        ini << "indIEDest=" << "9" << "\n";    //nao contribuinte
-        break;
-    }
-
-    ini << "Email=" << emailCli.toStdString() << "\n";
-    // //Endereço
-    ini << "xLgr=" << lgrCli.toStdString() << "\n";
-    ini << "nro=" << nroCli.toStdString() << "\n";
-    // //m_nfe->notafiscal->NFe->obj->infNFe->dest->enderDest->set_xCpl("complemento");
-    ini << "xBairro=" << bairroCli.toStdString() << "\n";
-    ini << "cMun=" << cmunCli.toStdString() << "\n";
-    ini << "xMun=" << xmunCli.toStdString() << "\n";
-    ini << "UF=" << ufCli.toStdString() << "\n";
-    ini << "CEP=" << cepCli.toStdString() << "\n";
-    ini << "cPais=" << "1058" << "\n";
-    ini << "xPais=" << "Brasil" << "\n";
-    // ini << "Fone=" << .toStdString() << "\n";
-
-    ini << "\n";
 }
 
 
@@ -522,7 +606,7 @@ void NfeACBR::carregarProds()
         float vDesc = descontoProd[i];
 
         ini << secProduto << "\n";
-        ini << "CFOP=5102\n";
+        ini << "CFOP=" << cfop.toStdString() << "\n";
         ini << "cProd=" << cProd.toStdString() << "\n";
         ini << "cEAN=" << cEAN.toStdString() << "\n";
         ini << "xProd=" << xProd.toStdString() << "\n";
@@ -646,6 +730,10 @@ void NfeACBR::pag()
         vPagNf = vNf;
         trocoNf = 0.0;
     }
+    if(tipo == devolucaoVenda){
+        vPagNf = 0.0;
+        trocoNf = 0.0;
+    }
 
     std::string indice = "001";
     std::string secao = "pag" + indice;
@@ -717,6 +805,9 @@ QString NfeACBR::gerarEnviar(){
     ini << "versao=4.00\n\n";
     carregarConfig();
     ide();
+    if(tipo == devolucaoVenda){
+        nfRef();
+    }
     emite();
     dest();
     carregarProds();
@@ -731,7 +822,7 @@ QString NfeACBR::gerarEnviar(){
     try {
         nfe->CarregarINI(ini.str());
         nfe->Assinar();
-            // nfe->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
+             nfe->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
 
         nfe->Validar();
 

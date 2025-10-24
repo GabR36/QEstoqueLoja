@@ -14,34 +14,6 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
     // // QMessageBox::warning(this,"Erro",nfce->getVersaoLib());
     rowDataList = listaProdutos;
 
-    for (int i = 0; i < listaProdutos.size(); ++i) {
-        const QList<QVariant> &produto = listaProdutos[i];
-        qDebug() << "\n📦 Produto" << i + 1 << ":";
-        qDebug() << "---------------------------------------------";
-
-        // Verifica tamanho da linha antes de acessar índices
-        auto safeValue = [&](int idx) {
-            return (idx < produto.size()) ? produto[idx].toString() : QString("<vazio>");
-        };
-
-        qDebug() << "ID:                " << safeValue(0);
-        qDebug() << "Quantidade:        " << safeValue(1);
-        qDebug() << "Descrição:         " << safeValue(2);
-        qDebug() << "Valor Unitário:    " << safeValue(3);
-        qDebug() << "Valor Total:       " << safeValue(4);
-        // qDebug() << "Código de Barras:  " << safeValue(5);
-        // qDebug() << "Un. Comercial:     " << safeValue(6);
-        // qDebug() << "NCM:               " << safeValue(7);
-        // qDebug() << "CEST:              " << safeValue(8);
-        // qDebug() << "Aliq. Imposto:     " << safeValue(9);
-        // qDebug() << "CSOSN:             " << safeValue(10);
-        // qDebug() << "PIS:               " << safeValue(11);
-
-        qDebug() << "---------------------------------------------";
-    }
-
-    qDebug() << "========== FIM DA LISTA ==========\n";
-
     fiscalValues = Configuracao::get_All_Fiscal_Values();
     empresaValues = Configuracao::get_All_Empresa_Values();
     this->idCliente = idCliente;
@@ -195,11 +167,11 @@ void pagamentoVenda::salvarNfeBD(NfeACBR *nfe){
     QDateTime dataIngles = portugues.toDateTime(dataGlobal, "dd-MM-yyyy hh:mm:ss");
 
     query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
-                  "tp_amb, xml_path, valor_total, atualizado_em, id_venda, cnpjemit,"
-                  "chnfe, nprot, cuf) "
+                  "tp_amb, xml_path, valor_total, atualizado_em, id_venda, cnpjemit, "
+                  "chnfe, nprot, cuf, finalidade, saida) "
                   "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, "
                   ":valortotal, :atualizado_em, :id_venda, :cnpjemit, :chnfe, "
-                  ":nprot, :cuf)");
+                  ":nprot, :cuf, :finalidade, :saida)");
     query.bindValue(":cstat", cStat);
     query.bindValue(":nnf", QString::number(nfe->getNNF()));
     query.bindValue(":serie", QString::number(nfe->getSerie()));
@@ -213,6 +185,11 @@ void pagamentoVenda::salvarNfeBD(NfeACBR *nfe){
     query.bindValue(":chnfe", nfe->getChaveNf());
     query.bindValue(":nprot", nProt);
     query.bindValue(":cuf", fiscalValues.value("cuf"));
+    query.bindValue(":finalidade", "NORMAL");
+    query.bindValue(":saida", "1");
+
+
+
 
 
     qDebug() << "idvenda: " << idVenda;
@@ -232,10 +209,10 @@ void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
 
     query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
                   "tp_amb, xml_path, valor_total, atualizado_em, id_venda, cnpjemit,"
-                  "chnfe, nprot, cuf) "
+                  "chnfe, nprot, cuf, finalidade, saida ) "
                   "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, "
                   ":valortotal, :atualizado_em, :id_venda, :cnpjemit, :chnfe, "
-                  ":nprot, :cuf )");
+                  ":nprot, :cuf, :finalidade, :saida )");
     query.bindValue(":cstat", cStat);
     query.bindValue(":nnf", QString::number(nfce->getNNF()));
     query.bindValue(":serie", QString::number(nfce->getSerie()));
@@ -249,6 +226,9 @@ void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
     query.bindValue(":chnfe", nfce->getChaveNf());
     query.bindValue(":nprot", nProt);
     query.bindValue(":cuf", fiscalValues.value("cuf"));
+    query.bindValue(":finalidade", "NORMAL");
+    query.bindValue(":saida", "1");
+
 
     qDebug() << "idvenda: " << idVenda;
     if (query.exec()) {

@@ -36,6 +36,7 @@ public:
 
     void AtualizarTabelasSinal();
     int getNfId(int id_venda);
+    void deletarVenda(bool cancelarNf);
 public slots:
     void imprimirReciboVendaSelec(QString id); //precisa ser slot :(
 

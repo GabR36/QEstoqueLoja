@@ -822,7 +822,7 @@ QString NfeACBR::gerarEnviar(){
     try {
         nfe->CarregarINI(ini.str());
         nfe->Assinar();
-             nfe->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
+             // nfe->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
 
         nfe->Validar();
 

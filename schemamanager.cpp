@@ -597,7 +597,9 @@ void SchemaManager::update() {
                 "INSERT INTO config (key, value) VALUES ('usar_ibs', '0')",
                 "ALTER TABLE notas_fiscais ADD COLUMN finalidade TEXT",
                 "ALTER TABLE notas_fiscais ADD COLUMN saida BOOL",
-                "ALTER TABLE notas_fiscais ADD COLUMN id_nf_ref INTEGER"
+                "ALTER TABLE notas_fiscais ADD COLUMN id_nf_ref INTEGER",
+                "UPDATE notas_fiscais SET saida = 1",
+                "UPDATE notas_fiscais SET finalidade = 'NORMAL'"
             };
 
             foreach (const QString &sql, alterStatements) {

@@ -18,16 +18,23 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
     empresaValues = Configuracao::get_All_Empresa_Values();
     this->idCliente = idCliente;
     //mostra as opçoes relacionadas a nf e
+
     if(fiscalValues.value("emit_nf") == "1"){
         ui->FrameNF->setVisible(true);
         ui->Ledit_NNF->setVisible(true);
         ui->Lbl_NNF->setVisible(true);
         ui->Ledit_NNF->setText(QString::number(nfce->getProximoNNF()));
+        ui->CBox_ModeloEmit->setVisible(true);
+        ui->RadioBtn_EmitNfApenas->setVisible(true);
+        ui->RadioBtn_EmitNfTodos->setVisible(true);
 
     }else{
         ui->FrameNF->setVisible(false);
         ui->Ledit_NNF->setVisible(false);
         ui->Lbl_NNF->setVisible(false);
+        ui->CBox_ModeloEmit->setVisible(false);
+        ui->RadioBtn_EmitNfApenas->setVisible(false);
+        ui->RadioBtn_EmitNfTodos->setVisible(false);
 
     }
 

@@ -14,8 +14,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set(CMAKE_PREFIX_PATH "C:/Qt/6.6.2/mingw_64/lib/cmake")
 
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core Network)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core Network)
 
 if (CMAKE_SYSTEM MATCHES "Linux")
     include_directories(
@@ -119,6 +119,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         nota/nfeacbr.h nota/nfeacbr.cpp
         schemamanager.h schemamanager.cpp
         nota/cancelnf.h nota/cancelnf.cpp
+        util/ACBrConsultaCNPJ.cpp util/ACBrConsultaCNPJ.h
+        util/consultacnpjmanager.h util/consultacnpjmanager.cpp
+        util/buscarcodigomunicipio.h util/buscarcodigomunicipio.cpp
+
 
 
 
@@ -155,7 +159,7 @@ else()
 endif()
 target_link_libraries(QEstoqueLoja PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::Sql Qt6::PrintSupport
     zint Qt6::Charts QtRPT Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Xml
-     Qt${QT_VERSION_MAJOR}::Qml
+     Qt${QT_VERSION_MAJOR}::Qml Qt${QT_VERSION_MAJOR}::Network
 )
 
 #target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lxml2)

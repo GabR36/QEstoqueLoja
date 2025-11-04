@@ -1,0 +1,32 @@
+#pragma once
+#include <string>
+#include <cstdint>
+
+#if defined(ISWINDOWS)
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
+
+#define BUFFER_LEN 8192
+
+class ACBrConsultaCNPJ {
+public:
+    ACBrConsultaCNPJ(std::string eArqConfig = "", std::string eChaveCrypt = "");
+    ~ACBrConsultaCNPJ();
+
+    std::string Nome() const;
+    std::string Versao() const;
+    std::string Consultar(std::string eCNPJ) const;
+
+private:
+#if defined(ISWINDOWS)
+    HMODULE nHandler;
+#else
+    void* nHandler;
+#endif
+    void* libHandler;
+
+    void CheckResult(int ret) const;
+    std::string ProcessResult(const std::string& buffer, int len) const;
+};

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>467</width>
-    <height>348</height>
+    <height>356</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -61,6 +61,35 @@
     </spacer>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_5">
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>CPF/CNPJ:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="Ledit_Cpf">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>30</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Btn_BuscaDados">
+       <property name="text">
+        <string>Buscar Dados 
+ CNPJ</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_17">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -89,20 +118,6 @@
          </item>
          <item>
           <widget class="QLineEdit" name="Ledit_Telefone"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
-         <item>
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>CPF/CNPJ:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="Ledit_Cpf"/>
          </item>
         </layout>
        </item>

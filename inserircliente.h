@@ -22,6 +22,8 @@ private slots:
 
     void on_Btn_Inserir_clicked();
 
+    void on_Btn_BuscaDados_clicked();
+
 private:
     Ui::InserirCliente *ui;
     QSqlDatabase db = QSqlDatabase::database();

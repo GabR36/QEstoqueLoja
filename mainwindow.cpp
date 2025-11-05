@@ -33,6 +33,7 @@
 #include <QStandardPaths>
 #include "util/helppage.h"
 #include "schemamanager.h"
+#include "util/consultacnpjmanager.h".h"
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -61,7 +62,7 @@ MainWindow::MainWindow(QWidget *parent)
     fiscalValues = Configuracao::get_All_Fiscal_Values();
 
     //pega o ponteiro do singleton para usar a lib acbr
-    acbr = AcbrManager::instance()->nfe();
+    // acbr = AcbrManager::instance()->nfe();
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
@@ -118,6 +119,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->Tview_Produtos, &QTableView::doubleClicked,
             this, &MainWindow::verProd);
+
+    //config versao 6
+    connect(schemaManager, &SchemaManager::dbVersao6, this,
+            &MainWindow::atualizarConfigAcbr);
 
 
 }
@@ -739,6 +744,11 @@ void MainWindow::on_actionDocumenta_o_triggered()
 }
 
 void MainWindow::atualizarConfigAcbr(){
+
+    auto acbr = AcbrManager::instance()->nfe();
+    auto cnpj = ConsultaCnpjManager::instance()->cnpj();
+
+
     qDebug() << "=== CARREGANDO CONFIGURAÇÕES ACBR ===";
     QString caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
                          "/xmlNf";
@@ -823,6 +833,10 @@ void MainWindow::atualizarConfigAcbr(){
     //     // nfce->ConfigGravarValor("DANFENFCe", "ImprimeItens", "1");
     //     // nfce->ConfigGravarValor("DANFENFCe", "ViaConsumidor", "1");
     //     // nfce->ConfigGravarValor("DANFENFCe", "FormatarNumeroDocumento", "1");
+
+
+    cnpj->ConfigGravarValor("ConsultaCNPJ", "Provedor", "3");
+
     acbr->ConfigGravar("");
     qDebug() << "Configurações salvas no arquivo acbrlib.ini";
 

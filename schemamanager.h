@@ -18,6 +18,7 @@ public:
 
     QSqlDatabase db;
 signals:
+    void dbVersao6();
 };
 
 #endif // SCHEMAMANAGER_H

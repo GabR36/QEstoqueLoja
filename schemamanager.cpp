@@ -619,6 +619,7 @@ void SchemaManager::update() {
                 db.rollback();
             } else {
                 dbSchemaVersion = 6;
+                emit dbVersao6();
             }
 
             break;

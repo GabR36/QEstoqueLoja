@@ -26,7 +26,7 @@ private slots:
 
 private:
     Ui::InserirCliente *ui;
-    QSqlDatabase db = QSqlDatabase::database();
+    QSqlDatabase db;
 signals:
     void clienteInserido();
 };

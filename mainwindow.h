@@ -89,7 +89,7 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    ACBrNFe *acbr;
+    // ACBrNFe *acbr;
     bool verificarCodigoBarras();
     QSet<QString> generatedNumbers;
     QAction* actionMenuAlterarProd;

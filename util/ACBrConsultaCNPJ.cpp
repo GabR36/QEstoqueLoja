@@ -120,3 +120,41 @@ std::string ACBrConsultaCNPJ::ProcessResult(const std::string& buffer, int len) 
     if (len <= 0) return "";
     return std::string(buffer.c_str(), len);
 }
+
+void ACBrConsultaCNPJ::ConfigGravarValor(const std::string& eSessao,
+                                         const std::string& eChave,
+                                         const std::string& eValor) const
+{
+    typedef int (*CNPJ_ConfigGravarValor)(void*, const char*, const char*, const char*);
+
+    CNPJ_ConfigGravarValor method;
+#if defined(ISWINDOWS)
+    method = reinterpret_cast<CNPJ_ConfigGravarValor>(GetProcAddress(nHandler, "CNPJ_ConfigGravarValor"));
+#else
+    method = reinterpret_cast<CNPJ_ConfigGravarValor>(dlsym(nHandler, "CNPJ_ConfigGravarValor"));
+#endif
+
+    if (!method)
+        throw std::runtime_error("Não encontrou função CNPJ_ConfigGravarValor na biblioteca");
+
+    int ret = method(this->libHandler, eSessao.c_str(), eChave.c_str(), eValor.c_str());
+    CheckResult(ret);
+}
+
+void ACBrConsultaCNPJ::ConfigGravar(const std::string& eArqConfig) const
+{
+    typedef int (*CNPJ_ConfigGravar)(void*, const char*);
+
+    CNPJ_ConfigGravar method;
+#if defined(ISWINDOWS)
+    method = reinterpret_cast<CNPJ_ConfigGravar>(GetProcAddress(nHandler, "CNPJ_ConfigGravar"));
+#else
+    method = reinterpret_cast<CNPJ_ConfigGravar>(dlsym(nHandler, "CNPJ_ConfigGravar"));
+#endif
+
+    if (!method)
+        throw std::runtime_error("Não encontrou função CNPJ_ConfigGravar na biblioteca");
+
+    int ret = method(this->libHandler, eArqConfig.c_str());
+    CheckResult(ret);
+}

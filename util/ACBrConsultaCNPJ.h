@@ -18,6 +18,12 @@ public:
     std::string Nome() const;
     std::string Versao() const;
     std::string Consultar(std::string eCNPJ) const;
+    void ConfigGravarValor(const std::string& eSessao,
+                           const std::string& eChave,
+                           const std::string& eValor) const;
+
+    void ConfigGravar(const std::string& eArqConfig) const;
+
 
 private:
 #if defined(ISWINDOWS)

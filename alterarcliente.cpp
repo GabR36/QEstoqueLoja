@@ -2,6 +2,8 @@
 #include "ui_alterarcliente.h"
 #include <QSqlQuery>
 #include <QMessageBox>
+#include "util/consultacnpjmanager.h"
+#include "util/buscarcodigomunicipio.h"
 
 AlterarCliente::AlterarCliente(QWidget *parent, QString id)
     : QWidget(parent)
@@ -243,5 +245,72 @@ void AlterarCliente::on_Btn_Ok_clicked()
         emit clienteAtualizado();
         this->close();
     }
+}
+
+
+void AlterarCliente::on_Btn_BuscaDados_clicked()
+{
+    // auto manager = ConsultaCnpjManager::instance();
+    auto cnpj = ConsultaCnpjManager::instance()->cnpj();
+
+    QString cnpjSt = ui->Ledit_Cpf->text();
+
+    QString retorno;
+    try {
+        std::string resultado = cnpj->Consultar(cnpjSt.toStdString());
+        retorno = QString::fromStdString(resultado);
+        qDebug() << "Consulta retornou:" << retorno.left(200);
+    } catch (const std::exception &e) {
+        QMessageBox::critical(this, "Erro", QString("Falha na consulta: %1").arg(e.what()));
+        // manager->resetLib();
+        return;
+
+    }
+
+    QStringList linhas = retorno.split(QRegularExpression("[\r\n]+"), Qt::SkipEmptyParts);
+    QString nomeRet, enderecoRet, numeroRet, bairroRet, municipioRet, data_nascRet,
+        cepRet, ufRet, ieRet;
+
+    for (const QString &linha : linhas) {
+        if (linha.startsWith("RazaoSocial="))
+            nomeRet = linha.section('=', 1).trimmed();
+        else if (linha.startsWith("Endereco="))
+            enderecoRet = linha.section('=', 1).trimmed();
+        else if (linha.startsWith("Numero="))
+            numeroRet = linha.section('=', 1).trimmed();
+        else if (linha.startsWith("Bairro="))
+            bairroRet = linha.section('=', 1).trimmed();
+        else if (linha.startsWith("Cidade="))
+            municipioRet = linha.section('=', 1).trimmed();
+        else if (linha.startsWith("Abertura="))
+            data_nascRet = linha.section('=', 1).trimmed();
+        else if (linha.startsWith("CEP="))
+            cepRet = linha.section('=', 1).trimmed();
+        else if (linha.startsWith("UF="))
+            ufRet = linha.section('=', 1).trimmed();
+        else if (linha.startsWith("InscricaoEstadual="))
+            ieRet = linha.section('=', 1).trimmed();
+    }
+    // QMessageBox::information(this, "teste", retorno);
+
+    ui->Ledit_Nome->setText(nomeRet);
+    ui->Ledit_Endereco->setText(enderecoRet);
+    ui->Ledit_Numero->setText(numeroRet);
+    ui->Ledit_Bairro->setText(bairroRet);
+    ui->Ledit_Municipio->setText(municipioRet);
+    ui->Ledit_DataNascimento->setText(data_nascRet);
+    ui->Ledit_CEP->setText(cepRet);
+    ui->Ledit_UF->setText(ufRet);
+    ui->Ledit_IE->setText(ieRet);
+
+    //se tem IE, indicador ie dest = contribuinte icms
+    if(!ieRet.isEmpty()){
+        ui->CBox_IndIEDest->setCurrentIndex(1);
+    }else{
+        ui->CBox_IndIEDest->setCurrentIndex(0);
+    }
+
+    QString cmun = BuscarCodigoMunicipio::buscarCodigoMunicipio(municipioRet);
+    ui->Ledit_CMun->setText(cmun);
 }
 

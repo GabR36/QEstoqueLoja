@@ -1,5 +1,4 @@
 #include "buscarcodigomunicipio.h"
-#include "buscarcodigomunicipio.h"
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -13,21 +12,25 @@
 BuscarCodigoMunicipio::BuscarCodigoMunicipio() {}
 
 QString BuscarCodigoMunicipio::buscarCodigoMunicipio(const QString &nomeMunicipio){
+    if (nomeMunicipio.isEmpty()) {
+        qWarning() << "Nome do município vazio!";
+        return QString();
+    }
+
     QNetworkAccessManager manager;
     QEventLoop loop;
     QObject::connect(&manager, &QNetworkAccessManager::finished, &loop, &QEventLoop::quit);
 
+    // Monta a URL com encode correto
     QString urlStr = QString("https://servicodados.ibge.gov.br/api/v1/localidades/municipios?nome=%1")
                          .arg(QUrl::toPercentEncoding(nomeMunicipio));
-
-    // CORREÇÃO: Criar o QUrl primeiro, depois o QNetworkRequest
     QUrl url(urlStr);
-    QNetworkRequest request(url);  // Agora está correto!
+    QNetworkRequest request(url);
 
     QNetworkReply *reply = manager.get(request);
-    loop.exec();
+    loop.exec();  // espera a resposta
 
-    // Restante do código permanece igual...
+    // Verifica erro na requisição
     if (reply->error() != QNetworkReply::NoError) {
         qWarning() << "Erro na requisição:" << reply->errorString();
         reply->deleteLater();
@@ -38,15 +41,28 @@ QString BuscarCodigoMunicipio::buscarCodigoMunicipio(const QString &nomeMunicipi
     reply->deleteLater();
 
     QJsonDocument doc = QJsonDocument::fromJson(data);
-    if (!doc.isArray())
+    if (!doc.isArray()) {
+        qWarning() << "Resposta não é um array JSON";
         return QString();
+    }
 
     QJsonArray arr = doc.array();
-    if (arr.isEmpty())
+    if (arr.isEmpty()) {
+        qWarning() << "Nenhum município encontrado para:" << nomeMunicipio;
         return QString();
+    }
 
-    QJsonObject obj = arr.first().toObject();
-    int codigo = obj["id"].toInt();
+    // Percorre todos os resultados e compara o nome exato (case-insensitive)
+    for (const QJsonValue &val : arr) {
+        QJsonObject obj = val.toObject();
+        QString nomeRetorno = obj.value("nome").toString();
+        if (nomeRetorno.compare(nomeMunicipio, Qt::CaseInsensitive) == 0) {
+            int codigo = obj.value("id").toInt();
+            return QString::number(codigo);
+        }
+    }
 
-    return QString::number(codigo);
+    qWarning() << "Município exato não encontrado, retornando primeiro resultado";
+    // Retorna o primeiro item como fallback
+    return QString::number(arr.first().toObject().value("id").toInt());
 }

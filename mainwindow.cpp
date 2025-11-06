@@ -43,6 +43,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     SchemaManager *schemaManager = new SchemaManager(this, 6);
+    //config versao 6
+    connect(schemaManager, &SchemaManager::dbVersao6, this,
+            &MainWindow::atualizarConfigAcbr);
     schemaManager->update();
 
     db = QSqlDatabase::database();
@@ -120,9 +123,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Tview_Produtos, &QTableView::doubleClicked,
             this, &MainWindow::verProd);
 
-    //config versao 6
-    connect(schemaManager, &SchemaManager::dbVersao6, this,
-            &MainWindow::atualizarConfigAcbr);
 
 
 }

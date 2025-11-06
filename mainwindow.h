@@ -1,6 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#if defined(Q_OS_WIN)
+#define WIN32_LEAN_AND_MEAN
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#endif
+
+
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <vector>
@@ -86,6 +93,7 @@ private slots:
 
 
     void on_actionDocumenta_o_triggered();
+    void atualizarConfigAcbr();
 
 private:
     Ui::MainWindow *ui;
@@ -106,7 +114,7 @@ private:
     void setarIconesJanela();
     //QModelIndex selected_index;
 
-    void atualizarConfigAcbr();
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
     int getIdProdSelected();

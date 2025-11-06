@@ -4,6 +4,7 @@
 #include <qdir.h>
 #include <fstream>
 #include <qrandom.h>
+#include <QSqlError>
 
 NfeACBR::NfeACBR(QObject *parent, bool saida, bool devolucao)
     : QObject{parent}
@@ -62,21 +63,33 @@ QString NfeACBR::getChaveNf(){
 int NfeACBR::getSerie(){
     return serieNf.toInt();
 }
-QString NfeACBR::getXmlPath(){
+QString NfeACBR::getXmlPath() {
+    // Obtém o caminho bruto do ACBR
     std::string raw = nfe->GetPath(0);
 
-    // Remove caracteres nulos (caso GetPath tenha buffer fixo)
+    // Remove caracteres nulos (caso GetPath use buffer fixo)
     raw.erase(std::find(raw.begin(), raw.end(), '\0'), raw.end());
+
+    // Converte para QString e remove espaços extras
     QString path = QString::fromStdString(raw).trimmed();
 
+    //Normaliza saída do ACBR (corrige barras no Windows)
+    path.replace("\\", "/");           // converte todas as barras invertidas
+    path = QDir::cleanPath(path);      // remove barras duplas
+    if (path.endsWith('/'))
+        path.chop(1);                  // remove barra final, se houver
+
+    // Trata o CNF (chave numérica da nota)
     raw = cnf;
     raw.erase(std::find(raw.begin(), raw.end(), '\0'), raw.end());
     QString cnfString = QString::fromStdString(raw).trimmed();
-    QString ret = QString("%1/%2-nfe.xml")
-                      .arg(path, cnfString);
+
+    // Monta o caminho final do XML
+    QString ret = QString("%1/%2-nfe.xml").arg(path, cnfString);
 
     return ret;
 }
+
 
 
 QString NfeACBR::getVersaoLib(){

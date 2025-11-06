@@ -775,6 +775,7 @@ void MainWindow::atualizarConfigAcbr(){
     QString caminhoCompletoLogo = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
                                   "/imagens/" + QFileInfo(empresaValues.value("caminho_logo_empresa")).fileName();
     qDebug() << "Certificado:" << QString::fromStdString(certificadoPath);
+    qDebug() << "Certificado antes: " << certificadoPath;
     qDebug() << "UF:" << QString::fromStdString(uf);
     qDebug() << "Schema:" << QString::fromStdString(schemaPath);
     qDebug() << "CaminhoCompletoLogo:" << caminhoCompletoLogo;

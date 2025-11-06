@@ -48,21 +48,24 @@ void cancelNf::preencherEvento(){
 
 
 }
-QString cancelNf::getPath(){
+
+QString cancelNf::getPath() {
+    // Pega o buffer do ACBr
     std::string raw = acbr->GetPathEvento("110111");
 
-    // Remove caracteres nulos (caso GetPath tenha buffer fixo)
-    raw.erase(std::find(raw.begin(), raw.end(), '\0'), raw.end());
+    // Remove tudo após o primeiro \0 (terminador de string)
+    auto nullPos = std::find(raw.begin(), raw.end(), '\0');
+    raw.erase(nullPos, raw.end());
+
+    // Converte para QString
     QString path = QString::fromStdString(raw).trimmed();
 
-    // raw = cnf;
-    // raw.erase(std::find(raw.begin(), raw.end(), '\0'), raw.end());
-    // QString cnfString = QString::fromStdString(raw).trimmed();
-    // QString ret = QString("%1/%2-nfe.xml")
-    //                   .arg(path, cnfString);
+    // Normaliza todas as barras para Windows
+    path.replace("/", "\\");
 
     return path;
 }
+
 
 QString cancelNf::gerarEnviar(){
     preencherEvento();

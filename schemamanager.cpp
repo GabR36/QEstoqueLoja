@@ -611,6 +611,7 @@ void SchemaManager::update() {
             // Atualizar versão do schema se tudo correu bem
             if (!query.exec("PRAGMA user_version = 6")) {
                 qDebug() << "Erro ao atualizar user_version:" << query.lastError().text();
+                emit dbVersao6();
             }
 
             // Finalizar transação
@@ -619,7 +620,6 @@ void SchemaManager::update() {
                 db.rollback();
             } else {
                 dbSchemaVersion = 6;
-                emit dbVersao6();
             }
 
             break;

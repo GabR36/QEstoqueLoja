@@ -4,7 +4,7 @@
 #include <qdir.h>
 #include <fstream>
 #include <qrandom.h>
-
+#include <QSqlError>
 NfceACBR::NfceACBR(QObject *parent)
     : QObject{parent}
 {
@@ -41,19 +41,29 @@ QString NfceACBR::getChaveNf(){
     return cnfString;
 }
 
-QString NfceACBR::getXmlPath(){
+QString NfceACBR::getXmlPath() {
     std::string raw = nfce->GetPath(0);
 
-    // Remove caracteres nulos (caso GetPath tenha buffer fixo)
+    // Remove possíveis caracteres nulos
     raw.erase(std::find(raw.begin(), raw.end(), '\0'), raw.end());
+
+    // Converte para QString
     QString path = QString::fromStdString(raw).trimmed();
 
+    path.replace("\\", "/");  // converte todas as barras invertidas
+    path = QDir::cleanPath(path);
+
+    // Remove barra final se houver
+    if (path.endsWith('/'))
+        path.chop(1);
+
+    // Trata CNF normalmente
     raw = cnf;
     raw.erase(std::find(raw.begin(), raw.end(), '\0'), raw.end());
     QString cnfString = QString::fromStdString(raw).trimmed();
-    QString ret = QString("%1/%2-nfe.xml")
-                      .arg(path, cnfString);
 
+    QString ret = QString("%1/%2-nfe.xml").arg(path, cnfString);
+    qDebug() << "getxmlpath: " << ret;
     return ret;
 }
 

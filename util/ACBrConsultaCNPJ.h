@@ -2,6 +2,12 @@
 #include <string>
 #include <cstdint>
 
+#if _WIN32 || _WIN64
+#define ISWINDOWS
+#elif __GNUC__
+#define ISUNIX
+#endif
+
 #if defined(ISWINDOWS)
 #include <windows.h>
 #else

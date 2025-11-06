@@ -96,72 +96,113 @@ void pagamentoVenda::on_CBox_ModeloEmit_currentIndexChanged(int index)
     }
 }
 
-
-QString pagamentoVenda::enviarNfce(NfceACBR *nfce){
+QString pagamentoVenda::enviarNfce(NfceACBR *nfce) {
     QString retorno = nfce->gerarEnviar();
 
-    if (retorno.isEmpty()) {
+    if (retorno.isEmpty())
         return "Erro: Nenhum retorno do ACBr";
-    }
 
-    QStringList linhas = retorno.split('\n', Qt::SkipEmptyParts);
+    QStringList linhas = retorno.split(QRegularExpression("[\r\n]+"), Qt::SkipEmptyParts);
+    bool dentroNFe = false;
 
     for (const QString &linha : linhas) {
-        if (linha.startsWith("CStat="))
-            cStat = linha.section('=', 1);
-        else if (linha.startsWith("XMotivo="))
-            xMotivo = linha.section('=', 1);
-        else if (linha.startsWith("Msg="))
-            msg = linha.section('=', 1);
-        else if (linha.startsWith("NProt=") || linha.startsWith("nProt="))
-            nProt = linha.section('=', 1);
+        QString l = linha.trimmed();
+
+        if (l.startsWith('[')) {
+            dentroNFe = l.startsWith("[NFe");  // só começar a pegar dados da nota dentro da seção NFe
+            continue;
+        }
+
+        if (!dentroNFe)
+            continue;  // ignora seção [Envio]
+
+        QString key = l.section('=', 0, 0).trimmed();
+        QString value = l.section('=', 1).trimmed();
+
+        key = key.toLower(); // normaliza
+
+        if (key == "cstat")
+            cStat = value;
+        else if (key == "xmotivo")
+            xMotivo = value;
+        else if (key == "msg")
+            msg = value;
+        else if (key == "nprot")
+            nProt = value;
     }
+    qDebug() << "Retorno ACBr:" << retorno;
+    qDebug() << "cStat:" << cStat << "xMotivo:" << xMotivo << "nProt:" << nProt;
+
 
     if (cStat == "100") {
-        // Nota autorizada
-        return QString("Nota Autorizada!\n cStat:%1 \n motivo:%2 \n protocolo:%3")
-            .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo, nProt);
+        return QString("Nota Autorizada!\ncStat:%1\nmotivo:%2\nprotocolo:%3")
+        .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo, nProt);
     } else if (!cStat.isEmpty()) {
-        // Nota rejeitada ou duplicada
-        return QString("Nota Rejeitada \ncStat:%1 \nmotivo:%2")
-            .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo);
+        return QString("Nota Rejeitada\ncStat:%1\nmotivo:%2")
+        .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo);
     } else {
-        // Resposta inesperada
-        return QString("Erro: Resposta inesperada do ACBr \n-> %1").arg(retorno.left(200));
+        return QString("Erro: Resposta inesperada do ACBr\n-> %1")
+        .arg(retorno.left(300));
     }
 }
 
-QString pagamentoVenda::enviarNfe(NfeACBR *nfe){
+QString pagamentoVenda::enviarNfe(NfeACBR *nfe) {
     QString retorno = nfe->gerarEnviar();
 
-    if (retorno.isEmpty()) {
+    if (retorno.isEmpty())
         return "Erro: Nenhum retorno do ACBr";
-    }
 
-    QStringList linhas = retorno.split('\n', Qt::SkipEmptyParts);
+    // Divide o retorno, tratando \r\n e linhas vazias
+    QStringList linhas = retorno.split(QRegularExpression("[\r\n]+"), Qt::SkipEmptyParts);
 
+    // Variáveis de resposta
+    bool dentroNFe = false;
+
+    // Percorre o retorno linha a linha
     for (const QString &linha : linhas) {
-        if (linha.startsWith("CStat="))
-            cStat = linha.section('=', 1);
-        else if (linha.startsWith("XMotivo="))
-            xMotivo = linha.section('=', 1);
-        else if (linha.startsWith("Msg="))
-            msg = linha.section('=', 1);
-        else if (linha.startsWith("NProt=") || linha.startsWith("nProt="))
-            nProt = linha.section('=', 1);
+        QString l = linha.trimmed();
+
+        // Detecta início de seções
+        if (l.startsWith('[')) {
+            dentroNFe = l.startsWith("[NFe"); // começa a ler apenas dentro da seção NFe
+            continue;
+        }
+
+        if (!dentroNFe)
+            continue; // ignora dados de [Envio] ou outras seções
+
+        QString key = l.section('=', 0, 0).trimmed().toLower();
+        QString value = l.section('=', 1).trimmed();
+
+        if (key == "cstat")
+            cStat = value;
+        else if (key == "xmotivo")
+            xMotivo = value;
+        else if (key == "msg")
+            msg = value;
+        else if (key == "nprot")
+            nProt = value;
     }
 
-    if (cStat == "100") {
+    // Log opcional para depuração
+    qDebug() << "Retorno NFe ACBr:"
+             << "\ncStat:" << cStat
+             << "\nxMotivo:" << xMotivo
+             << "\nnProt:" << nProt;
+
+    //  Avalia o resultado
+    if (cStat == "100" || cStat == "150") {
         // Nota autorizada
-        return QString("Nota Autorizada!\n cStat:%1 \n motivo:%2 \n protocolo:%3")
+        return QString("Nota Autorizada!\ncStat:%1\nmotivo:%2\nprotocolo:%3")
             .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo, nProt);
     } else if (!cStat.isEmpty()) {
         // Nota rejeitada ou duplicada
-        return QString("Nota Rejeitada \ncStat:%1 \nmotivo:%2")
+        return QString("Nota Rejeitada\ncStat:%1\nmotivo:%2")
             .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo);
     } else {
-        // Resposta inesperada
-        return QString("Erro: Resposta inesperada do ACBr \n-> %1").arg(retorno.left(200));
+        // Retorno inesperado
+        return QString("Erro: Resposta inesperada do ACBr\n-> %1")
+            .arg(retorno.left(300));
     }
 }
 
@@ -202,12 +243,16 @@ void pagamentoVenda::salvarNfeBD(NfeACBR *nfe){
     qDebug() << "idvenda: " << idVenda;
     if (query.exec()) {
         qDebug() << "Salvou nota no banco!";
+    } else {
+        qDebug() << "Erro ao salvar nota no banco:" << query.lastError().text();
+        qDebug() << "Query:" << query.lastQuery();
     }
+
 
 }
 
 void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
-
+    qDebug() << "inicio salvar bd nfce";
     if(!db.open()){
         qDebug() << "erro ao abrir banco de dados. salvar nfce banco.";
     }
@@ -240,6 +285,9 @@ void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
     qDebug() << "idvenda: " << idVenda;
     if (query.exec()) {
         qDebug() << "Salvou nota no banco!";
+    } else {
+        qDebug() << "Erro ao salvar nota no banco:" << query.lastError().text();
+        qDebug() << "Query:" << query.lastQuery();
     }
 
 }

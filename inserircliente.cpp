@@ -17,6 +17,7 @@ InserirCliente::InserirCliente(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::Tool);
+    db = QSqlDatabase::database();
 
     //aplicar validators
     QIntValidator *intValidator = new QIntValidator(1, 999999, this);

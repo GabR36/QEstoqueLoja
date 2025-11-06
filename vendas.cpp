@@ -352,7 +352,13 @@ QString Vendas::salvarEvento(QString retorno, int id_nf)
     if (match.hasMatch()) justificativa = match.captured(1).trimmed();
 
     match = rx_arquivo.match(retorno);
-    if (match.hasMatch()) xml_path = match.captured(1).trimmed();
+    if (match.hasMatch()) {
+        xml_path = match.captured(1).trimmed();
+
+        // Substitui todas as barras invertidas \ por /
+        xml_path.replace("\\", "/");
+    }
+
 
     match = rx_dh.match(retorno);
 
@@ -1108,7 +1114,7 @@ void Vendas::on_Btn_AbrirPag_clicked()
     actionAbrirPagamentosVenda(idVendaSelec);
 }
 
-QString Vendas::salvarDevolucaoNf(QString retornoEnvio, int idnf, NfeACBR *devolNfe){
+QString Vendas::salvarDevolucaoNf(QString retornoEnvio, int idnf, NfeACBR *devolNfe) {
     if (retornoEnvio.isEmpty()) {
         return "Erro: Nenhum retorno do ACBr";
     }
@@ -1116,30 +1122,36 @@ QString Vendas::salvarDevolucaoNf(QString retornoEnvio, int idnf, NfeACBR *devol
     QStringList linhas = retornoEnvio.split('\n', Qt::SkipEmptyParts);
     QString cStat, xMotivo, msg, nProt;
 
+    // Processa todas as linhas do retorno do ACBr
     for (const QString &linha : linhas) {
-        if (linha.startsWith("CStat="))
-            cStat = linha.section('=', 1);
-        else if (linha.startsWith("XMotivo="))
-            xMotivo = linha.section('=', 1);
-        else if (linha.startsWith("Msg="))
-            msg = linha.section('=', 1);
-        else if (linha.startsWith("NProt=") || linha.startsWith("nProt="))
-            nProt = linha.section('=', 1);
+        QString linhaTrim = linha.trimmed(); // Remove espaços e quebras de linha
+        if (linhaTrim.startsWith("CStat="))
+            cStat = linhaTrim.section('=', 1).trimmed();
+        else if (linhaTrim.startsWith("XMotivo="))
+            xMotivo = linhaTrim.section('=', 1).trimmed();
+        else if (linhaTrim.startsWith("Msg="))
+            msg = linhaTrim.section('=', 1).trimmed();
+        else if (linhaTrim.startsWith("NProt=") || linhaTrim.startsWith("nProt="))
+            nProt = linhaTrim.section('=', 1).trimmed();
     }
-    if(cStat == "100"){
 
-        if(!db.open()){
-            qDebug() << "bd nao abriu ao salvar nf devol";
+    qDebug() << "Retorno ACBr: cStat=" << cStat << " xMotivo=" << xMotivo << " nProt=" << nProt;
+
+    // Confirma se a nota foi autorizada
+    if (cStat == "100" || cStat == "150") { // 150 é contingência autorizada
+        if (!db.open()) {
+            qDebug() << "Erro ao abrir banco de dados ao salvar nota de devolução";
+            return "Erro: não foi possível abrir o banco de dados";
         }
-        QSqlQuery query;
-        QDateTime dataAtual = QDateTime::currentDateTime();
-        QString dataFormatada = dataAtual.toString("yyyy-MM-dd HH:mm:ss");
 
+        QSqlQuery query;
+        QString dataFormatada = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
 
         query.prepare("INSERT INTO notas_fiscais(cstat, nnf, serie, modelo, tp_amb, xml_path, valor_total,"
                       "atualizado_em, id_venda, cnpjemit, chnfe, nprot, cuf, finalidade, saida, id_nf_ref) "
                       "VALUES(:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :valortotal, :atualizadoem,"
                       ":id_venda, :cnpjemit, :chnfe, :nprot, :cuf, :finalidade, :saida, :id_nf_ref)");
+
         query.bindValue(":cstat", cStat);
         query.bindValue(":nnf", devolNfe->getNNF());
         query.bindValue(":serie", devolNfe->getSerie());
@@ -1156,24 +1168,22 @@ QString Vendas::salvarDevolucaoNf(QString retornoEnvio, int idnf, NfeACBR *devol
         query.bindValue(":finalidade", "DEVOLUCAO");
         query.bindValue(":saida", "0");
         query.bindValue(":id_nf_ref", QString::number(idnf));
+
         if (!query.exec()) {
             qDebug() << "Erro ao inserir nota fiscal de devolução:" << query.lastError().text();
             return QString("Erro ao salvar nota no banco: %1").arg(query.lastError().text());
         }
 
-        if (query.numRowsAffected() > 0) {
-            return QString("Nota de Devolução Autorizada e Salva!\n cStat:%1 \n motivo:%2 \n protocolo:%3")
-                .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo, nProt);
-        } else {
-            return "Erro: Nota não foi salva no banco de dados";
-        }
+        return QString("Nota de Devolução Autorizada e Salva!\n cStat:%1 \n motivo:%2 \n protocolo:%3")
+            .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo, nProt);
+
     } else {
-        return QString("Erro ao Enviar Nota de Devolução.\n cStat:%1 \n motivo:%2 \n protocolo:%3")
+        // Nota rejeitada
+        return QString("Erro ao enviar Nota de Devolução.\n cStat:%1 \n motivo:%2 \n protocolo:%3")
             .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo, nProt);
     }
-
-
 }
+
 
 
 void Vendas::on_Tview_ProdutosVendidos_customContextMenuRequested(const QPoint &pos)

@@ -11,11 +11,11 @@ HelpPage::HelpPage(QWidget *parent, QString idtopico)
 
     ui->TextB_Main->setOpenExternalLinks(true);
 
-    QStringList dataLocations = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
+    QStringList dataLocations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
     bool found = false;
 
     for (const QString &basePath : dataLocations) {
-        QString candidate = basePath + "/QEstoqueLoja/recursos/ajuda/help.html";
+        QString candidate = basePath + "/recursos/ajuda/help.html";
         qDebug() << "Verificando:" << candidate;
         if (QFileInfo::exists(candidate)) {
             caminhoArquivoHtml = candidate;
@@ -36,7 +36,7 @@ HelpPage::HelpPage(QWidget *parent, QString idtopico)
 
     // Usa o parâmetro passado, se não vier nada, abre o índice
     QString basePath = caminhoArquivoHtml;
-    QString url = "file://" + basePath;
+    QString url = QUrl::fromLocalFile(caminhoArquivoHtml).toString();
 
     if (!idtopico.isEmpty()) {
         url += "#" + idtopico;

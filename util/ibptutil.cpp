@@ -8,11 +8,11 @@
 IbptUtil::IbptUtil(QObject *parent)
     : QObject{parent}
 {
-    QStringList dataLocations = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
+    QStringList dataLocations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
     bool found = false;
 
     for (const QString &basePath : dataLocations) {
-        QString candidate = basePath + "/QEstoqueLoja/recursos/TabelaIBPTaxPR25.1.F.csv";
+        QString candidate = basePath + "/recursos/TabelaIBPTaxPR25.1.F.csv";
         qDebug() << "Verificando:" << candidate;
         if (QFileInfo::exists(candidate)) {
             caminhoArquivoTabela = candidate;

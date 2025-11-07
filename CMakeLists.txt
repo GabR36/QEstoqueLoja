@@ -14,20 +14,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set(CMAKE_PREFIX_PATH "C:/Qt/6.6.2/mingw_64/lib/cmake")
 
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Qml Xml Svg Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Qml Xml Svg Network)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core Network)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core Network)
 
 if (CMAKE_SYSTEM MATCHES "Linux")
     include_directories(
-        /usr/include/libxml2
         /usr/include/QtRPT
-        /usr/include/CppBrasil
 
     )
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     include_directories(
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/build/Release/include
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/include
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/OpenSSL3.1.3/include
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libiconv-for-Windows/include
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libxml2-v2.11.5/include/libxml2
@@ -104,7 +100,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         inserircliente.h inserircliente.cpp inserircliente.ui
         subclass/produtotableview.h subclass/produtotableview.cpp
         subclass/waitdialog.h subclass/waitdialog.cpp
-        nota/nfcevenda.h nota/nfcevenda.cpp
+
         inserirproduto.h inserirproduto.cpp inserirproduto.ui
         util/NfUtilidades.h
         util/ibptutil.h util/ibptutil.cpp
@@ -112,7 +108,20 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         util/NFUtilidades.cpp
         subclass/leditdialog.h subclass/leditdialog.cpp
         infojanelaprod.h infojanelaprod.cpp infojanelaprod.ui
-        nota/nfevenda.h nota/nfevenda.cpp
+
+        util/helppage.h util/helppage.cpp util/helppage.ui
+        nota/acbrmanager.h nota/acbrmanager.cpp
+        nota/ACBrNFe.h nota/ACBrNFe.cpp
+        nota/ACBrNFeImport.h
+        nota/nfceacbr.h nota/nfceacbr.cpp
+        nota/nfeacbr.h nota/nfeacbr.cpp
+        schemamanager.h schemamanager.cpp
+        nota/cancelnf.h nota/cancelnf.cpp
+        util/ACBrConsultaCNPJ.cpp util/ACBrConsultaCNPJ.h
+        util/consultacnpjmanager.h util/consultacnpjmanager.cpp
+        util/buscarcodigomunicipio.h util/buscarcodigomunicipio.cpp
+
+
 
 
 
@@ -147,24 +156,22 @@ else()
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
 target_link_libraries(QEstoqueLoja PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::Sql Qt6::PrintSupport
-    zint Qt6::Charts QtRPT Qt6::Xml Qt6::Qml Qt${QT_VERSION_MAJOR}::Network Qt${QT_VERSION_MAJOR}::Svg
+    zint Qt6::Charts QtRPT Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Xml
+     Qt${QT_VERSION_MAJOR}::Qml Qt${QT_VERSION_MAJOR}::Network
 )
 
 #target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lxml2)
 
 if (CMAKE_SYSTEM MATCHES "Linux")
-    target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lCppDanfeQtRPT -lxml2 -lCppNFe -lcrypto -lssl -lz)
+    target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lz)
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     target_link_directories(QEstoqueLoja PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/OpenSSL3.1.3/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libiconv-for-Windows/lib64/Release
-        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/build/Release/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libxml2-v2.11.5/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/bin/release/lib
-        #${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/QtRptProject3.0/lib/debug/lib
     )
-    target_link_libraries(QEstoqueLoja  PRIVATE CppNFe QtRPT CppDanfeQtRPT libcrypto libssl libiconv libxml2 zdll)
+    target_link_libraries(QEstoqueLoja  PRIVATE QtRPT )
 
 endif()
 

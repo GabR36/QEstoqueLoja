@@ -180,7 +180,7 @@ venda::venda(QWidget *parent) :
     }
     connect(ui->Tview_Produtos, &QTableView::doubleClicked,
             this, &venda::verProd);
-
+    ui->Ledit_Pesquisa->setFocus();
 }
 void venda::atualizarTotalProduto() {
     for (int row = 0; row < modeloSelecionados->rowCount(); ++row) {
@@ -580,7 +580,7 @@ void venda::on_Ledit_Pesquisa_returnPressed()
 
         // mostrar na tabela Selecionados
         modeloSelecionados->appendRow({new QStandardItem(idBarras), new QStandardItem("1"), new QStandardItem(descBarras), new QStandardItem(precoBarras)});
-
+        atualizarTotalProduto();
         ui->Ledit_Pesquisa->clear();
 
         // mostrar total

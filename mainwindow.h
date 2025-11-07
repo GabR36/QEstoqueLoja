@@ -1,6 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#if defined(Q_OS_WIN)
+#define WIN32_LEAN_AND_MEAN
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#endif
+
+
 #include <QMainWindow>
 #include <QStandardItemModel>
 #include <vector>
@@ -12,11 +19,12 @@
 #include <QKeyEvent>
 #include "configuracao.h"
 #include "subclass/customlineedit.h"
+#include "nota/acbrmanager.h"
 
 
 //#include "vendas.h"
 
-
+#define VERSAO_QE "2.1.0"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,7 +37,7 @@ class MainWindow : public QMainWindow
 public:
 
 
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    QSqlDatabase db;
     QSqlQueryModel* model = new QSqlQueryModel;
     void atualizarTableview();
     void imprimirEtiqueta(int quant, QString codBar = "1", QString desc = "null",  QString preco = "");
@@ -84,8 +92,12 @@ private slots:
     void verProd();
 
 
+    void on_actionDocumenta_o_triggered();
+    void atualizarConfigAcbr();
+
 private:
     Ui::MainWindow *ui;
+    // ACBrNFe *acbr;
     bool verificarCodigoBarras();
     QSet<QString> generatedNumbers;
     QAction* actionMenuAlterarProd;
@@ -95,10 +107,13 @@ private:
     QAction* actionMenuPrintBarCode3;
     QAction* actionVerProduto;
     QMap<QString, QString> financeiroValues;
+    QMap<QString, QString> fiscalValues;
+    QMap<QString, QString> empresaValues;
 
 
     void setarIconesJanela();
     //QModelIndex selected_index;
+
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;

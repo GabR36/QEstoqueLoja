@@ -7,14 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>438</width>
-    <height>337</height>
+    <height>348</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Alterar Cliente</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
-   <item>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
     <widget class="QLabel" name="label_7">
      <property name="font">
       <font>
@@ -26,7 +26,7 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="1" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_8">
      <item>
       <widget class="QRadioButton" name="RadioB_Pfisica">
@@ -47,7 +47,29 @@
      </item>
     </layout>
    </item>
-   <item>
+   <item row="2" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_18">
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>CPF/CNPJ:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="Ledit_Cpf"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Btn_BuscaDados">
+       <property name="text">
+        <string>Buscar Dados
+CNPJ</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_17">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -80,18 +102,7 @@
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
-         <item>
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>CPF/CNPJ:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="Ledit_Cpf"/>
-         </item>
-        </layout>
+        <layout class="QHBoxLayout" name="horizontalLayout_5"/>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -294,7 +305,7 @@
      </item>
     </layout>
    </item>
-   <item>
+   <item row="4" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_7">
      <item>
       <widget class="QPushButton" name="Btn_Cancelar">

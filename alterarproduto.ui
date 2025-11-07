@@ -306,7 +306,7 @@ background-color:rgb(170, 170, 170);
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_7">
         <item>
-         <widget class="QLabel" name="label_7">
+         <widget class="QLabel" name="Lbl_AltCEST">
           <property name="text">
            <string>CEST:</string>
           </property>

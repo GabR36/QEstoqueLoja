@@ -63,7 +63,7 @@ background-color:rgb(170, 170, 170);
    <property name="geometry">
     <rect>
      <x>180</x>
-     <y>450</y>
+     <y>460</y>
      <width>351</width>
      <height>32</height>
     </rect>
@@ -82,7 +82,7 @@ background-color:rgb(170, 170, 170);
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>190</y>
+     <y>210</y>
      <width>279</width>
      <height>28</height>
     </rect>
@@ -158,10 +158,10 @@ background-color:rgb(170, 170, 170);
   <widget class="QFrame" name="frame">
    <property name="geometry">
     <rect>
-     <x>110</x>
+     <x>120</x>
      <y>10</y>
      <width>291</width>
-     <height>161</height>
+     <height>191</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -195,14 +195,38 @@ font-size: 15px;
       <x>20</x>
       <y>30</y>
       <width>261</width>
-      <height>131</height>
+      <height>155</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
+      <layout class="QHBoxLayout" name="Layout_NNF">
+       <item>
+        <widget class="QLabel" name="Lbl_NNF">
+         <property name="toolTip">
+          <string>É recomendado usar o nNF gerado para seguir uma ordem crescente, apenas troque se necessário.</string>
+         </property>
+         <property name="text">
+          <string>Nº NF-e:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="Ledit_NNF">
+         <property name="toolTip">
+          <string>É recomendado usar o nNF gerado para seguir uma ordem crescente, apenas troque se necessário.</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
       <layout class="QHBoxLayout" name="horizontalLayout_4">
        <item>
         <widget class="QLabel" name="label_5">
+         <property name="toolTip">
+          <string/>
+         </property>
          <property name="text">
           <string>Total (R$):</string>
          </property>
@@ -318,7 +342,7 @@ font-size: 15px;
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>360</y>
+     <y>380</y>
      <width>271</width>
      <height>28</height>
     </rect>
@@ -340,7 +364,7 @@ font-size: 15px;
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>400</y>
+     <y>420</y>
      <width>201</width>
      <height>39</height>
     </rect>
@@ -371,7 +395,7 @@ font-size: 15px;
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>310</y>
+     <y>330</y>
      <width>250</width>
      <height>39</height>
     </rect>
@@ -402,7 +426,7 @@ font-size: 15px;
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>270</y>
+     <y>290</y>
      <width>165</width>
      <height>28</height>
     </rect>
@@ -424,7 +448,7 @@ font-size: 15px;
    <property name="geometry">
     <rect>
      <x>40</x>
-     <y>230</y>
+     <y>250</y>
      <width>321</width>
      <height>28</height>
     </rect>
@@ -453,7 +477,7 @@ font-size: 15px;
    <property name="geometry">
     <rect>
      <x>340</x>
-     <y>320</y>
+     <y>330</y>
      <width>211</width>
      <height>131</height>
     </rect>
@@ -464,75 +488,75 @@ font-size: 15px;
    <property name="frameShadow">
     <enum>QFrame::Shadow::Raised</enum>
    </property>
-   <widget class="QWidget" name="layoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>207</width>
-      <height>135</height>
-     </rect>
-    </property>
-    <layout class="QVBoxLayout" name="verticalLayout_3">
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QComboBox" name="CBox_ModeloEmit">
-         <item>
-          <property name="text">
-           <string>Emitir NFC-e</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Emitir NF-e</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Não Emitir NF</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="RadioBtn_EmitNfApenas">
+  </widget>
+  <widget class="QWidget" name="layoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>340</x>
+     <y>320</y>
+     <width>207</width>
+     <height>135</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_3">
+    <item>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QComboBox" name="CBox_ModeloEmit">
+        <item>
          <property name="text">
-          <string>Emitir NF apenas para itens NF</string>
+          <string>Emitir NFC-e</string>
          </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="RadioBtn_EmitNfTodos">
+        </item>
+        <item>
          <property name="text">
-          <string>Emitir NF para todos produtos</string>
+          <string>Emitir NF-e</string>
          </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="CheckImprimirCNF">
-       <property name="autoFillBackground">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>Imprimir cupom </string>
-       </property>
-       <property name="icon">
-        <iconset resource="Imagens/recursosImg.qrc">
-         <normaloff>:/QEstoqueLOja/document-print.svg</normaloff>:/QEstoqueLOja/document-print.svg</iconset>
-       </property>
-       <property name="tristate">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
+        </item>
+        <item>
+         <property name="text">
+          <string>Não Emitir NF</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="RadioBtn_EmitNfApenas">
+        <property name="text">
+         <string>Emitir NF apenas para itens NF</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="RadioBtn_EmitNfTodos">
+        <property name="text">
+         <string>Emitir NF para todos produtos</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QCheckBox" name="CheckImprimirCNF">
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Imprimir cupom </string>
+      </property>
+      <property name="icon">
+       <iconset resource="Imagens/recursosImg.qrc">
+        <normaloff>:/QEstoqueLOja/document-print.svg</normaloff>:/QEstoqueLOja/document-print.svg</iconset>
+      </property>
+      <property name="tristate">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <customwidgets>

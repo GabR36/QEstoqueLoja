@@ -13,6 +13,9 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
     ui->setupUi(this);
     util->setParent(this);
 
+    ui->Lbl_AltCEST->setVisible(false);
+    ui->Ledit_AltCEST->setVisible(false);
+
     ui->tabWidget->setCurrentIndex(0);
     // validadores para os campos
     QDoubleValidator *DoubleValidador = new QDoubleValidator(0.0, 9999.99, 2);
@@ -40,6 +43,8 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
     for (int i = 0; i < unidadesComerciaisCount; ++i) {
         ui->CBox_AltUCom->addItem(unidadesComerciais[i]);
     }
+    //desativa campo cest
+    ui->Ledit_AltCEST->setEnabled(false);
 
 }
 

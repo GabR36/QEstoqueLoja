@@ -14,6 +14,8 @@
 #include "delegatepago.h"
 #include "delegateprecof2.h"
 #include "nota/DanfeUtil.h"
+#include "nota/cancelnf.h"
+#include "nota/nfeacbr.h"
 
 
 Vendas::Vendas(QWidget *parent, int idCliente) :
@@ -285,92 +287,264 @@ void Vendas::LabelLucro(QString whereQueryData, QString whereQueryPrazo, QString
     db.close();
 }
 
-// void Vendas::LabelLucro(){
-//     // para ser chamada sem argumentos
-//     LabelLucro(QString());
-// }
+int Vendas::getNfId(int id_venda) {
+    QSqlQuery query;
+
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir banco de dados.";
+        return -1;
+    }
+
+    query.prepare("SELECT id FROM notas_fiscais WHERE id_venda = :idvenda");
+    query.bindValue(":idvenda", id_venda);
+
+    if (!query.exec()) {
+        qDebug() << "Erro ao executar query:" << query.lastError().text();
+        return -1;
+    }
+
+    if (query.next()) { // Move para o primeiro registro (se houver)
+        return query.value(0).toInt(); // Retorna o primeiro campo (id)
+    } else {
+        qDebug() << "Nenhum registro encontrado para id_venda =" << id_venda;
+        return -1;
+    }
+}
+
+QString Vendas::salvarEvento(QString retorno, int id_nf)
+{
+    if(!db.open()){
+        qDebug() << "Erro ao abrir banco de dados (salvarEvento)";
+        return "Erro: Banco de dados não aberto";
+    }
+
+    QString tipo_evento, cstat, justificativa, codigo, xml_path, nprot;
+    int id_lote = 1;
+
+    // Usa QRegularExpression para extrair dados do texto
+    QRegularExpression rx_idlote("idLote=(\\d+)");
+    QRegularExpression rx_tpEvento("tpEvento=(\\d+)");
+    QRegularExpression rx_xEvento("xEvento=([^\n]+)");
+    QRegularExpression rx_nProt("nProt=(\\d+)");
+    QRegularExpression rx_xJust("xJust=([^<\n]+)");
+    QRegularExpression rx_arquivo("arquivo=([^\n]+)");
+    QRegularExpression rx_cstat("CStat=(\\d+)");
+    QRegularExpression rx_dh("dhRegEvento=(\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}:\\d{2})");
+    QRegularExpression rx_xMotivo("XMotivo=([^\n]+)");
+
+
+    auto match = rx_idlote.match(retorno);
+    if (match.hasMatch()) id_lote = match.captured(1).toInt();
+
+    // match = rx_cstat.match(retorno);
+    // if (match.hasMatch()) cstat = match.captured(1).trimmed();
+
+    match = rx_tpEvento.match(retorno);
+    if (match.hasMatch()) codigo = match.captured(1).trimmed();
+
+    match = rx_xEvento.match(retorno);
+    if (match.hasMatch()) tipo_evento = match.captured(1).trimmed();
+
+    match = rx_nProt.match(retorno);
+    if (match.hasMatch()) nprot = match.captured(1).trimmed();
+
+    match = rx_xJust.match(retorno);
+    if (match.hasMatch()) justificativa = match.captured(1).trimmed();
+
+    match = rx_arquivo.match(retorno);
+    if (match.hasMatch()) {
+        xml_path = match.captured(1).trimmed();
+
+        // Substitui todas as barras invertidas \ por /
+        xml_path.replace("\\", "/");
+    }
+
+
+    match = rx_dh.match(retorno);
+
+    QDateTime dataIngles;
+    if (match.hasMatch()) {
+        QString dataStr = match.captured(1);
+        dataIngles = QDateTime::fromString(dataStr, "dd/MM/yyyy HH:mm:ss");
+    } else {
+        // Se não achar, usa a data atual
+        dataIngles = QDateTime::currentDateTime();
+    }
+
+    // match = rx_xMotivo.match(retorno);
+    // if (match.hasMatch()) {
+    //     xMotivo = match.captured(1).trimmed();
+    // }
+
+    QRegularExpressionMatchIterator it = rx_cstat.globalMatch(retorno);
+    while (it.hasNext()) {
+        QRegularExpressionMatch m = it.next();
+        cstat = m.captured(1).trimmed(); // sobrescreve até o último
+    }
+
+    QString xMotivo;
+    it = rx_xMotivo.globalMatch(retorno);
+    while (it.hasNext()) {
+        QRegularExpressionMatch m = it.next();
+        xMotivo = m.captured(1).trimmed(); // sobrescreve até o último
+    }
+    // Debug opcional
+    qDebug() << "Evento:" << tipo_evento << "| Prot:" << nprot << "| CStat:" << cstat;
+
+    if(cstat.trimmed() == "135"){
+        QString dataFormatada = dataIngles.toString("yyyy-MM-dd HH:mm:ss");
+        // Grava no banco
+        QSqlQuery query;
+        query.prepare(R"(
+            INSERT INTO eventos_fiscais
+            (tipo_evento, id_lote, cstat, justificativa, codigo, xml_path, nprot, id_nf, atualizado_em)
+            VALUES (:tipo_evento, :id_lote, :cstat, :justificativa, :codigo, :xml_path, :nprot, :id_nf,
+     :atualizado_em)
+        )");
+
+
+        query.bindValue(":tipo_evento", tipo_evento);
+        query.bindValue(":id_lote", id_lote);
+        query.bindValue(":cstat", cstat);
+        query.bindValue(":justificativa", justificativa);
+        query.bindValue(":codigo", codigo);
+        query.bindValue(":xml_path", xml_path);
+        query.bindValue(":nprot", nprot);
+        query.bindValue(":id_nf", id_nf);
+        query.bindValue(":atualizado_em", dataFormatada);
+
+        if(!query.exec()){
+            qDebug() << "Erro ao inserir evento fiscal:" << query.lastError().text();
+            return "Erro ao salvar evento no banco";
+        }
+
+        query.prepare("UPDATE notas_fiscais SET cstat = :novocstat WHERE id = :idnf ");
+        query.bindValue(":novocstat", cstat);
+        query.bindValue(":idnf", id_nf);
+        if(!query.exec()){
+            qDebug() << "Erro ao atualizar cstat da nota cancelada:" << query.lastError().text();
+        }
+
+        return "Evento cancelamento salvo com sucesso!";
+    }else{
+        QString msgErro = QString("Erro ao processar evento. \nCStat: %1").arg(cstat);
+        if (!xMotivo.isEmpty())
+            msgErro += QString("\nMotivo: %1").arg(xMotivo);
+
+        qDebug() << msgErro;
+        return msgErro;
+    }
+}
+void Vendas::deletarVenda(bool cancelarNf){
+    if(ui->Tview_Vendas2->currentIndex().isValid()){
+        // obter id selecionado
+        QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
+        QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
+        QVariant idVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 0));
+        QVariant valorVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 1));
+        QString productId = idVariant.toString();
+        QString productValor = portugues.toString(valorVariant.toFloat(), 'f', 2);
+
+        // Cria uma mensagem de confirmação
+        QMessageBox::StandardButton resposta;
+        resposta = QMessageBox::question(
+            nullptr,
+            "Confirmação",
+            "Tem certeza que deseja excluir a venda:\n\n"
+            "id: " + productId + "\n"
+                              "Valor total: " + productValor,
+            QMessageBox::Yes | QMessageBox::No
+            );
+        // Verifica a resposta do usuário
+        if (resposta == QMessageBox::Yes) {
+            if(cancelarNf){
+                //se existe nf com o id da venda
+                if(getNfId(productId.toInt()) != -1){
+                    qDebug() << "getnfid" << getNfId(productId.toInt());
+                    QMessageBox::StandardButton respostaNf;
+                    respostaNf = QMessageBox::question(
+                        nullptr,
+                        "Confirmação",
+                        "Deseja cancelar a Nota Fiscal referente a essa venda?:\n\n",
+                        QMessageBox::Yes | QMessageBox::No
+                        );
+                    if(respostaNf == QMessageBox::Yes){
+                        int idNf = getNfId(productId.toInt());
+                        cancelNf *evento = new cancelNf(this, idNf);
+                        QString retorno = evento->gerarEnviar();
+                        QString msg = salvarEvento(retorno, idNf);
+                        QMessageBox::information(this, "Aviso", msg);
+                        if (!msg.contains("sucesso", Qt::CaseInsensitive)) {
+                            return;
+                        }
+                    }else{
+                        //nao cancela a nf mas tenta deletar a venda msm assim
+                    }
+                }
+            }
+
+
+            // remover registro do banco de dados
+            if(!db.open()){
+                qDebug() << "erro ao abrir banco de dados. botao deletar.";
+            }
+            QSqlQuery query;
+
+            // pegar os ids dos produtos e quantidades para adicionar depois
+            query.prepare("SELECT id, id_produto, quantidade FROM produtos_vendidos WHERE id_venda = :valor1");
+            query.bindValue(":valor1", productId);
+            if (query.exec()) {
+                qDebug() << "query bem-sucedido!";
+            } else {
+                qDebug() << "Erro no query: ";
+            }
+            while (query.next()){
+                QString idProdVend = query.value(0).toString();
+                QString idProduto = query.value(1).toString();
+                QString quantProduto = query.value(2).toString();
+                qDebug() << idProdVend;
+                qDebug() << idProduto;
+                qDebug() <<  quantProduto;
+                devolverProduto(idProdVend, idProduto, quantProduto);
+            }
+
+            if(!db.open()){
+                qDebug() << "erro ao abrir banco de dados. botao deletar.";
+            }
+
+            query.prepare("DELETE FROM entradas_vendas WHERE id_venda = :valor1");
+            query.bindValue(":valor1", productId);
+            if (query.exec()) {
+                qDebug() << "query delete entrada bem-sucedido!";
+            } else {
+                qDebug() << "Erro no delete entrada ";
+            }
+
+            // deletar a venda
+            query.prepare("DELETE FROM vendas2 WHERE id = :valor1");
+            query.bindValue(":valor1", productId);
+            if (query.exec()) {
+                qDebug() << "Delete bem-sucedido!";
+            } else {
+                qDebug() << "Erro no Delete: ";
+            }
+            emit vendaDeletada();
+            atualizarTabelas();
+            db.close();
+        }
+        else {
+            // O usuário escolheu não deletar o produto
+            qDebug() << "A exclusão da venda foi cancelada.";
+        }
+    }else{
+        QMessageBox::warning(this,"Erro","Selecione uma venda antes de tentar deletar!");
+    }
+}
 
 
 void Vendas::on_Btn_DeletarVenda_clicked()
 {
-    if(ui->Tview_Vendas2->currentIndex().isValid()){
-    // obter id selecionado
-    QItemSelectionModel *selectionModel = ui->Tview_Vendas2->selectionModel();
-    QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
-    QVariant idVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 0));
-    QVariant valorVariant = ui->Tview_Vendas2->model()->data(ui->Tview_Vendas2->model()->index(selectedIndex.row(), 1));
-    QString productId = idVariant.toString();
-    QString productValor = portugues.toString(valorVariant.toFloat(), 'f', 2);
-
-    // Cria uma mensagem de confirmação
-    QMessageBox::StandardButton resposta;
-    resposta = QMessageBox::question(
-        nullptr,
-        "Confirmação",
-        "Tem certeza que deseja excluir a venda:\n\n"
-        "id: " + productId + "\n"
-                          "Valor total: " + productValor,
-        QMessageBox::Yes | QMessageBox::No
-        );
-    // Verifica a resposta do usuário
-    if (resposta == QMessageBox::Yes) {
-
-        // remover registro do banco de dados
-        if(!db.open()){
-            qDebug() << "erro ao abrir banco de dados. botao deletar.";
-        }
-        QSqlQuery query;
-
-        // pegar os ids dos produtos e quantidades para adicionar depois
-        query.prepare("SELECT id, id_produto, quantidade FROM produtos_vendidos WHERE id_venda = :valor1");
-        query.bindValue(":valor1", productId);
-        if (query.exec()) {
-            qDebug() << "query bem-sucedido!";
-        } else {
-            qDebug() << "Erro no query: ";
-        }
-        while (query.next()){
-            QString idProdVend = query.value(0).toString();
-            QString idProduto = query.value(1).toString();
-            QString quantProduto = query.value(2).toString();
-            qDebug() << idProdVend;
-            qDebug() << idProduto;
-            qDebug() <<  quantProduto;
-            devolverProduto(idProdVend, idProduto, quantProduto);
-        }
-
-        if(!db.open()){
-            qDebug() << "erro ao abrir banco de dados. botao deletar.";
-        }
-
-        query.prepare("DELETE FROM entradas_vendas WHERE id_venda = :valor1");
-        query.bindValue(":valor1", productId);
-        if (query.exec()) {
-            qDebug() << "query delete entrada bem-sucedido!";
-        } else {
-            qDebug() << "Erro no delete entrada ";
-        }
-
-        // deletar a venda
-        query.prepare("DELETE FROM vendas2 WHERE id = :valor1");
-        query.bindValue(":valor1", productId);
-        if (query.exec()) {
-            qDebug() << "Delete bem-sucedido!";
-        } else {
-            qDebug() << "Erro no Delete: ";
-        }
-        emit vendaDeletada();
-        atualizarTabelas();
-        db.close();
-    }
-    else {
-        // O usuário escolheu não deletar o produto
-        qDebug() << "A exclusão da venda foi cancelada.";
-    }
-    }else{
-        QMessageBox::warning(this,"Erro","Selecione uma venda antes de tentar deletar!");
-    }
-
+    deletarVenda(true);
 
 }
 
@@ -441,7 +615,7 @@ void Vendas::devolverProdutoVenda(QString id_venda, QString id_prod_vend)
     qDebug() << "produtoUnico: " + QString::number(produtoUnico);
 
     if (produtoUnico){
-        on_Btn_DeletarVenda_clicked();
+        deletarVenda(false);
     }
     else{
 
@@ -940,54 +1114,246 @@ void Vendas::on_Btn_AbrirPag_clicked()
     actionAbrirPagamentosVenda(idVendaSelec);
 }
 
+QString Vendas::salvarDevolucaoNf(QString retornoEnvio, int idnf, NfeACBR *devolNfe) {
+    if (retornoEnvio.isEmpty()) {
+        return "Erro: Nenhum retorno do ACBr";
+    }
+
+    QStringList linhas = retornoEnvio.split('\n', Qt::SkipEmptyParts);
+    QString cStat, xMotivo, msg, nProt;
+
+    // Processa todas as linhas do retorno do ACBr
+    for (const QString &linha : linhas) {
+        QString linhaTrim = linha.trimmed(); // Remove espaços e quebras de linha
+        if (linhaTrim.startsWith("CStat="))
+            cStat = linhaTrim.section('=', 1).trimmed();
+        else if (linhaTrim.startsWith("XMotivo="))
+            xMotivo = linhaTrim.section('=', 1).trimmed();
+        else if (linhaTrim.startsWith("Msg="))
+            msg = linhaTrim.section('=', 1).trimmed();
+        else if (linhaTrim.startsWith("NProt=") || linhaTrim.startsWith("nProt="))
+            nProt = linhaTrim.section('=', 1).trimmed();
+    }
+
+    qDebug() << "Retorno ACBr: cStat=" << cStat << " xMotivo=" << xMotivo << " nProt=" << nProt;
+
+    // Confirma se a nota foi autorizada
+    if (cStat == "100" || cStat == "150") { // 150 é contingência autorizada
+        if (!db.open()) {
+            qDebug() << "Erro ao abrir banco de dados ao salvar nota de devolução";
+            return "Erro: não foi possível abrir o banco de dados";
+        }
+
+        QSqlQuery query;
+        QString dataFormatada = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+
+        query.prepare("INSERT INTO notas_fiscais(cstat, nnf, serie, modelo, tp_amb, xml_path, valor_total,"
+                      "atualizado_em, id_venda, cnpjemit, chnfe, nprot, cuf, finalidade, saida, id_nf_ref) "
+                      "VALUES(:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :valortotal, :atualizadoem,"
+                      ":id_venda, :cnpjemit, :chnfe, :nprot, :cuf, :finalidade, :saida, :id_nf_ref)");
+
+        query.bindValue(":cstat", cStat);
+        query.bindValue(":nnf", devolNfe->getNNF());
+        query.bindValue(":serie", devolNfe->getSerie());
+        query.bindValue(":modelo", "55");
+        query.bindValue(":tpamb", devolNfe->getTpAmb());
+        query.bindValue(":xml_path", devolNfe->getXmlPath());
+        query.bindValue(":valortotal", QString::number(devolNfe->getVNF()));
+        query.bindValue(":atualizadoem", dataFormatada);
+        query.bindValue(":id_venda", idVendaSelec);
+        query.bindValue(":cnpjemit", devolNfe->getCnpjEmit());
+        query.bindValue(":chnfe", devolNfe->getChaveNf());
+        query.bindValue(":nprot", nProt);
+        query.bindValue(":cuf", devolNfe->getCuf());
+        query.bindValue(":finalidade", "DEVOLUCAO");
+        query.bindValue(":saida", "0");
+        query.bindValue(":id_nf_ref", QString::number(idnf));
+
+        if (!query.exec()) {
+            qDebug() << "Erro ao inserir nota fiscal de devolução:" << query.lastError().text();
+            return QString("Erro ao salvar nota no banco: %1").arg(query.lastError().text());
+        }
+
+        return QString("Nota de Devolução Autorizada e Salva!\n cStat:%1 \n motivo:%2 \n protocolo:%3")
+            .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo, nProt);
+
+    } else {
+        // Nota rejeitada
+        return QString("Erro ao enviar Nota de Devolução.\n cStat:%1 \n motivo:%2 \n protocolo:%3")
+            .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo, nProt);
+    }
+}
+
+
 
 void Vendas::on_Tview_ProdutosVendidos_customContextMenuRequested(const QPoint &pos)
 {
-    if(!ui->Tview_ProdutosVendidos->currentIndex().isValid())
-        return;
     QModelIndexList selectedRows = ui->Tview_ProdutosVendidos->selectionModel()->selectedRows();
-    QString idProdVend;
-    if (!selectedRows.isEmpty()) {
-        // Pega o primeiro índice selecionado (caso múltiplas linhas possam ser selecionadas)
-        QModelIndex selectedIndex = selectedRows.first();
 
-        // Obtém o índice da célula na coluna 0 da linha selecionada
-        QModelIndex columnIndex = ui->Tview_ProdutosVendidos->model()->index(selectedIndex.row(), 0);
-
-        // Obtém o valor da célula como uma QString
-        idProdVend = ui->Tview_ProdutosVendidos->model()->data(columnIndex).toString();
-        qDebug() << "idprodvend: " + idProdVend + " idVendSElec: " + idVendaSelec;
-    } else {
+    if (selectedRows.isEmpty()) {
         QMessageBox::warning(this, "Aviso", "Nenhuma linha selecionada.");
+        return;
     }
 
     QMenu menu(this);
+    actionMenuDevolverProd = new QAction("Devolver Produto(s)", this);
 
-    actionMenuDevolverProd = new QAction();
-    actionMenuDevolverProd->setText("Devolver Produto");
-    QObject::connect(actionMenuDevolverProd, &QAction::triggered, [&]() {
-        // Cria uma mensagem de confirmação
-        QMessageBox::StandardButton resposta;
-        resposta = QMessageBox::question(
-            nullptr,
+    QObject::connect(actionMenuDevolverProd, &QAction::triggered, [=]() {
+        QMessageBox::StandardButton resposta = QMessageBox::question(
+            this,
             "Confirmação",
-            "Tem certeza que deseja devolver esse produto?",
+            QString("Tem certeza que deseja devolver %1 produto(s) selecionado(s)?")
+                .arg(selectedRows.size()),
             QMessageBox::Yes | QMessageBox::No
             );
-        // Verifica a resposta do usuário
+
         if (resposta == QMessageBox::Yes) {
-            devolverProdutoVenda(idVendaSelec, idProdVend); // Chama nossa função com o parâmetro
+            QList<QList<QVariant>> produtosVendidosList;
+            QSqlQuery query;
+            QList<QString> listaIdProdutosVendidos;
+            for (const QModelIndex &index : selectedRows) {
+
+                // Colunas do modelo atual (sem mexer no SELECT original)
+                QModelIndex idRegistroVendaIndex = ui->Tview_ProdutosVendidos->model()->index(index.row(), 0); // produtos_vendidos.id
+                QModelIndex descIndex            = ui->Tview_ProdutosVendidos->model()->index(index.row(), 1);
+                QModelIndex qntdIndex            = ui->Tview_ProdutosVendidos->model()->index(index.row(), 2);
+                QModelIndex precoIndex           = ui->Tview_ProdutosVendidos->model()->index(index.row(), 3);
+
+                QString idRegistroVenda = ui->Tview_ProdutosVendidos->model()->data(idRegistroVendaIndex).toString();
+                listaIdProdutosVendidos.append(idRegistroVenda);
+                // Converter QUANTIDADE
+                QString quantidadeOriginal = ui->Tview_ProdutosVendidos->model()->data(qntdIndex).toString();
+                double quantidadeNum = 0;
+                bool okQuantidade = false;
+
+                // Remove possíveis formatações e converte para double
+                QString qtdClean = quantidadeOriginal;
+                qtdClean.replace(',', '.'); // Converte para formato numérico padrão
+
+                quantidadeNum = qtdClean.toDouble(&okQuantidade);
+
+                if (!okQuantidade) {
+                    qWarning() << "Erro na conversão da quantidade:" << quantidadeOriginal;
+                    continue;
+                }
+
+                // Formata com 4 casas decimais e vírgula
+                QString quantidadeFormatada = portugues.toString(quantidadeNum, 'f', 4);
+
+                // Converter PREÇO
+                QString precoOriginal = ui->Tview_ProdutosVendidos->model()->data(precoIndex).toString();
+                double precoNum = 0;
+                bool okPreco = false;
+
+                // Remove possíveis formatações e converte para double
+                QString precoClean = precoOriginal;
+                precoClean.replace(',', '.'); // Converte para formato numérico padrão
+
+                precoNum = precoClean.toDouble(&okPreco);
+
+                if (!okPreco) {
+                    qWarning() << "Erro na conversão do preço:" << precoOriginal;
+                    continue;
+                }
+
+                // Formata com 2 casas decimais e vírgula (IMPORTANTE: sempre 2 casas)
+                QString precoFormatado = portugues.toString(precoNum, 'f', 2);
+
+                //Busca o ID real do produto no banco
+                QString idProduto;
+                {
+                    db.open();
+                    query.prepare("SELECT id_produto FROM produtos_vendidos WHERE id = :id_registro");
+                    query.bindValue(":id_registro", idRegistroVenda);
+
+                    if (query.exec() && query.next()) {
+                        idProduto = query.value(0).toString();
+                    } else {
+                        qWarning() << "Erro ao buscar id_produto para produtos_vendidos.id =" << idRegistroVenda << ":" << query.lastError().text();
+                        continue; // pula este item se não encontrar
+                    }
+                }
+
+                // Monta a sublista com o ID real do produto
+                QList<QVariant> produtoInfo;
+                produtoInfo << idProduto
+                            << quantidadeFormatada
+                            << ui->Tview_ProdutosVendidos->model()->data(descIndex)
+                            << precoFormatado;
+
+                produtosVendidosList.append(produtoInfo);
+
+
+            }
+
+            // aqui começa tramite nota fiscal devolução
+
+            if(!db.open()){
+                qDebug() << "banco nao abriu para pegar chavenf";
+            }
+            query.prepare("SELECT chnfe FROM notas_fiscais WHERE id_venda = :idvenda "
+                          "AND finalidade = 'NORMAL' ");
+            query.bindValue(":idvenda", idVendaSelec);
+            QString chnfe;
+            bool temNota = false;
+
+            if(query.exec()){
+                if(query.next()) { // move para o primeiro resultado
+                    chnfe = query.value(0).toString();
+                    temNota = true;
+                } else {
+                    qDebug() << "Nenhum resultado encontrado para id_venda =" << idVendaSelec;
+                    temNota = false;
+
+                }
+
+            } else {
+                qDebug() << "Erro ao executar query:" << query.lastError().text();
+            }
+            qDebug() << "CHAVE NFE: " << chnfe;
+
+            if(temNota){
+                NfeACBR *nfe = new NfeACBR(this, false, true);
+                nfe->setNNF(nfe->getProximoNNF());
+                nfe->setNfRef(chnfe);
+                nfe->setProdutosVendidos(produtosVendidosList, false);
+                QString retorno = nfe->gerarEnviar();
+                QString msg = salvarDevolucaoNf(retorno, getNfId(idVendaSelec.toInt()), nfe);
+                QMessageBox::information(this,"Aviso", msg);
+
+            }
+            //aqui devolve o produto banco de dados normal
+
+            for(int i=0; i < listaIdProdutosVendidos.size(); i++){
+                // Continua usando o ID do registro da venda para a devolução
+                if (!listaIdProdutosVendidos[i].isEmpty()) {
+                    qDebug() << "Devolvendo registro da venda ID:" << listaIdProdutosVendidos[i]
+                             << "(produto real ID:" << listaIdProdutosVendidos[i] << ") da venda:" << idVendaSelec;
+                    devolverProdutoVenda(idVendaSelec, listaIdProdutosVendidos[i]);
+                }
+            }
+
+
+
+
+            // Debug opcional
+            qDebug() << "Produtos vendidos (dados completos):";
+            for (const QList<QVariant> &linha : produtosVendidosList) {
+                qDebug() << linha;
+            }
+
+
             atualizarTabelas();
-        }
-        else {
-            qDebug() << "A devolução do produto foi cancelada.";
+
+        } else {
+            qDebug() << "Devolução cancelada pelo usuário.";
         }
     });
 
     menu.addAction(actionMenuDevolverProd);
-
     menu.exec(ui->Tview_ProdutosVendidos->viewport()->mapToGlobal(pos));
 }
+
 
 void Vendas::devolverProduto(QString id_prod_vend, QString id_produto, QString qntd)
 {

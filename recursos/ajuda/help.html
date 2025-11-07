@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8">
+    <title>Documentação do Sistema</title>
+    <style>
+      body {
+	  font-family: Arial, sans-serif;
+	  padding: 10px;
+      }
+      h1, h2, h3, h4 {
+	  color: #2c3e50;
+      }
+      nav {
+	  background: #eeeeee;
+	  border: 1px solid #ccc;
+	  padding: 10px;
+	  margin-bottom: 20px;
+      }
+      nav ul {
+	  list-style-type: none;
+	  padding: 0;
+      }
+      nav ul li {
+	  margin: 5px 0;
+      }
+      nav ul li a {
+	  text-decoration: none;
+	  color: #0066cc;
+      }
+      nav ul li a:hover {
+	  text-decoration: underline;
+      }
+      section {
+	  margin-bottom: 30px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <h1>Documentação do Sistema</h1>
+
+    <nav>
+      <h2>Índice</h2>
+      <ul>
+	<li><a href="#configuracao">1.Configuração</a></li>
+	<li><a href="#vendas">2.Vendas</a></li>
+	<li><a href="#relatorios">3.Relatórios</a></li>
+      </ul>
+    </nav>
+
+    <section id="configuracao">
+      <h2>1.Configurações</h2>
+      <h3 id="empresa">Empresa</h3>
+      <p>Você deve preencher com dados corretos sobre sua empresa, especialmente se vai emitir nota.
+      <i>As informações poderão ser usadas na emissão de notas fiscais e recibos não fiscais.</i></p>
+      <h3 id="financeiro">Financeiro</h3>
+      <p>Campos usados para facilitar a automação da aplicação de taxas padrões, preencha com valores
+	em porcentagem. <i>Os valores serão usados como sugestão na hora do cadastro de produtos e vendas
+	que utilizem crédito ou débito</i>.</p>
+      <h3 id="fiscal">Fiscal</h3>
+      <p>Configuração de dados obrigatórios para emissão de <b>nota fiscal</b>, para estar apto a emissão
+	você deve preencher corretamente todos os dados desta aba e sua empresa estar cadastrada no regime
+	<b>Simples Nacional</b>. Se precisar veja a baixo como preencher cada um dos campos da aba Fiscal
+	ou consulte seu contador.</p>
+      <ul>
+	<li><b>Usar IBS</b></li>
+	<p>Marcar "Usar IBS" fará com que as notas sejam emitidas usando os novos campos IBS da reforma tributária, ainda estão em fase de testes e devem ser usados apenas se necessário.</p>
+	<li><b>Número da última NF</b></li>
+	<p>Preencha com os valores da última Nota Fiscal Eletrônica ou Nota Fiscal ao Consumidor Eletrônica
+	  emitida por outro sistema, se nunca foi utilizado outro sistema para emitir notas deve-se deixar os
+	  valores em <b>0</b>. <i>Observe que existem valores diferentes para homologação e produção, ou seja se foram emitidas
+	    notas apenas em <b>Produção</b> no outro sistema não existe necessidade de mudar o valor referenciado para homologação,
+	    apenas os campos relacionados a <b>Produção</b>. o QEstoqueLoja tentará emitir notas baseado na numeração indicada nessa configuração,
+	    se estiverem incorretas podem existir intervalos desnecessários entre as numerações da nota fiscal.</i></p>
+	<li><b>Ambiente</b></li>
+	<p>Escolha entre os ambientes disponíveis para emitir notas:<br>
+	  <b>Homologação</b>: Ambiente utilizado para testes, nenhuma nota enviada no ambiente de homologação tem valor fiscal,
+	  por isso é <i>altamente recomendado</i> utilizar somente este ambiente até que esteja familiarizado com o sistema.<br>
+	  <b>Produção:</b>: Ambiente para emitir suas notas de fato, todas notas emitidas no ambiente de produção tem valor fiscal e são
+	  de responsabilidade do usuário emissor.</p>
+	<li><b>CSC e ID CSC</b></li>
+	<p>Para conseguir o CSC e ID entre em <a href="https://receita.pr.gov.br">receita.pr.gov.br</a> e logue de preferencia com seu
+	  certificado digital, depois no menu esquerdo da página entre em DF-E > NFC-E > CSC > controle, digite seu CNPJ e busque com os filtros
+	  homologação e produção, se não houver nenhum CSC para o ambiente use o botão "Solicitar".</p>
+	<p>O CSC deve parecer algo como GW6YWZMZKFOCFHXLH5YQEDUYLWD9KOKKVR6 e o ID CSC: 000001, <i>lembre de usar o CSC e ID CSC de produção se estiver
+	usando o ambiente produção e o CSC e ID CSC de homologação se estiver usando o ambiente homologação.</i></p>
+	<li><b>Pasta Schemas</b></li>
+	<p>Selecione a pasta de schemas para validar xml das notas que é baixada automaticamente com o QEstoqueLoja, no <i>Windows</i> está em <i>%appdata%\Roaming\QEstoqueLoja\recursos\NFeSchemas</i>, no <i>Linux</i> fica em <i>~/.local/share/QEstoqueLoja/recursos/NFeSchemas.</i>
+	</p>
+	<!-- <p>Baixe a pasta contendo os schemas da NF oficiais do governo, geralmente é recomendado baixar a versão mais atual dos schemas, porém o -->
+	<!--   QEstoqueLoja nem sempre atualiza imediatamente para comportar as novas mudanças, nessa versão do QEstoqueLoja, a versão <i>Esquema XML NF-e/NFC-e - Pacote de Liberação nº 9o (Novo leiaute da NF-e, NT 2024.001 v.1.00) (ZIP). Publicado em 04/06/2024</i> foi testada e está funcionando corretamente. Para baixar o arquivo compactado contendo a pasta de schemas acesse o <a href="https://www.nfe.fazenda.gov.br/portal/listaConteudo.aspx?tipoConteudo=BMPFMBoln3w=&AspxAutoDetectCookieSupport=1">Portal da Nota Fiscal Eletrônica</a>, escolha a versão recomendada, descompacte o arquivo e selecione a pasta que contem os arquivos .xsd.</p> -->
+	<!-- <li><b>Pasta CertificadosAC</b></li> -->
+	<!-- <p>Baixe e selecione a pasta contendo os certificados digitais da ICP-Brasil, você pode baixar o <i>arquivo único compactado da cadeia vigente</i> no site: <a href="https://www.gov.br/iti/pt-br/assuntos/repositorio/certificados-das-acs-da-icp-brasil-arquivo-unico-compactado">Certificados das ACs da ICP-Brasil - Arquivo Único Compactado</a>.</p> -->
+	<li><b>Certificado</b></li>
+	<p>Selecione o arquivo do seu certificado digital .pfx da sua empresa e preencha o campo da senha.</p>
+	<li><b>Código UF</b></li>
+	<p>Digite o código de 2 dígitos referente ao seu estado, você pode encontrar o código <a href="https://sistemasweb.agricultura.gov.br/manuais/Manual_PGA_WS/322CodigoIBGESigladaUnidadeFeder.html">aqui</a></p>
+	<li><b>Código do Município</b></li>
+	<p>Digite o código referente ao seu município, o mesmo pode ser encontrado <a href="https://www.ibge.gov.br/explica/codigos-dos-municipios.php">aqui</a></p>
+	<li><b>Inscrição Estadual</b></li>
+	<p>Número referente a Inscrição Estadual da sua empresa.</p>
+	<li><b>Responsável Técnico</b></li>
+	<p>Você pode preencher os dados do responsável técnico com os dados da sua empresa como CNPJ, nome, telefone etc. mas para emitir NF-e é necessário que o CNPJ do responsável técnico esteja cadastrado como emissor na Receita(Para emitir apenas NFC-e não é necessário ainda), você pode cadastrar o seu CNPJ como <i>emissor próprio</i> no site da <a href="https://receita.pr.gov.br">receita</a> indo em <i>UPD > Cadastro de Fornecedor</i> no menu lateral, solicite o cadastro como <b> Fornecedor Próprio</b>, deve ser simples e você precisará levar alguns documentos listados no estabelecimento referenciado.<i> Você não precisa preencher os dados referentes a Hash e ID CSRT por enquanto</i>. 
+      </ul>
+      <h3 id="conf-produto">Produto</h3>
+      <p>Use esta aba para setar valores padrão da aba "imposto" do cadastro de produtos, essa aba é mais util se você emite nota fiscal. Confira com seu contador quais valores preencher principalmente para CSOSN e PIS/COFINS, visto que terão impacto no quanto de imposto você vai pagar.
+       os valores 102 para CSOSN e 49 para PIS/COFINS são os mais comuns para Simples Nacional, o NCM igual a '00000000' "passa" na fiscalização automatica da SEFAZ mas deve ser <b>evitado</b> principalmente na emissão de NF-e.</p>
+    </section>
+
+    <section id="vendas">
+      <h2>2.Venda</h2>
+      <h3 id="pedido">Como Vender</h3>
+      <p>O Processo para criar e registrar uma nova venda é o seguinte:</p>
+      <ol>
+	<li>Entre na janela "Vendas" pelo botao no menu superior da janela principal e no clique no botão "Inserir Venda", ou aperte <i>F5</i> estando na janela principal.</li><br>
+	<li>Pesquise pelo nome de um produto, as opções disponíveis vão aparecer na tabela ao lado, então basta selecionar o produto e apertar <i>Enter</i> ou o botão "Selecionar"(<b>dica:</b>você pode clicar com o botão esquerdo do mouse duas vezes rapidamente em um produto na tabela para exibir suas informações completas). Você pode tambem selecionar um cliente se quiser vender a prazo.</li><br>
+	<li>Após ter selecionado algum produto é possivel alterar seu preço ou quantidade clicando 2 vezes com o botão esquerdo do mouse em cima dos campos do produto na tabela de baixo.  Para deletar um produto da venda bastar selecionar o produto na tabela de baixo e pressionar <i>Delete</i> ou botão direito do mouse e deletar.</li><br>
+	<li>Terminado de selecionar e editar os produtos que serão vendidos, basta clicar no botão "Próximo:Pagamento" para digitar os valores de desconto, valores recebidos e visualizar o troco. Você também pode selecionar a forma de pagamento e aplicar taxas para crédito e débito.</li><br>
+	<li> Se você não emite notas fiscais basta clicar em "Ok" para concretizar a venda, já se emite notas você deve escolher tambem se emitirá nota para todos os produtos da venda, apenas os produtos que foram cadastrados como NF ou não emitir nota. Também é nessa janela que você decide se emitirá NFC-e ou NF-e, lembrando que se emitir NF-e precisa selecionar um cliente na janela anterior.</li><br>
+	<li>PRONTO, sua venda foi realizada e agora aparece na janela vendas.
+      </ol>
+      <h3 id="venda-prazo">Vendas a prazo</h3>
+	<p>Após ter vendido a prazo para um cliente, é possivel registrar os pagamentos aos poucos abrindo a janela de "entradas" ao selecionar a venda a prazo eclicar no botão "Abrir Pagamentos", nessa janela simples ficam registrados todos os valores pagos na tabela e você pode inserir um novo facilmente escrevendo o valor que quer debitar e clicar no botao "Prosseguir Pagamento".<br>Para imprimir o recibo contendo todos os pagamentos e informações da venda pra seu cliente basta selecionar a venda a prazo na janela "Vendas" e clicar com o botão direito do mouse e então "Imprimir Recibo".</p>
+      <h3 id="recibos">Recibos e DANFE</h3>
+      <p>Se você esqueceu de imprimir o recibo na hora da venda, não se preocupe, basta clicar com o botão direito do mouse na venda realizada na janela "Vendas"e selecionar "Imprimir Recibo" para imprimir recibo não fiscal, ou DANFE para imprimir o recibo fiscal caso tenha efetuado uma NF. </p>
+    </section>
+
+   <section id="relatorios">
+      <h2>3.Relatórios</h2>
+      <h3 id="grafico-venda">Gráficos relacionados à vendas</h3>
+      <p>Ao entrar na janela relatórios você pode clicar na guita "Vendas" para exibir gráficos e relatórios baseados nas vendas, como "Valor de vendas" ou "produtos mais vendidos", basta selecionar o relatório que deseja apertando tipo de relatório.</p>
+      <h3 id="orcamento">Orçamento</h3>
+      <p>Na janela relatórios guia estoque, o primeiro tipo de relatório é o "Orçamento para cliente" que funciona como uma venda mas ao invés de pagamento tem o botão "Visualizar/exportar orçamento" que permite imprimir em folha A4 o orçamento dos produtos selecionados, ou exportar em pdf <i>para usar o <b>logo</b> no orçamento basta seleciona-lo nas configuraçoes.</p>
+    </section>
+
+  </body>
+</html>

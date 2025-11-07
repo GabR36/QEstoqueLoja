@@ -21,6 +21,8 @@ private slots:
 
     void on_Btn_Ok_clicked();
 
+    void on_Btn_BuscaDados_clicked();
+
 private:
     Ui::AlterarCliente *ui;
     QSqlDatabase db =  QSqlDatabase::database();

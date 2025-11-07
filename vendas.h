@@ -9,6 +9,7 @@
 #include <QLocale>
 #include "entradasvendasprazo.h"
 #include "nota/DanfeUtil.h"
+#include "nota/nfeacbr.h"
 
 
 namespace Ui {
@@ -34,6 +35,8 @@ public:
 
 
     void AtualizarTabelasSinal();
+    int getNfId(int id_venda);
+    void deletarVenda(bool cancelarNf);
 public slots:
     void imprimirReciboVendaSelec(QString id); //precisa ser slot :(
 
@@ -79,6 +82,9 @@ private:
     void mostrarVendasCliente(int idCliente);
     int IDCLIENTE = 0;
     void abrirDanfeXml(QString id_Venda);
+    QString dataGlobal;
+    QString salvarEvento(QString retorno, int id_nf);
+    QString salvarDevolucaoNf(QString retornoEnvio, int idnf, NfeACBR *devolNfe);
 signals:
     void vendaConcluidaVendas();
     void pagamentosConcluidos();

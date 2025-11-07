@@ -358,15 +358,43 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>487</width>
-            <height>742</height>
+            <width>492</width>
+            <height>831</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
            <item>
+            <widget class="QLabel" name="label_35">
+             <property name="layoutDirection">
+              <enum>Qt::LayoutDirection::LeftToRight</enum>
+             </property>
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;
+border-bottom: 1px solid black;
+border-radius: 0px;</string>
+             </property>
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Se precisar de ajuda para preencher algum campo clique &lt;a href=&quot;help&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;aqui&lt;/span&gt;&lt;/a&gt; para abrir a &lt;br&gt;página de ajuda.&lt;br&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="wordWrap">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QCheckBox" name="CheckBox_emitNf">
              <property name="text">
               <string>Emitir Notas Fiscais</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="CheckBox_usarIbs">
+             <property name="text">
+              <string>Usar IBS</string>
              </property>
             </widget>
            </item>
@@ -836,7 +864,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_36">
          <item>
-          <widget class="QLabel" name="label_30">
+          <widget class="QLabel" name="Lbl_Csosn">
            <property name="text">
             <string>CSOSN Padrão:</string>
            </property>
@@ -872,7 +900,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_38">
          <item>
-          <widget class="QLabel" name="label_32">
+          <widget class="QLabel" name="Lbl_CestProd">
            <property name="text">
             <string>CEST Padrão:</string>
            </property>
@@ -880,6 +908,9 @@
          </item>
          <item>
           <widget class="QLineEdit" name="LEdit_CESTProd">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="maxLength">
             <number>20</number>
            </property>

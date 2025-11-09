@@ -1,23 +1,26 @@
 # QEstoqueLoja
 
-## Descriçao
+## Descrição
 
 Software simples ERP para controlar o estoque de lojas pequenas com
-funções de *emissão de nota fiscal eletrônica (NF-e) e NFC-e para
-regime simples nacional*, pesquisa de preço, registro de vendas, cadastro de
+funções de **emissão, cancelamento e devolução de nota fiscal
+eletrônica (NF-e) e NFC-e para 
+regime simples nacional**, pesquisa de preço, registro de vendas, cadastro de
 produtos, relatório de lucro e valor vendido, PDV, código de barras,
 vendas a prazo, gráficos, impressão de etiquetas, orçamento e mais.
 
 É feito para ser fácil de instalar e usar, sem necessidade de
 servidores ou dependencias, atualmente, funciona em apenas um
-computador, sem sincronização de dados.
+computador, sem sincronização de dados. Apenas instale um executável e
+está pronto.
 
 Feito em Qt framework e SQLite para o banco de dados.
 
 ## Instalação
 
-Disponibilizamos instaladores para Windows e Linux (Debian e Linux
-Mint) na página de [releases do repositório](https://github.com/GabR36/QEstoqueLoja/releases).
+Disponibilizamos instaladores para Windows e Linux (Debian) na página
+de [releases do
+repositório](https://github.com/GabR36/QEstoqueLoja/releases).
 
 # Compilação
 
@@ -29,8 +32,11 @@ Mint) na página de [releases do repositório](https://github.com/GabR36/QEstoqu
 - qt6-base-dev,
 - qt6-tools-dev,
 - libzint-dev,
-- [libCppNFe](https://github.com/cppbr/cppbrasil/tree/5e219001fe6700890f55290621e2465023ae0f37)(está
-no submodulo lib-externas).
+- [QtRpt](https://qtrpt.sourceforge.io/) *versão biblioteca e sem  barcode
+- [ACBrNFe](https://svn.code.sf.net/p/acbr/code/trunk2/) *Opcional,
+para lidar com Notas fiscais, compilada com Qt
+- [ACBrConsultaCNPJ](https://svn.code.sf.net/p/acbr/code/trunk2/)
+*Opcional, para fazer consulta de CNPJ, compilada com Qt
 
 ## Cmake
 

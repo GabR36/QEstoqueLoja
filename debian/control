@@ -1,0 +1,32 @@
+Source: qestoqueloja
+Section: misc
+Priority: optional
+Maintainer: Gabriel Bormann Chuede <gabrielbchuede@gmail.com>
+Rules-Requires-Root: no
+Build-Depends:
+ debhelper-compat (= 13),
+ cmake,
+ qt6-declarative-dev,
+ qt6-charts-dev,
+ qt6-base-dev,
+ qt6-tools-dev,
+ qt6-svg-dev,
+ libzint-dev,
+ libqtrpt,
+Standards-Version: 4.7.2
+Homepage: https://github.com/GabR36/QEstoqueLoja
+
+Package: qestoqueloja
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+Description: Sistema de controle de estoque, ERP, PDV simples.
+ Software simples ERP para controlar o estoque de lojas pequenas com
+ funções de emissão de nota fiscal eletrônica (NF-e) e NFC-e para
+ regime simples nacional, pesquisa de preço, registro de vendas,
+ cadastro de produtos, relatório de lucro e valor vendido, PDV, código
+ de barras, vendas a prazo, gráficos, impressão de etiquetas,
+ orçamento e mais. É feito para ser fácil de instalar e usar, sem
+ necessidade de servidores ou dependencias, atualmente, funciona em
+ apenas um computador, sem sincronização de dados.

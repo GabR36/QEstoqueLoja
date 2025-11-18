@@ -154,39 +154,43 @@ void NfceACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool
     }
     emitirApenasNf = !emitirTodos;
 
-    QList<QList<QVariant>> produtosFiltrados; // nova lista filtrada
+    QLocale usa(QLocale::English, QLocale::UnitedStates); // <<< NOVO
+
+    QList<QList<QVariant>> produtosFiltrados;
 
     for (int i = 0; i < produtosVendidos.size(); ++i) {
         QList<QVariant> produto = produtosVendidos[i];
 
-        // Verificar se o produto deve ser incluído conforme o campo 'nf'
+        // Verificar campo 'nf'
         QSqlQuery nfQuery;
         nfQuery.prepare("SELECT nf FROM produtos WHERE id = :idprod");
         nfQuery.bindValue(":idprod", produto[0]);
         if (!nfQuery.exec() || !nfQuery.next()) {
             qWarning() << "Erro ao consultar campo 'nf' do produto ID:" << produto[0].toString()
             << nfQuery.lastError().text();
-            continue; // pula esse produto
+            continue;
         }
 
         int nf = nfQuery.value("nf").toInt();
         if (!emitirTodos && nf != 1) {
-            continue; // ignora se não for para emitir todos e nf != 1
+            continue;
         }
 
-        // [1] quantidade, [3] valor unitário
-        QString quantidadeStr = QString::number(portugues.toFloat(produto[1].toString()));
-        QString valorUnitarioStr = QString::number(portugues.toFloat(produto[3].toString()));
+        // Agora os valores já vêm no formato USA: "3.50", "12.90"
+        QString quantidadeStr   = produto[1].toString();
+        QString valorUnitarioStr = produto[3].toString();
 
-        double quantidade = quantidadeStr.toDouble();
-        double valorUnitario = valorUnitarioStr.toDouble();
+        // Converte corretamente do formato americano
+        double quantidade    = usa.toDouble(quantidadeStr);
+        double valorUnitario = usa.toDouble(valorUnitarioStr);
+
         double valorTotal = quantidade * valorUnitario;
 
         produto[1] = quantidade;
         produto[3] = valorUnitario;
-        produto.append(QVariant(valorTotal)); // [4] valor total
+        produto.append(QVariant(valorTotal)); // [4] total
 
-        // Consulta dados adicionais do produto
+        // Buscar outros dados
         QSqlQuery query;
         query.prepare("SELECT codigo_barras, un_comercial, ncm, cest, csosn, pis,"
                       " aliquota_imposto FROM produtos WHERE id = :idprod");
@@ -194,36 +198,39 @@ void NfceACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool
 
         if (query.exec() && query.next()) {
             QString codigoBarras = query.value("codigo_barras").toString();
-            QString unComercial = query.value("un_comercial").toString();
-            QString ncm = query.value("ncm").toString();
-            QString cest = query.value("cest").toString();
-            QString csosn = query.value("csosn").toString();
-            QString pis = query.value("pis").toString();
-            double aliquotaImposto   = query.value("aliquota_imposto").toDouble();
+            QString unComercial  = query.value("un_comercial").toString();
+            QString ncm          = query.value("ncm").toString();
+            QString cest         = query.value("cest").toString();
+            QString csosn        = query.value("csosn").toString();
+            QString pis          = query.value("pis").toString();
+            double aliquotaImposto = query.value("aliquota_imposto").toDouble();
+
             if (!isValidGTIN(codigoBarras)) {
                 codigoBarras = "SEM GTIN";
             }
-            produto.append(codigoBarras);      // [5]
-            produto.append(unComercial);       // [6]
-            produto.append(ncm);               // [7]
-            produto.append(cest);              // [8]
-            produto.append(aliquotaImposto);   // [9]
-            produto.append(csosn); //[10]
-            produto.append(pis);//[11]
+
+            produto.append(codigoBarras);    // [5]
+            produto.append(unComercial);     // [6]
+            produto.append(ncm);             // [7]
+            produto.append(cest);            // [8]
+            produto.append(aliquotaImposto); // [9]
+            produto.append(csosn);           // [10]
+            produto.append(pis);             // [11]
+
         } else {
-            qWarning() << "Produto ID não encontrado ou erro ao consultar:" << produto[0].toString()
+            qWarning() << "Produto ID não encontrado ou erro:" << produto[0].toString()
                        << query.lastError().text();
 
-            produto.append("");      // codigo_barras
-            produto.append("");      // un_comercial
-            produto.append("");      // ncm
-            produto.append("");      // cest
-            produto.append(0.0);     // aliquota_imposto
-            produto.append("");//csosn
-            produto.append("");//pis
+            produto.append("");  // codigo_barras
+            produto.append("");  // un_comercial
+            produto.append("");  // ncm
+            produto.append("");  // cest
+            produto.append(0.0); // aliquota
+            produto.append("");  // csosn
+            produto.append("");  // pis
         }
 
-        produtosFiltrados.append(produto); // adiciona produto processado
+        produtosFiltrados.append(produto);
     }
 
     quantProds = produtosFiltrados.size();

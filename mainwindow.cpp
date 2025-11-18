@@ -33,7 +33,7 @@
 #include <QStandardPaths>
 #include "util/helppage.h"
 #include "schemamanager.h"
-#include "util/consultacnpjmanager.h".h"
+#include "util/consultacnpjmanager.h"
 
 
 MainWindow::MainWindow(QWidget *parent)

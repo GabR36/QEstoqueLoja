@@ -485,16 +485,36 @@ void venda::on_Btn_Aceitar_clicked()
 
     // pegar os valores da tabela dos produtos selecionados
     QList<QList<QVariant>> rowDataList;
-    for (int row = 0; row < modeloSelecionados->rowCount(); ++row){
+    QLocale brasil(QLocale::Portuguese, QLocale::Brazil);        // Usa vírgula
+    QLocale americano(QLocale::English, QLocale::UnitedStates);  // Usa ponto
+
+    for (int row = 0; row < modeloSelecionados->rowCount(); ++row) {
         QList<QVariant> rowData;
-        for (int col = 0; col < modeloSelecionados->columnCount() - 1; col++){
+        for (int col = 0; col < modeloSelecionados->columnCount() - 1; col++) {
+
             QModelIndex index = modeloSelecionados->index(row, col);
-            rowData.append(modeloSelecionados->data(index));
+            QVariant valor = modeloSelecionados->data(index);
+
+            // Coluna 1 = quantidade
+            // Coluna 3 = preço
+            if (col == 1 || col == 3) {
+                QString texto = valor.toString();
+
+                // Converte string BR ("12,50") → double
+                double numero = brasil.toDouble(texto);
+
+                // Converte double → string US ("12.50")
+                texto = americano.toString(numero, 'f', 2);
+
+                rowData.append(texto);
+            } else {
+                rowData.append(valor);
+            }
         }
         rowDataList.append(rowData);
     }
-    qDebug() << rowDataList;
 
+    qDebug() << rowDataList;
     //QString cliente = ui->Ledit_Cliente->text();
     QString data =  portugues.toString(ui->DateEdt_Venda->dateTime(), "dd-MM-yyyy hh:mm:ss");
     pagamentoVenda *pagamento = new pagamentoVenda(rowDataList, Total(), nome, data, idCliente);

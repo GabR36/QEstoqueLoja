@@ -13,7 +13,6 @@ pagamentoAPrazo::pagamentoAPrazo(QString id_venda, QString total, QString client
     ui->Ledit_CpfCnpjCliente->setEnabled(false);
     ui->RadioBtn_EmitNfApenas->setVisible(false);
     ui->RadioBtn_EmitNfTodos->setVisible(false);
-    ui->CBox_ModeloEmit->setVisible(false);
 }
 
 pagamentoAPrazo::~pagamentoAPrazo()

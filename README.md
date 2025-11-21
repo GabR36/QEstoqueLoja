@@ -22,9 +22,9 @@ Disponibilizamos instaladores para Windows e Linux (Debian) na página
 de [releases do
 repositório](https://github.com/GabR36/QEstoqueLoja/releases).
 
-# Compilação
+## Compilação
 
-## Dependências
+### Dependências
 
 - cmake,
 - qt6-declarative-dev,
@@ -33,12 +33,10 @@ repositório](https://github.com/GabR36/QEstoqueLoja/releases).
 - qt6-tools-dev,
 - libzint-dev,
 - [QtRpt](https://qtrpt.sourceforge.io/) *versão biblioteca e sem  barcode
-- [ACBrNFe](https://svn.code.sf.net/p/acbr/code/trunk2/) *Opcional,
-para lidar com Notas fiscais, compilada com Qt
-- [ACBrConsultaCNPJ](https://svn.code.sf.net/p/acbr/code/trunk2/)
-*Opcional, para fazer consulta de CNPJ, compilada com Qt
+- [ACBrNFe](https://svn.code.sf.net/p/acbr/code/trunk2/) *compilada com Qt
+- [ACBrConsultaCNPJConsoleMT](https://svn.code.sf.net/p/acbr/code/trunk2/)
 
-## Cmake
+### Cmake
 
 ```
 mkdir build

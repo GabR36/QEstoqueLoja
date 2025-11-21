@@ -462,8 +462,8 @@ void pagamentoVenda::terminarPagamento(){
         query.prepare("INSERT INTO produtos_vendidos (id_produto, quantidade, preco_vendido, id_venda) VALUES (:valor1, :valor2, :valor3, :valor4)");
         query.bindValue(":valor1", rowdata[0]);
         // precisa converter para notacao usa para inserir no banco de dados
-        query.bindValue(":valor2", QString::number(portugues.toFloat(rowdata[1].toString())));
-        query.bindValue(":valor3", QString::number(portugues.toFloat(rowdata[3].toString()), 'f', 2));
+        query.bindValue(":valor2", rowdata[1].toString());
+        query.bindValue(":valor3", rowdata[3].toString());
         query.bindValue(":valor4", idVenda);
         if (query.exec()) {
             qDebug() << "Inserção prod_vendidos bem-sucedida!";
@@ -473,7 +473,7 @@ void pagamentoVenda::terminarPagamento(){
         query.prepare("UPDATE produtos SET quantidade = quantidade - :valor2 WHERE id = :valor1");
         query.bindValue(":valor1", rowdata[0]);
         // precisa converter para notacao usa para inserir no banco de dados
-        query.bindValue(":valor2", QString::number(portugues.toFloat(rowdata[1].toString())));
+        query.bindValue(":valor2", rowdata[1].toString());
         if (query.exec()) {
             qDebug() << "update quantidade bem-sucedida!";
         } else {

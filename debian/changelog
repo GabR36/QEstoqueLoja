@@ -1,5 +1,16 @@
-qestoqueloja (2.1.0-1) UNRELEASED; urgency=medium
+qestoqueloja (2.1.1-1) unstable; urgency=medium
 
+ [ Gabriel B. Chuede ]
+  * upstream release 2.1.1
+
+ -- Gabriel Bormann Chuede <gabrielbchuede@gmail.com>  Thu, 20 Nov 2025 21:49:03 -0300
+
+qestoqueloja (2.1.0-1) unstable; urgency=medium
+
+  [ Gabriel Bormann Chuede ]
   * Initial release. (Closes: #nnnn)  <nnnn is the bug number of your ITP>
 
- -- Gabriel Bormann Chuede <gabriel@unknown>  Sat, 08 Nov 2025 21:37:50 -0300
+  [ Gabriel Chuede ]
+  * add gdp.conf
+
+ -- Gabriel Bormann Chuede <gabrielbchuede@gmail.com>  Thu, 20 Nov 2025 21:43:59 -0300

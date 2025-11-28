@@ -120,6 +120,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         util/ACBrConsultaCNPJ.cpp util/ACBrConsultaCNPJ.h
         util/consultacnpjmanager.h util/consultacnpjmanager.cpp
         util/buscarcodigomunicipio.h util/buscarcodigomunicipio.cpp
+        entradas.h entradas.cpp entradas.ui
+        dfeconsultautil.h dfeconsultautil.cpp
 
 
 

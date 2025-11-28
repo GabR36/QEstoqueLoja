@@ -34,7 +34,7 @@
 #include "util/helppage.h"
 #include "schemamanager.h"
 #include "util/consultacnpjmanager.h"
-
+#include "entradas.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -752,10 +752,13 @@ void MainWindow::atualizarConfigAcbr(){
     qDebug() << "=== CARREGANDO CONFIGURAÇÕES ACBR ===";
     QString caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
                          "/xmlNf";
-
+    QString caminhoEntradas = caminhoXml + "/entradas";
     QDir dir;
     if(!dir.exists(caminhoXml)){
         dir.mkpath(caminhoXml);
+    }
+    if(!dir.exists(caminhoEntradas)){
+        dir.mkpath(caminhoEntradas);
     }
 
     // LIMPAR strings antes de usar
@@ -803,7 +806,9 @@ void MainWindow::atualizarConfigAcbr(){
     acbr->ConfigGravarValor("NFe", "VersaoQRCode", "3");
     acbr->ConfigGravarValor("NFe", "FormaEmissao", "0");
     acbr->ConfigGravarValor("NFe", "Ambiente", tpAmb);
-
+    acbr->ConfigGravarValor("NFE", "Download.PathDownload", caminhoEntradas.toStdString());
+    //separar xml em pastas por nome da empresa
+    acbr->ConfigGravarValor("NFE", "Download.SepararPorNome", "1");
     // // CONFIGURAÇÕES DE ARQUIVO
 
     acbr->ConfigGravarValor("NFe", "PathSalvar", caminhoXml.toStdString());
@@ -841,5 +846,12 @@ void MainWindow::atualizarConfigAcbr(){
     acbr->ConfigGravar("");
     qDebug() << "Configurações salvas no arquivo acbrlib.ini";
 
+}
+
+
+void MainWindow::on_Btn_Entradas_clicked()
+{
+    Entradas *entradas = new Entradas();
+    entradas->show();
 }
 

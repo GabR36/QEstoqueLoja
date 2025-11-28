@@ -95,6 +95,8 @@ private slots:
     void on_actionDocumenta_o_triggered();
     void atualizarConfigAcbr();
 
+    void on_Btn_Entradas_clicked();
+
 private:
     Ui::MainWindow *ui;
     // ACBrNFe *acbr;

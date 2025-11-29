@@ -30,6 +30,7 @@ private:
 
     void salvarRegistroDFe(const QString &nome_emitente, const QString &data_emissao, const QString &vnf, const QString &nsu, const QString &tipo, const QString &chave, const QString &cnpj, const QString &situacao, const QString &xml, const QString &data_recebimento);
     void carregarTabela();
+    QString converterDataSefaz(const QString &data);
 };
 
 #endif // ENTRADAS_H

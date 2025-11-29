@@ -8,6 +8,7 @@
 #include <QFile>
 #include <QDomDocument>
 #include <QRegularExpression>
+#include <QDateTime>
 
 Entradas::Entradas(QWidget *parent)
     : QWidget(parent)
@@ -22,6 +23,23 @@ Entradas::Entradas(QWidget *parent)
 Entradas::~Entradas()
 {
     delete ui;
+}
+
+QString Entradas::converterDataSefaz(const QString &data){
+    if (data.isEmpty())
+        return "";
+
+    // Formato SEFAZ: 2025-11-29T16:17:31-03:00
+    QDateTime dt = QDateTime::fromString(data, Qt::ISODate);
+
+    // Se falhar, tente sem timezone
+    if (!dt.isValid())
+        dt = QDateTime::fromString(data, "yyyy-MM-dd'T'hh:mm:ss");
+
+    if (!dt.isValid())
+        return data; // retorna como veio
+
+    return dt.toString("yyyy-MM-dd HH:mm:ss");
 }
 
 void Entradas::salvarRegistroDFe(
@@ -64,7 +82,7 @@ void Entradas::salvarRegistroDFe(
 
 void Entradas::on_Btn_ConsultarDF_clicked()
 {
-    QString ultimo_nsu = "886";
+    QString ultimo_nsu = "891";
     auto acbrnfe = AcbrManager::instance()->nfe();
 
     std::string retorno, cnpj;
@@ -180,6 +198,10 @@ void Entradas::on_Btn_ConsultarDF_clicked()
         QString xmlInline    = getCampoLinha(bloco, "XML");        // XML inline (se houver)
         QString xmlpath      = getCampoLinha(bloco, "arquivo");    // caminho fornecido pelo ACBr
         QString schema       = getCampoLinha(bloco, "schema");
+
+        // converte para formato padrao do banco de dados
+        data_emissao = converterDataSefaz(data_emissao);
+        data_receb   = converterDataSefaz(data_emissao);
 
         //Filtra somente XML COMPLETO da nota
         if (!(schema.contains("NFe") || schema.contains("proc"))) {

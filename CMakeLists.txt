@@ -121,7 +121,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         util/consultacnpjmanager.h util/consultacnpjmanager.cpp
         util/buscarcodigomunicipio.h util/buscarcodigomunicipio.cpp
         entradas.h entradas.cpp entradas.ui
-        dfeconsultautil.h dfeconsultautil.cpp
+
+
+        nota/eventocienciaop.h nota/eventocienciaop.cpp
+        util/manifestadordfe.h util/manifestadordfe.cpp
 
 
 

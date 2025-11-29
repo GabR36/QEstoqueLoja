@@ -35,6 +35,7 @@
 #include "schemamanager.h"
 #include "util/consultacnpjmanager.h"
 #include "entradas.h"
+#include "util/manifestadordfe.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -123,8 +124,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Tview_Produtos, &QTableView::doubleClicked,
             this, &MainWindow::verProd);
 
-
-
+    // ManifestadorDFe *manifestdfe = new ManifestadorDFe();
+    // manifestdfe->consultarEManifestar();
 }
 
 MainWindow::~MainWindow()
@@ -821,6 +822,9 @@ void MainWindow::atualizarConfigAcbr(){
     acbr->ConfigGravarValor("NFe", "PathNFe", caminhoXml.toStdString());
     acbr->ConfigGravarValor("NFe", "SalvarEvento", "1");
     acbr->ConfigGravarValor("NFe", "PathEvento", caminhoXml.toStdString());
+
+    acbr->ConfigGravarValor("NFe", "SalvarGer", "0");
+
 
 
     //sistema

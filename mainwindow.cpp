@@ -124,8 +124,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Tview_Produtos, &QTableView::doubleClicked,
             this, &MainWindow::verProd);
 
-    // ManifestadorDFe *manifestdfe = new ManifestadorDFe();
-    // manifestdfe->consultarEManifestar();
+    ManifestadorDFe *manifestdfe = new ManifestadorDFe();
+    manifestdfe->consultarEManifestar();
 }
 
 MainWindow::~MainWindow()

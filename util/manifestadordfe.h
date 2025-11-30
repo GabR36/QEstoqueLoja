@@ -7,14 +7,17 @@
 #include <QSqlDatabase>
 #include "../nota/eventocienciaop.h"
 
-
-// typedef struct {
-//     QString cStat;
-//     QString xMotivo;
-//     QString nProt;
-//     QString xmlPath;
-//     int idLote = 1;
-// } EventoRetornoInfo;
+struct ResumoNFe {
+    QString chave;
+    QString nome;
+    QString cnpjEmit;
+    QString schema;
+    QString vnf;
+    QString cstat;
+    QString xml_path;
+    QString nProt;
+    QString dhEmi;
+};
 
 class ManifestadorDFe : public QObject
 {
@@ -29,9 +32,15 @@ private:
     QMap<QString, QString> fiscalValues;
     QMap<QString, QString> empresaValues;
     QString cuf,cnpj;
+    QString ultimo_nsu;
 
     void salvarEventoNoBanco(const QString &tipo, const EventoRetornoInfo &info, const QString &chaveNFe);
     void carregarConfigs();
+    QString getUltNsu();
+    void processarHeaderDfe(const QString &bloco);
+    void salvarNovoUltNsu(const QString &ultNsu);
+    bool existeCienciaOperacao(const QString &chNFe);
+    void salvarResumoNota(ResumoNFe resumo);
 signals:
 };
 

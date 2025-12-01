@@ -19,14 +19,46 @@ struct ResumoNFe {
     QString dhEmi;
 };
 
+struct ProcNfe {
+    QString chave;
+    QString nsu;
+    QString cnpjEmit;
+    QString schema;
+    QString vnf;
+    QString cstat;
+    QString xml_path;
+    QString nProt;
+    QString dhEmi;
+    QString nome;
+    QString cSitNfe;
+};
+
+
+struct Emitente {
+    QString cnpj;
+    QString nome;
+    QString xLgr;
+    QString nro;
+    QString xBairro;
+    QString xMun;
+    QString cMun;
+    QString uf;
+    QString cep;
+    QString ie;
+};
+
 class ManifestadorDFe : public QObject
 {
     Q_OBJECT
 public:
     explicit ManifestadorDFe(QObject *parent = nullptr);
-    void processarResumo(const QString &bloco);
     bool enviarCienciaOperacao(const QString &chNFe, const QString &cnpjEmit);
     void consultarEManifestar();
+    void consultarEBaixarXML();
+    QString getUltNsu();
+    QString getUltNsuXml();
+
+
 private:
     QSqlDatabase db;
     QMap<QString, QString> fiscalValues;
@@ -36,11 +68,14 @@ private:
 
     void salvarEventoNoBanco(const QString &tipo, const EventoRetornoInfo &info, const QString &chaveNFe);
     void carregarConfigs();
-    QString getUltNsu();
     void processarHeaderDfe(const QString &bloco);
     void salvarNovoUltNsu(const QString &ultNsu);
     bool existeCienciaOperacao(const QString &chNFe);
     void salvarResumoNota(ResumoNFe resumo);
+    void processarResumo(const QString &bloco);
+    void processarNota(const QString &bloco);
+    void salvarEmitenteCliente(ProcNfe notaInfo);
+    Emitente lerEmitenteDoXML(const QString &xmlPath);
 signals:
 };
 

@@ -125,7 +125,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::verProd);
 
     ManifestadorDFe *manifestdfe = new ManifestadorDFe();
-    manifestdfe->consultarEManifestar();
+    manifestdfe->consultarEBaixarXML();
 }
 
 MainWindow::~MainWindow()

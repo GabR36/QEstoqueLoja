@@ -78,24 +78,24 @@ EventoRetornoInfo EventoCienciaOP::gerarEnviarRetorno()
     EventoRetornoInfo info;
 
     try {
-        // acbr->LimparListaEventos();
-        // acbr->CarregarEventoINI(ini.str());
-        // acbr->Assinar();
-        // acbr->Validar();
+        acbr->LimparListaEventos();
+        acbr->CarregarEventoINI(ini.str());
+        acbr->Assinar();
+        acbr->Validar();
 
-        // std::string retorno = acbr->EnviarEvento(1);
-        // QString ret = QString::fromUtf8(retorno.c_str());
-        QFile file("retorno_evento.txt");
-        QString ret;
+        std::string retorno = acbr->EnviarEvento(1);
+        QString ret = QString::fromUtf8(retorno.c_str());
+        // QFile file("retorno_evento.txt");
+        // QString ret;
 
-        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            ret = QString::fromUtf8(file.readAll());
-            file.close();
-        } else {
-            qDebug() << "Erro ao abrir retorno.txt";
-        }
+        // if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        //     ret = QString::fromUtf8(file.readAll());
+        //     file.close();
+        // } else {
+        //     qDebug() << "Erro ao abrir retorno.txt";
+        // }
 
-        // qDebug() << "Retorno SEFAZ Evento:" << ret;
+        qDebug() << "Retorno SEFAZ Evento:" << ret;
 
         // 1. obtém caminho do evento gravado
         QString eventoPath = getCampo(ret, "arquivo");

@@ -47,6 +47,20 @@ struct Emitente {
     QString ie;
 };
 
+struct NotaFiscal {
+    QString cstat;
+    int nnf = 0;
+    QString serie;
+    QString modelo;
+    bool tp_amb = false;
+    QString xml_path;
+    double valor_total = 0.0;
+    QString cnpjemit;
+    QString chnfe;
+    QString nprot;
+    QString cuf;
+};
+
 class ManifestadorDFe : public QObject
 {
     Q_OBJECT
@@ -57,6 +71,8 @@ public:
     void consultarEBaixarXML();
     QString getUltNsu();
     QString getUltNsuXml();
+    bool possoConsultar();
+
 
 
 private:
@@ -65,6 +81,8 @@ private:
     QMap<QString, QString> empresaValues;
     QString cuf,cnpj;
     QString ultimo_nsu;
+    QString ultNsuXml;
+    int novoUltNsuXml;
 
     void salvarEventoNoBanco(const QString &tipo, const EventoRetornoInfo &info, const QString &chaveNFe);
     void carregarConfigs();
@@ -74,8 +92,12 @@ private:
     void salvarResumoNota(ResumoNFe resumo);
     void processarResumo(const QString &bloco);
     void processarNota(const QString &bloco);
-    void salvarEmitenteCliente(ProcNfe notaInfo);
+    bool salvarEmitenteCliente(ProcNfe notaInfo);
     Emitente lerEmitenteDoXML(const QString &xmlPath);
+    NotaFiscal lerNotaFiscalDoXML(const QString &xmlPath);
+    bool atualizarNotaBanco(ProcNfe notaInfo);
+    void salvarNovoUltNsuXml(int ultnsuxml);
+    void atualizarDataNsu(int option);
 signals:
 };
 

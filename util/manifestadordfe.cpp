@@ -95,22 +95,22 @@ void ManifestadorDFe::consultarEManifestar(){
 void ManifestadorDFe::consultarEBaixarXML(){
     qDebug() << "rodou consultarEBaixarXML()";
     auto acbr = AcbrManager::instance()->nfe();
-    QString ultNsuXml = getUltNsuXml();
-    // std::string retorno = acbr->DistribuicaoDFePorUltNSU(cuf.toInt(), cnpj.toStdString(), ultNsuXml.toStdString());
-    // qDebug() << "Retorno consulta DFE" << retorno;
-    // qDebug() << "ult nsuxml: " << ultNsuXml;
+    ultNsuXml = getUltNsuXml();
+    std::string retorno = acbr->DistribuicaoDFePorUltNSU(cuf.toInt(), cnpj.toStdString(), ultNsuXml.toStdString());
+    qDebug() << "Retorno consulta DFE" << retorno;
+    qDebug() << "ult nsuxml: " << ultNsuXml;
 
-    QFile file("retorno_distribuicao2.txt");
-    QString retorno;
+    // QFile file("retorno_distribuicao2.txt");
+    // QString retorno;
 
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        retorno = QString::fromUtf8(file.readAll());
-        file.close();
-    } else {
-        qDebug() << "Erro ao abrir retorno.txt";
-    }
+    // if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    //     retorno = QString::fromUtf8(file.readAll());
+    //     file.close();
+    // } else {
+    //     qDebug() << "Erro ao abrir retorno.txt";
+    // }
 
-    QString whole = QString::fromStdString(retorno.toStdString());
+    QString whole = QString::fromStdString(retorno);
 
     // // --- SALVAR EM ARQUIVO TXT ---
     // QFile file("retorno_distribuicao2.txt");
@@ -123,7 +123,6 @@ void ManifestadorDFe::consultarEBaixarXML(){
     //     qDebug() << "Erro ao salvar o arquivo!";
     // }
     // -----------------------------
-
     QStringList blocos = whole.split("[", Qt::SkipEmptyParts);
 
     for (QString bloco : blocos)
@@ -133,15 +132,34 @@ void ManifestadorDFe::consultarEBaixarXML(){
         if (bloco.startsWith("[ResNFe") || bloco.startsWith("[ResDFe"))
             processarNota(bloco);
     }
-    // for (QString bloco : blocos)
-    // {
-    //     bloco = "[" + bloco;
+    if(novoUltNsuXml > ultNsuXml.toInt()){
+        salvarNovoUltNsuXml(novoUltNsuXml);
+    }
 
-    //     if (bloco.startsWith("[DistribuicaoDFe"))
-    //         processarHeaderDfe(bloco);
-    // }
 }
 
+void ManifestadorDFe::salvarNovoUltNsuXml(int ultnsuxml){
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir DB em salvarNovoUltNsu:" << db.lastError().text();
+        return;
+    }
+
+    QSqlQuery query(db);
+    QDateTime dataIngles = QDateTime::currentDateTime();
+    QString dataFormatada = dataIngles.toString("yyyy-MM-dd HH:mm:ss");
+
+    query.prepare("UPDATE dfe_info SET ult_nsu = :nsu, data_modificado = :datamod "
+                  "WHERE identificacao = 'consulta_xml'");
+    query.bindValue(":nsu", ultnsuxml);
+    query.bindValue(":datamod", dataFormatada);
+
+    if(!query.exec()){
+        qDebug() << "query update ultnsuxml falhou:" << query.lastError().text();
+        qDebug() << "SQL:" << query.lastQuery();
+    } else {
+        qDebug() << "query update ultnsuxml rodou ok";
+    }
+}
 
 void ManifestadorDFe::processarHeaderDfe(const QString &bloco){
 
@@ -170,6 +188,7 @@ void ManifestadorDFe::processarHeaderDfe(const QString &bloco){
 
     if (cStat != "138") {
         qDebug() << "Consulta retornou erro, não atualizou ultNSU!";
+        atualizarDataNsu(1);// 1 = atualiza consulta_resumo
         return;
     }
 
@@ -177,16 +196,40 @@ void ManifestadorDFe::processarHeaderDfe(const QString &bloco){
     salvarNovoUltNsu(ultNsu);
 }
 
+void ManifestadorDFe::atualizarDataNsu(int option){
+    if (!db.open()) {
+        qDebug() << "Erro ao abrir DB em atualizarDataNsu:" << db.lastError().text();
+        return;
+    }
+    QString identificacao;
+    if(option == 1 ){
+        identificacao = "consulta_resumo";
+    }else{
+        identificacao = "consulta_xml";
+    }
+
+    QDateTime dataIngles = QDateTime::currentDateTime();
+    QString dataFormatada = dataIngles.toString("yyyy-MM-dd HH:mm:ss");
+    QSqlQuery query(db);
+    query.prepare("UPDATE dfe_info SET data_modificado = :datamod "
+                  "WHERE identificacao = :ide");
+    query.bindValue(":datamod", dataFormatada );
+    query.bindValue(":ide", identificacao);
+}
 
 void ManifestadorDFe::salvarNovoUltNsu(const QString &ultNsu){
     if (!db.open()) {
         qDebug() << "Erro ao abrir DB em salvarNovoUltNsu:" << db.lastError().text();
         return;
     }
+    QDateTime dataIngles = QDateTime::currentDateTime();
+    QString dataFormatada = dataIngles.toString("yyyy-MM-dd HH:mm:ss");
 
     QSqlQuery query(db);
-    query.prepare("UPDATE dfe_info SET ult_nsu = :nsu WHERE identificacao = 'consulta_resumo'");
+    query.prepare("UPDATE dfe_info SET ult_nsu = :nsu, data_modificado = :datamod "
+                  "WHERE identificacao = 'consulta_resumo'");
     query.bindValue(":nsu", ultNsu);
+    query.bindValue(":datamod", dataFormatada);
 
     if(!query.exec()){
         qDebug() << "query update ultnsu falhou:" << query.lastError().text();
@@ -202,6 +245,7 @@ void ManifestadorDFe::salvarResumoNota(ResumoNFe resumo){
     }
     QDateTime dataIngles = QDateTime::currentDateTime();
     QString dataFormatada = dataIngles.toString("yyyy-MM-dd HH:mm:ss");
+    QLocale portugues(QLocale::Portuguese, QLocale::Brazil);
     QSqlQuery query;
     query.prepare("INSERT INTO notas_fiscais (cstat, modelo, tp_amb, xml_path, valor_total, atualizado_em,"
                   "cnpjemit, chnfe, nprot, cuf, finalidade, saida, nnf, serie) VALUES (:cstat, :modelo,"
@@ -211,7 +255,7 @@ void ManifestadorDFe::salvarResumoNota(ResumoNFe resumo){
     query.bindValue(":modelo", "55");
     query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
     query.bindValue(":xmlpath", resumo.xml_path);
-    query.bindValue(":vnf", resumo.vnf);
+    query.bindValue(":vnf", portugues.toString(resumo.vnf.toDouble()));
     query.bindValue(":atualizadoem", dataFormatada);
     query.bindValue(":cnpjemit", resumo.cnpjEmit);
     query.bindValue(":chnf", resumo.chave);
@@ -232,14 +276,18 @@ void ManifestadorDFe::salvarResumoNota(ResumoNFe resumo){
 void ManifestadorDFe::processarResumo(const QString &bloco)
 {
     auto campo = [&](const QString &nome) {
-        QRegularExpression re("^" + nome + R"(=(.*))", QRegularExpression::MultilineOption);
-        QRegularExpressionMatch m = re.match(bloco);
-        if (!m.hasMatch())
+        // ^nome=(valor) em qualquer linha do bloco
+        QRegularExpression re("^" + nome + R"(=(.*))",
+                              QRegularExpression::MultilineOption);
+
+        auto it = re.globalMatch(bloco);
+        if (!it.hasNext())
             return QString();
 
-        QString value = m.captured(1);
-        return value.trimmed();   // <-- remove qualquer \r, \n, espaços
+        QString value = it.next().captured(1).trimmed();
+        return value;
     };
+
 
     ResumoNFe resumo;
     resumo.chave    = campo("chDFe");
@@ -252,14 +300,16 @@ void ManifestadorDFe::processarResumo(const QString &bloco)
     resumo.nProt    = campo("nProt");
     resumo.dhEmi    = campo("dhEmi");
 
-    // Apenas notas completas ou resumos válidos
+    // Apenas resumos válidos
     if (!resumo.schema.contains("resNFe"))
         return;
 
     qDebug() << "\nResumo localizado:" << resumo.chave << resumo.nome;
+
     salvarResumoNota(resumo);
     enviarCienciaOperacao(resumo.chave, resumo.cnpjEmit);
 }
+
 
 void ManifestadorDFe::processarNota(const QString &bloco){
     auto campo = [&](const QString &nome) {
@@ -287,19 +337,99 @@ void ManifestadorDFe::processarNota(const QString &bloco){
         // Apenas notas completas ou resumos válidos
         if (!nfe.schema.contains("procNFe"))
             return;
-
         qDebug() << "\nNota Xml localizado:" << nfe.chave << nfe.nome;
-        salvarEmitenteCliente(nfe);
-        // salvarResumoNota(nfe);
-        // enviarCienciaOperacao(nfe.chave, nfe.cnpjEmit);
+        if(nfe.cSitNfe == "1"){
+            //se executar as duas funções corretamente atualiza o ultnsuxml;
+            if( salvarEmitenteCliente(nfe) && atualizarNotaBanco(nfe)){
+                if(nfe.nsu.toInt() > novoUltNsuXml ){
+                    novoUltNsuXml = nfe.nsu.toInt();
+                }else{
+                    qDebug() << "Algo aconteceu ao tentar rodar "
+                                "salvarEmitenteCliente(nfe)|atualizarNotaBanco(nfe)";
+                }
+            }
+
+        }
+
 }
 
-void ManifestadorDFe::salvarEmitenteCliente(ProcNfe notaInfo){
+bool ManifestadorDFe::atualizarNotaBanco(ProcNfe notaInfo){
+    NotaFiscal nf = lerNotaFiscalDoXML(notaInfo.xml_path);
+
+    if(!db.isOpen()){
+        if(!db.open()){
+            qDebug() << "banco nao abriu atualizarNotaBanco";
+            return false;
+        }
+    }
+    QSqlQuery q;
+    int idcliente;
+    q.prepare("SELECT id FROM clientes WHERE cpf = :cnpjemit");
+    q.bindValue(":cnpjemit", nf.cnpjemit);
+    if(!q.exec()){
+        qDebug() << "nao executou query para achar idcliente em atualizarNotaBanco()";
+        return false;
+
+    }else{
+        if (q.next()) {
+            idcliente = q.value(0).toInt();
+        }
+    }
+    QString dhemi = notaInfo.dhEmi;
+    QDateTime dt = QDateTime::fromString(dhemi, "dd/MM/yyyy HH:mm:ss");
+    QString dhemiFormatada = dt.toString("yyyy-MM-dd HH:mm:ss");
+    QDateTime dataIngles = QDateTime::currentDateTime();
+    QString dataFormatada = dataIngles.toString("yyyy-MM-dd HH:mm:ss");
+    q.prepare("UPDATE notas_fiscais SET "
+              "cstat = :cstat, "
+              "nnf = :nnf, "
+              "serie = :serie, "
+              "modelo = :modelo, "
+              "tp_amb = :tp_amb, "
+              "xml_path = :xml_path, "
+              "valor_total = :valor_total, "
+              "cnpjemit = :cnpjemit, "
+              "nprot = :nprot, "
+              "cuf = :cuf, "
+              "atualizado_em = :atualizadoem, "
+              "finalidade = :finalidade, "
+              "saida = :saida, "
+              "id_emissorcliente = :idcliente, "
+              "dhemi = :dhemi "
+              "WHERE chnfe = :chnfe");
+    q.bindValue(":cstat", nf.cstat);
+    q.bindValue(":nnf", nf.nnf);
+    q.bindValue(":serie", nf.serie);
+    q.bindValue(":modelo", nf.modelo);
+    q.bindValue(":tp_amb", nf.tp_amb);
+    q.bindValue(":xml_path", nf.xml_path);
+    q.bindValue(":valor_total", nf.valor_total);
+    q.bindValue(":cnpjemit", nf.cnpjemit);
+    q.bindValue(":nprot", nf.nprot);
+    q.bindValue(":cuf", nf.cuf);
+    q.bindValue(":chnfe", nf.chnfe);
+    q.bindValue(":atualizadoem", dataFormatada);
+    q.bindValue(":finalidade", "ENTRADA EXTERNA");
+    q.bindValue(":saida", "0");
+    q.bindValue(":idcliente", idcliente);
+    q.bindValue(":dhemi", dhemiFormatada);
+
+
+    if (!q.exec()){
+        qDebug() << "Erro ao atualizar NF:" << q.lastError();
+        return false;
+    }else{
+        qDebug() << "Nota fiscal atualizada com sucesso!";
+    }
+    return true;
+}
+
+bool ManifestadorDFe::salvarEmitenteCliente(ProcNfe notaInfo){
     Emitente emi = lerEmitenteDoXML(notaInfo.xml_path);
 
     if(!db.open()){
         qDebug() << "banco de dados nao aberto salvarEmitenteCliente";
-        return;
+        return false;
     }
     bool ehPf = false;
     int indiedest = 1;
@@ -323,7 +453,7 @@ void ManifestadorDFe::salvarEmitenteCliente(ProcNfe notaInfo){
 
     if (!check.exec()) {
         qDebug() << "Erro ao verificar cliente existente:" << check.lastError();
-        return;
+        return false;
     }
 
     check.next();
@@ -331,7 +461,7 @@ void ManifestadorDFe::salvarEmitenteCliente(ProcNfe notaInfo){
 
     if (total > 0) {
         qDebug() << "Cliente já cadastrado com este CNPJ/CPF!";
-        return;  // evita inserir duplicado
+        return true;  // evita inserir duplicado
     }
     QSqlQuery query;
     query.prepare("INSERT INTO clientes (nome, email, telefone, endereco, cpf, "
@@ -358,11 +488,92 @@ void ManifestadorDFe::salvarEmitenteCliente(ProcNfe notaInfo){
 
     if(!query.exec()){
         qDebug() << "Query insert salvarEmitenteCliente nao funcionou!";
+        return false;
     }else{
         qDebug() << "Fornecedor adicionado com sucesso!";
+
     }
+    return true;
 
 }
+
+NotaFiscal ManifestadorDFe::lerNotaFiscalDoXML(const QString &xmlPath)
+{
+    NotaFiscal nf;
+    nf.xml_path = xmlPath;
+
+    QFile file(xmlPath);
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "Erro ao abrir XML:" << xmlPath;
+        return nf;
+    }
+
+    QDomDocument doc;
+    if (!doc.setContent(&file)) {
+        qWarning() << "Erro ao carregar XML:" << xmlPath;
+        file.close();
+        return nf;
+    }
+    file.close();
+
+    auto getTag = [&](const QDomElement &parent, const QString &tag) {
+        QDomNode n = parent.elementsByTagName(tag).item(0);
+        return n.isNull() ? QString() : n.toElement().text().trimmed();
+    };
+
+    // Pegando nó nfeProc ou NFe
+    QDomNodeList listaInfNFe = doc.elementsByTagName("infNFe");
+    if (listaInfNFe.isEmpty()) {
+        qWarning() << "XML sem <infNFe>";
+        return nf;
+    }
+
+    QDomElement infNFe = listaInfNFe.at(0).toElement();
+
+    // CHAVE DA NFE (atributo Id removendo "NFe")
+    QString id = infNFe.attribute("Id");
+    if (id.startsWith("NFe"))
+        nf.chnfe = id.mid(3);
+
+    // --- TAGS DIRETAS DO INFNFE ---
+    QDomNodeList ideList = infNFe.elementsByTagName("ide");
+    if (!ideList.isEmpty()) {
+        QDomElement ide = ideList.at(0).toElement();
+        nf.cuf   = getTag(ide, "cUF");
+        nf.nnf   = getTag(ide, "nNF").toInt();
+        nf.serie = getTag(ide, "serie");
+        nf.modelo = getTag(ide, "mod");
+        nf.tp_amb = (getTag(ide, "tpAmb") == "1");  // 1 = produção
+    }
+
+    // --- VALOR TOTAL DA NOTA ---
+    QDomNodeList totalList = infNFe.elementsByTagName("ICMSTot");
+    if (!totalList.isEmpty()) {
+        QDomElement tot = totalList.at(0).toElement();
+        nf.valor_total = getTag(tot, "vNF").toDouble();
+    }
+
+    // --- EMITENTE ---
+    QDomNodeList emitList = infNFe.elementsByTagName("emit");
+    if (!emitList.isEmpty()) {
+        QDomElement emite = emitList.at(0).toElement();
+        nf.cnpjemit = getTag(emite, "CNPJ");
+    }
+
+    // --- <protNFe> (protocolo) ---
+    QDomNodeList protList = doc.elementsByTagName("protNFe");
+    if (!protList.isEmpty()) {
+        QDomElement prot = protList.at(0).toElement();
+        QDomElement infProt = prot.elementsByTagName("infProt").item(0).toElement();
+
+        nf.cstat = getTag(infProt, "cStat");
+        nf.nprot = getTag(infProt, "nProt");
+    }
+
+    return nf;
+}
+
 
 
 bool ManifestadorDFe::enviarCienciaOperacao(const QString &chNFe, const QString &cnpjEmit)
@@ -475,4 +686,48 @@ Emitente ManifestadorDFe::lerEmitenteDoXML(const QString &xmlPath) {
     }
 
     return e;
+}
+
+bool ManifestadorDFe::possoConsultar(){
+    if (!db.isOpen()) {
+        if (!db.open()) {
+            qDebug() << "Banco não abriu em possoConsultar";
+            return false;
+        }
+    }
+
+    QSqlQuery query;
+
+    // Pega a MAIOR data_modificado (a mais recente), considerando xml e resumo
+    if (!query.exec("SELECT MAX(data_modificado) FROM dfe_info")) {
+        qDebug() << "Erro ao consultar dfe_info:" << query.lastError();
+        return false;
+    }
+
+    if (!query.next()) {
+        qDebug() << "Nenhum registro encontrado em dfe_info";
+        return true; // nunca consultou → pode consultar
+    }
+
+    QString dataModStr = query.value(0).toString();
+
+    if (dataModStr.isEmpty()) {
+        return true; // sem data registrada
+    }
+
+    QDateTime dataMod = QDateTime::fromString(dataModStr, "yyyy-MM-dd HH:mm:ss");
+
+    if (!dataMod.isValid()) {
+        qDebug() << "Data inválida em dfe_info:" << dataModStr;
+        return true; // se inválida, permite consultar
+    }
+
+    QDateTime agora = QDateTime::currentDateTime();
+
+    qint64 diff = dataMod.secsTo(agora);
+
+    qDebug() << "Diferença em segundos desde última consulta:" << diff;
+
+    // 1 hora = 3600s
+    return diff >= 3600;
 }

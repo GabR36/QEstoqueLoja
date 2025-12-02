@@ -125,7 +125,13 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::verProd);
 
     ManifestadorDFe *manifestdfe = new ManifestadorDFe();
-    manifestdfe->consultarEBaixarXML();
+    if(manifestdfe->possoConsultar()){
+        manifestdfe->consultarEManifestar();
+
+    }else{
+        qDebug() << "Nao consultado DFE";
+
+    }
 }
 
 MainWindow::~MainWindow()

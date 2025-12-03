@@ -625,6 +625,51 @@ void SchemaManager::update() {
 
             break;
         }
+        case 6:
+        {
+            // comecar transacao
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+            }
+            qDebug() << "atualizou para versao 7";
+            QDateTime dataIngles = QDateTime::currentDateTime();
+            QString dataFormatada = dataIngles.toString("yyyy-MM-dd HH:mm:ss");
+            QSqlQuery query;
+
+            QStringList alterStatements = {
+                "ALTER TABLE notas_fiscais ADD COLUMN dhemi TEXT",
+                "ALTER TABLE notas_fiscais ADD COLUMN id_emissorcliente INTEGER",
+                "UPDATE notas_fiscais SET dhemi = atualizado_em",
+                "CREATE TABLE IF NOT EXISTS dfe_info(id INTEGER NOT NULL UNIQUE PRIMARY KEY "
+                "AUTOINCREMENT, ult_nsu, data_modificado TEXT, identificacao TEXT) ",
+                "INSERT INTO dfe_info (ult_nsu, data_modificado, identificacao) VALUES "
+                "(0, '2025-12-01 00:00:00', 'consulta_xml')",
+                "INSERT INTO dfe_info (ult_nsu, data_modificado, identificacao) VALUES "
+                "(0, '2025-12-01 00:01:00', 'consulta_resumo')"
+            };
+            foreach (const QString &sql, alterStatements) {
+                if (!query.exec(sql)) {
+                    qDebug() << "Erro ao executar:" << sql << ":" << query.lastError().text();
+                }
+            }
+
+            // Atualizar versão do schema se tudo correu bem
+            if (!query.exec("PRAGMA user_version = 7")) {
+                qDebug() << "Erro ao atualizar user_version:" << query.lastError().text();
+            }
+
+            // Finalizar transação
+            if (!db.commit()) {
+                qDebug() << "Error: unable to commit transaction";
+                db.rollback();
+            } else {
+                dbSchemaVersion = 7;
+                emit dbVersao7();
+            }
+
+            break;
+
+        }
 
         }
     }

@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    SchemaManager *schemaManager = new SchemaManager(this, 6);
+    SchemaManager *schemaManager = new SchemaManager(this, 7);
     //config versao 6
     connect(schemaManager, &SchemaManager::dbVersao6, this,
             &MainWindow::atualizarConfigAcbr);

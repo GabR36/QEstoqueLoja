@@ -19,6 +19,7 @@ public:
     QSqlDatabase db;
 signals:
     void dbVersao6();
+    void dbVersao7();
 };
 
 #endif // SCHEMAMANAGER_H

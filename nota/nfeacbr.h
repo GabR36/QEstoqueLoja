@@ -34,6 +34,7 @@ public:
     QString getTpAmb();
     QString getCnpjEmit();
     QString getCuf();
+    QString getDhEmiConvertida();
 private:
     ACBrNFe *nfe;
     QSqlDatabase db;
@@ -65,6 +66,7 @@ private:
     bool usarIBS;
 
     QString natOp,tpNf,finNfe,cfop, refNfe;
+    std::string dataHora;
 
     enum tipoNota{
         saidaNormal,

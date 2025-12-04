@@ -213,13 +213,12 @@ void pagamentoVenda::salvarNfeBD(NfeACBR *nfe){
     }
     QSqlQuery query;
     QDateTime dataIngles = portugues.toDateTime(dataGlobal, "dd-MM-yyyy hh:mm:ss");
-
     query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
                   "tp_amb, xml_path, valor_total, atualizado_em, id_venda, cnpjemit, "
-                  "chnfe, nprot, cuf, finalidade, saida) "
+                  "chnfe, nprot, cuf, finalidade, saida, dhemi) "
                   "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, "
                   ":valortotal, :atualizado_em, :id_venda, :cnpjemit, :chnfe, "
-                  ":nprot, :cuf, :finalidade, :saida)");
+                  ":nprot, :cuf, :finalidade, :saida, :dhemi)");
     query.bindValue(":cstat", cStat);
     query.bindValue(":nnf", QString::number(nfe->getNNF()));
     query.bindValue(":serie", QString::number(nfe->getSerie()));
@@ -235,6 +234,7 @@ void pagamentoVenda::salvarNfeBD(NfeACBR *nfe){
     query.bindValue(":cuf", fiscalValues.value("cuf"));
     query.bindValue(":finalidade", "NORMAL");
     query.bindValue(":saida", "1");
+    query.bindValue(":dhemi", nfe->getDhEmiConvertida());
 
 
 
@@ -261,10 +261,10 @@ void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
 
     query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, "
                   "tp_amb, xml_path, valor_total, atualizado_em, id_venda, cnpjemit,"
-                  "chnfe, nprot, cuf, finalidade, saida ) "
+                  "chnfe, nprot, cuf, finalidade, saida, dhemi ) "
                   "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, "
                   ":valortotal, :atualizado_em, :id_venda, :cnpjemit, :chnfe, "
-                  ":nprot, :cuf, :finalidade, :saida )");
+                  ":nprot, :cuf, :finalidade, :saida, :dhemi )");
     query.bindValue(":cstat", cStat);
     query.bindValue(":nnf", QString::number(nfce->getNNF()));
     query.bindValue(":serie", QString::number(nfce->getSerie()));
@@ -280,6 +280,7 @@ void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
     query.bindValue(":cuf", fiscalValues.value("cuf"));
     query.bindValue(":finalidade", "NORMAL");
     query.bindValue(":saida", "1");
+    query.bindValue(":dhemi", nfce->getDhEmiConvertida());
 
 
     qDebug() << "idvenda: " << idVenda;

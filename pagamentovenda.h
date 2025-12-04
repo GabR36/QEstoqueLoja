@@ -39,6 +39,7 @@ private:
     void salvarNfceBD(NfceACBR *nfce);
     QString enviarNfe(NfeACBR *nfe);
     void salvarNfeBD(NfeACBR *nfe);
+    QString dhemiRet;
 signals:
     void gerarEnviarNf();
 

@@ -1154,9 +1154,9 @@ QString Vendas::salvarDevolucaoNf(QString retornoEnvio, int idnf, NfeACBR *devol
         QString dataFormatada = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
 
         query.prepare("INSERT INTO notas_fiscais(cstat, nnf, serie, modelo, tp_amb, xml_path, valor_total,"
-                      "atualizado_em, id_venda, cnpjemit, chnfe, nprot, cuf, finalidade, saida, id_nf_ref) "
+                      "atualizado_em, id_venda, cnpjemit, chnfe, nprot, cuf, finalidade, saida, id_nf_ref, dhemi) "
                       "VALUES(:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :valortotal, :atualizadoem,"
-                      ":id_venda, :cnpjemit, :chnfe, :nprot, :cuf, :finalidade, :saida, :id_nf_ref)");
+                      ":id_venda, :cnpjemit, :chnfe, :nprot, :cuf, :finalidade, :saida, :id_nf_ref, :dhemi)");
 
         query.bindValue(":cstat", cStat);
         query.bindValue(":nnf", devolNfe->getNNF());
@@ -1174,6 +1174,7 @@ QString Vendas::salvarDevolucaoNf(QString retornoEnvio, int idnf, NfeACBR *devol
         query.bindValue(":finalidade", "DEVOLUCAO");
         query.bindValue(":saida", "0");
         query.bindValue(":id_nf_ref", QString::number(idnf));
+        query.bindValue(":dhemi", devolNfe->getDhEmiConvertida());
 
         if (!query.exec()) {
             qDebug() << "Erro ao inserir nota fiscal de devolução:" << query.lastError().text();

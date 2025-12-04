@@ -124,14 +124,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Tview_Produtos, &QTableView::doubleClicked,
             this, &MainWindow::verProd);
 
-    ManifestadorDFe *manifestdfe = new ManifestadorDFe();
-    if(manifestdfe->possoConsultar()){
-        manifestdfe->consultarEManifestar();
+    // ManifestadorDFe *manifestdfe = new ManifestadorDFe();
+    // if(manifestdfe->possoConsultar()){
+    //     manifestdfe->consultarEManifestar();
 
-    }else{
-        qDebug() << "Nao consultado DFE";
+    // }else{
+    //     qDebug() << "Nao consultado DFE";
 
-    }
+    // }
 }
 
 MainWindow::~MainWindow()
@@ -754,7 +754,8 @@ void MainWindow::atualizarConfigAcbr(){
 
     auto acbr = AcbrManager::instance()->nfe();
     auto cnpj = ConsultaCnpjManager::instance()->cnpj();
-
+    fiscalValues = Configuracao::get_All_Fiscal_Values();
+    empresaValues = Configuracao::get_All_Empresa_Values();
 
     qDebug() << "=== CARREGANDO CONFIGURAÇÕES ACBR ===";
     QString caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
@@ -782,6 +783,7 @@ void MainWindow::atualizarConfigAcbr(){
     std::string idCsc = cleanStr(fiscalValues.value("id_csc"));
     std::string csc = cleanStr(fiscalValues.value("csc"));
     std::string tpAmb = (fiscalValues.value("tp_amb") == "0" ? "1" : "0");
+    qDebug() << "tpamb obtido: " << tpAmb;
     QString caminhoCompletoLogo = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
                                   "/imagens/" + QFileInfo(empresaValues.value("caminho_logo_empresa")).fileName();
     qDebug() << "Certificado:" << QString::fromStdString(certificadoPath);
@@ -792,7 +794,6 @@ void MainWindow::atualizarConfigAcbr(){
 
 
     //     // LIMPAR lista
-    // nfce->LimparLista();
 
 
 
@@ -815,7 +816,7 @@ void MainWindow::atualizarConfigAcbr(){
     acbr->ConfigGravarValor("NFe", "Ambiente", tpAmb);
     acbr->ConfigGravarValor("NFE", "Download.PathDownload", caminhoEntradas.toStdString());
     //separar xml em pastas por nome da empresa
-    acbr->ConfigGravarValor("NFE", "Download.SepararPorNome", "1");
+    acbr->ConfigGravarValor("NFe", "Download.SepararPorNome", "1");
     // // CONFIGURAÇÕES DE ARQUIVO
 
     acbr->ConfigGravarValor("NFe", "PathSalvar", caminhoXml.toStdString());
@@ -849,11 +850,10 @@ void MainWindow::atualizarConfigAcbr(){
     //     // nfce->ConfigGravarValor("DANFENFCe", "ImprimeItens", "1");
     //     // nfce->ConfigGravarValor("DANFENFCe", "ViaConsumidor", "1");
     //     // nfce->ConfigGravarValor("DANFENFCe", "FormatarNumeroDocumento", "1");
-
+    acbr->ConfigGravar("");
 
     cnpj->ConfigGravarValor("ConsultaCNPJ", "Provedor", "3");
-
-    acbr->ConfigGravar("");
+    cnpj->ConfigGravar("");
     qDebug() << "Configurações salvas no arquivo acbrlib.ini";
 
 }

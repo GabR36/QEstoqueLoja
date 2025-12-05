@@ -85,6 +85,7 @@ void Entradas::on_Btn_ConsultarDF_clicked()
 {
     ManifestadorDFe *manifestdfe = new ManifestadorDFe(this);
     if(manifestdfe->possoConsultar()){
+
         manifestdfe->consultarEBaixarXML();
         QMessageBox::information(this, "Resposta", "Consultado");
         carregarTabela();

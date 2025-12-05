@@ -861,7 +861,13 @@ void MainWindow::atualizarConfigAcbr(){
 
 void MainWindow::on_Btn_Entradas_clicked()
 {
-    Entradas *entradas = new Entradas();
-    entradas->show();
+    if(fiscalValues.value("emit_nf") == "1" && fiscalValues.value("tp_amb") == "1"){
+        Entradas *entradas = new Entradas();
+        entradas->show();
+    }else{
+        QMessageBox::warning(this, "Aviso", "Para visualizar as notas de entrada é "
+                                            "necessário estar no ambiente 'Produção'.");
+    }
+
 }
 

@@ -72,9 +72,7 @@ public:
     QString getUltNsu();
     QString getUltNsuXml();
     bool possoConsultar();
-
-
-
+    void consultaAlternada();
 private:
     QSqlDatabase db;
     QMap<QString, QString> fiscalValues;
@@ -82,7 +80,7 @@ private:
     QString cuf,cnpj;
     QString ultimo_nsu;
     QString ultNsuXml;
-    int novoUltNsuXml;
+    QString novoUltNsuXml;
 
     void salvarEventoNoBanco(const QString &tipo, const EventoRetornoInfo &info, const QString &chaveNFe);
     void carregarConfigs();
@@ -96,8 +94,9 @@ private:
     Emitente lerEmitenteDoXML(const QString &xmlPath);
     NotaFiscal lerNotaFiscalDoXML(const QString &xmlPath);
     bool atualizarNotaBanco(ProcNfe notaInfo);
-    void salvarNovoUltNsuXml(int ultnsuxml);
+    void salvarNovoUltNsuXml(const QString &ultnsuxml);
     void atualizarDataNsu(int option);
+    void processarHeaderDfeXML(const QString &bloco);
 signals:
 };
 

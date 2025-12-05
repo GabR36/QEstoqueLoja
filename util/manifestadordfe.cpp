@@ -24,7 +24,30 @@ void ManifestadorDFe::carregarConfigs(){
     auto acbr = AcbrManager::instance()->nfe();
     acbr->ConfigGravarValor("NFe", "ModeloDF", "0");
 }
+void ManifestadorDFe::consultaAlternada(){
+    if(!db.isOpen()){
+        if(!db.open()){
+            qDebug() << "Banco nao abriu consultaAlternada";
+        }
+    }
+    QSqlQuery q("SELECT identificacao FROM dfe_info ORDER BY datetime(data_modificado) DESC LIMIT 1");
 
+    QString ultimaAcao;
+
+    if (q.next()) {
+        ultimaAcao = q.value(0).toString();
+    }
+
+    if (ultimaAcao == "consulta_xml") {
+        consultarEManifestar();      // próxima ação
+    } else if (ultimaAcao == "consulta_resumo") {
+        consultarEBaixarXML();       // próxima ação
+    } else {
+        // primeiro uso ou inconsistente
+        consultarEManifestar();
+    }
+
+}
 QString ManifestadorDFe::getUltNsu(){
     if(!db.open()){
         qDebug() << "não abriu bd getultnsu";
@@ -124,7 +147,7 @@ void ManifestadorDFe::consultarEBaixarXML(){
     // }
     // -----------------------------
     QStringList blocos = whole.split("[", Qt::SkipEmptyParts);
-
+    novoUltNsuXml = "0";
     for (QString bloco : blocos)
     {
         bloco = "[" + bloco;
@@ -132,13 +155,21 @@ void ManifestadorDFe::consultarEBaixarXML(){
         if (bloco.startsWith("[ResNFe") || bloco.startsWith("[ResDFe"))
             processarNota(bloco);
     }
-    if(novoUltNsuXml > ultNsuXml.toInt()){
+    for (QString bloco : blocos)
+    {
+        bloco = "[" + bloco;
+
+        if (bloco.startsWith("[DistribuicaoDFe"))
+            processarHeaderDfeXML(bloco);
+    }
+    if(novoUltNsuXml.toLongLong() > ultNsuXml.toLongLong()){
         salvarNovoUltNsuXml(novoUltNsuXml);
     }
 
+
 }
 
-void ManifestadorDFe::salvarNovoUltNsuXml(int ultnsuxml){
+void ManifestadorDFe::salvarNovoUltNsuXml(const QString &ultnsuxml){
     if (!db.open()) {
         qDebug() << "Erro ao abrir DB em salvarNovoUltNsu:" << db.lastError().text();
         return;
@@ -196,11 +227,47 @@ void ManifestadorDFe::processarHeaderDfe(const QString &bloco){
     salvarNovoUltNsu(ultNsu);
 }
 
+void ManifestadorDFe::processarHeaderDfeXML(const QString &bloco){
+
+    auto campo = [&](QString nome) {
+        QRegularExpression re(nome + R"(=([^\r\n]*))");
+        QRegularExpressionMatch m = re.match(bloco);
+        return m.hasMatch() ? m.captured(1).trimmed() : "";
+    };
+
+    QString cStat = campo("CStat");
+    QString msg   = campo("Msg");
+    QString ultNsu = campo("ultNSU");
+
+    // Limpeza de NSU como já tinha
+    ultNsu.replace("\\n", "");
+    ultNsu.replace("\\r", "");
+    ultNsu.remove('\n');
+    ultNsu.remove('\r');
+    ultNsu = ultNsu.trimmed();
+
+    qDebug() << "CStat da consulta:" << cStat;
+    qDebug() << "Mensagem:" << msg;
+    qDebug() << "ultNSU:" << ultNsu;
+
+    // nÃO atualizar o novo NSU se CStat indicar erro
+
+    if (cStat != "138") {
+        qDebug() << "Consulta retornou erro, não atualizou ultNSU!";
+        atualizarDataNsu(2);// 2 = atualiza consulta_xml
+        return;
+    }
+    atualizarDataNsu(2);
+    // // Somente sucesso > atualiza NSU
+    // salvarNovoUltNsu(ultNsu);
+}
+
 void ManifestadorDFe::atualizarDataNsu(int option){
     if (!db.open()) {
         qDebug() << "Erro ao abrir DB em atualizarDataNsu:" << db.lastError().text();
         return;
     }
+    qDebug() << "atualizando data modificado nsu";
     QString identificacao;
     if(option == 1 ){
         identificacao = "consulta_resumo";
@@ -215,6 +282,9 @@ void ManifestadorDFe::atualizarDataNsu(int option){
                   "WHERE identificacao = :ide");
     query.bindValue(":datamod", dataFormatada );
     query.bindValue(":ide", identificacao);
+    if(!query.exec()){
+        qDebug() << "nao completou query atualizar data";
+    }
 }
 
 void ManifestadorDFe::salvarNovoUltNsu(const QString &ultNsu){
@@ -237,6 +307,7 @@ void ManifestadorDFe::salvarNovoUltNsu(const QString &ultNsu){
     } else {
         qDebug() << "query update ultnsu rodou ok";
     }
+
 }
 
 void ManifestadorDFe::salvarResumoNota(ResumoNFe resumo){
@@ -311,47 +382,71 @@ void ManifestadorDFe::processarResumo(const QString &bloco)
 }
 
 
-void ManifestadorDFe::processarNota(const QString &bloco){
-    auto campo = [&](const QString &nome) {
-        QRegularExpression re("^" + nome + R"(=(.*))", QRegularExpression::MultilineOption);
-        QRegularExpressionMatch m = re.match(bloco);
-        if (!m.hasMatch())
-            return QString();
+void ManifestadorDFe::processarNota(const QString &bloco)
+{
+    auto campoTexto = [&](const QString &nome) {
+        // Captura até o fim da linha, com limpeza total
+        QRegularExpression re("^" + nome + R"(=(.*)$)",
+                              QRegularExpression::MultilineOption);
+        auto m = re.match(bloco);
+        if (!m.hasMatch()) return QString();
 
-        QString value = m.captured(1);
-        return value.trimmed();   // <-- remove qualquer \r, \n, espaços
+        QString v = m.captured(1).trimmed();
+        v.remove("\r");
+        v.remove("\n");
+        return v;
     };
-        ProcNfe nfe;
-        nfe.chave    = campo("chDFe");
-        nfe.nome     = campo("xNome");
-        nfe.cnpjEmit = campo("CNPJCPF");
-        nfe.schema   = campo("schema");
-        nfe.vnf      = campo("vNF");
-        nfe.cstat    = campo("CStat");
-        nfe.xml_path = campo("arquivo");
-        nfe.nProt    = campo("nProt");
-        nfe.dhEmi    = campo("dhEmi");
-        nfe.nsu = campo("NSU");
-        nfe.cSitNfe = campo("cSitNFe");
 
-        // Apenas notas completas ou resumos válidos
-        if (!nfe.schema.contains("procNFe"))
-            return;
-        qDebug() << "\nNota Xml localizado:" << nfe.chave << nfe.nome;
-        if(nfe.cSitNfe == "1"){
-            //se executar as duas funções corretamente atualiza o ultnsuxml;
-            if( salvarEmitenteCliente(nfe) && atualizarNotaBanco(nfe)){
-                if(nfe.nsu.toInt() > novoUltNsuXml ){
-                    novoUltNsuXml = nfe.nsu.toInt();
-                }else{
-                    qDebug() << "Algo aconteceu ao tentar rodar "
-                                "salvarEmitenteCliente(nfe)|atualizarNotaBanco(nfe)";
-                }
+    auto campoNumero = [&](const QString &nome) {
+        // Somente dígitos impede valores inválidos
+        QRegularExpression re("^" + nome + R"(=(\d+)$)",
+                              QRegularExpression::MultilineOption);
+        auto m = re.match(bloco);
+        return m.hasMatch() ? m.captured(1).trimmed() : QString();
+    };
+
+    ProcNfe nfe;
+    nfe.chave    = campoTexto("chDFe");
+    nfe.nome     = campoTexto("xNome");
+    nfe.cnpjEmit = campoTexto("CNPJCPF");
+    nfe.schema   = campoTexto("schema");
+    nfe.vnf      = campoTexto("vNF");
+    nfe.cstat    = campoTexto("CStat");
+    nfe.xml_path = campoTexto("arquivo");
+    nfe.nProt    = campoTexto("nProt");
+    nfe.dhEmi    = campoTexto("dhEmi");
+    nfe.cSitNfe  = campoTexto("cSitNFe");
+
+    nfe.nsu      = campoNumero("NSU");
+
+    // Não processa resumos inválidos
+    if (!nfe.schema.contains("procNFe"))
+        return;
+
+    qDebug() << "\n+++ Nota XML localizado +++";
+    qDebug() << "Chave:" << nfe.chave;
+    qDebug() << "NSU capturado:" << nfe.nsu;
+    qDebug() << "Emitente:" << nfe.nome;
+
+    if (nfe.cSitNfe == "1")
+    {
+        if (salvarEmitenteCliente(nfe) && atualizarNotaBanco(nfe))
+        {
+            qlonglong nsuInt = nfe.nsu.toLongLong();
+
+            if (nsuInt > novoUltNsuXml.toLongLong())
+            {
+                novoUltNsuXml = QString::number(nsuInt);
+                qDebug() << "Novo ultNSU atualizado para:" << novoUltNsuXml;
             }
-
         }
-
+        else
+        {
+            qDebug() << "Erro ao atualizar emitente ou nota.";
+        }
+    }
 }
+
 
 bool ManifestadorDFe::atualizarNotaBanco(ProcNfe notaInfo){
     NotaFiscal nf = lerNotaFiscalDoXML(notaInfo.xml_path);

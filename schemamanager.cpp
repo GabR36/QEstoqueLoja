@@ -641,7 +641,8 @@ void SchemaManager::update() {
                 "ALTER TABLE notas_fiscais ADD COLUMN id_emissorcliente INTEGER",
                 "UPDATE notas_fiscais SET dhemi = atualizado_em",
                 "CREATE TABLE IF NOT EXISTS dfe_info(id INTEGER NOT NULL UNIQUE PRIMARY KEY "
-                "AUTOINCREMENT, ult_nsu, data_modificado TEXT, identificacao TEXT) ",
+                "AUTOINCREMENT, ult_nsu, data_modificado TEXT, identificacao TEXT, ult_nsu_homolog "
+                "INTEGER) ",
                 "INSERT INTO dfe_info (ult_nsu, data_modificado, identificacao) VALUES "
                 "(0, '2025-12-01 00:00:00', 'consulta_xml')",
                 "INSERT INTO dfe_info (ult_nsu, data_modificado, identificacao) VALUES "

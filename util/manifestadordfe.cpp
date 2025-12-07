@@ -439,6 +439,11 @@ void ManifestadorDFe::processarNota(const QString &bloco)
                 novoUltNsuXml = QString::number(nsuInt);
                 qDebug() << "Novo ultNSU atualizado para:" << novoUltNsuXml;
             }
+            if(salvarProdutosNota(nfe.xml_path, nfe.chave)){
+                qDebug() << "Salvou os produtos da nota";
+            }else{
+                qDebug() << "Não salvou os produtos da nota";
+            }
         }
         else
         {
@@ -447,6 +452,138 @@ void ManifestadorDFe::processarNota(const QString &bloco)
     }
 }
 
+bool ManifestadorDFe::salvarProdutosNota(const QString &xml_path, const QString &chnfe){
+    if(!db.isOpen()){
+        if(!db.open()){
+            qDebug() << "bd nao abriu salvarProdutosNota()";
+            return false;
+        }
+    }
+
+    QSqlQuery query;
+    query.prepare("SELECT id FROM notas_fiscais WHERE chnfe = :chnfe");
+    query.bindValue(":chnfe", chnfe);
+    QString id_nf = "";
+    if(query.exec()){
+        while(query.next()){
+            id_nf = query.value(0).toString();
+        }
+    }else{
+        qDebug() << "nao rodou query select idnf";
+        return false;
+    }
+
+    QList<ProdutoNota> produtos = carregarProdutosDaNFe(xml_path, id_nf.toLongLong());
+
+    if (produtos.isEmpty()) {
+        qDebug() << "Nenhum produto encontrado no XML";
+        return false;
+    }
+
+
+    QSqlQuery ins;
+    ins.prepare(
+        "INSERT INTO produtos_nota "
+        "(id_nf, nitem, quantidade, descricao, preco, codigo_barras, un_comercial, "
+        " ncm, csosn, pis, cfop, aliquota_imposto, status) "
+        "VALUES "
+        "(:id_nf, :nitem, :quant, :desc, :preco, :cod_barras, :un_comercial, "
+        " :ncm, :csosn, :pis, :cfop, :aliquota, :status)"
+        );
+
+    for (const ProdutoNota &p : produtos) {
+        ins.bindValue(":id_nf",           p.id_nf);
+        ins.bindValue(":nitem",           p.nitem);
+        ins.bindValue(":quant",           p.quant);
+        ins.bindValue(":desc",            p.desc);
+        ins.bindValue(":preco",           p.preco);
+        ins.bindValue(":cod_barras",      p.cod_barras);
+        ins.bindValue(":un_comercial",    p.un_comercial);
+        ins.bindValue(":ncm",             p.ncm);
+        ins.bindValue(":csosn",           p.csosn);
+        ins.bindValue(":pis",             p.pis);
+        ins.bindValue(":cfop",            p.cfop);
+        ins.bindValue(":aliquota",        p.aliquota_imposto);
+        ins.bindValue(":status", "OK");
+
+        if (!ins.exec()) {
+            qDebug() << "Erro ao inserir produto:" << ins.lastError().text();
+            return false;
+        }
+    }
+
+    return true;
+}
+
+QList<ProdutoNota> ManifestadorDFe::carregarProdutosDaNFe(const QString &xml_path, qlonglong id_nf)
+{
+    QList<ProdutoNota> lista;
+
+    QFile file(xml_path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qDebug() << "Erro ao abrir arquivo XML:" << xml_path;
+        return lista;
+    }
+
+    QDomDocument doc;
+    if (!doc.setContent(&file)) {
+        qDebug() << "Erro ao ler conteúdo do XML";
+        file.close();
+        return lista;
+    }
+    file.close();
+
+    QDomNodeList itens = doc.elementsByTagName("det");
+
+    for (int i = 0; i < itens.count(); i++) {
+        QDomElement det = itens.at(i).toElement();
+
+        ProdutoNota p;
+        p.id_nf = id_nf;
+
+        p.nitem = det.attribute("nItem");
+
+        QDomElement prod = det.firstChildElement("prod");
+
+        p.desc          = prod.firstChildElement("xProd").text();
+        p.cod_barras    = prod.firstChildElement("cEAN").text();
+        p.un_comercial  = prod.firstChildElement("uCom").text();
+        p.ncm           = prod.firstChildElement("NCM").text();
+        p.cfop          = prod.firstChildElement("CFOP").text();
+
+        p.quant         = prod.firstChildElement("qCom").text().replace(",", ".").toFloat();
+        p.preco         = prod.firstChildElement("vUnCom").text().replace(",", ".").toDouble();
+
+        // ----- IMPOSTOS -----
+
+        QDomElement imposto = det.firstChildElement("imposto");
+
+        // CSOSN
+        QDomNodeList listaCSOSN = imposto.elementsByTagName("CSOSN");
+        if (!listaCSOSN.isEmpty())
+            p.csosn = listaCSOSN.at(0).toElement().text();
+        else
+            p.csosn = "";
+
+        // PIS - CST
+        QDomNodeList listaPIS = imposto.elementsByTagName("PISOutr");
+        if (listaPIS.isEmpty())
+            listaPIS = imposto.elementsByTagName("PISNT");
+
+        if (!listaPIS.isEmpty())
+            p.pis = listaPIS.at(0).firstChildElement("CST").text();
+        else
+            p.pis = "";
+
+        // Aliq. imposto (opcional) — usa pPIS se existir, senão zero
+        QString aliquota = listaPIS.at(0).firstChildElement("pPIS").text();
+        p.aliquota_imposto = aliquota.replace(",", ".").toFloat();
+
+        lista.append(p);
+    }
+
+    return lista;
+}
 
 bool ManifestadorDFe::atualizarNotaBanco(ProcNfe notaInfo){
     NotaFiscal nf = lerNotaFiscalDoXML(notaInfo.xml_path);

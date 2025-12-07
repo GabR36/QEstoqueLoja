@@ -28,6 +28,9 @@
    <property name="selectionMode">
     <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
    </property>
+   <property name="selectionBehavior">
+    <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+   </property>
   </widget>
   <widget class="QPushButton" name="Btn_ConsultarDF">
    <property name="geometry">
@@ -40,6 +43,22 @@
    </property>
    <property name="text">
     <string>Consultar</string>
+   </property>
+  </widget>
+  <widget class="QTableView" name="Tview_ProdutosNota">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>310</y>
+     <width>581</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="selectionMode">
+    <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+   </property>
+   <property name="selectionBehavior">
+    <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
    </property>
   </widget>
  </widget>

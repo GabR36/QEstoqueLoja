@@ -124,14 +124,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Tview_Produtos, &QTableView::doubleClicked,
             this, &MainWindow::verProd);
 
-    // ManifestadorDFe *manifestdfe = new ManifestadorDFe();
-    // if(manifestdfe->possoConsultar()){
-    //     manifestdfe->consultarEManifestar();
+    ManifestadorDFe *manifestdfe = new ManifestadorDFe();
+    if(manifestdfe->possoConsultar()){
+        manifestdfe->consultarEManifestar();
 
-    // }else{
-    //     qDebug() << "Nao consultado DFE";
+    }else{
+        qDebug() << "Nao consultado DFE";
 
-    // }
+    }
 }
 
 MainWindow::~MainWindow()

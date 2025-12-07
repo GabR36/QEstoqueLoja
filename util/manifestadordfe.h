@@ -49,7 +49,7 @@ struct Emitente {
 
 struct NotaFiscal {
     QString cstat;
-    int nnf = 0;
+    qlonglong nnf = 0;
     QString serie;
     QString modelo;
     bool tp_amb = false;
@@ -59,6 +59,21 @@ struct NotaFiscal {
     QString chnfe;
     QString nprot;
     QString cuf;
+};
+
+struct ProdutoNota {
+    float quant;
+    QString desc;
+    double preco;
+    QString cod_barras;
+    QString un_comercial;
+    QString ncm;
+    QString csosn;
+    QString pis;
+    QString cfop;
+    float aliquota_imposto;
+    QString nitem;
+    qlonglong id_nf;
 };
 
 class ManifestadorDFe : public QObject
@@ -97,6 +112,8 @@ private:
     void salvarNovoUltNsuXml(const QString &ultnsuxml);
     void atualizarDataNsu(int option);
     void processarHeaderDfeXML(const QString &bloco);
+    QList<ProdutoNota> carregarProdutosDaNFe(const QString &xml_path, qlonglong id_nf);
+    bool salvarProdutosNota(const QString &xml_path, const QString &chnfe);
 signals:
 };
 

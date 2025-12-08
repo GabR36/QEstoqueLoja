@@ -62,6 +62,39 @@ InserirProduto::~InserirProduto()
     delete ui;
     delete util;
 }
+
+void InserirProduto::preencherCamposProduto(
+    const QString &quantidade,
+    const QString &descricao,
+    const QString &preco,
+    const QString &codigoBarras,
+    bool nf,
+    const QString &uCom,
+    const QString &precoFornecedor,
+    const QString &percentLucro,
+    const QString &ncm,
+    const QString &aliquota,
+    const QString &csosn,
+    const QString &pis)
+{
+    ui->Ledit_Quant->setText(quantidade);
+    ui->Ledit_Desc->setText(descricao);
+    ui->Ledit_PrecoFinal->setText(preco);
+    ui->Ledit_CBarras->setText(codigoBarras);
+    ui->Check_Nf->setChecked(nf);
+    ui->Ledit_PrecoFornecedor->setText(precoFornecedor);
+    ui->Ledit_PercentualLucro->setText(percentLucro);
+    ui->Ledit_NCM->setText(ncm);
+    ui->Ledit_Aliquota->setText(aliquota);
+    ui->Ledit_CSOSN->setText(csosn);
+    ui->Ledit_PIS->setText(pis);
+    int index = ui->CBox_UCom->findText(uCom, Qt::MatchFixedString | Qt::MatchCaseSensitive);
+    ui->CBox_UCom->setCurrentIndex(index >= 0 ? index : 0);
+    ui->CBox_UCom->setCurrentText(uCom);
+
+    on_Ledit_NCM_editingFinished();
+}
+
 QString InserirProduto::gerarNumero()
 {
     QString number;

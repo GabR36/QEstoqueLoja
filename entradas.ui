@@ -54,6 +54,9 @@
      <height>151</height>
     </rect>
    </property>
+   <property name="contextMenuPolicy">
+    <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+   </property>
    <property name="selectionMode">
     <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
    </property>

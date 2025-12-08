@@ -864,6 +864,8 @@ void MainWindow::on_Btn_Entradas_clicked()
     if(fiscalValues.value("emit_nf") == "1" && fiscalValues.value("tp_amb") == "1"){
         Entradas *entradas = new Entradas();
         entradas->show();
+        connect(entradas, &Entradas::produtoAdicionado, this,
+                &MainWindow::atualizarTableview);
     }else{
         QMessageBox::warning(this, "Aviso", "Para visualizar as notas de entrada é "
                                             "necessário estar no ambiente 'Produção'.");

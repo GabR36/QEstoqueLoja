@@ -480,31 +480,32 @@ bool ManifestadorDFe::salvarProdutosNota(const QString &xml_path, const QString 
         return false;
     }
 
-
     QSqlQuery ins;
     ins.prepare(
         "INSERT INTO produtos_nota "
         "(id_nf, nitem, quantidade, descricao, preco, codigo_barras, un_comercial, "
-        " ncm, csosn, pis, cfop, aliquota_imposto, status) "
+        " ncm, csosn, pis, cfop, aliquota_imposto, cst_icms, tem_st, status) "
         "VALUES "
         "(:id_nf, :nitem, :quant, :desc, :preco, :cod_barras, :un_comercial, "
-        " :ncm, :csosn, :pis, :cfop, :aliquota, :status)"
+        " :ncm, :csosn, :pis, :cfop, :aliquota, :cst_icms, :tem_st, :status)"
         );
 
     for (const ProdutoNota &p : produtos) {
-        ins.bindValue(":id_nf",           p.id_nf);
-        ins.bindValue(":nitem",           p.nitem);
-        ins.bindValue(":quant",           p.quant);
-        ins.bindValue(":desc",            p.desc);
-        ins.bindValue(":preco",           p.preco);
-        ins.bindValue(":cod_barras",      p.cod_barras);
-        ins.bindValue(":un_comercial",    p.un_comercial);
-        ins.bindValue(":ncm",             p.ncm);
-        ins.bindValue(":csosn",           p.csosn);
-        ins.bindValue(":pis",             p.pis);
-        ins.bindValue(":cfop",            p.cfop);
-        ins.bindValue(":aliquota",        p.aliquota_imposto);
-        ins.bindValue(":status", "OK");
+        ins.bindValue(":id_nf",        p.id_nf);
+        ins.bindValue(":nitem",        p.nitem);
+        ins.bindValue(":quant",        p.quant);
+        ins.bindValue(":desc",         p.desc);
+        ins.bindValue(":preco",        p.preco);
+        ins.bindValue(":cod_barras",   p.cod_barras);
+        ins.bindValue(":un_comercial", p.un_comercial);
+        ins.bindValue(":ncm",          p.ncm);
+        ins.bindValue(":csosn",        p.csosn);
+        ins.bindValue(":pis",          p.pis);
+        ins.bindValue(":cfop",         p.cfop);
+        ins.bindValue(":aliquota",     p.aliquota_imposto);
+        ins.bindValue(":cst_icms",     p.cst_icms);
+        ins.bindValue(":tem_st",       p.tem_st ? 1 : 0);
+        ins.bindValue(":status",       "OK");
 
         if (!ins.exec()) {
             qDebug() << "Erro ao inserir produto:" << ins.lastError().text();
@@ -514,6 +515,7 @@ bool ManifestadorDFe::salvarProdutosNota(const QString &xml_path, const QString 
 
     return true;
 }
+
 
 QList<ProdutoNota> ManifestadorDFe::carregarProdutosDaNFe(const QString &xml_path, qlonglong id_nf)
 {
@@ -550,22 +552,58 @@ QList<ProdutoNota> ManifestadorDFe::carregarProdutosDaNFe(const QString &xml_pat
         p.un_comercial  = prod.firstChildElement("uCom").text();
         p.ncm           = prod.firstChildElement("NCM").text();
         p.cfop          = prod.firstChildElement("CFOP").text();
-
         p.quant         = prod.firstChildElement("qCom").text().replace(",", ".").toFloat();
         p.preco         = prod.firstChildElement("vUnCom").text().replace(",", ".").toDouble();
 
-        // ----- IMPOSTOS -----
-
+        // ======= IMPOSTOS =======
         QDomElement imposto = det.firstChildElement("imposto");
 
-        // CSOSN
-        QDomNodeList listaCSOSN = imposto.elementsByTagName("CSOSN");
-        if (!listaCSOSN.isEmpty())
-            p.csosn = listaCSOSN.at(0).toElement().text();
-        else
-            p.csosn = "";
+        // -------------------- CSOSN ou CST ICMS --------------------
+        p.csosn = "";
+        p.cst_icms = "";
+        p.tem_st = false;
 
-        // PIS - CST
+        QDomElement icms = imposto.firstChildElement("ICMS");
+
+        QStringList gruposICMS = {
+            "ICMS00","ICMS10","ICMS20","ICMS30","ICMS40","ICMS51","ICMS60","ICMS70","ICMS90",
+            "ICMSSN101","ICMSSN102","ICMSSN201","ICMSSN202","ICMSSN500","ICMSSN900"
+        };
+
+        for (const QString &g : gruposICMS) {
+            QDomElement e = icms.firstChildElement(g);
+            if (!e.isNull()) {
+
+                // pega CST ou CSOSN
+                QString CST = e.firstChildElement("CST").text();
+                QString CSOSN = e.firstChildElement("CSOSN").text();
+
+                if (!CSOSN.isEmpty())
+                    p.csosn = CSOSN;
+
+                if (!CST.isEmpty())
+                    p.cst_icms = CST;
+
+                // identifica ST
+                if (g == "ICMS10" || g == "ICMS30" || g == "ICMS60" ||
+                    g == "ICMS70" || g == "ICMSSN201" || g == "ICMSSN202") {
+                    p.tem_st = true;
+                }
+
+                // valida ST por valores
+                if (!e.firstChildElement("vBCST").isNull() ||
+                    !e.firstChildElement("vICMSST").isNull() ||
+                    !e.firstChildElement("vBCSTRet").isNull() ||
+                    !e.firstChildElement("vICMSSTRet").isNull())
+                {
+                    p.tem_st = true;
+                }
+
+                break;
+            }
+        }
+
+        // -------------------- PIS --------------------
         QDomNodeList listaPIS = imposto.elementsByTagName("PISOutr");
         if (listaPIS.isEmpty())
             listaPIS = imposto.elementsByTagName("PISNT");
@@ -575,7 +613,6 @@ QList<ProdutoNota> ManifestadorDFe::carregarProdutosDaNFe(const QString &xml_pat
         else
             p.pis = "";
 
-        // Aliq. imposto (opcional) — usa pPIS se existir, senão zero
         QString aliquota = listaPIS.at(0).firstChildElement("pPIS").text();
         p.aliquota_imposto = aliquota.replace(",", ".").toFloat();
 

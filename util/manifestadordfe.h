@@ -74,6 +74,8 @@ struct ProdutoNota {
     float aliquota_imposto;
     QString nitem;
     qlonglong id_nf;
+    QString cst_icms;
+    bool tem_st;
 };
 
 class ManifestadorDFe : public QObject

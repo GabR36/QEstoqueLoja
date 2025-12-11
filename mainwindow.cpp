@@ -124,14 +124,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Tview_Produtos, &QTableView::doubleClicked,
             this, &MainWindow::verProd);
 
-    ManifestadorDFe *manifestdfe = new ManifestadorDFe();
-    if(manifestdfe->possoConsultar()){
-        manifestdfe->consultarEManifestar();
+    // ManifestadorDFe *manifestdfe = new ManifestadorDFe();
+    // if(manifestdfe->possoConsultar()){
+    //     manifestdfe->consultarEManifestar();
 
-    }else{
-        qDebug() << "Nao consultado DFE";
+    // }else{
+    //     qDebug() << "Nao consultado DFE";
 
-    }
+    // }
 }
 
 MainWindow::~MainWindow()
@@ -861,15 +861,15 @@ void MainWindow::atualizarConfigAcbr(){
 
 void MainWindow::on_Btn_Entradas_clicked()
 {
-    if(fiscalValues.value("emit_nf") == "1" && fiscalValues.value("tp_amb") == "1"){
+    // if(fiscalValues.value("emit_nf") == "1" && fiscalValues.value("tp_amb") == "1"){
         Entradas *entradas = new Entradas();
         entradas->show();
         connect(entradas, &Entradas::produtoAdicionado, this,
                 &MainWindow::atualizarTableview);
-    }else{
-        QMessageBox::warning(this, "Aviso", "Para visualizar as notas de entrada é "
-                                            "necessário estar no ambiente 'Produção'.");
-    }
+    // }else{
+    //     QMessageBox::warning(this, "Aviso", "Para visualizar as notas de entrada é "
+    //                                         "necessário estar no ambiente 'Produção'.");
+    // }
 
 }
 

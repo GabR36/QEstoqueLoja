@@ -98,11 +98,12 @@ void Entradas::on_Btn_ConsultarDF_clicked()
     ManifestadorDFe *manifestdfe = new ManifestadorDFe(this);
     if(manifestdfe->possoConsultar()){
 
-        manifestdfe->consultarEBaixarXML();
-        QMessageBox::information(this, "Resposta", "Consultado");
+        manifestdfe->consultaAlternada();
+        // QMessageBox::information(this, "Resposta", "Consultado");
         carregarTabela();
     }else{
-        QMessageBox::information(this, "Erro", "Espere uma hora para consultar");
+        QMessageBox::warning(this, "Aviso", "Não faz uma hora que a última consulta "
+                                               "foi realizada, por favor espere.");
     }
     ui->Tview_Entradas->selectRow(0);
 }
@@ -186,6 +187,7 @@ void Entradas::carregarProdutosDaNota(qlonglong id_nf)
             quantidade AS Quantidade,
             preco AS Preço,
             un_comercial AS Unidade,
+            status AS Status,
             ncm AS NCM,
             cfop AS CFOP,
             csosn AS CSOSN,
@@ -252,11 +254,21 @@ void Entradas::on_Tview_ProdutosNota_customContextMenuRequested(const QPoint &po
 
 
     QList<qlonglong> idsSelecionados;
+    bool jaDevolvido = false;
+
     for (const QModelIndex &linha : selecionadas) {
         int id = ui->Tview_ProdutosNota->model()
         ->data(ui->Tview_ProdutosNota->model()->index(linha.row(), 0))
             .toInt();
         idsSelecionados.append(id);
+
+        QString status = ui->Tview_ProdutosNota->model()
+                             ->data(ui->Tview_ProdutosNota->model()->index(linha.row(), 6))
+                             .toString();
+
+        if (status.trimmed().toUpper() == "DEVOLVIDO") {
+            jaDevolvido = true;
+        }
     }
 
     // Apenas para debug
@@ -266,6 +278,10 @@ void Entradas::on_Tview_ProdutosNota_customContextMenuRequested(const QPoint &po
     QMenu menu(this);
     QAction *adicionar = menu.addAction("Adicionar ao Estoque");
     QAction *devolucao = menu.addAction("Emitir Devolução");
+
+    if (jaDevolvido) {
+        devolucao->setEnabled(false);
+    }
 
     QAction *selecionada = menu.exec(ui->Tview_ProdutosNota->viewport()->mapToGlobal(pos));
     if (!selecionada)
@@ -287,7 +303,17 @@ void Entradas::on_Tview_ProdutosNota_customContextMenuRequested(const QPoint &po
         }
 
     } else if (selecionada == devolucao) {
-        devolverProdutos(idsSelecionados);
+        QMessageBox::StandardButton resposta = QMessageBox::question(
+            this,
+            "Confirmação",
+            QString("Tem certeza que deseja emitir uma nota de devolução de "
+                    "%1 produto(s) selecionado(s)?")
+                .arg(idsSelecionados.size()),
+            QMessageBox::Yes | QMessageBox::No
+            );
+        if(resposta == QMessageBox::Yes){
+            devolverProdutos(idsSelecionados);
+        }
     }
 }
 

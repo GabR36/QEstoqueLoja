@@ -413,11 +413,16 @@ background-color:rgb(03,75,119);
                  </size>
                 </property>
                 <property name="text">
-                 <string>Entrada de
- Mercadoria</string>
+                 <string>Compras</string>
                 </property>
                 <property name="icon">
                  <iconset theme="QIcon::ThemeIcon::GoHome"/>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>40</width>
+                  <height>40</height>
+                 </size>
                 </property>
                </widget>
               </item>

@@ -67,6 +67,7 @@ private:
     QString salvarDevolucaoNf(QString retornoEnvio, QString idnf, NfeACBR *devolNfe,
                               QList<qlonglong> &idsProduto);
     void atualizarProdutoNotaAoDevolver(QString idNfDevol, QList<qlonglong> &idsProduto);
+    double calcularPrecoItemSN(const QString &xmlPath, int nItem);
 signals:
     void produtoAdicionado();
 };

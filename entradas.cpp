@@ -14,6 +14,10 @@
 #include <qmenu.h>
 #include "inserirproduto.h"
 #include "configuracao.h"
+#include <QFile>
+#include <QDomDocument>
+#include <QDebug>
+#include "util/nfxmlutil.h"
 
 Entradas::Entradas(QWidget *parent)
     : QWidget(parent)
@@ -506,26 +510,37 @@ void Entradas::addProdSemCodBarras(QString idProd, QString codBarras){
     QString csosn;
     QString pis;
     QSqlQuery query;
-    query.prepare("SELECT quantidade, descricao, preco, codigo_barras, un_comercial, ncm, csosn, pis "
-                  "FROM produtos_nota WHERE id = :id");
+    QString xml_path;
+    int nitem;
+    query.prepare("SELECT quantidade, descricao, preco, codigo_barras, un_comercial, ncm, csosn, pis, nitem, xml_path "
+                  "FROM produtos_nota INNER JOIN notas_fiscais ON id_nf = notas_fiscais.id WHERE produtos_nota.id = :id");
     query.bindValue(":id", idProd);
     if(query.exec()){
         while(query.next()){
-            quant = query.value(0).toString();
-            desc = query.value(1).toString();
-            preco = query.value(2).toString();
-            cod_barras = query.value(3).toString();
-            un_comercial = query.value(4).toString();
-            ncm = query.value(5).toString();
-            csosn = query.value(6).toString();
-            pis = query.value(7).toString();
+            quant = query.value("quantidade").toString();
+            desc = query.value("descricao").toString();
+            preco = query.value("preco").toString();
+            cod_barras = query.value("codigo_barras").toString();
+            un_comercial = query.value("un_comercial").toString();
+            ncm = query.value("ncm").toString();
+            csosn = query.value("csosn").toString();
+            pis = query.value("pis").toString();
+            nitem = query.value("nitem").toInt();
+            xml_path = query.value("xml_path").toString();
 
         }
     }else{
         qDebug() << "query addProdSemCodBarras nao rodou";
     }
     quant = portugues.toString(quant.toFloat());
-    preco = portugues.toString(preco.toFloat());
+
+    NfXmlUtil *nfutil = new NfXmlUtil(this);
+    CustoItem custoxml = nfutil->calcularCustoItemSN(xml_path, nitem);
+
+    qDebug() << "custo fornecedor taxas incluidas:" << custoxml.custoUnitario;
+    qDebug() << "Preço fornecedor " << custoxml.precoUnitarioNota;
+    double coreValue = custoxml.custoUnitario;
+    preco = portugues.toString(coreValue);
 
     QString porcent_lucro = portugues.toString(financeiroValues.value("porcent_lucro").toFloat());
     QString pisCofins = produtoValues.value("pis_padrao");
@@ -541,4 +556,5 @@ void Entradas::addProdSemCodBarras(QString idProd, QString codBarras){
             &Entradas::produtoAdicionado);
     db.close();
 }
+
 

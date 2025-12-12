@@ -125,6 +125,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
         nota/eventocienciaop.h nota/eventocienciaop.cpp
         util/manifestadordfe.h util/manifestadordfe.cpp
+        util/nfxmlutil.h util/nfxmlutil.cpp
 
 
 

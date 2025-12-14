@@ -18,6 +18,8 @@
 #include <QDomDocument>
 #include <QDebug>
 #include "util/nfxmlutil.h"
+#include "util/dbutil.h"
+#include "mergeprodutos.h"
 
 Entradas::Entradas(QWidget *parent)
     : QWidget(parent)
@@ -301,6 +303,8 @@ void Entradas::on_Tview_ProdutosNota_customContextMenuRequested(const QPoint &po
 
             if (existeCodBarras(codigoEscaneado)) {
                 QMessageBox::warning(this, "Aviso", "Já existe um produto com esse código cadastrado.");
+
+                addProdComCodBarras(QString::number(idsSelecionados.first()), codigoEscaneado);
             } else {
                 addProdSemCodBarras(QString::number(idsSelecionados.first()), codigoEscaneado);
             }
@@ -557,4 +561,108 @@ void Entradas::addProdSemCodBarras(QString idProd, QString codBarras){
     db.close();
 }
 
+void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
+    qDebug() << idProd << codBarras;
+    if(!db.isOpen()){
+        if(!db.open()){
+            qDebug() << "Banco nao abriu em addProdComCodBarras()";
+        }
+    }
 
+    QSqlQuery query;
+
+    query.prepare("SELECT * FROM produtos WHERE produtos.codigo_barras = :codBarras");
+    query.bindValue(":codBarras", codBarras);
+    if (!query.exec()) {
+        qDebug() << "erro query addprodcombarras()";
+    }
+
+    QVector<QVariantMap> registros = DBUtil::extrairResultados(query);
+
+    qDebug() << registros;
+
+    if (registros.isEmpty()) {
+        qDebug() << "Produto não encontrado";
+        return;
+    }
+
+    QVariantMap produto = registros.first();
+
+    QSqlQuery query2;
+
+    query2.prepare("SELECT id, quantidade, descricao, preco, codigo_barras, un_comercial, "
+                   "ncm, aliquota_imposto, csosn, pis FROM produtos_nota"
+                   " WHERE produtos_nota.id = :idProd");
+    query2.bindValue(":idProd", idProd);
+    if (!query2.exec()) {
+        qDebug() << "erro query addprodcombarras()2";
+    }
+
+    QVector<QVariantMap> registros2 = DBUtil::extrairResultados(query2);
+
+    qDebug() << registros2;
+
+    if (registros2.isEmpty()) {
+        qDebug() << "ProdutoNota não encontrado";
+        return;
+    }
+
+    QVariantMap produtoNota = registros2.first();
+
+    // comparar os campos do produtoNota e produto e pegar a diferença
+    QVariantMap resultado;
+
+    if (produto["quantidade"].toFloat() != produtoNota["quantidade"].toFloat()) {
+        resultado["quantidade"] = produto["quantidade"].toFloat() + produtoNota["quantidade"].toFloat();
+    }
+
+    if (produto["descricao"].toString() != produtoNota["descricao"].toString()) {
+        if (produto["descricao"].toString() == "") {
+            resultado["descricao"] = produtoNota["descricao"].toString();
+        }
+        else {
+            resultado["descricao"] = produto["descricao"].toString();
+        }
+    }
+
+    if (produto["preco_fornecedor"].toFloat() != produtoNota["preco"].toFloat()) {
+        float porcent_lucro = financeiroValues.value("porcent_lucro").toFloat();
+        resultado["preco"] = produtoNota["preco"].toFloat() * (porcent_lucro/100 + 1);
+        resultado["porcent_lucro"] = porcent_lucro;
+        resultado["preco_fornecedor"] = produtoNota["preco"].toFloat();
+    }
+
+    if (produto["un_comercial"].toString() != produtoNota["un_comercial"].toString()) {
+        if (produto["un_comercial"].toString() == "") {
+            resultado["un_comercial"] = produtoNota["un_comercial"].toString();
+        }
+        else {
+            resultado["un_comercial"] = produto["un_comercial"].toString();
+        }
+    }
+
+    if (produto["ncm"].toString() != produtoNota["ncm"].toString()) {
+        if (produto["ncm"].toString() == "" || produto["ncm"] == "00000000") {
+            resultado["ncm"] = produtoNota["ncm"].toString();
+        }
+        else {
+            resultado["ncm"] = produto["ncm"].toString();
+        }
+    }
+
+    if (produto["aliquota_imposto"].toFloat() != produtoNota["aliquota_imposto"].toFloat()) {
+        if (produto["aliquota_imposto"].toFloat() == 0) {
+            resultado["aliquota_imposto"] = produtoNota["aliquota_imposto"].toFloat();
+        }
+        else {
+            resultado["aliquota_imposto"] = produto["aliquota_imposto"].toFloat();
+        }
+    }
+
+    db.close();
+
+    qDebug() << resultado;
+
+    MergeProdutos *janelaMerge = new MergeProdutos(produto, produtoNota, resultado);
+    janelaMerge->show();
+}

@@ -15,11 +15,18 @@ MergeProdutos::MergeProdutos(QVariantMap produto1, QVariantMap produto2,
     idProduto = produto1["id"].toString();
     nfProduto = produto1["nf"].toBool();
     db = QSqlDatabase::database();
-    QStandardItemModel *modeloComparacaoProd = new QStandardItemModel;
+    QStandardItemModel *modeloComparacaoProd = new QStandardItemModel(this);
     this->modeloComparacaoProd = modeloComparacaoProd;
-    QStringList headersOriginais = sugerido.keys();
-    headersOriginais.sort();
-    modeloComparacaoProd->setColumnCount(headersOriginais.size());
+
+    QStringList campos = sugerido.keys();
+    campos.sort();
+
+    modeloComparacaoProd->setColumnCount(3);
+    modeloComparacaoProd->setRowCount(campos.size());
+
+    modeloComparacaoProd->setHeaderData(0, Qt::Horizontal, "Existente");
+    modeloComparacaoProd->setHeaderData(1, Qt::Horizontal, "Novo");
+    modeloComparacaoProd->setHeaderData(2, Qt::Horizontal, "Sugerido");
 
     const QMap<QString, QString> mapaHeadersLegiveis = {
         { "aliquota_imposto", "Alíquota de imposto" },
@@ -32,61 +39,34 @@ MergeProdutos::MergeProdutos(QVariantMap produto1, QVariantMap produto2,
         { "pis", "PIS" },
     };
 
-    for (int col = 0; col < headersOriginais.size(); ++col) {
-        const QString &chave = headersOriginais[col];
+    for (int row = 0; row < campos.size(); ++row) {
+        const QString &chave = campos[row];
 
         QString legivel = mapaHeadersLegiveis.value(chave, chave);
+        modeloComparacaoProd->setHeaderData(row, Qt::Vertical, legivel);
+        modeloComparacaoProd->setHeaderData(row, Qt::Vertical, chave, Qt::UserRole);
 
-        modeloComparacaoProd->setHeaderData(
-            col,
-            Qt::Horizontal,
-            legivel,
-            Qt::DisplayRole
+        modeloComparacaoProd->setItem(
+            row, 0,
+            new QStandardItem(produto1.value(chave).toString())
             );
 
-        modeloComparacaoProd->setHeaderData(
-            col,
-            Qt::Horizontal,
-            chave,
-            Qt::UserRole
+        modeloComparacaoProd->setItem(
+            row, 1,
+            new QStandardItem(produto2.value(chave).toString())
+            );
+
+        modeloComparacaoProd->setItem(
+            row, 2,
+            new QStandardItem(sugerido.value(chave).toString())
             );
     }
-
-    QList<QStandardItem*> linhaSugerido;
-    QList<QStandardItem*> linhaProd1;
-    QList<QStandardItem*> linhaProd2;
-
-    for (const QString &chave : headersOriginais) {
-        QVariant valor = sugerido.value(chave);
-        linhaSugerido << new QStandardItem(valor.toString());
-        valor = produto1.value(chave);
-        linhaProd1 << new QStandardItem(valor.toString());
-        valor = produto2.value(chave);
-        linhaProd2 << new QStandardItem(valor.toString());
-    }
-
-    modeloComparacaoProd->appendRow(linhaProd1);
-    modeloComparacaoProd->appendRow(linhaProd2);
-    modeloComparacaoProd->appendRow(linhaSugerido);
-
-    modeloComparacaoProd->setVerticalHeaderLabels({
-        "Existente",
-        "Novo",
-        "Sugerido"
-    });
 
     ui->Tview_ComparacaoProd->setModel(modeloComparacaoProd);
     ui->Tview_ComparacaoProd->horizontalHeader()->setStretchLastSection(true);
     ui->Tview_ComparacaoProd->resizeColumnsToContents();
-    // int altura = ui->Tview_ComparacaoProd->horizontalHeader()->height();
-    // for (int row = 0; row < modeloComparacaoProd->rowCount(); ++row) {
-    //     altura += ui->Tview_ComparacaoProd->rowHeight(row);
-    // }
-    // if (ui->Tview_ComparacaoProd->horizontalScrollBar()->isVisible()) {
-    //     altura += ui->Tview_ComparacaoProd->horizontalScrollBar()->height();
-    // }
-    // ui->Tview_ComparacaoProd->setFixedHeight(altura);
-    // ui->Tview_ComparacaoProd->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->Tview_ComparacaoProd->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
 }
 
 MergeProdutos::~MergeProdutos()
@@ -102,26 +82,30 @@ void MergeProdutos::on_Btn_Cancelar_clicked()
 
 void MergeProdutos::on_Btn_Importar_clicked()
 {
-    int linhaSugerido = 2;
+    const int colunaSugerido = 2; // Existente=0, Novo=1, Sugerido=2
 
     QVariantMap valoresSugeridos;
 
-    for (int col = 0; col < modeloComparacaoProd->columnCount(); ++col) {
+    for (int row = 0; row < modeloComparacaoProd->rowCount(); ++row) {
+
         QString chave = modeloComparacaoProd
-                            ->headerData(col, Qt::Horizontal, Qt::UserRole)
+                            ->headerData(row, Qt::Vertical, Qt::UserRole)
                             .toString();
 
-        QVariant valor = modeloComparacaoProd
-                             ->item(linhaSugerido, col)
-                             ->data(Qt::DisplayRole);
+        if (chave.isEmpty())
+            continue;
 
+        QStandardItem *item = modeloComparacaoProd->item(row, colunaSugerido);
+        if (!item)
+            continue;
+
+        QVariant valor = item->data(Qt::DisplayRole);
         valoresSugeridos.insert(chave, valor);
     }
 
-    qDebug() << "valoresSugeridos: " << valoresSugeridos;
+    qDebug() << "valoresSugeridos:" << valoresSugeridos;
 
-    // atualizar o produto no banco de dados
-
+    // Monta UPDATE
     QStringList sets;
     QVariantList binds;
 
@@ -138,13 +122,14 @@ void MergeProdutos::on_Btn_Importar_clicked()
         "UPDATE produtos SET " + sets.join(", ") +
         " WHERE id = ?";
 
-    if(!db.isOpen()){
-        if(!db.open()){
+    if (!db.isOpen()) {
+        if (!db.open()) {
             qDebug() << "Banco nao abriu em btn_importar (mergeprodutos)";
+            return;
         }
     }
 
-    QSqlQuery query;
+    QSqlQuery query(db);
     query.prepare(sql);
 
     for (const QVariant &v : binds)
@@ -152,10 +137,11 @@ void MergeProdutos::on_Btn_Importar_clicked()
 
     query.addBindValue(idProduto);
 
-    query.exec();
+    if (!query.exec()) {
+        qDebug() << "Erro ao atualizar produto:" << query.lastError();
+    }
 
     db.close();
-
-    this->close();
+    close();
 }
 

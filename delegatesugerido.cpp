@@ -28,10 +28,12 @@ QWidget *DelegateSugerido::createEditor(
 
     // -------- quantidade --------
     if (chave == "quantidade") {
-        QSpinBox *sb = new QSpinBox(parent);
-        sb->setMinimum(0);
-        sb->setMaximum(1000000);
-        return sb;
+        QDoubleSpinBox *dsb = new QDoubleSpinBox(parent);
+        dsb->setDecimals(2);
+        dsb->setMinimum(0.0);
+        dsb->setMaximum(1000000.0);
+        dsb->setSingleStep(0.01);  // passo fino
+        return dsb;
     }
 
     // -------- preço / impostos --------
@@ -85,8 +87,8 @@ void DelegateSugerido::setEditorData(QWidget *editor,
 {
     QVariant valor = index.data(Qt::EditRole);
 
-    if (auto sb = qobject_cast<QSpinBox *>(editor))
-        sb->setValue(valor.toInt());
+    if (auto dsb = qobject_cast<QDoubleSpinBox *>(editor))
+        dsb->setValue(valor.toDouble());
 
     else if (auto dsb = qobject_cast<QDoubleSpinBox *>(editor))
         dsb->setValue(valor.toDouble());

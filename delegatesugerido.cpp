@@ -6,9 +6,10 @@
 #include <QComboBox>
 #include <QPainter>
 #include "mainwindow.h"
+#include <QStyledItemDelegate>
 
 DelegateSugerido::DelegateSugerido(QObject *parent)
-    : QItemDelegate(parent)
+    : QStyledItemDelegate(parent)
 {
 }
 
@@ -141,17 +142,7 @@ void DelegateSugerido::setModelData(QWidget *editor,
         return;
     }
 
-    // if (auto sb = qobject_cast<QSpinBox *>(editor))
-    //     model->setData(index, sb->value());
 
-    // else if (auto dsb = qobject_cast<QDoubleSpinBox *>(editor))
-    //     model->setData(index, dsb->value());
-
-    // else if (auto le = qobject_cast<QLineEdit *>(editor))
-    //     model->setData(index, le->text());
-
-    // else if (auto cb = qobject_cast<QComboBox *>(editor))
-    //     model->setData(index, cb->currentText());
 }
 
 void DelegateSugerido::paint(QPainter *painter,
@@ -162,5 +153,14 @@ void DelegateSugerido::paint(QPainter *painter,
         painter->fillRect(option.rect, QColor(230, 240, 255));
     }
 
-    QItemDelegate::paint(painter, option, index);
+    QStyledItemDelegate::paint(painter, option, index);
+}
+
+QString DelegateSugerido::displayText(const QVariant &value,
+                                      const QLocale &locale) const
+{
+    if (value.metaType().id() == QMetaType::Double) {
+        return locale.toString(value.toDouble(), 'f', 2);
+    }
+    return QStyledItemDelegate::displayText(value, locale);
 }

@@ -202,12 +202,11 @@ void MergeProdutos::on_Btn_Importar_clicked()
     db.close();
     close();
 }
-
 void MergeProdutos::onModelDataChanged(const QModelIndex &topLeft,
                                        const QModelIndex &,
                                        const QVector<int> &)
 {
-    // só reage à coluna "Sugerido"
+    // reage apenas à coluna "Sugerido"
     if (topLeft.column() != 2)
         return;
 
@@ -218,9 +217,10 @@ void MergeProdutos::onModelDataChanged(const QModelIndex &topLeft,
                          Qt::UserRole)
             .toString();
 
+    // campos relevantes
     if (chaveAlterada != "preco_fornecedor" &&
         chaveAlterada != "porcent_lucro" &&
-        chaveAlterada != "aliquota_imposto" &&
+        chaveAlterada != "preco" &&
         chaveAlterada != "ncm")
         return;
 
@@ -228,7 +228,6 @@ void MergeProdutos::onModelDataChanged(const QModelIndex &topLeft,
     int rowLucro = -1;
     int rowPrecoFinal = -1;
     int rowNcm = -1;
-    int rowAliquota = -1;
 
     for (int r = 0; r < modeloComparacaoProd->rowCount(); ++r) {
         QString chave =
@@ -244,38 +243,12 @@ void MergeProdutos::onModelDataChanged(const QModelIndex &topLeft,
             rowPrecoFinal = r;
         else if (chave == "ncm")
             rowNcm = r;
-        else if (chave == "aliquota_imposto")
-            rowAliquota = r;
     }
+
     if (chaveAlterada == "ncm") {
-
-        // if (rowNcm < 0 || rowAliquota < 0)
-        //     return;
-
-        // QString ncm =
-        //     modeloComparacaoProd
-        //         ->item(rowNcm, 2)
-        //         ->data(Qt::EditRole)
-        //         .toString();
-
-        // if (ncm.isEmpty())
-        //     return;
-        // IbptUtil *ibpt = new IbptUtil();
-        // float aliquota =
-        //     ibpt->get_Aliquota_From_Csv(ncm);
-
-        // QStandardItem *itemAliquota =
-        //     modeloComparacaoProd->item(rowAliquota, 2);
-
-        // // evita loop infinito
-        // if (qFuzzyCompare(itemAliquota->data(Qt::EditRole).toDouble(),
-        //                   aliquota))
-        //     return;
-
-        // itemAliquota->setData(aliquota, Qt::EditRole);
         atualizarAliquotaPeloNcm();
+        return;
     }
-
 
     if (rowPrecoFornecedor < 0 ||
         rowLucro < 0 ||
@@ -288,24 +261,53 @@ void MergeProdutos::onModelDataChanged(const QModelIndex &topLeft,
             ->data(Qt::EditRole)
             .toDouble();
 
-    double porcentLucro =
-        modeloComparacaoProd
-            ->item(rowLucro, 2)
-            ->data(Qt::EditRole)
-            .toDouble();
-
-    double precoFinal =
-        precoFornecedor * (1.0 + porcentLucro / 100.0);
-
     QStandardItem *itemPreco =
         modeloComparacaoProd->item(rowPrecoFinal, 2);
 
-    // evita loop infinito
-    if (qFuzzyCompare(itemPreco->data(Qt::EditRole).toDouble(),
-                      precoFinal))
-        return;
+    if (chaveAlterada == "preco_fornecedor" ||
+        chaveAlterada == "porcent_lucro") {
 
-    itemPreco->setData(precoFinal, Qt::EditRole);
+        if (precoFornecedor <= 0)
+            return;
+
+        double porcentLucro =
+            modeloComparacaoProd
+                ->item(rowLucro, 2)
+                ->data(Qt::EditRole)
+                .toDouble();
+
+        double novoPreco =
+            precoFornecedor * (1.0 + porcentLucro / 100.0);
+
+        if (!qFuzzyCompare(itemPreco->data(Qt::EditRole).toDouble(),
+                           novoPreco)) {
+            itemPreco->setData(novoPreco, Qt::EditRole);
+        }
+
+        return;
+    }
+
+    if (chaveAlterada == "preco") {
+
+        if (precoFornecedor <= 0)
+            return;
+
+        double precoEditado =
+            itemPreco->data(Qt::EditRole).toDouble();
+
+        double novoLucro =
+            ((precoEditado / precoFornecedor) - 1.0) * 100.0;
+
+        QStandardItem *itemLucro =
+            modeloComparacaoProd->item(rowLucro, 2);
+
+        if (!qFuzzyCompare(itemLucro->data(Qt::EditRole).toDouble(),
+                           novoLucro)) {
+            itemLucro->setData(novoLucro, Qt::EditRole);
+        }
+
+        return;
+    }
 }
 
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QItemDelegate>
+#include <QStyledItemDelegate>
 
-class DelegateSugerido : public QItemDelegate
+class DelegateSugerido : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
@@ -22,4 +22,5 @@ public:
     void paint(QPainter *painter,
                const QStyleOptionViewItem &option,
                const QModelIndex &index) const override;
+    QString displayText(const QVariant &value, const QLocale &locale) const override;
 };

@@ -5,6 +5,7 @@
 #include <QScrollBar>
 #include <QSqlQuery>
 #include <QSqlDatabase>
+#include "delegatesugerido.h"
 
 MergeProdutos::MergeProdutos(QVariantMap produto1, QVariantMap produto2,
                              QVariantMap sugerido, QWidget *parent)
@@ -19,7 +20,41 @@ MergeProdutos::MergeProdutos(QVariantMap produto1, QVariantMap produto2,
     this->modeloComparacaoProd = modeloComparacaoProd;
 
     QStringList campos = sugerido.keys();
-    campos.sort();
+
+    QStringList ordemPreferida = {
+        "descricao",
+        "quantidade",
+        "preco_fornecedor",
+        "porcent_lucro",
+        "preco",
+        "aliquota_imposto",
+        "pis",
+        "csosn",
+        "ncm",
+        "un_comercial"
+    };
+
+    std::sort(campos.begin(), campos.end(),
+      [&](const QString &a, const QString &b) {
+
+          int idxA = ordemPreferida.indexOf(a);
+          int idxB = ordemPreferida.indexOf(b);
+
+          // Ambos estão na lista de prioridade
+          if (idxA != -1 && idxB != -1)
+              return idxA < idxB;
+
+          // Só A está na prioridade → A vem primeiro
+          if (idxA != -1)
+              return true;
+
+          // Só B está na prioridade → B vem primeiro
+          if (idxB != -1)
+              return false;
+
+          // Nenhum está → ordena alfabeticamente
+          return a < b;
+    });
 
     modeloComparacaoProd->setColumnCount(3);
     modeloComparacaoProd->setRowCount(campos.size());
@@ -37,6 +72,8 @@ MergeProdutos::MergeProdutos(QVariantMap produto1, QVariantMap produto2,
         { "ncm", "NCM" },
         { "csosn", "CSOSN" },
         { "pis", "PIS" },
+        { "porcent_lucro", "Pctg Lucro" },
+        { "preco_fornecedor", "Preço Fornecedor" }
     };
 
     for (int row = 0; row < campos.size(); ++row) {
@@ -46,26 +83,42 @@ MergeProdutos::MergeProdutos(QVariantMap produto1, QVariantMap produto2,
         modeloComparacaoProd->setHeaderData(row, Qt::Vertical, legivel);
         modeloComparacaoProd->setHeaderData(row, Qt::Vertical, chave, Qt::UserRole);
 
-        modeloComparacaoProd->setItem(
-            row, 0,
-            new QStandardItem(produto1.value(chave).toString())
-            );
+        QStandardItem *item = new QStandardItem();
+        item->setData(produto1.value(chave), Qt::EditRole);
+        modeloComparacaoProd->setItem(row, 0, item);
 
-        modeloComparacaoProd->setItem(
-            row, 1,
-            new QStandardItem(produto2.value(chave).toString())
-            );
+        QStandardItem *item2 = new QStandardItem();
+        item2->setData(produto2.value(chave), Qt::EditRole);
+        modeloComparacaoProd->setItem(row, 1, item2);
 
-        modeloComparacaoProd->setItem(
-            row, 2,
-            new QStandardItem(sugerido.value(chave).toString())
-            );
+        QStandardItem *item3 = new QStandardItem();
+        item3->setData(sugerido.value(chave), Qt::EditRole);
+        modeloComparacaoProd->setItem(row, 2, item3);
     }
 
     ui->Tview_ComparacaoProd->setModel(modeloComparacaoProd);
     ui->Tview_ComparacaoProd->horizontalHeader()->setStretchLastSection(true);
-    ui->Tview_ComparacaoProd->resizeColumnsToContents();
+    ui->Tview_ComparacaoProd->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->Tview_ComparacaoProd->setWordWrap(true);
     ui->Tview_ComparacaoProd->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+    int linhaQuantidade = -1;
+
+    for (int row = 0; row < modeloComparacaoProd->rowCount(); ++row) {
+        QString chave = modeloComparacaoProd
+                            ->headerData(row, Qt::Vertical, Qt::UserRole)
+                            .toString();
+
+        if (chave == "quantidade") {
+            linhaQuantidade = row;
+            break;
+        }
+    }
+    ui->Tview_ComparacaoProd->setItemDelegate(
+        new DelegateSugerido(ui->Tview_ComparacaoProd)
+        );
+
+
 
 }
 

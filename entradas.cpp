@@ -579,8 +579,6 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
 
     QVector<QVariantMap> registros = DBUtil::extrairResultados(query);
 
-    qDebug() << registros;
-
     if (registros.isEmpty()) {
         qDebug() << "Produto não encontrado";
         return;
@@ -600,8 +598,6 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
 
     QVector<QVariantMap> registros2 = DBUtil::extrairResultados(query2);
 
-    qDebug() << registros2;
-
     if (registros2.isEmpty()) {
         qDebug() << "ProdutoNota não encontrado";
         return;
@@ -612,9 +608,7 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
     // comparar os campos do produtoNota e produto e pegar a diferença
     QVariantMap resultado;
 
-    if (produto["quantidade"].toFloat() != produtoNota["quantidade"].toFloat()) {
-        resultado["quantidade"] = produto["quantidade"].toFloat() + produtoNota["quantidade"].toFloat();
-    }
+    resultado["quantidade"] = produto["quantidade"].toDouble() + produtoNota["quantidade"].toFloat();
 
     if (produto["descricao"].toString() != produtoNota["descricao"].toString()) {
         if (produto["descricao"].toString() == "") {
@@ -625,11 +619,11 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
         }
     }
 
-    if (produto["preco_fornecedor"].toFloat() != produtoNota["preco"].toFloat()) {
-        float porcent_lucro = financeiroValues.value("porcent_lucro").toFloat();
-        resultado["preco"] = produtoNota["preco"].toFloat() * (porcent_lucro/100 + 1);
+    if (produto["preco_fornecedor"].toDouble() != produtoNota["preco"].toDouble()) {
+        float porcent_lucro = financeiroValues.value("porcent_lucro").toDouble();
+        resultado["preco"] = produtoNota["preco"].toDouble() * (porcent_lucro/100 + 1);
         resultado["porcent_lucro"] = porcent_lucro;
-        resultado["preco_fornecedor"] = produtoNota["preco"].toFloat();
+        resultado["preco_fornecedor"] = produtoNota["preco"].toDouble();
     }
 
     if (produto["un_comercial"].toString() != produtoNota["un_comercial"].toString()) {
@@ -650,18 +644,22 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
         }
     }
 
-    if (produto["aliquota_imposto"].toFloat() != produtoNota["aliquota_imposto"].toFloat()) {
-        if (produto["aliquota_imposto"].toFloat() == 0) {
-            resultado["aliquota_imposto"] = produtoNota["aliquota_imposto"].toFloat();
+    if (produto["aliquota_imposto"].toDouble() != produtoNota["aliquota_imposto"].toDouble()) {
+        if (produto["aliquota_imposto"].toDouble() == 0) {
+            resultado["aliquota_imposto"] = produtoNota["aliquota_imposto"].toDouble();
         }
         else {
-            resultado["aliquota_imposto"] = produto["aliquota_imposto"].toFloat();
+            resultado["aliquota_imposto"] = produto["aliquota_imposto"].toDouble();
         }
     }
 
     db.close();
 
-    qDebug() << resultado;
+    qDebug() << "produto: " << produto;
+
+    qDebug() << "produtoNota: " << produtoNota;
+
+    qDebug() << "resultado: " << resultado;
 
     MergeProdutos *janelaMerge = new MergeProdutos(produto, produtoNota, resultado);
     janelaMerge->show();

@@ -97,6 +97,8 @@ MergeProdutos::MergeProdutos(QVariantMap produto1, QVariantMap produto2,
     }
 
     ui->Tview_ComparacaoProd->setModel(modeloComparacaoProd);
+    connect(modeloComparacaoProd, &QStandardItemModel::dataChanged,
+            this, &MergeProdutos::onModelDataChanged);
     ui->Tview_ComparacaoProd->horizontalHeader()->setStretchLastSection(true);
     ui->Tview_ComparacaoProd->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->Tview_ComparacaoProd->setWordWrap(true);
@@ -197,4 +199,73 @@ void MergeProdutos::on_Btn_Importar_clicked()
     db.close();
     close();
 }
+
+void MergeProdutos::onModelDataChanged(const QModelIndex &topLeft,
+                                       const QModelIndex &,
+                                       const QVector<int> &)
+{
+    // só reage à coluna "Sugerido"
+    if (topLeft.column() != 2)
+        return;
+
+    QString chaveAlterada =
+        modeloComparacaoProd
+            ->headerData(topLeft.row(),
+                         Qt::Vertical,
+                         Qt::UserRole)
+            .toString();
+
+    if (chaveAlterada != "preco_fornecedor" &&
+        chaveAlterada != "porcent_lucro")
+        return;
+
+    int rowPrecoFornecedor = -1;
+    int rowLucro = -1;
+    int rowPrecoFinal = -1;
+
+    for (int r = 0; r < modeloComparacaoProd->rowCount(); ++r) {
+        QString chave =
+            modeloComparacaoProd
+                ->headerData(r, Qt::Vertical, Qt::UserRole)
+                .toString();
+
+        if (chave == "preco_fornecedor")
+            rowPrecoFornecedor = r;
+        else if (chave == "porcent_lucro")
+            rowLucro = r;
+        else if (chave == "preco")
+            rowPrecoFinal = r;
+    }
+
+    if (rowPrecoFornecedor < 0 ||
+        rowLucro < 0 ||
+        rowPrecoFinal < 0)
+        return;
+
+    double precoFornecedor =
+        modeloComparacaoProd
+            ->item(rowPrecoFornecedor, 2)
+            ->data(Qt::EditRole)
+            .toDouble();
+
+    double porcentLucro =
+        modeloComparacaoProd
+            ->item(rowLucro, 2)
+            ->data(Qt::EditRole)
+            .toDouble();
+
+    double precoFinal =
+        precoFornecedor * (1.0 + porcentLucro / 100.0);
+
+    QStandardItem *itemPreco =
+        modeloComparacaoProd->item(rowPrecoFinal, 2);
+
+    // evita loop infinito
+    if (qFuzzyCompare(itemPreco->data(Qt::EditRole).toDouble(),
+                      precoFinal))
+        return;
+
+    itemPreco->setData(precoFinal, Qt::EditRole);
+}
+
 

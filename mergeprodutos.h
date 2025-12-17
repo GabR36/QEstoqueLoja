@@ -22,6 +22,7 @@ private slots:
 
     void on_Btn_Importar_clicked();
 
+    void onModelDataChanged(const QModelIndex &topLeft, const QModelIndex &, const QVector<int> &);
 private:
     Ui::MergeProdutos *ui;
     QStandardItemModel *modeloComparacaoProd;

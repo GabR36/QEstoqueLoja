@@ -35,8 +35,10 @@ QWidget *DelegateSugerido::createEditor(
 
     // -------- preço / impostos --------
     if (chave == "preco" ||
+        chave == "preco_fornecedor" ||
+        chave == "porcent_lucro" ||
         chave == "aliquota_imposto" ||
-        chave == "pis") {
+        chave == "pis")  {
 
         QDoubleSpinBox *dsb = new QDoubleSpinBox(parent);
         dsb->setDecimals(2);

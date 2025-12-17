@@ -19,6 +19,8 @@ MergeProdutos::MergeProdutos(QVariantMap produto1, QVariantMap produto2,
     QStandardItemModel *modeloComparacaoProd = new QStandardItemModel(this);
     this->modeloComparacaoProd = modeloComparacaoProd;
 
+    ibpt = new IbptUtil();//tabela ibpt
+
     QStringList campos = sugerido.keys();
 
     QStringList ordemPreferida = {
@@ -119,6 +121,7 @@ MergeProdutos::MergeProdutos(QVariantMap produto1, QVariantMap produto2,
     ui->Tview_ComparacaoProd->setItemDelegate(
         new DelegateSugerido(ui->Tview_ComparacaoProd)
         );
+    atualizarAliquotaPeloNcm();
 
 
 
@@ -216,12 +219,16 @@ void MergeProdutos::onModelDataChanged(const QModelIndex &topLeft,
             .toString();
 
     if (chaveAlterada != "preco_fornecedor" &&
-        chaveAlterada != "porcent_lucro")
+        chaveAlterada != "porcent_lucro" &&
+        chaveAlterada != "aliquota_imposto" &&
+        chaveAlterada != "ncm")
         return;
 
     int rowPrecoFornecedor = -1;
     int rowLucro = -1;
     int rowPrecoFinal = -1;
+    int rowNcm = -1;
+    int rowAliquota = -1;
 
     for (int r = 0; r < modeloComparacaoProd->rowCount(); ++r) {
         QString chave =
@@ -235,7 +242,40 @@ void MergeProdutos::onModelDataChanged(const QModelIndex &topLeft,
             rowLucro = r;
         else if (chave == "preco")
             rowPrecoFinal = r;
+        else if (chave == "ncm")
+            rowNcm = r;
+        else if (chave == "aliquota_imposto")
+            rowAliquota = r;
     }
+    if (chaveAlterada == "ncm") {
+
+        // if (rowNcm < 0 || rowAliquota < 0)
+        //     return;
+
+        // QString ncm =
+        //     modeloComparacaoProd
+        //         ->item(rowNcm, 2)
+        //         ->data(Qt::EditRole)
+        //         .toString();
+
+        // if (ncm.isEmpty())
+        //     return;
+        // IbptUtil *ibpt = new IbptUtil();
+        // float aliquota =
+        //     ibpt->get_Aliquota_From_Csv(ncm);
+
+        // QStandardItem *itemAliquota =
+        //     modeloComparacaoProd->item(rowAliquota, 2);
+
+        // // evita loop infinito
+        // if (qFuzzyCompare(itemAliquota->data(Qt::EditRole).toDouble(),
+        //                   aliquota))
+        //     return;
+
+        // itemAliquota->setData(aliquota, Qt::EditRole);
+        atualizarAliquotaPeloNcm();
+    }
+
 
     if (rowPrecoFornecedor < 0 ||
         rowLucro < 0 ||
@@ -266,6 +306,48 @@ void MergeProdutos::onModelDataChanged(const QModelIndex &topLeft,
         return;
 
     itemPreco->setData(precoFinal, Qt::EditRole);
+}
+
+
+void MergeProdutos::atualizarAliquotaPeloNcm()
+{
+    int rowNcm = -1;
+    int rowAliquota = -1;
+
+    for (int r = 0; r < modeloComparacaoProd->rowCount(); ++r) {
+        QString chave =
+            modeloComparacaoProd
+                ->headerData(r, Qt::Vertical, Qt::UserRole)
+                .toString();
+
+        if (chave == "ncm")
+            rowNcm = r;
+        else if (chave == "aliquota_imposto")
+            rowAliquota = r;
+    }
+
+    if (rowNcm < 0 || rowAliquota < 0)
+        return;
+
+    QString ncm =
+        modeloComparacaoProd
+            ->item(rowNcm, 2)
+            ->data(Qt::EditRole)
+            .toString();
+
+    if (ncm.isEmpty())
+        return;
+    double aliquota =
+        ibpt->get_Aliquota_From_Csv(ncm);
+
+    QStandardItem *itemAliquota =
+        modeloComparacaoProd->item(rowAliquota, 2);
+
+    if (qFuzzyCompare(itemAliquota->data(Qt::EditRole).toDouble(),
+                      aliquota))
+        return;
+
+    itemAliquota->setData(aliquota, Qt::EditRole);
 }
 
 

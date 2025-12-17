@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QStandardItemModel>
 #include <QSqlDatabase>
-
+#include "util/ibptutil.h"
 namespace Ui {
 class MergeProdutos;
 }
@@ -29,6 +29,8 @@ private:
     QSqlDatabase db;
     QString idProduto;
     bool nfProduto;
+    IbptUtil *ibpt;
+    void atualizarAliquotaPeloNcm();
 };
 
 #endif // MERGEPRODUTOS_H

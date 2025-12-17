@@ -128,6 +128,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         util/nfxmlutil.h util/nfxmlutil.cpp
         util/dbutil.h util/dbutil.cpp
         mergeprodutos.h mergeprodutos.cpp mergeprodutos.ui
+        delegatesugerido.h delegatesugerido.cpp
 
 
 

@@ -109,7 +109,7 @@ void Entradas::on_Btn_ConsultarDF_clicked()
     if(manifestdfe->possoConsultar()){
 
         manifestdfe->consultaAlternada();
-        // QMessageBox::information(this, "Resposta", "Consultado");
+        QMessageBox::information(this, "Resposta", "Consulta realizada com sucesso.");
         carregarTabela();
     }else{
         QMessageBox::warning(this, "Aviso", "Não faz uma hora que a última consulta "

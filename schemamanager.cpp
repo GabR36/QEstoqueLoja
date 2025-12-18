@@ -632,6 +632,25 @@ void SchemaManager::update() {
                 qDebug() << "Error: unable to start transaction";
             }
             qDebug() << "atualizou para versao 7";
+
+            QStringList dataLocations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
+            bool found = false;
+            QString caminhoPastaSchemas;
+
+            for (const QString &basePath : dataLocations) {
+                QString candidate = basePath + "/recursos/NFeSchemas";
+                qDebug() << "Verificando:" << candidate;
+
+                QDir dir(candidate);
+                if (dir.exists()) {
+                    caminhoPastaSchemas = candidate;
+                    found = true;
+                    break;
+                }
+            }
+
+
+
             QDateTime dataIngles = QDateTime::currentDateTime();
             QString dataFormatada = dataIngles.toString("yyyy-MM-dd HH:mm:ss");
             QSqlQuery query;
@@ -652,6 +671,14 @@ void SchemaManager::update() {
                 if (!query.exec(sql)) {
                     qDebug() << "Erro ao executar:" << sql << ":" << query.lastError().text();
                 }
+            }
+
+            //atualizar o caminho da pasta schema correto para cada OS
+            query.prepare("UPDATE config SET value = :schemapath WHERE key = "
+                          "caminho_schema");
+            query.bindValue(":schemapath", caminhoPastaSchemas);
+            if(!query.exec()){
+                qDebug() << "query update config pasta schemas nao rodou";
             }
 
             // Atualizar versão do schema se tudo correu bem

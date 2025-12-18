@@ -416,7 +416,8 @@ background-color:rgb(03,75,119);
                  <string>Compras</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="QIcon::ThemeIcon::DocumentPageSetup"/>
+                 <iconset resource="Imagens/recursosImg.qrc">
+                  <normaloff>:/QEstoqueLOja/view-bank.svg</normaloff>:/QEstoqueLOja/view-bank.svg</iconset>
                 </property>
                 <property name="iconSize">
                  <size>

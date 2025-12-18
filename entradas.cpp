@@ -20,7 +20,7 @@
 #include "util/nfxmlutil.h"
 #include "util/dbutil.h"
 #include "mergeprodutos.h"
-
+#include "delegatepago.h"
 Entradas::Entradas(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Entradas)
@@ -38,6 +38,10 @@ Entradas::Entradas(QWidget *parent)
             &Entradas::on_EntradaSelecionada);
 
     nfe = new NfeACBR(this, true, true);
+
+    //delegate SIM VERDE NAO VERMELHO para coluna 'adicionado' da tabela produtos
+    DelegatePago *delegateSimNao = new DelegatePago(this);
+    ui->Tview_ProdutosNota->setItemDelegateForColumn(5, delegateSimNao);
 }
 
 Entradas::~Entradas()
@@ -189,11 +193,12 @@ void Entradas::carregarProdutosDaNota(qlonglong id_nf)
         SELECT
             id as id,
             nitem AS Item,
-            descricao AS Descrição,
             quantidade AS Quantidade,
+            descricao AS Descrição,
             preco AS Preço,
-            un_comercial AS Unidade,
+            adicionado AS Adicionado,
             status AS Status,
+            un_comercial AS Unidade,
             ncm AS NCM,
             cfop AS CFOP,
             csosn AS CSOSN,
@@ -558,8 +563,38 @@ void Entradas::addProdSemCodBarras(QString idProd, QString codBarras){
     addProd->show();
     connect(addProd, &InserirProduto::produtoInserido, this,
             &Entradas::produtoAdicionado);
+
+    connect(addProd, &InserirProduto::produtoInserido, this,
+            [=]() {
+                atualizarProdutoNotaAdicionado(idProd);
+            });
+    connect(addProd, &InserirProduto::produtoInserido, this,
+            [=]() {
+                carregarProdutosDaNota(id_nf_selec);
+            });
+
     db.close();
 }
+
+void Entradas::atualizarProdutoNotaAdicionado(QString idProd){
+    if(!db.isOpen()){
+        if(!db.open()){
+            qDebug() << "Banco nao abriu atualizarProdutoNotaAdicionado";
+        }
+    }
+
+    QSqlQuery query;
+    query.prepare("UPDATE produtos_nota SET adicionado = 1 WHERE id = :id");
+    query.bindValue(":id", idProd);
+
+    if(query.exec()){
+    }else{
+        qDebug() << "query nao rodou atualizarProdutoNotaAdicionado. ";
+        return;
+    }
+    qDebug() << "query update produto nota adicionado = 1 ok";
+}
+
 
 void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
     qDebug() << idProd << codBarras;
@@ -663,4 +698,16 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
 
     MergeProdutos *janelaMerge = new MergeProdutos(produto, produtoNota, resultado);
     janelaMerge->show();
+
+    connect(janelaMerge, &MergeProdutos::produtoAtualizado, this,
+            [=]() {
+                atualizarProdutoNotaAdicionado(idProd);
+            });
+    connect(janelaMerge, &MergeProdutos::produtoAtualizado, this,
+            &Entradas::produtoAdicionado);
+    connect(janelaMerge, &MergeProdutos::produtoAtualizado, this,
+            [=]() {
+                carregarProdutosDaNota(id_nf_selec);
+            });
+
 }

@@ -416,7 +416,7 @@ background-color:rgb(03,75,119);
                  <string>Compras</string>
                 </property>
                 <property name="icon">
-                 <iconset theme="QIcon::ThemeIcon::GoHome"/>
+                 <iconset theme="QIcon::ThemeIcon::DocumentPageSetup"/>
                 </property>
                 <property name="iconSize">
                  <size>

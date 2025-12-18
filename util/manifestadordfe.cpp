@@ -484,10 +484,10 @@ bool ManifestadorDFe::salvarProdutosNota(const QString &xml_path, const QString 
     ins.prepare(
         "INSERT INTO produtos_nota "
         "(id_nf, nitem, quantidade, descricao, preco, codigo_barras, un_comercial, "
-        " ncm, csosn, pis, cfop, aliquota_imposto, cst_icms, tem_st, status) "
+        " ncm, csosn, pis, cfop, aliquota_imposto, cst_icms, tem_st, status, adicionado) "
         "VALUES "
         "(:id_nf, :nitem, :quant, :desc, :preco, :cod_barras, :un_comercial, "
-        " :ncm, :csosn, :pis, :cfop, :aliquota, :cst_icms, :tem_st, :status)"
+        " :ncm, :csosn, :pis, :cfop, :aliquota, :cst_icms, :tem_st, :status, :adicionado)"
         );
 
     for (const ProdutoNota &p : produtos) {
@@ -506,6 +506,7 @@ bool ManifestadorDFe::salvarProdutosNota(const QString &xml_path, const QString 
         ins.bindValue(":cst_icms",     p.cst_icms);
         ins.bindValue(":tem_st",       p.tem_st ? 1 : 0);
         ins.bindValue(":status",       "OK");
+        ins.bindValue(":adicionado", 0);
 
         if (!ins.exec()) {
             qDebug() << "Erro ao inserir produto:" << ins.lastError().text();

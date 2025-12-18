@@ -31,6 +31,8 @@ private:
     bool nfProduto;
     IbptUtil *ibpt;
     void atualizarAliquotaPeloNcm();
+signals:
+    void produtoAtualizado();
 };
 
 #endif // MERGEPRODUTOS_H

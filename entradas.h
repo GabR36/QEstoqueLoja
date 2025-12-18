@@ -69,6 +69,7 @@ private:
     void atualizarProdutoNotaAoDevolver(QString idNfDevol, QList<qlonglong> &idsProduto);
     double calcularPrecoItemSN(const QString &xmlPath, int nItem);
     void addProdComCodBarras(QString idProd, QString codBarras);
+    void atualizarProdutoNotaAdicionado(QString idProd);
 signals:
     void produtoAdicionado();
 };

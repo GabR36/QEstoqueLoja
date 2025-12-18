@@ -197,6 +197,8 @@ void MergeProdutos::on_Btn_Importar_clicked()
 
     if (!query.exec()) {
         qDebug() << "Erro ao atualizar produto:" << query.lastError();
+    }else{
+        produtoAtualizado();
     }
 
     db.close();

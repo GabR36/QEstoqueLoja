@@ -36,6 +36,7 @@
 #include "util/consultacnpjmanager.h"
 #include "entradas.h"
 #include "util/manifestadordfe.h"
+#include "util/mailmanager.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -64,6 +65,7 @@ MainWindow::MainWindow(QWidget *parent)
     financeiroValues = Configuracao::get_All_Financeiro_Values();
     empresaValues = Configuracao::get_All_Empresa_Values();
     fiscalValues = Configuracao::get_All_Fiscal_Values();
+    emailValues = Configuracao::get_All_Email_Values();
 
     //pega o ponteiro do singleton para usar a lib acbr
     // acbr = AcbrManager::instance()->nfe();
@@ -754,8 +756,11 @@ void MainWindow::atualizarConfigAcbr(){
 
     auto acbr = AcbrManager::instance()->nfe();
     auto cnpj = ConsultaCnpjManager::instance()->cnpj();
+    auto mail = MailManager::instance().mail();
+
     fiscalValues = Configuracao::get_All_Fiscal_Values();
     empresaValues = Configuracao::get_All_Empresa_Values();
+    emailValues = Configuracao::get_All_Email_Values();
 
     qDebug() << "=== CARREGANDO CONFIGURAÇÕES ACBR ===";
     QString caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
@@ -854,6 +859,18 @@ void MainWindow::atualizarConfigAcbr(){
 
     cnpj->ConfigGravarValor("ConsultaCNPJ", "Provedor", "3");
     cnpj->ConfigGravar("");
+
+    //acbrMail
+    mail->ConfigGravarValor("Email", "Nome", emailValues.value("email_nome").toStdString());
+    mail->ConfigGravarValor("Email", "Servidor", emailValues.value("email_smtp").toStdString());
+    mail->ConfigGravarValor("Email", "Conta", emailValues.value("email_conta").toStdString());
+    mail->ConfigGravarValor("Email", "Usuario", emailValues.value("email_usuario").toStdString());
+    mail->ConfigGravarValor("Email", "Senha", emailValues.value("email_senha").toStdString());
+    mail->ConfigGravarValor("Email", "Porta", emailValues.value("email_porta").toStdString());
+    mail->ConfigGravarValor("Email", "SSL", emailValues.value("email_ssl").toStdString());
+    mail->ConfigGravarValor("Email", "TLS", emailValues.value("email_tls").toStdString());
+    mail->ConfigGravar("");
+
     qDebug() << "Configurações salvas no arquivo acbrlib.ini";
 
 }
@@ -871,5 +888,25 @@ void MainWindow::on_Btn_Entradas_clicked()
     //                                         "necessário estar no ambiente 'Produção'.");
     // }
 
+}
+
+
+void MainWindow::on_actionEnviar_triggered()
+{
+    try {
+        auto mail = MailManager::instance().mail();
+
+        mail->Limpar();
+        mail->AddCorpoAlternativo("corpo!");
+        mail->SetAssunto("enviado pelo qt");
+        mail->AddDestinatario("teste@gmail.com");
+
+        mail->Enviar();
+
+        qDebug() << "Email enviado com sucesso";
+    }
+    catch (const std::exception& e) {
+        qDebug() << "Erro ao enviar email:" << e.what();
+    }
 }
 

@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>5</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -924,106 +924,137 @@ border-radius: 0px;</string>
       <attribute name="title">
        <string>E-mail</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_9">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_41">
+         <item>
+          <widget class="QLabel" name="label_30">
+           <property name="text">
+            <string>Nome:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="Ledit_EmailNome"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_42">
+         <item>
+          <widget class="QLabel" name="label_32">
+           <property name="text">
+            <string>Servidor SMTP:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="Ledit_EmailSmtp"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_43">
+         <item>
+          <widget class="QLabel" name="label_36">
+           <property name="text">
+            <string>Conta:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="Ledit_EmailConta"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_44">
+         <item>
+          <widget class="QLabel" name="label_37">
+           <property name="text">
+            <string>Usuário:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="Ledit_EmailUsuario"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_45">
+         <item>
+          <widget class="QLabel" name="label_38">
+           <property name="text">
+            <string>Senha:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="Ledit_EmailSenha"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_46">
+         <item>
+          <widget class="QLabel" name="label_39">
+           <property name="text">
+            <string>Porta:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="Ledit_EmailPorta"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="CheckBox_EmailSSL">
+         <property name="text">
+          <string>SSL</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="CheckBox_EmailTLS">
+         <property name="text">
+          <string>TLS</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_6">
+      <attribute name="title">
+       <string>Contador</string>
+      </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_10">
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_9">
+        <layout class="QHBoxLayout" name="horizontalLayout_48">
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_41">
-           <item>
-            <widget class="QLabel" name="label_30">
-             <property name="text">
-              <string>Nome:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="Ledit_EmailNome"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_42">
-           <item>
-            <widget class="QLabel" name="label_32">
-             <property name="text">
-              <string>Servidor SMTP:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="Ledit_EmailSmtp"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_43">
-           <item>
-            <widget class="QLabel" name="label_36">
-             <property name="text">
-              <string>Conta:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="Ledit_EmailConta"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_44">
-           <item>
-            <widget class="QLabel" name="label_37">
-             <property name="text">
-              <string>Usuário:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="Ledit_EmailUsuario"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_45">
-           <item>
-            <widget class="QLabel" name="label_38">
-             <property name="text">
-              <string>Senha:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="Ledit_EmailSenha"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_46">
-           <item>
-            <widget class="QLabel" name="label_39">
-             <property name="text">
-              <string>Porta:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="Ledit_EmailPorta"/>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="CheckBox_EmailSSL">
+          <widget class="QLabel" name="label_40">
            <property name="text">
-            <string>SSL</string>
+            <string>Nome:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="CheckBox_EmailTLS">
+          <widget class="QLineEdit" name="Ledit_ContadorNome"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_47">
+         <item>
+          <widget class="QLabel" name="label_41">
            <property name="text">
-            <string>TLS</string>
+            <string>E-mail:</string>
            </property>
           </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="Ledit_ContadorEmail"/>
          </item>
         </layout>
        </item>

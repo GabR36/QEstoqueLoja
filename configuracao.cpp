@@ -96,6 +96,9 @@ Configuracao::Configuracao(QWidget *parent)
     ui->CheckBox_EmailSSL->setChecked(configValues.value("email_ssl") == "1");
     ui->CheckBox_EmailTLS->setChecked(configValues.value("email_tls") == "1");
 
+    //contador
+    ui->Ledit_ContadorNome->setText(configValues.value("contador_nome", ""));
+    ui->Ledit_ContadorEmail->setText(configValues.value("contador_email", ""));
 
 
 
@@ -151,7 +154,8 @@ void Configuracao::on_Btn_Aplicar_clicked()
         cnpjEmpresa, telEmpresa, lucro, debito, credito, cidadeEmpresa, estadoEmpresa, logoEmpresa, regimeTrib, tpAmb,
         idCsc, csc, pastaSchema, pastaCertificadoAc, certificado, senhaCertificado, cUf, cMun, iEstad, cnpjRT, nomeRT,
         emailRt, foneRt, idCSRT, hasCsrt, nnfHomolog, nnfProd, csosnPadrao, ncmPadrao, cestPadrao, pisPadrao,
-        nnfHomologNfe, nnfProdNfe, email_nome, email_smtp, email_conta, email_usuario, email_senha, email_porta;
+        nnfHomologNfe, nnfProdNfe, email_nome, email_smtp, email_conta, email_usuario, email_senha, email_porta,
+        contador_nome, contador_email;
     bool emitNf, usarIbs, email_ssl, email_tls;
     // converter para notacao americana para armazenar no banco de dados
     nomeEmpresa = ui->Ledt_NomeEmpresa->text().trimmed();
@@ -204,6 +208,9 @@ void Configuracao::on_Btn_Aplicar_clicked()
     email_porta = ui->Ledit_EmailPorta->text().trimmed();
     email_ssl = ui->CheckBox_EmailSSL->isChecked();
     email_tls = ui->CheckBox_EmailTLS->isChecked();
+    contador_nome = ui->Ledit_ContadorNome->text().trimmed();
+    contador_email = ui->Ledit_ContadorEmail->text().trimmed();
+
 
 
     if(emitNf == true && (ui->Lbl_CertificadoPath->text().isEmpty() ||
@@ -424,6 +431,14 @@ void Configuracao::on_Btn_Aplicar_clicked()
     query.prepare("UPDATE config set value = :value WHERE key = :key");
     query.bindValue(":value", email_tls);
     query.bindValue(":key", "email_tls");
+    query.exec();
+    query.prepare("UPDATE config SET value = :value WHERE key = :key");
+    query.bindValue(":value", contador_nome);
+    query.bindValue(":key", "contador_nome");
+    query.exec();
+    query.prepare("UPDATE config SET value = :value WHERE key = :key");
+    query.bindValue(":value", contador_email);
+    query.bindValue(":key", "contador_email");
     query.exec();
 
 
@@ -779,6 +794,51 @@ QMap<QString, QString> Configuracao::get_All_Email_Values(){
         "email_porta",
         "email_ssl",
         "email_tls"
+    };
+
+    // Montar a query com placeholders
+    QStringList placeholders;
+    for (int i = 0; i < keys.size(); ++i) {
+        placeholders << "?";
+    }
+
+    QString queryStr = QString("SELECT key, value FROM config WHERE key IN (%1)")
+                           .arg(placeholders.join(", "));
+
+    QSqlQuery query;
+    query.prepare(queryStr);
+
+    // Vincular os valores
+    for (const QString &key : keys) {
+        query.addBindValue(key);
+    }
+
+    if (!query.exec()) {
+        qWarning() << "Erro ao executar a query de configuração:" << query.lastError().text();
+        return result;
+    }
+
+    while (query.next()) {
+        QString key = query.value("key").toString();
+        QString value = query.value("value").toString();
+        result.insert(key, value);
+    }
+
+    return result;
+}
+
+QMap<QString, QString> Configuracao::get_All_Contador_Values(){
+
+    QSqlDatabase db2 = QSqlDatabase::database();
+    if(!db2.open()){
+        qDebug() << "erro bd get all email values config";
+    }
+    QMap<QString, QString> result;
+
+    // Lista fixa de chaves que queremos buscar
+    QStringList keys = {
+        "contador_nome",
+        "contador_email"
     };
 
     // Montar a query com placeholders

@@ -16,6 +16,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core Network)
+find_package(QuaZip-Qt6)
 
 if (CMAKE_SYSTEM MATCHES "Linux")
     include_directories(
@@ -132,6 +133,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         util/ACBrMail.cpp util/ACBrMail.h
         util/mailmanager.h util/mailmanager.cpp
         janelaemailcontador.h janelaemailcontador.cpp janelaemailcontador.ui
+        util/ziputil.h util/ziputil.cpp
 
 
 
@@ -175,7 +177,7 @@ target_link_libraries(QEstoqueLoja PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::S
 #target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lxml2)
 
 if (CMAKE_SYSTEM MATCHES "Linux")
-    target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lz)
+    target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lz QuaZip::QuaZip)
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     target_link_directories(QEstoqueLoja PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/OpenSSL3.1.3/lib

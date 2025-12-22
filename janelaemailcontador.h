@@ -21,10 +21,16 @@ private slots:
 
     void on_Dedit_Fim_dateChanged(const QDate &date);
 
+    void on_pushButton_clicked();
+
 private:
     Ui::JanelaEmailContador *ui;
     QSqlDatabase db;
     void atualizarContadores();
+    QMap<QString, QStringList> xmlsPorPasta;
+    QMap<QString, QString> contadorValues;
+    QMap<QString, QString> empresaValues;
+    void enviarEmailContador(QString zip, QDateTime dtIni, QDateTime dtFim);
 };
 
 #endif // JANELAEMAILCONTADOR_H

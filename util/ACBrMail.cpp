@@ -14,6 +14,8 @@ typedef int (*MAIL_AddBody)(void*, const char*);
 typedef int (*MAIL_AddAltBody)(void*, const char*);
 typedef int (*MAIL_Send)(void*, int);
 typedef int (*MAIL_ConfigGravar)(void*, const char*);
+typedef int (*MAIL_ClearAttachment)(void*);
+typedef int (*MAIL_AddAttachment)(void*, const char*, const char*, int);
 
 #define CHECK_HANDLE() \
 if (!libHandler) \
@@ -225,4 +227,49 @@ void ACBrMail::ConfigGravar(const std::string& eArqConfig) const
 
     int ret = method(libHandler, eArqConfig.c_str());
     CheckResult(ret);
+}
+
+void ACBrMail::LimparAnexos() const
+{
+    CHECK_HANDLE();
+
+    MAIL_ClearAttachment method;
+#if defined(ISWINDOWS)
+    method = reinterpret_cast<MAIL_ClearAttachment>(
+        GetProcAddress(nHandler, "MAIL_ClearAttachment"));
+#else
+    method = reinterpret_cast<MAIL_ClearAttachment>(
+        dlsym(nHandler, "MAIL_ClearAttachment"));
+#endif
+
+    if (!method)
+        throw std::runtime_error("Não encontrou MAIL_ClearAttachment");
+
+    CheckResult(method(libHandler));
+}
+
+void ACBrMail::AddAnexo(const std::string& fileName,
+                        const std::string& descricao,
+                        int disposition) const
+{
+    CHECK_HANDLE();
+
+    MAIL_AddAttachment method;
+#if defined(ISWINDOWS)
+    method = reinterpret_cast<MAIL_AddAttachment>(
+        GetProcAddress(nHandler, "MAIL_AddAttachment"));
+#else
+    method = reinterpret_cast<MAIL_AddAttachment>(
+        dlsym(nHandler, "MAIL_AddAttachment"));
+#endif
+
+    if (!method)
+        throw std::runtime_error("Não encontrou MAIL_AddAttachment");
+
+    const char* desc = descricao.empty() ? nullptr : descricao.c_str();
+
+    CheckResult(method(libHandler,
+                       fileName.c_str(),
+                       desc,
+                       disposition));
 }

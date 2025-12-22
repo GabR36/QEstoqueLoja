@@ -894,22 +894,6 @@ void MainWindow::on_Btn_Entradas_clicked()
 
 void MainWindow::on_actionEnviar_triggered()
 {
-    // try {
-    //     auto mail = MailManager::instance().mail();
-
-    //     mail->Limpar();
-    //     mail->AddCorpoAlternativo("corpo!");
-    //     mail->SetAssunto("enviado pelo qt");
-    //     mail->AddDestinatario("teste@gmail.com");
-
-    //     mail->Enviar();
-
-    //     qDebug() << "Email enviado com sucesso";
-    // }
-    // catch (const std::exception& e) {
-    //     qDebug() << "Erro ao enviar email:" << e.what();
-    // }
-
     JanelaEmailContador *janelaEmail = new JanelaEmailContador();
     janelaEmail->show();
 }

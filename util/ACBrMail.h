@@ -39,6 +39,8 @@ public:
 
     void Enviar() const;
 
+    void AddAnexo(const std::string &fileName, const std::string &descricao, int disposition = 1) const;
+    void LimparAnexos() const;
 private:
 #if defined(ISWINDOWS)
     HMODULE nHandler;

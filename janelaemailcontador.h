@@ -30,6 +30,7 @@ private:
     QMap<QString, QStringList> xmlsPorPasta;
     QMap<QString, QString> contadorValues;
     QMap<QString, QString> empresaValues;
+    QMap<QString, QString> fiscalValues;
     void enviarEmailContador(QString zip, QDateTime dtIni, QDateTime dtFim);
 };
 

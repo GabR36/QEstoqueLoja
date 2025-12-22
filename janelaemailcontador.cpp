@@ -2,11 +2,11 @@
 #include "ui_janelaemailcontador.h"
 #include <QSqlQuery>
 #include <QDir>
-#include "util/ziputil.h"
 #include <quazip/quazip.h>
 #include <quazip/JlCompress.h>
 #include "util/mailmanager.h"
 #include "configuracao.h"
+#include <QMessageBox>
 
 
 JanelaEmailContador::JanelaEmailContador(QWidget *parent)
@@ -14,6 +14,13 @@ JanelaEmailContador::JanelaEmailContador(QWidget *parent)
     , ui(new Ui::JanelaEmailContador)
 {
     ui->setupUi(this);
+    contadorValues = Configuracao::get_All_Contador_Values();
+    empresaValues = Configuracao::get_All_Empresa_Values();
+    fiscalValues = Configuracao::get_All_Fiscal_Values();
+
+    ui->Dedit_Fim->setMaximumDateTime(QDateTime::currentDateTime());
+    ui->Dedit_Inicio->setMaximumDateTime(QDateTime::currentDateTime());
+
     db = QSqlDatabase::database();
 
     QDate hoje = QDate::currentDate();
@@ -23,11 +30,9 @@ JanelaEmailContador::JanelaEmailContador(QWidget *parent)
     QDate fimMes = inicioMes.addMonths(1).addDays(-1);
 
     ui->Dedit_Inicio->setDate(inicioMes);
-    ui->Dedit_Fim->setDate(fimMes);
+    ui->Dedit_Fim->setDate(hoje);
 
     atualizarContadores();
-    contadorValues = Configuracao::get_All_Contador_Values();
-    empresaValues = Configuracao::get_All_Empresa_Values();
 }
 
 JanelaEmailContador::~JanelaEmailContador()
@@ -79,11 +84,14 @@ void JanelaEmailContador::atualizarContadores()
         SELECT finalidade, COUNT(*)
         FROM notas_fiscais
         WHERE atualizado_em BETWEEN :ini AND :fim
+        AND tp_amb = :tpamb
         GROUP BY finalidade
     )");
 
     qNotas.bindValue(":ini", dtIni.toString("yyyy-MM-dd HH:mm:ss"));
     qNotas.bindValue(":fim", dtFim.toString("yyyy-MM-dd HH:mm:ss"));
+    qNotas.bindValue(":tpamb", fiscalValues.value("tp_amb"));
+    qDebug() << fiscalValues;
 
     if (qNotas.exec()) {
         textoNfs += "NOTAS FISCAIS:\n";
@@ -94,6 +102,8 @@ void JanelaEmailContador::atualizarContadores()
 
             textoNfs += QString("• %1: %2\n").arg(finalidade).arg(qtd);
         }
+    } else {
+        qDebug() << "ERRO query email";
     }
 
     // =========================
@@ -164,9 +174,11 @@ void JanelaEmailContador::on_pushButton_clicked()
         SELECT finalidade, xml_path
         FROM notas_fiscais
         WHERE atualizado_em BETWEEN :ini AND :fim
+        AND tp_amb = :tpamb
     )");
     qNotas.bindValue(":ini", dtIni.toString("yyyy-MM-dd HH:mm:ss"));
     qNotas.bindValue(":fim", dtFim.toString("yyyy-MM-dd HH:mm:ss"));
+    qNotas.bindValue(":tpamb", fiscalValues.value("tp_amb"));
 
     if (qNotas.exec()) {
         textoNfs += "NOTAS FISCAIS:\n";
@@ -213,6 +225,7 @@ void JanelaEmailContador::on_pushButton_clicked()
             }
         }
     }
+    // zipar o diretorio
 
     QString zipPath = baseDir + ".zip";
 
@@ -225,6 +238,23 @@ void JanelaEmailContador::on_pushButton_clicked()
     }
 
     enviarEmailContador(zipPath, dtIni, dtFim);
+
+    // remover os arquivos no tmp
+
+    QDir dirExp(baseDir);
+    if (dirExp.exists()) {
+        if (!dirExp.removeRecursively()) {
+            qDebug() << "Falha ao remover diretório:" << dirExp;
+        }
+    }
+
+    if (QFile::exists(zipPath)) {
+        if (!QFile::remove(zipPath)) {
+            qDebug() << "Falha ao remover o arquivo:" << zipPath;
+        }
+    }
+
+    close();
 }
 
 void JanelaEmailContador::enviarEmailContador(QString zip, QDateTime dtIni, QDateTime dtFim) {
@@ -247,9 +277,9 @@ void JanelaEmailContador::enviarEmailContador(QString zip, QDateTime dtIni, QDat
 
         mail->Enviar();
 
-        qDebug() << "Email enviado com sucesso";
+        QMessageBox::information(this, "E-mail enviado com sucesso", "O e-mail foi enviado.");
     }
     catch (const std::exception& e) {
-        qDebug() << "Erro ao enviar email:" << e.what();
+        QMessageBox::warning(this, "Erro ao enviar e-mail", "O e-mail não foi enviado.");
     }
 }

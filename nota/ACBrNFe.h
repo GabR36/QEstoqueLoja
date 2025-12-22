@@ -7,6 +7,7 @@
 
 #include "ACBrNFeImport.h"
 
+
 // Check windows
 #if _WIN32 || _WIN64
 #if _WIN64
@@ -104,4 +105,5 @@ public:
 	void ImprimirEventoPDF(std::string eXmlNFe, std::string eXmlEvento) const;
 	void ImprimirInutilizacao(std::string eXmlInutilizacao) const;
 	void ImprimirInutilizacaoPDF(std::string eXmlInutilizacao) const;
+    std::string SalvarPDFBase64() const;
 };

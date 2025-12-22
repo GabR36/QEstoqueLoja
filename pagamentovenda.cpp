@@ -3,6 +3,8 @@
 #include <QTimer>
 #include "configuracao.h"
 #include <QSqlError>
+#include "util/mailmanager.h"
+#include <QDir>
 
 pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString total, QString cliente, QString data, int idCliente, QWidget *parent)
     : pagamento(total, cliente, data, parent)
@@ -525,7 +527,10 @@ void pagamentoVenda::terminarPagamento(){
             waitDialog->setMessage(enviarNfe(nfe));
             if(cStat == "100" || cStat == "150"){
                 salvarNfeBD(nfe); //salva nfe no banco
+                // if(nfe->getTpAmb())
+                enviarEmailNFe(nomeCli, emailCli, nfe->getXmlPath(), nfe->getPdfDanfe());
                 QTimer::singleShot(1500, waitDialog, &WaitDialog::close); //fecha depois de 2 seg
+
             }
         }else if(ui->CBox_ModeloEmit->currentIndex() == 2){
         }
@@ -536,6 +541,61 @@ void pagamentoVenda::terminarPagamento(){
     this->close();
 
 }
+
+void pagamentoVenda::enviarEmailNFe(QString nomeCliente, QString emailCliente,
+                                    QString xmlPath, std::string pdfDanfe){
+
+    try {
+
+        QDateTime data = portugues.toDateTime(dataGlobal, "dd-MM-yyyy hh:mm:ss");
+
+        auto mail = MailManager::instance().mail();
+        QByteArray pdfBytes = QByteArray::fromBase64(
+            QByteArray::fromStdString(pdfDanfe)
+            );
+        QString pdfPath =
+            QDir::tempPath() + "/DANFE_" +
+            QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss") +
+            ".pdf";
+
+        QFile pdfFile(pdfPath);
+        if (!pdfFile.open(QIODevice::WriteOnly)) {
+            qDebug() << "Erro ao criar PDF DANFE";
+            return;
+        }
+        pdfFile.write(pdfBytes);
+        pdfFile.close();
+
+        QString corpo;
+        QString nomeEmpresa = empresaValues.value("nome_empresa");
+        QString dataFormatada = portugues.toString(
+            data,
+            "dddd, dd 'de' MMMM 'de' yyyy 'às' HH:mm"
+            );
+
+        corpo = "Olá " + nomeCliente + "\n\n"
+                                       "Agradecemos por comprar da " + nomeEmpresa + "!\n"
+                                       "em anexo, você encontrará os arquivos referentes à "
+                                "Nota Fiscal da compra de " +
+                                       dataFormatada + ".\n\n"
+                                       "Cordialmente,\n\n" +
+                                       nomeEmpresa;
+        mail->Limpar();
+        mail->LimparAnexos();
+        mail->AddCorpoAlternativo(corpo.toStdString());
+        mail->SetAssunto("Nota Fiscal Eletrônica de " + empresaValues.value("nome_empresa").toStdString());
+        mail->AddDestinatario(emailCliente.toStdString());
+        mail->AddAnexo(xmlPath.toStdString(), "XML NFe", 0);
+        mail->AddAnexo(pdfPath.toStdString(), "DANFE (PDF)", 0);
+
+        mail->Enviar();
+        qDebug() << "email enviado NFE";
+    }
+    catch (const std::exception& e) {
+        qDebug() << "email não enviado NFE";
+    }
+}
+
 bool pagamentoVenda::existeItensComNcmVazio(QList<QList<QVariant>> listaProdutos, bool somenteNf) {
     QSqlQuery query;
     db.open();

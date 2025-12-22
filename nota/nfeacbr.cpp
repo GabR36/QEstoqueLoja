@@ -1026,6 +1026,11 @@ QString NfeACBR::gerarEnviar(){
     }
 }
 
+std::string NfeACBR::getPdfDanfe(){
+    std::string pdfBase64 = nfe->SalvarPDFBase64();
+    return pdfBase64;
+}
+
 
 
 

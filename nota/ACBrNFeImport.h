@@ -146,3 +146,5 @@ typedef int (*NFE_ImprimirInutilizacao)(uintptr_t handle, const char* eXmlInutil
 
 // function NFE_ImprimirInutilizacaoPDF(const eChave: PChar): longint;
 typedef int (*NFE_ImprimirInutilizacaoPDF)(uintptr_t handle, const char* eXmlInutilizacao);
+
+typedef int (*NFE_SalvarPDF)(uintptr_t handle, char* sResposta, long* esTamanho);

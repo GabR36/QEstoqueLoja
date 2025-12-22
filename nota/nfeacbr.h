@@ -37,6 +37,7 @@ public:
     QString getDhEmiConvertida();
     void setProdutosNota(QList<qlonglong> &idsProduto);
 
+    std::string getPdfDanfe();
 private:
     ACBrNFe *nfe;
     QSqlDatabase db;

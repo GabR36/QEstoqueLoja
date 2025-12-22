@@ -854,3 +854,40 @@ std::string ACBrNFe::ProcessResult(std::string buffer, int buffer_len) const
 
 	return this->Trim(buffer);
 }
+
+std::string ACBrNFe::SalvarPDFBase64() const
+{
+    if (!libHandler)
+        throw std::runtime_error("ACBrNFe não inicializado");
+
+    NFE_SalvarPDF method;
+
+#if defined(ISWINDOWS)
+    method = reinterpret_cast<NFE_SalvarPDF>(
+        GetProcAddress(nHandler, "NFE_SalvarPDF"));
+#else
+    method = reinterpret_cast<NFE_SalvarPDF>(
+        dlsym(nHandler, "NFE_SalvarPDF"));
+#endif
+
+    if (!method)
+        throw std::runtime_error("Função NFE_SalvarPDF não encontrada");
+
+    long tamanho = 0;
+
+    // 1ª chamada → obter tamanho
+    int ret = method(libHandler, nullptr, &tamanho);
+    CheckResult(ret);
+
+    if (tamanho <= 0)
+        return {};
+
+    std::string buffer(tamanho, '\0');
+
+    // 2ª chamada → obter Base64
+    ret = method(libHandler, buffer.data(), &tamanho);
+    CheckResult(ret);
+
+    return buffer;
+}
+

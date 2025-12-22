@@ -37,6 +37,7 @@
 #include "entradas.h"
 #include "util/manifestadordfe.h"
 #include "util/mailmanager.h"
+#include "janelaemailcontador.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -893,20 +894,23 @@ void MainWindow::on_Btn_Entradas_clicked()
 
 void MainWindow::on_actionEnviar_triggered()
 {
-    try {
-        auto mail = MailManager::instance().mail();
+    // try {
+    //     auto mail = MailManager::instance().mail();
 
-        mail->Limpar();
-        mail->AddCorpoAlternativo("corpo!");
-        mail->SetAssunto("enviado pelo qt");
-        mail->AddDestinatario("teste@gmail.com");
+    //     mail->Limpar();
+    //     mail->AddCorpoAlternativo("corpo!");
+    //     mail->SetAssunto("enviado pelo qt");
+    //     mail->AddDestinatario("teste@gmail.com");
 
-        mail->Enviar();
+    //     mail->Enviar();
 
-        qDebug() << "Email enviado com sucesso";
-    }
-    catch (const std::exception& e) {
-        qDebug() << "Erro ao enviar email:" << e.what();
-    }
+    //     qDebug() << "Email enviado com sucesso";
+    // }
+    // catch (const std::exception& e) {
+    //     qDebug() << "Erro ao enviar email:" << e.what();
+    // }
+
+    JanelaEmailContador *janelaEmail = new JanelaEmailContador();
+    janelaEmail->show();
 }
 

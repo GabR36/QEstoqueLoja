@@ -131,6 +131,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         delegatesugerido.h delegatesugerido.cpp
         util/ACBrMail.cpp util/ACBrMail.h
         util/mailmanager.h util/mailmanager.cpp
+        janelaemailcontador.h janelaemailcontador.cpp janelaemailcontador.ui
 
 
 

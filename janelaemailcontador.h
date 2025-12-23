@@ -31,7 +31,7 @@ private:
     QMap<QString, QString> contadorValues;
     QMap<QString, QString> empresaValues;
     QMap<QString, QString> fiscalValues;
-    void enviarEmailContador(QString zip, QDateTime dtIni, QDateTime dtFim);
+    void enviarEmailContador(QString zip, QDate dtIni, QDate dtFim);
 };
 
 #endif // JANELAEMAILCONTADOR_H

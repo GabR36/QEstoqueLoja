@@ -21,6 +21,9 @@
 #include "util/dbutil.h"
 #include "mergeprodutos.h"
 #include "delegatepago.h"
+#include "util/mailmanager.h"
+#include <QDir>
+
 Entradas::Entradas(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Entradas)
@@ -110,13 +113,43 @@ void Entradas::on_Btn_ConsultarDF_clicked()
 
         manifestdfe->consultaAlternada();
         QMessageBox::information(this, "Resposta", "Consulta realizada com sucesso.");
-        carregarTabela();
+        atualizarTabela();
     }else{
         QMessageBox::warning(this, "Aviso", "Não faz uma hora que a última consulta "
                                                "foi realizada, por favor espere.");
     }
     ui->Tview_Entradas->selectRow(0);
 }
+
+void Entradas::atualizarTabela()
+{
+    if (!db.isOpen()) {
+        if (!db.open()) {
+            qDebug() << "Erro ao abrir banco atualizarTabela()";
+            return;
+        }
+    }
+
+    modelEntradas->setQuery(R"(
+        SELECT
+            c.nome AS emitente,
+            n.valor_total AS valor,
+            n.dhemi AS emissao,
+            n.cnpjemit AS cnpj,
+            n.modelo AS modelo,
+            n.chnfe AS chave,
+            n.cstat AS cstat,
+            n.id AS id_nf
+        FROM notas_fiscais n
+        LEFT JOIN clientes c
+            ON c.id = n.id_emissorcliente
+        WHERE n.finalidade = 'ENTRADA EXTERNA'
+          AND n.cstat IN (100, 150)
+        ORDER BY n.dhemi DESC
+    )");
+
+}
+
 
 void Entradas::carregarTabela()
 {
@@ -125,9 +158,9 @@ void Entradas::carregarTabela()
             qDebug() << "Erro ao abrir banco carregarTabela()";
         }
     }
-    QSqlQueryModel *model = new QSqlQueryModel(this);
+    modelEntradas = new QSqlQueryModel(this);
 
-    model->setQuery(R"(
+    modelEntradas->setQuery(R"(
         SELECT
             c.nome AS emitente,
             n.valor_total AS valor,
@@ -145,23 +178,23 @@ void Entradas::carregarTabela()
         ORDER BY n.dhemi DESC
     )");
 
-    if (model->lastError().isValid()) {
-        qDebug() << "Erro ao carregar tabela:" << model->lastError();
+    if (modelEntradas->lastError().isValid()) {
+        qDebug() << "Erro ao carregar tabela:" << modelEntradas->lastError();
     }
 
-    model->setHeaderData(0, Qt::Horizontal, "Emitente");
-    model->setHeaderData(1, Qt::Horizontal, "Valor NF");
-    model->setHeaderData(2, Qt::Horizontal, "Emissão");
-    model->setHeaderData(3, Qt::Horizontal, "CNPJ");
-    model->setHeaderData(4, Qt::Horizontal, "Modelo");
-    model->setHeaderData(5, Qt::Horizontal, "Chave");
-    model->setHeaderData(6, Qt::Horizontal, "CStat");
+    modelEntradas->setHeaderData(0, Qt::Horizontal, "Emitente");
+    modelEntradas->setHeaderData(1, Qt::Horizontal, "Valor NF");
+    modelEntradas->setHeaderData(2, Qt::Horizontal, "Emissão");
+    modelEntradas->setHeaderData(3, Qt::Horizontal, "CNPJ");
+    modelEntradas->setHeaderData(4, Qt::Horizontal, "Modelo");
+    modelEntradas->setHeaderData(5, Qt::Horizontal, "Chave");
+    modelEntradas->setHeaderData(6, Qt::Horizontal, "CStat");
 
-    ui->Tview_Entradas->setModel(model);
+    ui->Tview_Entradas->setModel(modelEntradas);
 
     ui->Tview_Entradas->resizeColumnsToContents();
     ui->Tview_Entradas->horizontalHeader()->setStretchLastSection(true);
-    ui->Tview_Entradas->setModel(model);
+    ui->Tview_Entradas->setModel(modelEntradas);
     ui->Tview_Entradas->setColumnHidden(7, true); // Oculta id_nf
     db.close();
 }
@@ -390,8 +423,67 @@ void Entradas::devolverProdutos(QList<qlonglong> &idsProduto){
     QString msg = salvarDevolucaoNf(retorno, QString::number(id_nf_selec), nfe, idsProduto);
     QMessageBox::information(this, "Aviso", msg);
 
+    if(cstatRetornado == "100" || cstatRetornado == "150" && nfe->getTpAmb() == "1"){
+        enviarEmailNFe(dest.nome, dest.email, nfe->getXmlPath(), nfe->getPdfDanfe(), dest.cpfcnpj);
+    }
+
     db.close();
 
+}
+
+void Entradas::enviarEmailNFe(QString nomeCliente, QString emailCliente,
+                                    QString xmlPath, std::string pdfDanfe, QString cnpj){
+
+    try {
+
+        QDateTime data = QDateTime::currentDateTime();
+
+        auto mail = MailManager::instance().mail();
+        QByteArray pdfBytes = QByteArray::fromBase64(
+            QByteArray::fromStdString(pdfDanfe)
+            );
+        QString pdfPath =
+            QDir::tempPath() + "/DANFE_" +
+            QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss") +
+            ".pdf";
+
+        QFile pdfFile(pdfPath);
+        if (!pdfFile.open(QIODevice::WriteOnly)) {
+            qDebug() << "Erro ao criar PDF DANFE";
+            return;
+        }
+        pdfFile.write(pdfBytes);
+        pdfFile.close();
+
+        QString corpo;
+        QString nomeEmpresa = empresaValues.value("nome_empresa");
+        QString dataFormatada = portugues.toString(
+            data,
+            "dddd, dd 'de' MMMM 'de' yyyy 'às' HH:mm"
+            );
+
+        corpo = "Olá " + nomeCliente + "\n\n"
+            "Foi emitido uma Nota Fiscal de Devolução da " + nomeEmpresa + " para o CNPJ:" +
+               cnpj +
+                "\n\nem anexo, você encontrará os arquivos referentes à "
+                                "Nota Fiscal de " +
+                dataFormatada + ".\n\n"
+                                "Cordialmente,\n\n" +
+                nomeEmpresa;
+        mail->Limpar();
+        mail->LimparAnexos();
+        mail->AddCorpoAlternativo(corpo.toStdString());
+        mail->SetAssunto("Nota Fiscal Eletrônica de " + empresaValues.value("nome_empresa").toStdString());
+        mail->AddDestinatario(emailCliente.toStdString());
+        mail->AddAnexo(xmlPath.toStdString(), "XML NFe", 0);
+        mail->AddAnexo(pdfPath.toStdString(), "DANFE (PDF)", 0);
+
+        mail->Enviar();
+        qDebug() << "email enviado NFE";
+    }
+    catch (const std::exception& e) {
+        qDebug() << "email não enviado NFE";
+    }
 }
 
 QString Entradas::salvarDevolucaoNf(QString retornoEnvio, QString idnf, NfeACBR *devolNfe,
@@ -417,7 +509,7 @@ QString Entradas::salvarDevolucaoNf(QString retornoEnvio, QString idnf, NfeACBR 
         else if (linhaTrim.startsWith("NProt=") || linhaTrim.startsWith("nProt="))
             nProt = linhaTrim.section('=', 1).trimmed();
     }
-
+    cstatRetornado = cStat;
     qDebug() << "Retorno ACBr: cStat=" << cStat << " xMotivo=" << xMotivo << " nProt=" << nProt;
 
     // Confirma se a nota foi autorizada
@@ -462,7 +554,7 @@ QString Entradas::salvarDevolucaoNf(QString retornoEnvio, QString idnf, NfeACBR 
         }else{
             lastInsertedIDNfDevol = query.lastInsertId().toString();
             atualizarProdutoNotaAoDevolver(lastInsertedIDNfDevol, idsProduto);
-            return QString("Nota de Devolução Autorizada e Salva!\n cStat:%1 \n motivo:%2 \n protocolo:%3")
+            return QString("Nota de Devolução Autorizada e Salva!\n cStat:%1 \n Motivo:%2 \n")
                 .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo, nProt);
         }
 

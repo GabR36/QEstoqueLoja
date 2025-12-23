@@ -27,7 +27,7 @@ JanelaEmailContador::JanelaEmailContador(QWidget *parent)
 
     QDate inicioMes(hoje.year(), hoje.month(), 1);
 
-    QDate fimMes = inicioMes.addMonths(1).addDays(-1);
+    // QDate fimMes = inicioMes.addMonths(1).addDays(-1);
 
     ui->Dedit_Inicio->setDate(inicioMes);
     ui->Dedit_Fim->setDate(hoje);
@@ -66,7 +66,7 @@ void JanelaEmailContador::atualizarContadores()
 
 
     QDateTime dtIni(ui->Dedit_Inicio->date().startOfDay());
-    QDateTime dtFim(ui->Dedit_Fim->date(), QTime::currentTime());
+    QDateTime dtFim(ui->Dedit_Fim->date().endOfDay());
 
     int totalNotas = 0;
     int totalEventos = 0;
@@ -87,7 +87,7 @@ void JanelaEmailContador::atualizarContadores()
         AND tp_amb = :tpamb
         GROUP BY finalidade
     )");
-
+    
     qNotas.bindValue(":ini", dtIni.toString("yyyy-MM-dd HH:mm:ss"));
     qNotas.bindValue(":fim", dtFim.toString("yyyy-MM-dd HH:mm:ss"));
     qNotas.bindValue(":tpamb", fiscalValues.value("tp_amb"));
@@ -164,7 +164,7 @@ void JanelaEmailContador::on_pushButton_clicked()
     }
 
     QDateTime dtIni(ui->Dedit_Inicio->date().startOfDay());
-    QDateTime dtFim(ui->Dedit_Fim->date(), QTime::currentTime());
+    QDateTime dtFim(ui->Dedit_Fim->date().endOfDay());
 
     QString textoNfs;
     QString textoEventos;
@@ -237,7 +237,7 @@ void JanelaEmailContador::on_pushButton_clicked()
         qDebug() << "ZIP criado em:" << zipPath;
     }
 
-    enviarEmailContador(zipPath, dtIni, dtFim);
+    enviarEmailContador(zipPath, dtIni.date(), dtFim.date());
 
     // remover os arquivos no tmp
 
@@ -257,7 +257,7 @@ void JanelaEmailContador::on_pushButton_clicked()
     close();
 }
 
-void JanelaEmailContador::enviarEmailContador(QString zip, QDateTime dtIni, QDateTime dtFim) {
+void JanelaEmailContador::enviarEmailContador(QString zip, QDate dtIni, QDate dtFim) {
     try {
         auto mail = MailManager::instance().mail();
 
@@ -265,8 +265,8 @@ void JanelaEmailContador::enviarEmailContador(QString zip, QDateTime dtIni, QDat
 
         corpo = "Olá " + contadorValues.value("contador_nome") + ",\n\n"
             "Em anexo, você encontrará os documentos fiscais referente ao período entre "
-                + dtIni.toString("dd/MM/yyyy HH:mm:ss") + " e "
-                + dtFim.toString("dd/MM/yyyy HH:mm:ss") + ".";
+                + dtIni.toString("dd/MM/yyyy") + " e "
+                + dtFim.toString("dd/MM/yyyy") + ".";
 
         mail->Limpar();
         mail->LimparAnexos();

@@ -6,6 +6,7 @@
 #include "nota/ACBrNFe.h"
 #include <QLocale>
 #include "nota/nfeacbr.h"
+#include <QSqlQueryModel>
 
 struct Cliente{
     QString nome;
@@ -55,6 +56,8 @@ private:
     NfeACBR *nfe;
     qlonglong id_nf_selec;
     QString lastInsertedIDNfDevol;
+    QString cstatRetornado;
+    QSqlQueryModel *modelEntradas;
 
 
     void salvarRegistroDFe(const QString &nome_emitente, const QString &data_emissao, const QString &vnf, const QString &nsu, const QString &tipo, const QString &chave, const QString &cnpj, const QString &situacao, const QString &xml, const QString &data_recebimento);
@@ -70,6 +73,9 @@ private:
     double calcularPrecoItemSN(const QString &xmlPath, int nItem);
     void addProdComCodBarras(QString idProd, QString codBarras);
     void atualizarProdutoNotaAdicionado(QString idProd);
+    void enviarEmailNFe(QString nomeCliente, QString emailCliente, QString xmlPath, std::string pdfDanfe, QString cnpj);
+    void atualizarTabela();
+
 signals:
     void produtoAdicionado();
 };

@@ -527,8 +527,10 @@ void pagamentoVenda::terminarPagamento(){
             waitDialog->setMessage(enviarNfe(nfe));
             if(cStat == "100" || cStat == "150"){
                 salvarNfeBD(nfe); //salva nfe no banco
-                // if(nfe->getTpAmb())
-                enviarEmailNFe(nomeCli, emailCli, nfe->getXmlPath(), nfe->getPdfDanfe());
+                if(nfe->getTpAmb() == "1"){
+                    enviarEmailNFe(nomeCli, emailCli, nfe->getXmlPath(),
+                                   nfe->getPdfDanfe());
+                }
                 QTimer::singleShot(1500, waitDialog, &WaitDialog::close); //fecha depois de 2 seg
 
             }

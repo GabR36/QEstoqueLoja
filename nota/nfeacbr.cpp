@@ -152,7 +152,7 @@ QString NfeACBR::getCnpjEmit(){
 QString NfeACBR::getTpAmb(){
     QString tpAmbBD = (QString::fromStdString(tpAmb) == "1" ? "0" : "1");
 
-    return tpAmbBD;
+    return tpAmbBD; // retorna para salvar no db
 }
 
 QString NfeACBR::getCuf(){

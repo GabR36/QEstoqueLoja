@@ -625,7 +625,7 @@ QList<ProdutoNota> ManifestadorDFe::carregarProdutosDaNFe(const QString &xml_pat
 
 bool ManifestadorDFe::atualizarNotaBanco(ProcNfe notaInfo){
     NotaFiscal nf = lerNotaFiscalDoXML(notaInfo.xml_path);
-
+    qDebug() << "XML PATH atualizar NOTA BANCO: " << notaInfo.xml_path;
     if(!db.isOpen()){
         if(!db.open()){
             qDebug() << "banco nao abriu atualizarNotaBanco";
@@ -691,6 +691,7 @@ bool ManifestadorDFe::atualizarNotaBanco(ProcNfe notaInfo){
     }else{
         qDebug() << "Nota fiscal atualizada com sucesso!";
     }
+    qDebug() << "Linhas afetadas:" << q.numRowsAffected();
     return true;
 }
 

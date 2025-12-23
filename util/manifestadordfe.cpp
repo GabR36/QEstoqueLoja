@@ -895,7 +895,7 @@ void ManifestadorDFe::salvarEventoNoBanco(const QString &tipo, const EventoRetor
     q.bindValue(":lote", info.idLote);
     q.bindValue(":cstat", info.cStat);
     q.bindValue(":just", info.xMotivo);
-    q.bindValue(":codigo", tipo);
+    q.bindValue(":codigo", "210210");
     q.bindValue(":xml", info.xmlPath);
     q.bindValue(":nprot", info.nProt);
     q.bindValue(":chave", chaveNFe);

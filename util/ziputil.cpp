@@ -4,6 +4,7 @@
 #include <qfile.h>
 #include <qfileinfo.h>
 
+
 ZipUtil::ZipUtil() {}
 
 bool ZipUtil::adicionarArquivoZip(QuaZip &zip, QString caminhoArquivo) {

@@ -6,6 +6,8 @@
 #include <QSqlQuery>
 #include <QSqlDatabase>
 #include "delegatesugerido.h"
+#include <QSqlError>
+#include <QDebug>
 
 MergeProdutos::MergeProdutos(QVariantMap produto1, QVariantMap produto2,
                              QVariantMap sugerido, QWidget *parent)

@@ -23,6 +23,8 @@
 #include "delegatepago.h"
 #include "util/mailmanager.h"
 #include <QDir>
+#include <QSqlError>
+#include <QDebug>
 
 Entradas::Entradas(QWidget *parent)
     : QWidget(parent)

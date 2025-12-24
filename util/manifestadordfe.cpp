@@ -9,6 +9,8 @@
 #include <QFile>
 #include <QDomDocument>
 #include <QDomNode>
+#include <QSqlError>
+#include <QDebug>
 
 ManifestadorDFe::ManifestadorDFe(QObject *parent)
     : QObject{parent}

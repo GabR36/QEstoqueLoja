@@ -95,6 +95,10 @@ private slots:
     void on_actionDocumenta_o_triggered();
     void atualizarConfigAcbr();
 
+    void on_Btn_Entradas_clicked();
+
+    void on_actionEnviar_triggered();
+
 private:
     Ui::MainWindow *ui;
     // ACBrNFe *acbr;
@@ -109,6 +113,7 @@ private:
     QMap<QString, QString> financeiroValues;
     QMap<QString, QString> fiscalValues;
     QMap<QString, QString> empresaValues;
+    QMap<QString, QString> emailValues;
 
 
     void setarIconesJanela();

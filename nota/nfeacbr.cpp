@@ -14,6 +14,7 @@ NfeACBR::NfeACBR(QObject *parent, bool saida, bool devolucao)
     db = QSqlDatabase::database();
     fiscalValues = Configuracao::get_All_Fiscal_Values();
     empresaValues = Configuracao::get_All_Empresa_Values();
+    produtosValues = Configuracao::get_All_Produto_Values();
 
 
     // se a nota é de devolução e entrada
@@ -32,6 +33,14 @@ NfeACBR::NfeACBR(QObject *parent, bool saida, bool devolucao)
         finNfe = "1"; //nfe normal = 1
         cfop = "5102";
         tPagNf = "01"; //01 = dinheiro, usar setpagamento
+    }else if(saida && devolucao){
+        tipo = devolucaoFornecedor;
+        natOp = "DEVOLUCAO COMPRA PARA COMERCIALIZACAO EM OPERACAO";
+        tpNf = "1";
+        finNfe = "4";
+        cfop = "";
+        tPagNf = "90";
+
     }
 
     cnpjEmit = empresaValues.value("cnpj_empresa").toStdString();
@@ -143,7 +152,7 @@ QString NfeACBR::getCnpjEmit(){
 QString NfeACBR::getTpAmb(){
     QString tpAmbBD = (QString::fromStdString(tpAmb) == "1" ? "0" : "1");
 
-    return tpAmbBD;
+    return tpAmbBD; // retorna para salvar no db
 }
 
 QString NfeACBR::getCuf(){
@@ -196,6 +205,131 @@ bool NfeACBR::isValidGTIN(const QString& gtin) {
     }
     int dv = (10 - (sum % 10)) % 10;
     return dv == clean.right(1).toInt();
+}
+
+QString NfeACBR::cfopDevolucao(const QString &cfopOriginal)
+{
+    if (cfopOriginal.isEmpty() || cfopOriginal.length() < 4)
+        return ""; // inválido
+
+    QChar primeira = cfopOriginal.at(0);
+
+    // devolução de compra -> sempre x411
+    if (primeira == '6')
+        return "6411";
+
+    if (primeira == '5')
+        return "5411";
+
+    // Entrada (1xxx ou 2xxx) também gera nota de saída
+    if (primeira == '1' || primeira == '2')
+        return "5411"; // devolução interna por padrão
+
+    // fallback (caso improvável)
+    return "5411";
+}
+
+void NfeACBR::setProdutosNota(QList<qlonglong> &idsProduto)
+{
+    if (!db.isOpen()) {
+        if(!db.open()){
+            qDebug() << "Erro ao abrir banco em setProdutosNota()";
+            return;
+        }
+    }
+
+    QLocale usa(QLocale::English, QLocale::UnitedStates);
+    QList<QList<QVariant>> produtosFinal;
+
+    for (int id_prod_nota : idsProduto)
+    {
+        QSqlQuery q(db);
+
+        // -------------------------------
+        // BUSCA DADOS DO produtos_nota
+        // -------------------------------
+        q.prepare(R"(
+            SELECT descricao,
+                   quantidade,
+                   preco,
+                   codigo_barras,
+                   un_comercial,
+                   ncm,
+                   cfop,
+                   csosn,
+                   pis,
+                    aliquota_imposto
+            FROM produtos_nota
+            WHERE id = :id
+        )");
+        q.bindValue(":id", id_prod_nota);
+
+        if (!q.exec() || !q.next()) {
+            qWarning() << "Produto_nota não encontrado:" << id_prod_nota;
+            continue;
+        }
+
+        QString descricao     = q.value("descricao").toString();
+        QString quantidadeStr = q.value("quantidade").toString();
+        QString precoStr      = q.value("preco").toString();
+        QString codBarras     = q.value("codigo_barras").toString();
+        QString unComercial   = q.value("un_comercial").toString();
+        QString ncm           = q.value("ncm").toString();
+        QString csosn         = q.value("csosn").toString();
+        QString pis           = q.value("pis").toString();
+        QString aliquota      = q.value("aliquota_imposto").toString();
+        QString cfop          = q.value("cfop").toString();
+
+        // -------------------------------
+        // CONVERSÕES
+        // -------------------------------
+        double quantidade    = usa.toDouble(quantidadeStr);
+        double precoUnitario = usa.toDouble(precoStr);
+        double valorTotal    = quantidade * precoUnitario;
+
+        // GTIN obrigatório formatado
+        if (!isValidGTIN(codBarras))
+            codBarras = "SEM GTIN";
+
+        double aliquotaImposto = aliquota.toDouble();
+        QString cfopFinal;
+        if(tipo == devolucaoFornecedor){
+            cfopFinal = cfopDevolucao(cfop);
+            qDebug() << "CfopFinal:" << cfopFinal;
+        }
+
+        // -------------------------------
+        // BUSCAR CEST E ALIQUOTAS EM PRODUTOS (se existir)
+        // -------------------------------
+
+        // montar lista EXACTAMENTE igual ao setProdutosVendidos()
+        QList<QVariant> produto;
+
+        produto << id_prod_nota;        // [0]
+        produto << quantidade;          // [1]
+        produto << descricao;           // [2]
+        produto << precoUnitario;       // [3]
+        produto << valorTotal;          // [4]
+        produto << codBarras;           // [5]
+        produto << unComercial;         // [6]
+        produto << ncm;                 // [7]
+        produto << "";                  // [8] CEST opcional (vazio por padrão)
+        produto << aliquotaImposto;     // [9]
+        produto << csosn;               // [10]
+        produto << pis;                 // [11]
+        produto << cfopFinal;           // [12]
+
+        //manda o ultimo cfop para global apenas para verificar se é interestadual
+        this->cfop = cfopFinal;
+
+        produtosFinal.append(produto);
+    }
+
+    listaProdutos = produtosFinal;
+    quantProds = produtosFinal.size();
+    vTotTribProduto.resize(produtosFinal.size());
+
+    qDebug() << "Produtos carregados de produtos_nota:" << quantProds;
 }
 
 void NfeACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool emitirTodos){
@@ -255,9 +389,17 @@ void NfeACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool 
             QString csosn          = query.value("csosn").toString();
             QString pis            = query.value("pis").toString();
             double aliquotaImposto = query.value("aliquota_imposto").toDouble();
+            QString cfopFinal = "5102";
 
             if (!isValidGTIN(codigoBarras)) {
                 codigoBarras = "SEM GTIN";
+            }
+            if(tipo == devolucaoVenda){
+                cfopFinal = "1202";
+            }else if(tipo == devolucaoFornecedor){
+                cfopFinal = "5411";
+            }else if(tipo == saidaNormal){
+                cfopFinal = "5102";
             }
 
             produto.append(codigoBarras);     // [5]
@@ -267,6 +409,8 @@ void NfeACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool 
             produto.append(aliquotaImposto);  // [9]
             produto.append(csosn);            // [10]
             produto.append(pis);              // [11]
+            produto.append(cfopFinal);        // [12]
+
 
         } else {
             qWarning() << "Produto ID não encontrado:" << produto[0].toString()
@@ -279,6 +423,7 @@ void NfeACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool 
             produto.append(0.0);      // [9]
             produto.append("");       // [10]
             produto.append("");       // [11]
+            produto.append("");         //[12]
         }
 
         produtosFiltrados.append(produto);
@@ -409,13 +554,20 @@ void NfeACBR::carregarConfig(){
     nfe->ConfigGravarValor("NFe", "FormaEmissao", "0");
     nfe->ConfigGravarValor("NFe", "Ambiente", tpAmb);
 }
+QString NfeACBR::getDhEmiConvertida(){
+    QString dhemi = QString::fromStdString(dataHora);
+    QDateTime dt = QDateTime::fromString(dhemi, "dd/MM/yyyy hh:mm");
+    QString dhemiConvertida = dt.toString("yyyy-MM-dd HH:mm:ss");
+
+    return dhemiConvertida;
+}
 
 
 void NfeACBR::ide()
 {
     cuf = fiscalValues.value("cuf").toStdString();
     std::string data = QDateTime::currentDateTime().toString("dd/MM/yyyy").toStdString();
-    std::string dataHora = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm").toStdString();
+    dataHora = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm").toStdString();
     mod = 55;
     int numeroAleatorio8dig = QRandomGenerator::global()->bounded(10000000, 99999999);
     if (nnf == "") {
@@ -432,6 +584,11 @@ void NfeACBR::ide()
     std::string tpAmbIde = (tpAmb == "1") ? "2" : "1";
     qDebug() << "TPAMBIDE:" << tpAmbIde + "tpamb:" << tpAmb;
     qDebug() << "cnf:" <<  std::to_string(numeroAleatorio8dig);
+    idDest = "1";
+
+    if(tipo == devolucaoFornecedor && cfop.startsWith("6")){
+        idDest="2"; //operação interestadual
+    }
 
     ini << "[Identificacao]\n";
     ini << "cUF=" << cuf << "\n";
@@ -443,6 +600,7 @@ void NfeACBR::ide()
     ini << "dhEmi=" << dataHora << "\n";
     ini << "natOp=" << natOp.toStdString() << "\n";
     ini << "tpNF=" << tpNf.toStdString() << "\n";
+    ini << "idDest=" << idDest.toStdString() << "\n";
     ini << "finNFe=" << finNfe.toStdString() << "\n";
     ini << "indFinal=1\n";
     ini << "indPres=1\n";
@@ -618,9 +776,15 @@ void NfeACBR::carregarProds()
         QString csosn = produto[10].toString();
         QString pis = produto[11].toString();
         float vDesc = descontoProd[i];
+        QString CFOP = produto[12].toString();
+        qDebug() << "CFOP do produto:" << CFOP;
+        if(tipo == devolucaoFornecedor){
+            csosn = produtosValues.value("csosn_padrao");
+            pis = produtosValues.value("pis_padrao");
+        }
 
         ini << secProduto << "\n";
-        ini << "CFOP=" << cfop.toStdString() << "\n";
+        ini << "CFOP=" << CFOP.toStdString() << "\n";
         ini << "cProd=" << cProd.toStdString() << "\n";
         ini << "cEAN=" << cEAN.toStdString() << "\n";
         ini << "xProd=" << xProd.toStdString() << "\n";
@@ -747,6 +911,8 @@ void NfeACBR::pag()
     if(tipo == devolucaoVenda){
         vPagNf = 0.0;
         trocoNf = 0.0;
+    }else if(tipo == devolucaoFornecedor){
+        trocoNf = 0.0;
     }
 
     std::string indice = "001";
@@ -819,7 +985,7 @@ QString NfeACBR::gerarEnviar(){
     ini << "versao=4.00\n\n";
     carregarConfig();
     ide();
-    if(tipo == devolucaoVenda){
+    if(tipo == devolucaoFornecedor){
         nfRef();
     }
     emite();
@@ -836,7 +1002,7 @@ QString NfeACBR::gerarEnviar(){
     try {
         nfe->CarregarINI(ini.str());
         nfe->Assinar();
-             // nfe->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
+        nfe->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
 
         nfe->Validar();
 
@@ -858,6 +1024,11 @@ QString NfeACBR::gerarEnviar(){
         qDebug() << "Erro desconhecido!";
         return QString("Erro desconhecido ao enviar nota %1.").arg(QString::fromStdString(nnf));
     }
+}
+
+std::string NfeACBR::getPdfDanfe(){
+    std::string pdfBase64 = nfe->SalvarPDFBase64();
+    return pdfBase64;
 }
 
 

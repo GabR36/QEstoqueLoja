@@ -23,6 +23,8 @@ public:
     static QMap<QString, QString> get_All_Empresa_Values();
     static QMap<QString, QString> get_All_Financeiro_Values();
     static QMap<QString, QString> get_All_Produto_Values();
+    static QMap<QString, QString> get_All_Email_Values();
+    static QMap<QString, QString> get_All_Contador_Values();
 private slots:
 
     void on_Btn_Aplicar_clicked();

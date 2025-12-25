@@ -34,7 +34,10 @@
 #include "util/helppage.h"
 #include "schemamanager.h"
 #include "util/consultacnpjmanager.h"
-
+#include "entradas.h"
+#include "util/manifestadordfe.h"
+#include "util/mailmanager.h"
+#include "janelaemailcontador.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -42,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    SchemaManager *schemaManager = new SchemaManager(this, 6);
+    SchemaManager *schemaManager = new SchemaManager(this, 7);
     //config versao 6
     connect(schemaManager, &SchemaManager::dbVersao6, this,
             &MainWindow::atualizarConfigAcbr);
@@ -63,6 +66,7 @@ MainWindow::MainWindow(QWidget *parent)
     financeiroValues = Configuracao::get_All_Financeiro_Values();
     empresaValues = Configuracao::get_All_Empresa_Values();
     fiscalValues = Configuracao::get_All_Fiscal_Values();
+    emailValues = Configuracao::get_All_Email_Values();
 
     //pega o ponteiro do singleton para usar a lib acbr
     // acbr = AcbrManager::instance()->nfe();
@@ -123,8 +127,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Tview_Produtos, &QTableView::doubleClicked,
             this, &MainWindow::verProd);
 
+    ManifestadorDFe *manifestdfe = new ManifestadorDFe();
+    if(manifestdfe->possoConsultar() &&
+        fiscalValues.value("emit_nf") == "1" && fiscalValues.value("tp_amb") == "1"){
+        manifestdfe->consultarEManifestar();
+    }else{
+        qDebug() << "Nao consultado DFE";
 
-
+    }
 }
 
 MainWindow::~MainWindow()
@@ -747,15 +757,22 @@ void MainWindow::atualizarConfigAcbr(){
 
     auto acbr = AcbrManager::instance()->nfe();
     auto cnpj = ConsultaCnpjManager::instance()->cnpj();
+    auto mail = MailManager::instance().mail();
 
+    fiscalValues = Configuracao::get_All_Fiscal_Values();
+    empresaValues = Configuracao::get_All_Empresa_Values();
+    emailValues = Configuracao::get_All_Email_Values();
 
     qDebug() << "=== CARREGANDO CONFIGURAÇÕES ACBR ===";
     QString caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
                          "/xmlNf";
-
+    QString caminhoEntradas = caminhoXml + "/entradas";
     QDir dir;
     if(!dir.exists(caminhoXml)){
         dir.mkpath(caminhoXml);
+    }
+    if(!dir.exists(caminhoEntradas)){
+        dir.mkpath(caminhoEntradas);
     }
 
     // LIMPAR strings antes de usar
@@ -772,6 +789,7 @@ void MainWindow::atualizarConfigAcbr(){
     std::string idCsc = cleanStr(fiscalValues.value("id_csc"));
     std::string csc = cleanStr(fiscalValues.value("csc"));
     std::string tpAmb = (fiscalValues.value("tp_amb") == "0" ? "1" : "0");
+    qDebug() << "tpamb obtido: " << tpAmb;
     QString caminhoCompletoLogo = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
                                   "/imagens/" + QFileInfo(empresaValues.value("caminho_logo_empresa")).fileName();
     qDebug() << "Certificado:" << QString::fromStdString(certificadoPath);
@@ -782,7 +800,6 @@ void MainWindow::atualizarConfigAcbr(){
 
 
     //     // LIMPAR lista
-    // nfce->LimparLista();
 
 
 
@@ -803,7 +820,9 @@ void MainWindow::atualizarConfigAcbr(){
     acbr->ConfigGravarValor("NFe", "VersaoQRCode", "3");
     acbr->ConfigGravarValor("NFe", "FormaEmissao", "0");
     acbr->ConfigGravarValor("NFe", "Ambiente", tpAmb);
-
+    acbr->ConfigGravarValor("NFE", "Download.PathDownload", caminhoEntradas.toStdString());
+    //separar xml em pastas por nome da empresa
+    acbr->ConfigGravarValor("NFe", "Download.SepararPorNome", "1");
     // // CONFIGURAÇÕES DE ARQUIVO
 
     acbr->ConfigGravarValor("NFe", "PathSalvar", caminhoXml.toStdString());
@@ -816,6 +835,9 @@ void MainWindow::atualizarConfigAcbr(){
     acbr->ConfigGravarValor("NFe", "PathNFe", caminhoXml.toStdString());
     acbr->ConfigGravarValor("NFe", "SalvarEvento", "1");
     acbr->ConfigGravarValor("NFe", "PathEvento", caminhoXml.toStdString());
+
+    acbr->ConfigGravarValor("NFe", "SalvarGer", "0");
+
 
 
     //sistema
@@ -834,12 +856,45 @@ void MainWindow::atualizarConfigAcbr(){
     //     // nfce->ConfigGravarValor("DANFENFCe", "ImprimeItens", "1");
     //     // nfce->ConfigGravarValor("DANFENFCe", "ViaConsumidor", "1");
     //     // nfce->ConfigGravarValor("DANFENFCe", "FormatarNumeroDocumento", "1");
-
+    acbr->ConfigGravar("");
 
     cnpj->ConfigGravarValor("ConsultaCNPJ", "Provedor", "3");
+    cnpj->ConfigGravar("");
 
-    acbr->ConfigGravar("");
+    //acbrMail
+    mail->ConfigGravarValor("Email", "Nome", emailValues.value("email_nome").toStdString());
+    mail->ConfigGravarValor("Email", "Servidor", emailValues.value("email_smtp").toStdString());
+    mail->ConfigGravarValor("Email", "Conta", emailValues.value("email_conta").toStdString());
+    mail->ConfigGravarValor("Email", "Usuario", emailValues.value("email_usuario").toStdString());
+    mail->ConfigGravarValor("Email", "Senha", emailValues.value("email_senha").toStdString());
+    mail->ConfigGravarValor("Email", "Porta", emailValues.value("email_porta").toStdString());
+    mail->ConfigGravarValor("Email", "SSL", emailValues.value("email_ssl").toStdString());
+    mail->ConfigGravarValor("Email", "TLS", emailValues.value("email_tls").toStdString());
+    mail->ConfigGravar("");
+
     qDebug() << "Configurações salvas no arquivo acbrlib.ini";
 
+}
+
+
+void MainWindow::on_Btn_Entradas_clicked()
+{
+    if(fiscalValues.value("emit_nf") == "1" && fiscalValues.value("tp_amb") == "1"){
+        Entradas *entradas = new Entradas();
+        entradas->show();
+        connect(entradas, &Entradas::produtoAdicionado, this,
+                &MainWindow::atualizarTableview);
+    }else{
+        QMessageBox::warning(this, "Aviso", "Para visualizar as notas de entrada é "
+                                            "necessário estar no ambiente 'Produção'.");
+    }
+
+}
+
+
+void MainWindow::on_actionEnviar_triggered()
+{
+    JanelaEmailContador *janelaEmail = new JanelaEmailContador();
+    janelaEmail->show();
 }
 

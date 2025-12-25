@@ -28,6 +28,7 @@ public:
     QString getXmlPath();
     double getVNF();
     QString getChaveNf();
+    QString getDhEmiConvertida();
 private:
     ACBrNFe *nfce;
     QSqlDatabase db;
@@ -53,6 +54,7 @@ private:
     float taxaPercentual;
     double totalGeral;
     bool usarIBS;
+    std::string dataHora;
 
     void carregarConfig();
     void ide();

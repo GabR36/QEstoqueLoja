@@ -625,6 +625,95 @@ void SchemaManager::update() {
 
             break;
         }
+        case 6:
+        {
+            // comecar transacao
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+            }
+            qDebug() << "atualizou para versao 7";
+
+            QStringList dataLocations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
+            bool found = false;
+            QString caminhoPastaSchemas;
+
+            for (const QString &basePath : dataLocations) {
+                QString candidate = basePath + "/recursos/NFeSchemas";
+                qDebug() << "Verificando:" << candidate;
+
+                QDir dir(candidate);
+                if (dir.exists()) {
+                    caminhoPastaSchemas = candidate;
+                    found = true;
+                    break;
+                }
+            }
+
+
+
+            QDateTime dataIngles = QDateTime::currentDateTime();
+            QString dataFormatada = dataIngles.toString("yyyy-MM-dd HH:mm:ss");
+            QSqlQuery query;
+
+            QStringList alterStatements = {
+                "ALTER TABLE notas_fiscais ADD COLUMN dhemi TEXT",
+                "ALTER TABLE notas_fiscais ADD COLUMN id_emissorcliente INTEGER",
+                "UPDATE notas_fiscais SET dhemi = atualizado_em",
+                "CREATE TABLE IF NOT EXISTS dfe_info(id INTEGER NOT NULL UNIQUE PRIMARY KEY "
+                "AUTOINCREMENT, ult_nsu TEXT, data_modificado TEXT, identificacao TEXT) ",
+                "INSERT INTO dfe_info (ult_nsu, data_modificado, identificacao) VALUES "
+                "(0, '2025-12-01 00:01:00', 'consulta_xml')",
+                "INSERT INTO dfe_info (ult_nsu, data_modificado, identificacao) VALUES "
+                "(0, '2025-12-01 00:00:00', 'consulta_resumo')",
+                "CREATE TABLE produtos_nota (id	INTEGER NOT NULL UNIQUE, quantidade	REAL, "
+                "descricao	TEXT, preco	NUMERIC, codigo_barras	TEXT, un_comercial	TEXT, "
+                "ncm	TEXT, csosn	INTEGER, pis	INTEGER, cfop TEXT, "
+                "aliquota_imposto REAL, nitem INTEGER, id_nf INTEGER, status TEXT, "
+                "cst_icms TEXT, tem_st BOOLEAN, id_nfDevol INTEGER, adicionado BOOLEAN, "
+                "PRIMARY KEY(id AUTOINCREMENT))",
+                "INSERT INTO config (key, value) VALUES ('email_cliente', '')",
+                "INSERT INTO config (key, value) VALUES ('email_nome', '')",
+                "INSERT INTO config (key, value) VALUES ('email_smtp', '')",
+                "INSERT INTO config (key, value) VALUES ('email_conta', '')",
+                "INSERT INTO config (key, value) VALUES ('email_usuario', '')",
+                "INSERT INTO config (key, value) VALUES ('email_senha', '')",
+                "INSERT INTO config (key, value) VALUES ('email_porta', '')",
+                "INSERT INTO config (key, value) VALUES ('email_ssl', '0')",
+                "INSERT INTO config (key, value) VALUES ('email_tls', '0')",
+                "INSERT INTO config (key, value) VALUES ('contador_nome', '')",
+                "INSERT INTO config (key, value) VALUES ('contador_email', '')",
+
+            };
+            foreach (const QString &sql, alterStatements) {
+                if (!query.exec(sql)) {
+                    qDebug() << "Erro ao executar:" << sql << ":" << query.lastError().text();
+                }
+            }
+
+            //atualizar o caminho da pasta schema correto para cada OS
+            query.prepare("UPDATE config SET value = :schemapath WHERE key = 'caminho_schema'");
+            query.bindValue(":schemapath", caminhoPastaSchemas);
+            if(!query.exec()){
+                qDebug() << "query update config pasta schemas nao rodou";
+            }
+
+            // Atualizar versão do schema se tudo correu bem
+            if (!query.exec("PRAGMA user_version = 7")) {
+                qDebug() << "Erro ao atualizar user_version:" << query.lastError().text();
+            }
+
+            // Finalizar transação
+            if (!db.commit()) {
+                qDebug() << "Error: unable to commit transaction";
+                db.rollback();
+            } else {
+                dbSchemaVersion = 7;
+                emit dbVersao7();
+            }
+
+            break;
+
+        }
 
         }
     }

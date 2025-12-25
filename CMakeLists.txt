@@ -14,8 +14,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # set(CMAKE_PREFIX_PATH "C:/Qt/6.6.2/mingw_64/lib/cmake")
 
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core Network)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core Network Core5Compat)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core Network Core5Compat)
+if (CMAKE_SYSTEM MATCHES "Linux")
+    find_package(QuaZip-Qt6)
+endif()
+
+if (CMAKE_SYSTEM MATCHES "Windows")
+    # find_package(ZLIB REQUIRED)
+endif()
 
 if (CMAKE_SYSTEM MATCHES "Linux")
     include_directories(
@@ -28,6 +35,8 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libiconv-for-Windows/include
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libxml2-v2.11.5/include/libxml2
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/QtRPT
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/include
+        # ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-headers
 
     )
 endif()
@@ -120,6 +129,19 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         util/ACBrConsultaCNPJ.cpp util/ACBrConsultaCNPJ.h
         util/consultacnpjmanager.h util/consultacnpjmanager.cpp
         util/buscarcodigomunicipio.h util/buscarcodigomunicipio.cpp
+        entradas.h entradas.cpp entradas.ui
+
+
+        nota/eventocienciaop.h nota/eventocienciaop.cpp
+        util/manifestadordfe.h util/manifestadordfe.cpp
+        util/nfxmlutil.h util/nfxmlutil.cpp
+        util/dbutil.h util/dbutil.cpp
+        mergeprodutos.h mergeprodutos.cpp mergeprodutos.ui
+        delegatesugerido.h delegatesugerido.cpp
+        util/ACBrMail.cpp util/ACBrMail.h
+        util/mailmanager.h util/mailmanager.cpp
+        janelaemailcontador.h janelaemailcontador.cpp janelaemailcontador.ui
+        util/ziputil.h util/ziputil.cpp
 
 
 
@@ -155,6 +177,18 @@ else()
 
     qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
 endif()
+
+if (WIN32)
+    add_library(quazip1-qt6 UNKNOWN IMPORTED)
+
+    set_target_properties(quazip1-qt6 PROPERTIES
+        IMPORTED_LOCATION
+            ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-lib/quazip1-qt6.lib
+        INTERFACE_INCLUDE_DIRECTORIES
+            ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-headers/
+    )
+endif()
+
 target_link_libraries(QEstoqueLoja PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::Sql Qt6::PrintSupport
     zint Qt6::Charts QtRPT Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Xml
      Qt${QT_VERSION_MAJOR}::Qml Qt${QT_VERSION_MAJOR}::Network
@@ -163,15 +197,17 @@ target_link_libraries(QEstoqueLoja PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt6::S
 #target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lxml2)
 
 if (CMAKE_SYSTEM MATCHES "Linux")
-    target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lz)
+    target_link_libraries(QEstoqueLoja  PRIVATE -lQtRPT -lz QuaZip::QuaZip)
 elseif (CMAKE_SYSTEM MATCHES "Windows")
     target_link_directories(QEstoqueLoja PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/OpenSSL3.1.3/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libiconv-for-Windows/lib64/Release
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libxml2-v2.11.5/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/bin/release/lib
+        # ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/lib
     )
-    target_link_libraries(QEstoqueLoja  PRIVATE QtRPT )
+    target_link_libraries(QEstoqueLoja  PRIVATE QtRPT quazip1-qt6 Qt6::Core5Compat zdll)
 
 endif()
 

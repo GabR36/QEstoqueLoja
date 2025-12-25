@@ -770,7 +770,7 @@ void Vendas::on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos)
 }
 
 bool Vendas::imprimirReciboVenda(QString idVenda){
-    QLocale portugues2;
+    QLocale portugues2(QLocale::Portuguese, QLocale::Brazil);
 
     QSqlDatabase db2 = QSqlDatabase::database();
     if(!db2.open()){
@@ -886,7 +886,18 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
         QString quantidadProduto = produtos[i + 1];
         QString valorProduto = produtos[i + 2];
 
+        int quantidade = quantidadProduto.toInt();
+
+        //tudo isso para formatar o valor maior q 1k para br
+        QLocale americano(QLocale::English, QLocale::UnitedStates);
+        double valorUnitario = americano.toDouble(valorProduto);
+        double totalprods = valorUnitario * quantidade;
+        QString totalFormatado = portugues2.toString(totalprods, 'f', 2);
+
+
+
         QTextOption textOption;
+
         QRect rectQuantProd(xPosPrm, yPos, xPosProds - xPosPrm, lineHeight);
         painter.drawText(rectQuantProd, quantidadProduto, textOption);
 
@@ -895,8 +906,7 @@ bool Vendas::imprimirReciboVenda(QString idVenda){
         painter.drawText(rectDesc, descricaoProduto, textOption);
 
         QRect rectValor(xPosValor, yPos, pageWidth - xPosValor, lineHeight);
-        painter.drawText(rectValor, portugues2.toString(valorProduto.toFloat() * quantidadProduto.toInt(), 'f',2), textOption);
-
+        painter.drawText(rectValor, totalFormatado, textOption);
         yPos += lineHeight;
     }
     int posx = xPosPrm;
@@ -1154,9 +1164,9 @@ QString Vendas::salvarDevolucaoNf(QString retornoEnvio, int idnf, NfeACBR *devol
         QString dataFormatada = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
 
         query.prepare("INSERT INTO notas_fiscais(cstat, nnf, serie, modelo, tp_amb, xml_path, valor_total,"
-                      "atualizado_em, id_venda, cnpjemit, chnfe, nprot, cuf, finalidade, saida, id_nf_ref) "
+                      "atualizado_em, id_venda, cnpjemit, chnfe, nprot, cuf, finalidade, saida, id_nf_ref, dhemi) "
                       "VALUES(:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :valortotal, :atualizadoem,"
-                      ":id_venda, :cnpjemit, :chnfe, :nprot, :cuf, :finalidade, :saida, :id_nf_ref)");
+                      ":id_venda, :cnpjemit, :chnfe, :nprot, :cuf, :finalidade, :saida, :id_nf_ref, :dhemi)");
 
         query.bindValue(":cstat", cStat);
         query.bindValue(":nnf", devolNfe->getNNF());
@@ -1174,6 +1184,7 @@ QString Vendas::salvarDevolucaoNf(QString retornoEnvio, int idnf, NfeACBR *devol
         query.bindValue(":finalidade", "DEVOLUCAO");
         query.bindValue(":saida", "0");
         query.bindValue(":id_nf_ref", QString::number(idnf));
+        query.bindValue(":dhemi", devolNfe->getDhEmiConvertida());
 
         if (!query.exec()) {
             qDebug() << "Erro ao inserir nota fiscal de devolução:" << query.lastError().text();

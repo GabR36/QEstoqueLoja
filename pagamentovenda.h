@@ -39,6 +39,8 @@ private:
     void salvarNfceBD(NfceACBR *nfce);
     QString enviarNfe(NfeACBR *nfe);
     void salvarNfeBD(NfeACBR *nfe);
+    QString dhemiRet;
+    void enviarEmailNFe(QString nomeCliente, QString emailCliente, QString xmlPath, std::string pdfDanfe);
 signals:
     void gerarEnviarNf();
 

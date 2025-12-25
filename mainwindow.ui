@@ -405,6 +405,29 @@ background-color:rgb(03,75,119);
                </widget>
               </item>
               <item>
+               <widget class="QPushButton" name="Btn_Entradas">
+                <property name="minimumSize">
+                 <size>
+                  <width>140</width>
+                  <height>60</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>Compras</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="Imagens/recursosImg.qrc">
+                  <normaloff>:/QEstoqueLOja/view-bank.svg</normaloff>:/QEstoqueLOja/view-bank.svg</iconset>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>40</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
                <spacer name="horizontalSpacer">
                 <property name="orientation">
                  <enum>Qt::Orientation::Horizontal</enum>
@@ -589,10 +612,17 @@ font-size: 15px;</string>
     </property>
     <addaction name="actionDocumenta_o"/>
    </widget>
+   <widget class="QMenu" name="menuEmail">
+    <property name="title">
+     <string>Email</string>
+    </property>
+    <addaction name="actionEnviar"/>
+   </widget>
    <addaction name="menuEditar"/>
    <addaction name="menuVendas"/>
    <addaction name="menuGerarrelat_rios"/>
    <addaction name="menuAjuda"/>
+   <addaction name="menuEmail"/>
   </widget>
   <action name="actionteste">
    <property name="text">
@@ -641,6 +671,11 @@ font-size: 15px;</string>
   <action name="actionDocumenta_o">
    <property name="text">
     <string>Documentação</string>
+   </property>
+  </action>
+  <action name="actionEnviar">
+   <property name="text">
+    <string>Enviar notas ao contador</string>
    </property>
   </action>
  </widget>

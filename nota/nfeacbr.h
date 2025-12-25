@@ -34,6 +34,10 @@ public:
     QString getTpAmb();
     QString getCnpjEmit();
     QString getCuf();
+    QString getDhEmiConvertida();
+    void setProdutosNota(QList<qlonglong> &idsProduto);
+
+    std::string getPdfDanfe();
 private:
     ACBrNFe *nfe;
     QSqlDatabase db;
@@ -41,6 +45,7 @@ private:
     std::stringstream ini;
     QMap<QString, QString> fiscalValues;
     QMap<QString, QString> empresaValues;
+    QMap<QString, QString> produtosValues;
 
     QString caminhoXml;
     std::string tpAmb, cuf, cnf, cnpjEmit;
@@ -63,8 +68,10 @@ private:
     bool ehPfCli = false;
     int indiedestCli = 0;
     bool usarIBS;
+    QString idDest;
 
     QString natOp,tpNf,finNfe,cfop, refNfe;
+    std::string dataHora;
 
     enum tipoNota{
         saidaNormal,
@@ -92,6 +99,7 @@ private:
     float corrigirTaxa(float taxaAntiga, float desconto);
     void aplicarAcrescimoProporcional(float taxaPercentual);
 
+    QString cfopDevolucao(const QString &cfopOriginal);
 signals:
 };
 

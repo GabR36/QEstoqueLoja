@@ -35,5 +35,6 @@
         <file>QEstoqueLOja/taxes-finances.svg</file>
         <file>QEstoqueLOja/appointment-soon-symbolic.svg</file>
         <file>QEstoqueLOja/user-others.svg</file>
+        <file>QEstoqueLOja/view-bank.svg</file>
     </qresource>
 </RCC>

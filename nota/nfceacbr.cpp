@@ -360,13 +360,20 @@ void NfceACBR::carregarConfig(){
     nfce->ConfigGravarValor("NFe", "Ambiente", tpAmb);
 }
 
+QString NfceACBR::getDhEmiConvertida(){
+    QString dhemi = QString::fromStdString(dataHora);
+    QDateTime dt = QDateTime::fromString(dhemi, "dd/MM/yyyy hh:mm");
+    QString dhemiConvertida = dt.toString("yyyy-MM-dd HH:mm:ss");
+
+    return dhemiConvertida;
+}
 
 
 void NfceACBR::ide()
 {
     cuf = fiscalValues.value("cuf").toStdString();
     std::string data = QDateTime::currentDateTime().toString("dd/MM/yyyy").toStdString();
-    std::string dataHora = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm").toStdString();
+    dataHora = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm").toStdString();
     mod = 65;
     int numeroAleatorio8dig = QRandomGenerator::global()->bounded(10000000, 99999999);
     if (nnf == "") {

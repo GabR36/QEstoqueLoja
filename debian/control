@@ -13,6 +13,7 @@ Build-Depends:
  qt6-svg-dev,
  libzint-dev,
  libqtrpt,
+ libquazip1-qt6-dev,
 Standards-Version: 4.7.2
 Homepage: https://github.com/GabR36/QEstoqueLoja
 

@@ -341,7 +341,7 @@ void Entradas::on_Tview_ProdutosNota_customContextMenuRequested(const QPoint &po
         if (barcodePage->exec() == QDialog::Accepted) {
             QString codigoEscaneado = barcodePage->getLineEditText();
 
-            if (existeCodBarras(codigoEscaneado)) {
+            if (existeCodBarras(codigoEscaneado) && !codigoEscaneado.isEmpty()) {
                 QMessageBox::warning(this, "Aviso", "Já existe um produto com esse código cadastrado.");
 
                 addProdComCodBarras(QString::number(idsSelecionados.first()), codigoEscaneado);

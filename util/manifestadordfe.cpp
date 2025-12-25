@@ -11,6 +11,7 @@
 #include <QDomNode>
 #include <QSqlError>
 #include <QDebug>
+#include <QDir>
 
 ManifestadorDFe::ManifestadorDFe(QObject *parent)
     : QObject{parent}
@@ -369,9 +370,20 @@ void ManifestadorDFe::processarResumo(const QString &bloco)
     resumo.schema   = campo("schema");
     resumo.vnf      = campo("vNF");
     resumo.cstat    = campo("CStat");
-    resumo.xml_path = campo("arquivo");
     resumo.nProt    = campo("nProt");
     resumo.dhEmi    = campo("dhEmi");
+
+    QString path = campo("arquivo");
+
+    path.remove('\r');
+    path.remove('\n');
+
+    path.replace('\\', '/');
+
+    // Remove duplicações tipo //
+    path = QDir::cleanPath(path);
+
+    resumo.xml_path = path;
 
     // Apenas resumos válidos
     if (!resumo.schema.contains("resNFe"))
@@ -400,12 +412,12 @@ void ManifestadorDFe::processarNota(const QString &bloco)
     };
 
     auto campoNumero = [&](const QString &nome) {
-        // Somente dígitos impede valores inválidos
-        QRegularExpression re("^" + nome + R"(=(\d+)$)",
-                              QRegularExpression::MultilineOption);
+        // Captura somente até o fim da linha (seguro mesmo com XML= depois)
+        QRegularExpression re(nome + R"(=([^\r\n]+))");
         auto m = re.match(bloco);
         return m.hasMatch() ? m.captured(1).trimmed() : QString();
     };
+
 
     ProcNfe nfe;
     nfe.chave    = campoTexto("chDFe");
@@ -414,10 +426,21 @@ void ManifestadorDFe::processarNota(const QString &bloco)
     nfe.schema   = campoTexto("schema");
     nfe.vnf      = campoTexto("vNF");
     nfe.cstat    = campoTexto("CStat");
-    nfe.xml_path = campoTexto("arquivo");
     nfe.nProt    = campoTexto("nProt");
     nfe.dhEmi    = campoTexto("dhEmi");
     nfe.cSitNfe  = campoTexto("cSitNFe");
+
+    QString path = campoTexto("arquivo");
+
+    path.remove('\r');
+    path.remove('\n');
+
+    path.replace('\\', '/');
+
+    // Remove duplicações tipo //
+    path = QDir::cleanPath(path);
+
+    nfe.xml_path = path;
 
     nfe.nsu      = campoNumero("NSU");
 
@@ -857,7 +880,9 @@ bool ManifestadorDFe::enviarCienciaOperacao(const QString &chNFe, const QString 
 
     // Envia
     EventoRetornoInfo info =  evento->gerarEnviarRetorno();
-    salvarEventoNoBanco("Ciencia de Operacao", info, chNFe);
+    if(info.cStat == "128" || info.cStat == "135" || info.cStat == "136"){
+        salvarEventoNoBanco("Ciencia de Operacao", info, chNFe);
+    }
     qDebug() << "Manifestacao enviada:";
 
     bool sucesso = info.cStat == "128" || info.cStat == "135" || info.cStat == "136";

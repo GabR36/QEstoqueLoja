@@ -662,9 +662,9 @@ void SchemaManager::update() {
                 "CREATE TABLE IF NOT EXISTS dfe_info(id INTEGER NOT NULL UNIQUE PRIMARY KEY "
                 "AUTOINCREMENT, ult_nsu TEXT, data_modificado TEXT, identificacao TEXT) ",
                 "INSERT INTO dfe_info (ult_nsu, data_modificado, identificacao) VALUES "
-                "(0, '2025-12-01 00:00:00', 'consulta_xml')",
+                "(0, '2025-12-01 00:01:00', 'consulta_xml')",
                 "INSERT INTO dfe_info (ult_nsu, data_modificado, identificacao) VALUES "
-                "(0, '2025-12-01 00:01:00', 'consulta_resumo')",
+                "(0, '2025-12-01 00:00:00', 'consulta_resumo')",
                 "CREATE TABLE produtos_nota (id	INTEGER NOT NULL UNIQUE, quantidade	REAL, "
                 "descricao	TEXT, preco	NUMERIC, codigo_barras	TEXT, un_comercial	TEXT, "
                 "ncm	TEXT, csosn	INTEGER, pis	INTEGER, cfop TEXT, "

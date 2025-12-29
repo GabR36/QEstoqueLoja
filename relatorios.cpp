@@ -394,7 +394,12 @@ void relatorios::configurarJanelaTopProdutosVendas(){
     series->append(set);
     connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
         if (status) {
-            QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
+            QToolTip::showText(
+                QCursor::pos(),
+                QString("%1\nValor: R$ %2")
+                    .arg(categorias.at(index))
+                    .arg((*set)[index], 0, 'f', 2)
+                );
         }
     });
 
@@ -1535,12 +1540,21 @@ QMap<QString, float> relatorios::produtosMaisLucrativosAno(const QString &ano) {
     query.prepare(R"(
         SELECT
             p.descricao,
-            SUM(pv.quantidade * (pv.preco_vendido * (IFNULL(p.porcent_lucro, 0) / 100.0))) AS lucro_total
+            SUM(
+                pv.quantidade *
+                CASE
+                    WHEN p.preco_fornecedor IS NOT NULL THEN
+                        (pv.preco_vendido - p.preco_fornecedor)
+                    ELSE
+                        (pv.preco_vendido * (IFNULL(p.porcent_lucro, 0) / 100.0))
+                END
+            ) AS lucro_total
         FROM produtos_vendidos pv
         JOIN produtos p ON pv.id_produto = p.id
         JOIN vendas2 v ON pv.id_venda = v.id
         WHERE strftime('%Y', v.data_hora) = :ano
         GROUP BY p.descricao
+        HAVING lucro_total > 0
         ORDER BY lucro_total DESC
         LIMIT 10
     )");
@@ -1549,9 +1563,10 @@ QMap<QString, float> relatorios::produtosMaisLucrativosAno(const QString &ano) {
 
     if (query.exec()) {
         while (query.next()) {
-            QString descricaoProduto = query.value(0).toString();
-            float lucro = query.value(1).toFloat();
-            produtosLucro[descricaoProduto] = lucro;
+            produtosLucro.insert(
+                query.value(0).toString(),
+                query.value(1).toFloat()
+                );
         }
     } else {
         qDebug() << "Erro ao buscar produtos mais lucrativos:" << query.lastError().text();
@@ -1559,6 +1574,8 @@ QMap<QString, float> relatorios::produtosMaisLucrativosAno(const QString &ano) {
 
     return produtosLucro;
 }
+
+
 
 void relatorios::configurarJanelaProdutoLucroValor(){
     ui->CBox_AnoProdutoLucro->addItems(buscarAnosDisponiveis());
@@ -1584,7 +1601,13 @@ void relatorios::configurarJanelaProdutoLucroValor(){
 
         connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
             if (status) {
-                QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
+
+                QToolTip::showText(
+                    QCursor::pos(),
+                    QString("%1\nLucro: R$ %2")
+                        .arg(categorias.at(index))
+                        .arg((*set)[index], 0, 'f', 2)
+                    );
             }
         });
 

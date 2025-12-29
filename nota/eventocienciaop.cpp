@@ -3,6 +3,8 @@
 #include "../configuracao.h"
 #include <QFile>
 #include <QDomDocument>
+#include <QDir>
+
 #define ID_LOTE 1
 
 EventoCienciaOP::EventoCienciaOP(QObject *parent, QString chnfe)
@@ -99,6 +101,14 @@ EventoRetornoInfo EventoCienciaOP::gerarEnviarRetorno()
 
         // 1. obtém caminho do evento gravado
         QString eventoPath = getCampo(ret, "arquivo");
+
+        eventoPath.remove('\r');
+        eventoPath.remove('\n');
+
+        eventoPath.replace('\\', '/');
+
+        // Remove duplicações tipo //
+        eventoPath = QDir::cleanPath(eventoPath);
         info.xmlPath = eventoPath;
 
 

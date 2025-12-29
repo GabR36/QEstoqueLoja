@@ -62,81 +62,92 @@ CustoItem NfXmlUtil::calcularCustoItemSN(const QString &xmlPath, int nItem)
     file.close();
 
     QDomElement root = doc.documentElement();
-    QDomElement nfe = root.firstChildElement("NFe");
-    QDomElement infNFe = nfe.firstChildElement("infNFe");
+    QDomElement infNFe = root.firstChildElement("NFe")
+                             .firstChildElement("infNFe");
 
-    // --- TOTAL DA NOTA (para rateios)
+    // ================= TOTAL DA NOTA =================
     QDomElement total = infNFe.firstChildElement("total")
                             .firstChildElement("ICMSTot");
 
-    double vNF      = total.firstChildElement("vNF").text().toDouble();
-    double vFrete   = total.firstChildElement("vFrete").text().toDouble();
-    double vSeg     = total.firstChildElement("vSeg").text().toDouble();
-    double vOutros  = total.firstChildElement("vOutro").text().toDouble();
-    double vDesc    = total.firstChildElement("vDesc").text().toDouble();
-    double vProdTot = total.firstChildElement("vProd").text().toDouble();
+    double vFrete   = getDouble(total.firstChildElement("vFrete").text());
+    double vSeg     = getDouble(total.firstChildElement("vSeg").text());
+    double vOutros  = getDouble(total.firstChildElement("vOutro").text());
+    double vDesc    = getDouble(total.firstChildElement("vDesc").text());
+    double vProdTot = getDouble(total.firstChildElement("vProd").text());
 
-    // --- ACHANDO O ITEM EXATO
+    // ================= ITEM =================
     QDomNodeList itens = infNFe.elementsByTagName("det");
-    QDomElement itemEncontrado;
+    QDomElement det;
 
     for (int i = 0; i < itens.count(); i++) {
-        QDomElement det = itens.at(i).toElement();
-        if (det.attribute("nItem").toInt() == nItem) {
-            itemEncontrado = det;
+        QDomElement e = itens.at(i).toElement();
+        if (e.attribute("nItem").toInt() == nItem) {
+            det = e;
             break;
         }
     }
 
-    if (itemEncontrado.isNull()) {
+    if (det.isNull()) {
         qWarning() << "Item não encontrado!";
         return ci;
     }
 
-    // --- PROD
-    QDomElement prod = itemEncontrado.firstChildElement("prod");
-    double vProd = prod.firstChildElement("vProd").text().toDouble();
-    double qCom  = prod.firstChildElement("qCom").text().toDouble();
+    // ================= PROD =================
+    QDomElement prod = det.firstChildElement("prod");
+    double vProd = getDouble(prod.firstChildElement("vProd").text());
+    double qCom  = getDouble(prod.firstChildElement("qCom").text());
 
     ci.vProd = vProd;
-    ci.precoUnitarioNota = vProd / qCom;       // 57.27643 no seu XML
+    ci.precoUnitarioNota = (qCom > 0) ? vProd / qCom : 0;
 
-    // --- IPI (CST 50 → tributado)
-    QDomElement imposto = itemEncontrado.firstChildElement("imposto");
-    QDomElement ipi = imposto.firstChildElement("IPI");
+    // ================= IMPOSTOS DO ITEM =================
+    QDomElement imposto = det.firstChildElement("imposto");
+
+    // ---- IPI ----
     double vIPI = 0;
-
+    QDomElement ipi = imposto.firstChildElement("IPI");
     if (!ipi.isNull()) {
         QDomElement ipiTrib = ipi.firstChildElement("IPITrib");
-        if (!ipiTrib.isNull()) {
-            vIPI = ipiTrib.firstChildElement("vIPI").text().toDouble();
+        if (!ipiTrib.isNull())
+            vIPI = getDouble(ipiTrib.firstChildElement("vIPI").text());
+    }
+    ci.vIPI = vIPI;
+
+    // ---- ICMS-ST / FCP / DIFAL ----
+    double vICMSST = 0;
+    double vFCPST  = 0;
+    double vDIFAL  = 0;
+
+    QDomElement icms = imposto.firstChildElement("ICMS");
+    if (!icms.isNull()) {
+        QDomElement icmsDet = icms.firstChildElement();
+        while (!icmsDet.isNull()) {
+            vICMSST += getDouble(icmsDet.firstChildElement("vICMSST").text());
+            vFCPST  += getDouble(icmsDet.firstChildElement("vFCPST").text());
+            vDIFAL  += getDouble(icmsDet.firstChildElement("vICMSUFDest").text());
+            icmsDet = icmsDet.nextSiblingElement();
         }
     }
 
-    ci.vIPI = vIPI;
+    ci.vICMSST = vICMSST;
 
-    double ipiUnit = (vIPI / qCom);  // ~3.724
+    // ================= RATEIO =================
+    double proporcao = (vProdTot > 0) ? vProd / vProdTot : 0;
 
-    // --- RATEIOS (proporcionais ao valor do item)
-    double proporcao = vProd / vProdTot;
+    double rateioTotal =
+        proporcao * (vFrete + vSeg + vOutros - vDesc);
 
-    ci.rateioFrete   = proporcao * vFrete;
-    ci.rateioSeguro  = proporcao * vSeg;
-    ci.rateioOutros  = proporcao * vOutros;
-    ci.rateioDesconto = proporcao * vDesc;
+    // ================= CUSTO =================
+    double custoTotalItem =
+        vProd +
+        vIPI +
+        vICMSST +
+        vFCPST +
+        vDIFAL +
+        rateioTotal;
 
-    double rateioUnit = 0;
-    if (qCom > 0)
-        rateioUnit = (ci.rateioFrete + ci.rateioSeguro +
-                      ci.rateioOutros - ci.rateioDesconto) / qCom;
-
-    // --- CUSTO UNITÁRIO FINAL
-    ci.custoUnitario =
-        ci.precoUnitarioNota   // base da nota
-        + ipiUnit              // IPI rateado
-        + rateioUnit;          // Frete/Seguro/Outros/Desc rateados
-
-    ci.custoTotal = ci.custoUnitario * qCom;
+    ci.custoTotal   = custoTotalItem;
+    ci.custoUnitario = (qCom > 0) ? custoTotalItem / qCom : 0;
 
     return ci;
 }

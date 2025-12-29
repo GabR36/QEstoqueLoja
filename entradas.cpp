@@ -717,9 +717,11 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
 
     QSqlQuery query2;
 
-    query2.prepare("SELECT id, quantidade, descricao, preco, codigo_barras, un_comercial, "
-                   "ncm, aliquota_imposto, csosn, pis FROM produtos_nota"
-                   " WHERE produtos_nota.id = :idProd");
+    query2.prepare("SELECT produtos_nota.id, quantidade, descricao, preco, codigo_barras, "
+                   "un_comercial, ncm, aliquota_imposto, csosn, nitem, pis, xml_path "
+                   "FROM produtos_nota "
+                   "INNER JOIN notas_fiscais ON produtos_nota.id_nf = notas_fiscais.id "
+                   "WHERE produtos_nota.id = :idProd");
     query2.bindValue(":idProd", idProd);
     if (!query2.exec()) {
         qDebug() << "erro query addprodcombarras()2";
@@ -733,6 +735,11 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
     }
 
     QVariantMap produtoNota = registros2.first();
+
+    NfXmlUtil *nfutil = new NfXmlUtil(this);
+    CustoItem custoxml = nfutil->calcularCustoItemSN(produtoNota["xml_path"].toString(), produtoNota["nitem"].toInt());
+
+    produtoNota["preco"] = custoxml.custoUnitario;
 
     // comparar os campos do produtoNota e produto e pegar a diferença
     QVariantMap resultado;

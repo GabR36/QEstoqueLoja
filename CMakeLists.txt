@@ -58,10 +58,10 @@ elseif(CMAKE_SYSTEM MATCHES "Linux")
 
 endif()
 set(PROJECT_SOURCES
-        main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
+        src/main.cpp
+        src/mainwindow.cpp
+        src/mainwindow.h
+        src/mainwindow.ui
         ${TS_FILES}
 )
 
@@ -69,7 +69,7 @@ if(WIN32)
     set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Imagens/QEstoqueLOja/AppIcon.rc")
        list(APPEND PROJECT_SOURCES ${APP_ICON_RESOURCE_WINDOWS})
 endif()
-include_directories(${CMAKE_SOURCE_DIR}/subclass)
+include_directories(${CMAKE_SOURCE_DIR}/src/subclass)
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     #set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Imagens/QEstoqueLOja/AppIcon.rc")
 
@@ -78,75 +78,67 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         #${APP_ICON_RESOURCE_WINDOWS}
-        alterarproduto.h alterarproduto.cpp alterarproduto.ui
+        src/alterarproduto.h src/alterarproduto.cpp src/alterarproduto.ui
 
-        vendas.h vendas.cpp vendas.ui
-        venda.h venda.cpp venda.ui
+        src/vendas.h src/vendas.cpp src/vendas.ui
+        src/venda.h src/venda.cpp src/venda.ui
         Imagens/recursosImg.qrc
-        relatorios.h relatorios.cpp relatorios.ui
-        pagamento.h pagamento.cpp pagamento.ui
+        src/relatorios.h src/relatorios.cpp src/relatorios.ui
+        src/pagamento.h src/pagamento.cpp src/pagamento.ui
 
-        configuracao.h configuracao.cpp configuracao.ui
-        entradasvendasprazo.h entradasvendasprazo.cpp entradasvendasprazo.ui
-        pagamentoaprazo.h pagamentoaprazo.cpp
-        delegateprecof2.h delegateprecof2.cpp
-        customdelegate.h customdelegate.cpp
-        delegatehora.h delegatehora.cpp
-        pagamentovenda.cpp
-        pagamentovenda.h
-        delegateprecof2.cpp delegateprecof2.h
-        delegateprecof2.cpp delegateprecof2.h
-        delegateprecof2.cpp delegateprecof2.h
-        delegateprecof2.cpp delegateprecof2.h
-        delegatepago.h delegatepago.cpp
-        util/pdfexporter.h util/pdfexporter.cpp
-        subclass/customlineedit.h subclass/customlineedit.cpp
-        delegateprecovalidate.h delegateprecovalidate.cpp
-        delegatelockcol.h delegatelockcol.cpp
-        delegatequant.h delegatequant.cpp
-        clientes.h clientes.cpp clientes.ui
-        alterarcliente.h alterarcliente.cpp alterarcliente.ui
-        inserircliente.h inserircliente.cpp inserircliente.ui
-        subclass/produtotableview.h subclass/produtotableview.cpp
-        subclass/waitdialog.h subclass/waitdialog.cpp
+        src/configuracao.h src/configuracao.cpp src/configuracao.ui
+        src/entradasvendasprazo.h src/entradasvendasprazo.cpp src/entradasvendasprazo.ui
+        src/pagamentoaprazo.h src/pagamentoaprazo.cpp
+        src/delegateprecof2.h src/delegateprecof2.cpp
+        src/customdelegate.h src/customdelegate.cpp
+        src/delegatehora.h src/delegatehora.cpp
+        src/pagamentovenda.cpp
+        src/pagamentovenda.h
+        src/delegateprecof2.cpp src/delegateprecof2.h
+        src/delegatepago.h src/delegatepago.cpp
+        src/util/pdfexporter.h src/util/pdfexporter.cpp
+        src/subclass/customlineedit.h src/subclass/customlineedit.cpp
+        src/delegateprecovalidate.h src/delegateprecovalidate.cpp
+        src/delegatelockcol.h src/delegatelockcol.cpp
+        src/delegatequant.h src/delegatequant.cpp
+        src/clientes.h src/clientes.cpp src/clientes.ui
+        src/alterarcliente.h src/alterarcliente.cpp src/alterarcliente.ui
+        src/inserircliente.h src/inserircliente.cpp src/inserircliente.ui
+        src/subclass/produtotableview.h src/subclass/produtotableview.cpp
+        src/subclass/waitdialog.h src/subclass/waitdialog.cpp
 
-        inserirproduto.h inserirproduto.cpp inserirproduto.ui
-        util/NfUtilidades.h
-        util/ibptutil.h util/ibptutil.cpp
-        nota/DanfeUtil.h nota/DanfeUtil.cpp
-        util/NFUtilidades.cpp
-        subclass/leditdialog.h subclass/leditdialog.cpp
-        infojanelaprod.h infojanelaprod.cpp infojanelaprod.ui
+        src/inserirproduto.h src/inserirproduto.cpp src/inserirproduto.ui
+        src/util/NfUtilidades.h
+        src/util/ibptutil.h src/util/ibptutil.cpp
+        src/nota/DanfeUtil.h src/nota/DanfeUtil.cpp
+        src/util/NFUtilidades.cpp
+        src/subclass/leditdialog.h src/subclass/leditdialog.cpp
+        src/infojanelaprod.h src/infojanelaprod.cpp src/infojanelaprod.ui
 
-        util/helppage.h util/helppage.cpp util/helppage.ui
-        nota/acbrmanager.h nota/acbrmanager.cpp
-        nota/ACBrNFe.h nota/ACBrNFe.cpp
-        nota/ACBrNFeImport.h
-        nota/nfceacbr.h nota/nfceacbr.cpp
-        nota/nfeacbr.h nota/nfeacbr.cpp
-        schemamanager.h schemamanager.cpp
-        nota/cancelnf.h nota/cancelnf.cpp
-        util/ACBrConsultaCNPJ.cpp util/ACBrConsultaCNPJ.h
-        util/consultacnpjmanager.h util/consultacnpjmanager.cpp
-        util/buscarcodigomunicipio.h util/buscarcodigomunicipio.cpp
-        entradas.h entradas.cpp entradas.ui
+        src/util/helppage.h src/util/helppage.cpp src/util/helppage.ui
+        src/nota/acbrmanager.h src/nota/acbrmanager.cpp
+        src/nota/ACBrNFe.h src/nota/ACBrNFe.cpp
+        src/nota/ACBrNFeImport.h
+        src/nota/nfceacbr.h src/nota/nfceacbr.cpp
+        src/nota/nfeacbr.h src/nota/nfeacbr.cpp
+        src/schemamanager.h src/schemamanager.cpp
+        src/nota/cancelnf.h src/nota/cancelnf.cpp
+        src/util/ACBrConsultaCNPJ.cpp src/util/ACBrConsultaCNPJ.h
+        src/util/consultacnpjmanager.h src/util/consultacnpjmanager.cpp
+        src/util/buscarcodigomunicipio.h src/util/buscarcodigomunicipio.cpp
+        src/entradas.h src/entradas.cpp src/entradas.ui
 
 
-        nota/eventocienciaop.h nota/eventocienciaop.cpp
-        util/manifestadordfe.h util/manifestadordfe.cpp
-        util/nfxmlutil.h util/nfxmlutil.cpp
-        util/dbutil.h util/dbutil.cpp
-        mergeprodutos.h mergeprodutos.cpp mergeprodutos.ui
-        delegatesugerido.h delegatesugerido.cpp
-        util/ACBrMail.cpp util/ACBrMail.h
-        util/mailmanager.h util/mailmanager.cpp
-        janelaemailcontador.h janelaemailcontador.cpp janelaemailcontador.ui
-        util/ziputil.h util/ziputil.cpp
-
-
-
-
-
+        src/nota/eventocienciaop.h src/nota/eventocienciaop.cpp
+        src/util/manifestadordfe.h src/util/manifestadordfe.cpp
+        src/util/nfxmlutil.h src/util/nfxmlutil.cpp
+        src/util/dbutil.h src/util/dbutil.cpp
+        src/mergeprodutos.h src/mergeprodutos.cpp src/mergeprodutos.ui
+        src/delegatesugerido.h src/delegatesugerido.cpp
+        src/util/ACBrMail.cpp src/util/ACBrMail.h
+        src/util/mailmanager.h src/util/mailmanager.cpp
+        src/janelaemailcontador.h src/janelaemailcontador.cpp src/janelaemailcontador.ui
+        src/util/ziputil.h src/util/ziputil.cpp
 
     )
 

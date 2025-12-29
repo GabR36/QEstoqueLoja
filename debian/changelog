@@ -1,3 +1,9 @@
+qestoqueloja (2.2.1-1) unstable; urgency=medium
+
+  * New upstream version v2.2.1
+
+ -- Gabriel Bormann Chuede <gabrielbchuede@gmail.com>  Mon, 29 Dec 2025 13:05:55 -0300
+
 qestoqueloja (2.2.0-1) unstable; urgency=medium
 
   * New upstream version v2.2.0
@@ -6,7 +12,6 @@ qestoqueloja (2.2.0-1) unstable; urgency=medium
 
 qestoqueloja (2.1.1-1) unstable; urgency=medium
 
- [ Gabriel B. Chuede ]
   * upstream release 2.1.1
 
  -- Gabriel Bormann Chuede <gabrielbchuede@gmail.com>  Thu, 20 Nov 2025 21:49:03 -0300

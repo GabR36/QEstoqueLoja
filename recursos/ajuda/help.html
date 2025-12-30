@@ -53,11 +53,11 @@
       <h2>1.Configurações</h2>
       <h3 id="empresa">Empresa</h3>
       <p>Você deve preencher com dados corretos sobre sua empresa, especialmente se vai emitir nota.
-      <i>As informações poderão ser usadas na emissão de notas fiscais e recibos não fiscais.</i></p>
+	<i>As informações poderão ser usadas na emissão de notas fiscais e recibos não fiscais.</i></p>
       <h3 id="financeiro">Financeiro</h3>
       <p>Campos usados para facilitar a automação da aplicação de taxas padrões, preencha com valores
 	em porcentagem. <i>Os valores serão usados como sugestão na hora do cadastro de produtos e vendas
-	que utilizem crédito ou débito</i>.</p>
+	  que utilizem crédito ou débito</i>.</p>
       <h3 id="fiscal">Fiscal</h3>
       <p>Configuração de dados obrigatórios para emissão de <b>nota fiscal</b>, para estar apto a emissão
 	você deve preencher corretamente todos os dados desta aba e sua empresa estar cadastrada no regime
@@ -84,12 +84,12 @@
 	  certificado digital, depois no menu esquerdo da página entre em DF-E > NFC-E > CSC > controle, digite seu CNPJ e busque com os filtros
 	  homologação e produção, se não houver nenhum CSC para o ambiente use o botão "Solicitar".</p>
 	<p>O CSC deve parecer algo como GW6YWZMZKFOCFHXLH5YQEDUYLWD9KOKKVR6 e o ID CSC: 000001, <i>lembre de usar o CSC e ID CSC de produção se estiver
-	usando o ambiente produção e o CSC e ID CSC de homologação se estiver usando o ambiente homologação.</i></p>
+	    usando o ambiente produção e o CSC e ID CSC de homologação se estiver usando o ambiente homologação.</i></p>
 	<li><b>Pasta Schemas</b></li>
-	<p>Selecione a pasta de schemas para validar xml das notas que é baixada automaticamente com o QEstoqueLoja, no <i>Windows</i> está em <i>%appdata%\Roaming\QEstoqueLoja\recursos\NFeSchemas</i>, no <i>Linux</i> fica em <i>~/usr/local/share/QEstoqueLoja/recursos/NFeSchemas.</i>
+	<p>Selecione a pasta de schemas para validar xml das notas que é baixada automaticamente com o QEstoqueLoja, no <i>Windows</i> está em <i>%appdata%\Roaming\QEstoqueLoja\recursos\NFeSchemas</i>, no <i>Linux</i> fica em <i>/usr/local/share/QEstoqueLoja/recursos/NFeSchemas.</i>
 	</p>
 	<!-- <p>Baixe a pasta contendo os schemas da NF oficiais do governo, geralmente é recomendado baixar a versão mais atual dos schemas, porém o -->
-	<!--   QEstoqueLoja nem sempre atualiza imediatamente para comportar as novas mudanças, nessa versão do QEstoqueLoja, a versão <i>Esquema XML NF-e/NFC-e - Pacote de Liberação nº 9o (Novo leiaute da NF-e, NT 2024.001 v.1.00) (ZIP). Publicado em 04/06/2024</i> foi testada e está funcionando corretamente. Para baixar o arquivo compactado contendo a pasta de schemas acesse o <a href="https://www.nfe.fazenda.gov.br/portal/listaConteudo.aspx?tipoConteudo=BMPFMBoln3w=&AspxAutoDetectCookieSupport=1">Portal da Nota Fiscal Eletrônica</a>, escolha a versão recomendada, descompacte o arquivo e selecione a pasta que contem os arquivos .xsd.</p> -->
+	  <!--   QEstoqueLoja nem sempre atualiza imediatamente para comportar as novas mudanças, nessa versão do QEstoqueLoja, a versão <i>Esquema XML NF-e/NFC-e - Pacote de Liberação nº 9o (Novo leiaute da NF-e, NT 2024.001 v.1.00) (ZIP). Publicado em 04/06/2024</i> foi testada e está funcionando corretamente. Para baixar o arquivo compactado contendo a pasta de schemas acesse o <a href="https://www.nfe.fazenda.gov.br/portal/listaConteudo.aspx?tipoConteudo=BMPFMBoln3w=&AspxAutoDetectCookieSupport=1">Portal da Nota Fiscal Eletrônica</a>, escolha a versão recomendada, descompacte o arquivo e selecione a pasta que contem os arquivos .xsd.</p> -->
 	<!-- <li><b>Pasta CertificadosAC</b></li> -->
 	<!-- <p>Baixe e selecione a pasta contendo os certificados digitais da ICP-Brasil, você pode baixar o <i>arquivo único compactado da cadeia vigente</i> no site: <a href="https://www.gov.br/iti/pt-br/assuntos/repositorio/certificados-das-acs-da-icp-brasil-arquivo-unico-compactado">Certificados das ACs da ICP-Brasil - Arquivo Único Compactado</a>.</p> -->
 	<li><b>Certificado</b></li>
@@ -105,8 +105,30 @@
       </ul>
       <h3 id="conf-produto">Produto</h3>
       <p>Use esta aba para setar valores padrão da aba "imposto" do cadastro de produtos, essa aba é mais util se você emite nota fiscal. Confira com seu contador quais valores preencher principalmente para CSOSN e PIS/COFINS, visto que terão impacto no quanto de imposto você vai pagar.
-       os valores 102 para CSOSN e 49 para PIS/COFINS são os mais comuns para Simples Nacional, o NCM igual a '00000000' "passa" na fiscalização automatica da SEFAZ mas deve ser <b>evitado</b> principalmente na emissão de NF-e.</p>
+	os valores 102 para CSOSN e 49 para PIS/COFINS são os mais comuns para Simples Nacional, o NCM igual a '00000000' "passa" na fiscalização automatica da SEFAZ mas deve ser <b>evitado</b> principalmente na emissão de NF-e.</p>
+      <h3 id="conf-email">E-mail</h3>
+      <p>Configure o servidor de email para enviar automaticamente as
+	notas-fiscais para o cliente e/ou contador. Preencha as
+	informações de acordo com o seu provedor de e-mail. "Nome" é o
+	nome de quem envia, que será mostrado para o destinatário.
+      </p>
+      <h4>Gmail e outros provedores que usam Oauth2 </h4>
+      <p>
+	O QEstoqueLoja não suporta OAuth2 ainda. Mas você pode usar sua
+	conta Gmail ativando o "app passwords". Para isso, ative a
+	autenticação de dois fatores em sua conta se não fez ainda e
+	siga os outros passos mencionados
+	em <a href="https://support.google.com/accounts/answer/185833?hl=pt-BR">https://support.google.com/accounts/answer/185833?hl=pt-BR</a>.
+	Depois, coloque as outras informações de SMTP do provedor nas
+	configurações, disponíveis
+	em <a href="https://developers.google.com/workspace/gmail/imap/imap-smtp?hl=pt-br">https://developers.google.com/workspace/gmail/imap/imap-smtp?hl=pt-br</a>. Usando
+	a senha de app como senha nas configurações.</p>
+      <h3 id="conf-contador">Contador</h3>
+      <p>Complete os campos nome e email, com o Nome e o Email do seu
+      contador.
+      </p>
     </section>
+    
 
     <section id="vendas">
       <h2>2.Venda</h2>
@@ -121,18 +143,50 @@
 	<li>PRONTO, sua venda foi realizada e agora aparece na janela vendas.
       </ol>
       <h3 id="venda-prazo">Vendas a prazo</h3>
-	<p>Após ter vendido a prazo para um cliente, é possivel registrar os pagamentos aos poucos abrindo a janela de "entradas" ao selecionar a venda a prazo eclicar no botão "Abrir Pagamentos", nessa janela simples ficam registrados todos os valores pagos na tabela e você pode inserir um novo facilmente escrevendo o valor que quer debitar e clicar no botao "Prosseguir Pagamento".<br>Para imprimir o recibo contendo todos os pagamentos e informações da venda pra seu cliente basta selecionar a venda a prazo na janela "Vendas" e clicar com o botão direito do mouse e então "Imprimir Recibo".</p>
+      <p>Após ter vendido a prazo para um cliente, é possivel registrar os pagamentos aos poucos abrindo a janela de "entradas" ao selecionar a venda a prazo eclicar no botão "Abrir Pagamentos", nessa janela simples ficam registrados todos os valores pagos na tabela e você pode inserir um novo facilmente escrevendo o valor que quer debitar e clicar no botao "Prosseguir Pagamento".<br>Para imprimir o recibo contendo todos os pagamentos e informações da venda pra seu cliente basta selecionar a venda a prazo na janela "Vendas" e clicar com o botão direito do mouse e então "Imprimir Recibo".</p>
       <h3 id="recibos">Recibos e DANFE</h3>
       <p>Se você esqueceu de imprimir o recibo na hora da venda, não se preocupe, basta clicar com o botão direito do mouse na venda realizada na janela "Vendas"e selecionar "Imprimir Recibo" para imprimir recibo não fiscal, ou DANFE para imprimir o recibo fiscal caso tenha efetuado uma NF. </p>
     </section>
 
-   <section id="relatorios">
+    <section id="relatorios">
       <h2>3.Relatórios</h2>
       <h3 id="grafico-venda">Gráficos relacionados à vendas</h3>
       <p>Ao entrar na janela relatórios você pode clicar na guita "Vendas" para exibir gráficos e relatórios baseados nas vendas, como "Valor de vendas" ou "produtos mais vendidos", basta selecionar o relatório que deseja apertando tipo de relatório.</p>
       <h3 id="orcamento">Orçamento</h3>
       <p>Na janela relatórios guia estoque, o primeiro tipo de relatório é o "Orçamento para cliente" que funciona como uma venda mas ao invés de pagamento tem o botão "Visualizar/exportar orçamento" que permite imprimir em folha A4 o orçamento dos produtos selecionados, ou exportar em pdf <i>para usar o <b>logo</b> no orçamento basta seleciona-lo nas configuraçoes.</p>
     </section>
+    <section id="Compras">
+      <h2>4.Compras</h2>
+      <p>Na janela compras você pode consultar as notas fiscais
+	que foram enviadas contra seu CNPJ e cadastrar os produtos
+	contidos nela de forma rápida e fácil com os preços
+	corretamente alterados para o valor pago(ICMS + IPI + FRETE...).
+	Para usar a janela compras você deve preencher as
+	configurações fiscais e da empresa corretamente e estar usando o ambiente
+	produção.</p>
+      <h3 id="importacao-cadastro-produtos">Importação dos Produtos da
+	Nota</h3>
+      <p>Quando uma nota fiscal aparece na tabela Entradas, basta
+      selecioná-la e aparecerão os produtos da compra na tabela
+      abaixo, para importar o produto clique com o botão direito do
+      mouse no registro do produto na tabela para aparecer o menu de
+      contexto "Adicionar Produto" e então digite ou bipe o código de
+      barras do produto selecionado. Se o produto selecionado ja
+      existe no sistema, uma tela com informações conflitantes vai
+      aparecer para que você mude oque achar necessário(clicando nas
+      células "Sugerido" da tabela), se o produto nunca foi
+      cadastrado a janela de novo produto vai aparecer bastando
+	apertar em salvar.</p>
+      <h3 id="compras-devolucao">Devolução De Produtos Comprados</h3>
+      <p>Para gerar uma nota fiscal de devolução de um ou mais
+      produtos comprados apenas selecione a nota fiscal na tabela
+      superior(Compras) e os produtos que dejeja devolver na tabela
+      inferior e clique com o botão direito do mouse para aparecer o
+      menu de contexto "Devolver Produtos", depois se tudo estiver
+      correto a nota de devolução será gerada e enviada para o email
+      do destinatário.</p>
+      
+	
 
   </body>
 </html>

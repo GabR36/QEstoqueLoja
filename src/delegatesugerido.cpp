@@ -7,6 +7,7 @@
 #include <QPainter>
 #include "mainwindow.h"
 #include <QStyledItemDelegate>
+#include "util/NfUtilidades.h"
 
 DelegateSugerido::DelegateSugerido(QObject *parent)
     : QStyledItemDelegate(parent)
@@ -61,8 +62,12 @@ QWidget *DelegateSugerido::createEditor(
     // -------- unidade comercial --------
     if (chave == "un_comercial") {
         QComboBox *cb = new QComboBox(parent);
-        cb->addItems({ "UN", "KG", "CX", "LT" });
+
+        for (int i = 0; i < unidadesComerciaisCount; ++i) {
+            cb->addItem(unidadesComerciais[i]);
+        }
         return cb;
+
     }
 
     // -------- CSOSN --------

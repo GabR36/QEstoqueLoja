@@ -1446,6 +1446,7 @@ QMap<QString, float> relatorios::buscarValoresNfAno(const QString &ano) {
                   "FROM notas_fiscais "
                   "WHERE (strftime('%Y', atualizado_em) = :ano "
                   "AND (cstat = '100' OR cstat = '150')) AND tp_amb = :tpamb "
+                  "AND finalidade = 'NORMAL' "
                   "GROUP BY mes");
     query.bindValue(":ano", ano);
     query.bindValue(":tpamb", tpamb);

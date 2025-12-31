@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QSqlError>
 #include <QDebug>
+#include "delegatehora.h"
 
 Entradas::Entradas(QWidget *parent)
     : QWidget(parent)
@@ -47,6 +48,8 @@ Entradas::Entradas(QWidget *parent)
     //delegate SIM VERDE NAO VERMELHO para coluna 'adicionado' da tabela produtos
     DelegatePago *delegateSimNao = new DelegatePago(this);
     ui->Tview_ProdutosNota->setItemDelegateForColumn(5, delegateSimNao);
+    DelegateHora *delegateData = new DelegateHora(this);
+    ui->Tview_Entradas->setItemDelegateForColumn(2, delegateData);
 }
 
 Entradas::~Entradas()

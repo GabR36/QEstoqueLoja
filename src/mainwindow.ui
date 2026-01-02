@@ -172,7 +172,7 @@ color: rgb(255, 255, 255);
                <string/>
               </property>
               <property name="pixmap">
-               <pixmap resource="Imagens/recursosImg.qrc">:/QEstoqueLOja/mkaoyvblContraste.png</pixmap>
+               <pixmap resource="../Imagens/recursosImg.qrc">:/QEstoqueLOja/mkaoyvblContraste.png</pixmap>
               </property>
               <property name="scaledContents">
                <bool>true</bool>
@@ -416,7 +416,7 @@ background-color:rgb(03,75,119);
                  <string>Compras</string>
                 </property>
                 <property name="icon">
-                 <iconset resource="Imagens/recursosImg.qrc">
+                 <iconset resource="../Imagens/recursosImg.qrc">
                   <normaloff>:/QEstoqueLOja/view-bank.svg</normaloff>:/QEstoqueLOja/view-bank.svg</iconset>
                 </property>
                 <property name="iconSize">
@@ -611,6 +611,7 @@ font-size: 15px;</string>
      <string>Ajuda</string>
     </property>
     <addaction name="actionDocumenta_o"/>
+    <addaction name="actionSobre"/>
    </widget>
    <widget class="QMenu" name="menuEmail">
     <property name="title">
@@ -621,8 +622,8 @@ font-size: 15px;</string>
    <addaction name="menuEditar"/>
    <addaction name="menuVendas"/>
    <addaction name="menuGerarrelat_rios"/>
-   <addaction name="menuAjuda"/>
    <addaction name="menuEmail"/>
+   <addaction name="menuAjuda"/>
   </widget>
   <action name="actionteste">
    <property name="text">
@@ -678,6 +679,11 @@ font-size: 15px;</string>
     <string>Enviar notas ao contador</string>
    </property>
   </action>
+  <action name="actionSobre">
+   <property name="text">
+    <string>Sobre</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -687,7 +693,7 @@ font-size: 15px;</string>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="Imagens/recursosImg.qrc"/>
+  <include location="../Imagens/recursosImg.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -99,6 +99,8 @@ private slots:
 
     void on_actionEnviar_triggered();
 
+    void on_actionSobre_triggered();
+
 private:
     Ui::MainWindow *ui;
     // ACBrNFe *acbr;

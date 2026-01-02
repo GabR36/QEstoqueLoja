@@ -38,12 +38,15 @@
 #include "util/manifestadordfe.h"
 #include "util/mailmanager.h"
 #include "janelaemailcontador.h"
+#include "sobre.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    QCoreApplication::setApplicationVersion("v2.2.2");
 
     SchemaManager *schemaManager = new SchemaManager(this, 7);
     //config versao 6
@@ -896,5 +899,12 @@ void MainWindow::on_actionEnviar_triggered()
 {
     JanelaEmailContador *janelaEmail = new JanelaEmailContador();
     janelaEmail->show();
+}
+
+
+void MainWindow::on_actionSobre_triggered()
+{
+    Sobre *sobre = new Sobre();
+    sobre->show();
 }
 

@@ -357,7 +357,7 @@ void MainWindow::on_Btn_Alterar_clicked()
     alterar->idAlt = productId;
     alterar->TrazerInfo(productDesc, productQuant, productPreco, productBarras, productNf, productUCom,
     produtoPrecoForn, productPorcentLucro, productNCM, productCEST, productAliquotaImp, productCsosn, productPis);
-    alterar->setWindowModality(Qt::ApplicationModal);
+    // alterar->setWindowModality(Qt::ApplicationModal);
     alterar->show();
     connect(alterar, &AlterarProduto::produtoAlterado, this,
             &MainWindow::on_Btn_Pesquisa_clicked);

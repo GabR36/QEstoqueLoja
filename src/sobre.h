@@ -15,6 +15,9 @@ public:
     explicit Sobre(QWidget *parent = nullptr);
     ~Sobre();
 
+private slots:
+    void on_pushButton_clicked();
+
 private:
     Ui::Sobre *ui;
 };

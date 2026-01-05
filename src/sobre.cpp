@@ -20,3 +20,9 @@ Sobre::~Sobre()
 {
     delete ui;
 }
+
+void Sobre::on_pushButton_clicked()
+{
+    close();
+}
+

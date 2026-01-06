@@ -396,7 +396,7 @@ void relatorios::configurarJanelaTopProdutosVendas(){
         if (status) {
             QToolTip::showText(
                 QCursor::pos(),
-                QString("%1\nValor: R$ %2")
+                QString("%1\nValor: %2")
                     .arg(categorias.at(index))
                     .arg((*set)[index], 0, 'f', 2)
                 );

@@ -39,6 +39,7 @@
 #include "util/mailmanager.h"
 #include "janelaemailcontador.h"
 #include "sobre.h"
+#include "monitorfiscal.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -906,5 +907,12 @@ void MainWindow::on_actionSobre_triggered()
 {
     Sobre *sobre = new Sobre();
     sobre->show();
+}
+
+
+void MainWindow::on_actionMonitor_Fiscal_triggered()
+{
+    MonitorFiscal *monitor = new MonitorFiscal();
+    monitor->show();
 }
 

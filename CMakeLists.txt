@@ -140,6 +140,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/janelaemailcontador.h src/janelaemailcontador.cpp src/janelaemailcontador.ui
         src/util/ziputil.h src/util/ziputil.cpp
         src/sobre.h src/sobre.cpp src/sobre.ui
+        src/monitorfiscal.h src/monitorfiscal.cpp src/monitorfiscal.ui
+        src/subclass/menuitem.h src/subclass/menuitem.cpp
 
     )
 

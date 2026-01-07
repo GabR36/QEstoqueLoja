@@ -619,10 +619,17 @@ font-size: 15px;</string>
     </property>
     <addaction name="actionEnviar"/>
    </widget>
+   <widget class="QMenu" name="menuFiscal">
+    <property name="title">
+     <string>Fiscal</string>
+    </property>
+    <addaction name="actionMonitor_Fiscal"/>
+   </widget>
    <addaction name="menuEditar"/>
    <addaction name="menuVendas"/>
    <addaction name="menuGerarrelat_rios"/>
    <addaction name="menuEmail"/>
+   <addaction name="menuFiscal"/>
    <addaction name="menuAjuda"/>
   </widget>
   <action name="actionteste">
@@ -682,6 +689,11 @@ font-size: 15px;</string>
   <action name="actionSobre">
    <property name="text">
     <string>Sobre</string>
+   </property>
+  </action>
+  <action name="actionMonitor_Fiscal">
+   <property name="text">
+    <string>Monitor Fiscal</string>
    </property>
   </action>
  </widget>

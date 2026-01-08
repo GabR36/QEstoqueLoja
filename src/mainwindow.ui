@@ -417,7 +417,7 @@ background-color:rgb(03,75,119);
                 </property>
                 <property name="icon">
                  <iconset resource="../Imagens/recursosImg.qrc">
-                  <normaloff>:/QEstoqueLOja/view-bank.svg</normaloff>:/QEstoqueLOja/view-bank.svg</iconset>
+                  <normaloff>:/QEstoqueLOja/view-financial-transfer-reconciled.svg</normaloff>:/QEstoqueLOja/view-financial-transfer-reconciled.svg</iconset>
                 </property>
                 <property name="iconSize">
                  <size>

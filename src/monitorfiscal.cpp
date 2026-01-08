@@ -1,12 +1,16 @@
 #include "monitorfiscal.h"
 #include "ui_monitorfiscal.h"
 #include "nota/DanfeUtil.h"
+#include "delegatehora.h"
+#include "delegateambiente.h"
 
 MonitorFiscal::MonitorFiscal(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::MonitorFiscal)
 {
     ui->setupUi(this);
+
+    m_tipoAtual = TipoVisualizacao::NotaFiscal;
 
     db = QSqlDatabase::database();
 
@@ -15,6 +19,7 @@ MonitorFiscal::MonitorFiscal(QWidget *parent)
     ui->frame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
     modelSaida = new QSqlQueryModel(this);
+    modelEventos = new QSqlQueryModel(this);
     ui->TView_Fiscal->setModel(modelSaida);
 
 
@@ -36,6 +41,11 @@ MonitorFiscal::MonitorFiscal(QWidget *parent)
         });
     }
     selectItem(item1);
+
+    DelegateHora *delegateHora = new DelegateHora();
+    ui->TView_Fiscal->setItemDelegateForColumn(4, delegateHora);
+    DelegateAmbiente *delegateAmb = new DelegateAmbiente();
+    ui->TView_Fiscal->setItemDelegateForColumn(5, delegateAmb);
 }
 
 
@@ -49,15 +59,20 @@ void MonitorFiscal::selectItem(MenuItem* item)
     }
 
     // Ação por botão
-    if (item->button()->text() == "Saída")
+    if (item->button()->text() == "Saída"){
+        m_tipoAtual = TipoVisualizacao::NotaFiscal;
         abrirSaida();
+    }
     else if (item->button()->text() == "Devolução"){
+        m_tipoAtual = TipoVisualizacao::NotaFiscal;
         abrirDevolucao();
     }
     else if (item->button()->text() == "Eventos"){
+        m_tipoAtual = TipoVisualizacao::Evento;
         abrirEventos();
     }
     else if (item->button()->text() == "Entrada"){
+        m_tipoAtual = TipoVisualizacao::NotaFiscal;
         abrirEntrada();
     }
 }
@@ -78,50 +93,6 @@ void MonitorFiscal::abrirEventos(){
     AtualizarTabelaEventos("WHERE cstat != ''");
 }
 
-void MonitorFiscal::carregarTabelaSaida()
-{
-    if(!db.isOpen()){
-        if(!db.open()){
-            qDebug() << "Erro ao abrir banco carregarTabela()";
-        }
-    }
-
-    modelSaida->setQuery(R"(
-    SELECT
-        id,
-        valor_total,
-        modelo,
-        nnf,
-        dhemi,
-        tp_amb,
-        chnfe,
-        cnpjemit,
-        finalidade,
-        xml_path
-    FROM notas_fiscais
-    WHERE finalidade = 'NORMAL'
-    ORDER BY dhemi DESC
-)");
-    modelSaida->setHeaderData(0, Qt::Horizontal, "ID");
-    modelSaida->setHeaderData(1, Qt::Horizontal, "Valor");
-    modelSaida->setHeaderData(2, Qt::Horizontal, "Modelo");
-    modelSaida->setHeaderData(3, Qt::Horizontal, "Número");
-    modelSaida->setHeaderData(4, Qt::Horizontal, "Data Emissão");
-    modelSaida->setHeaderData(5, Qt::Horizontal, "Modelo");
-    modelSaida->setHeaderData(6, Qt::Horizontal, "Ambiente");
-    modelSaida->setHeaderData(7, Qt::Horizontal, "Tipo");
-
-    if (modelSaida->lastError().isValid()) {
-        qDebug() << "Erro ao carregar tabela:" << modelSaida->lastError();
-    }
-
-    ui->TView_Fiscal->setColumnHidden(0, true); // Oculta id
-
-    ui->TView_Fiscal->setModel(modelSaida);
-
-    db.close();
-}
-
 
 MonitorFiscal::~MonitorFiscal()
 {
@@ -135,6 +106,8 @@ void MonitorFiscal::AtualizarTabelaNotas(QString whereSql){
                 return;
             }
         }
+        ui->TView_Fiscal->setModel(modelSaida);
+
 
         QString sql = R"(
             SELECT
@@ -156,20 +129,23 @@ void MonitorFiscal::AtualizarTabelaNotas(QString whereSql){
 
         sql += " ORDER BY dhemi DESC";
 
+        modelSaida->setQuery(sql);
+
         modelSaida->setHeaderData(0, Qt::Horizontal, "ID");
         modelSaida->setHeaderData(1, Qt::Horizontal, "Valor");
         modelSaida->setHeaderData(2, Qt::Horizontal, "Modelo");
         modelSaida->setHeaderData(3, Qt::Horizontal, "Número");
         modelSaida->setHeaderData(4, Qt::Horizontal, "Data Emissão");
-        modelSaida->setHeaderData(5, Qt::Horizontal, "Modelo");
-        modelSaida->setHeaderData(6, Qt::Horizontal, "Ambiente");
-        modelSaida->setHeaderData(7, Qt::Horizontal, "Tipo");
-        modelSaida->setHeaderData(7, Qt::Horizontal, "Caminho XML");
+        modelSaida->setHeaderData(5, Qt::Horizontal, "Ambiente");
+        modelSaida->setHeaderData(6, Qt::Horizontal, "Chave");
+        modelSaida->setHeaderData(7, Qt::Horizontal, "CNPJ Emitente");
+        modelSaida->setHeaderData(8, Qt::Horizontal, "Finalidade");
+        modelSaida->setHeaderData(9, Qt::Horizontal, "Caminho XML");
+
 
         ui->TView_Fiscal->setColumnHidden(0, true); // Oculta id
+        ui->TView_Fiscal->setColumnHidden(9, true); // Oculta id
 
-
-        modelSaida->setQuery(sql);
         ui->TView_Fiscal->selectRow(0);
 }
 
@@ -180,6 +156,7 @@ void MonitorFiscal::AtualizarTabelaEventos(QString whereSql){
             return;
         }
     }
+    ui->TView_Fiscal->setModel(modelEventos);
 
     QString sql = R"(
             SELECT
@@ -196,16 +173,21 @@ void MonitorFiscal::AtualizarTabelaEventos(QString whereSql){
 
     sql += " ORDER BY atualizado_em DESC";
 
-    modelSaida->setHeaderData(0, Qt::Horizontal, "ID");
-    modelSaida->setHeaderData(1, Qt::Horizontal, "Tipo");
-    modelSaida->setHeaderData(2, Qt::Horizontal, "CStat");
-    modelSaida->setHeaderData(3, Qt::Horizontal, "Código");
-    modelSaida->setHeaderData(4, Qt::Horizontal, "Data");
-    modelSaida->setHeaderData(7, Qt::Horizontal, "Caminho XML");
+
+    modelEventos->setQuery(sql);
+
+
+    modelEventos->setHeaderData(0, Qt::Horizontal, "ID");
+    modelEventos->setHeaderData(1, Qt::Horizontal, "Tipo");
+    modelEventos->setHeaderData(2, Qt::Horizontal, "CStat");
+    modelEventos->setHeaderData(3, Qt::Horizontal, "Código");
+    modelEventos->setHeaderData(4, Qt::Horizontal, "Data");
+    modelEventos->setHeaderData(5, Qt::Horizontal, "Caminho XML");
 
     ui->TView_Fiscal->setColumnHidden(0, true); // Oculta id
+    ui->TView_Fiscal->setColumnHidden(5, true);
 
-    modelSaida->setQuery(sql);
+    ui->TView_Fiscal->setColumnWidth(1, 150);
     ui->TView_Fiscal->selectRow(0);
 }
 
@@ -218,23 +200,25 @@ void MonitorFiscal::on_Btn_Danfe_clicked()
         return;
     }
 
-    QModelIndex index = selectionModel->currentIndex();
-    if (!index.isValid()) {
-        qDebug() << "Indice invalido";
-        return;
-    }
+    int row = selectionModel->currentIndex().row();
 
-    int row = index.row();
+    // xml_path é coluna 9 em notas e 5 em eventos
+    int colunaXml = (m_tipoAtual == TipoVisualizacao::Evento) ? 5 : 9;
 
-    QModelIndex xmlIndex = modelSaida->index(row, 9); // coluna xml_path
+    QModelIndex xmlIndex = modelSaida->index(row, colunaXml);
     QString xmlPath = modelSaida->data(xmlIndex).toString();
 
     if (xmlPath.isEmpty()) {
-        qDebug() << "XML vazio para a linha selecionada";
+        qDebug() << "XML vazio";
         return;
     }
 
     DanfeUtil danfe;
-    danfe.abrirDanfePorXml(xmlPath);
+
+    if (m_tipoAtual == TipoVisualizacao::Evento) {
+        danfe.abrirDanfePorXmlEvento(xmlPath);
+    } else {
+        danfe.abrirDanfePorXml(xmlPath);
+    }
 }
 

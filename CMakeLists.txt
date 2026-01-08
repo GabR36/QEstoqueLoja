@@ -142,6 +142,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/sobre.h src/sobre.cpp src/sobre.ui
         src/monitorfiscal.h src/monitorfiscal.cpp src/monitorfiscal.ui
         src/subclass/menuitem.h src/subclass/menuitem.cpp
+        src/delegateambiente.h src/delegateambiente.cpp
 
     )
 

@@ -6,6 +6,11 @@
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
 
+enum class TipoVisualizacao {
+    NotaFiscal,
+    Evento
+};
+
 
 namespace Ui {
 class MonitorFiscal;
@@ -28,9 +33,10 @@ private:
     void selectItem(MenuItem *item);
     QSqlDatabase db;
     QSqlQueryModel *modelSaida;
+    QSqlQueryModel *modelEventos;
+    TipoVisualizacao m_tipoAtual;
 
     void abrirSaida();
-    void carregarTabelaSaida();
     void abrirDevolucao();
     void carregarTabelaDevolucao();
     void AtualizarTabelaNotas(QString whereSql);

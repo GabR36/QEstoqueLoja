@@ -80,7 +80,7 @@ void MonitorFiscal::abrirDevolucao(){
 }
 
 void MonitorFiscal::abrirEntrada(){
-    AtualizarTabelaNotas("WHERE finalidade = 'ENTRADA EXTERNA'");
+    AtualizarTabelaNotas("WHERE finalidade = 'ENTRADA EXTERNA' OR finalidade = 'resNFe'");
 }
 
 void MonitorFiscal::abrirSaida(){

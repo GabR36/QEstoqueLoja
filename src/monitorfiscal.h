@@ -5,6 +5,8 @@
 #include "menuitem.h"
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
+#include "delegateambiente.h"
+#include "delegatehora.h"
 
 enum class TipoVisualizacao {
     NotaFiscal,
@@ -35,6 +37,8 @@ private:
     QSqlQueryModel *modelSaida;
     QSqlQueryModel *modelEventos;
     TipoVisualizacao m_tipoAtual;
+    DelegateAmbiente *delegateAmb;
+    DelegateHora *delegateHora;
 
     void abrirSaida();
     void abrirDevolucao();

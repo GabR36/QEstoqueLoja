@@ -40,12 +40,10 @@ MonitorFiscal::MonitorFiscal(QWidget *parent)
             selectItem(item);
         });
     }
+    delegateHora = new DelegateHora(ui->TView_Fiscal);
+    delegateAmb = new DelegateAmbiente(ui->TView_Fiscal);
     selectItem(item1);
 
-    DelegateHora *delegateHora = new DelegateHora();
-    ui->TView_Fiscal->setItemDelegateForColumn(4, delegateHora);
-    DelegateAmbiente *delegateAmb = new DelegateAmbiente();
-    ui->TView_Fiscal->setItemDelegateForColumn(5, delegateAmb);
 }
 
 
@@ -106,8 +104,8 @@ void MonitorFiscal::AtualizarTabelaNotas(QString whereSql){
                 return;
             }
         }
-        ui->TView_Fiscal->setModel(modelSaida);
 
+        ui->TView_Fiscal->setModel(modelSaida);
 
         QString sql = R"(
             SELECT
@@ -130,6 +128,10 @@ void MonitorFiscal::AtualizarTabelaNotas(QString whereSql){
         sql += " ORDER BY dhemi DESC";
 
         modelSaida->setQuery(sql);
+
+
+        ui->TView_Fiscal->setItemDelegateForColumn(4, delegateHora);
+        ui->TView_Fiscal->setItemDelegateForColumn(5, delegateAmb);
 
         modelSaida->setHeaderData(0, Qt::Horizontal, "ID");
         modelSaida->setHeaderData(1, Qt::Horizontal, "Valor");
@@ -156,8 +158,10 @@ void MonitorFiscal::AtualizarTabelaEventos(QString whereSql){
             return;
         }
     }
-    ui->TView_Fiscal->setModel(modelEventos);
 
+    ui->TView_Fiscal->setItemDelegateForColumn(5, nullptr);
+
+    ui->TView_Fiscal->setModel(modelEventos);
     QString sql = R"(
             SELECT
                 id,
@@ -202,11 +206,13 @@ void MonitorFiscal::on_Btn_Danfe_clicked()
 
     int row = selectionModel->currentIndex().row();
 
-    // xml_path é coluna 9 em notas e 5 em eventos
     int colunaXml = (m_tipoAtual == TipoVisualizacao::Evento) ? 5 : 9;
 
-    QModelIndex xmlIndex = modelSaida->index(row, colunaXml);
-    QString xmlPath = modelSaida->data(xmlIndex).toString();
+    QAbstractItemModel *modelAtual =
+        (m_tipoAtual == TipoVisualizacao::Evento) ? modelEventos : modelSaida;
+
+    QModelIndex xmlIndex = modelAtual->index(row, colunaXml);
+    QString xmlPath = modelAtual->data(xmlIndex).toString();
 
     if (xmlPath.isEmpty()) {
         qDebug() << "XML vazio";

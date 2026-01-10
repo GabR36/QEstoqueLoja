@@ -57,4 +57,49 @@ void DanfeUtil::setCaminhoLogo(QString logo){
     caminhoLogo = logo;
 }
 
+bool DanfeUtil::abrirDanfePorXml(const QString& xmlPath)
+{
+    if (xmlPath.isEmpty()) {
+        qDebug() << "XML vazio";
+        return false;
+    }
+
+    if (!QFileInfo::exists(xmlPath)) {
+        qDebug() << "XML nao encontrado:" << xmlPath;
+        return false;
+    }
+
+    auto nf = AcbrManager::instance()->nfe();
+    nf->LimparLista();
+
+    nf->CarregarXML(xmlPath.toStdString());
+
+
+    imprimirDanfe(nf);
+    return true;
+}
+
+bool DanfeUtil::abrirDanfePorXmlEvento(const QString& xmlPath)
+{
+    if (xmlPath.isEmpty()) {
+        qDebug() << "XML vazio";
+        return false;
+    }
+
+    if (!QFileInfo::exists(xmlPath)) {
+        qDebug() << "XML nao encontrado:" << xmlPath;
+        return false;
+    }
+
+    auto nf = AcbrManager::instance()->nfe();
+    nf->LimparLista();
+
+    nf->CarregarXML(xmlPath.toStdString());
+
+
+    nf->ImprimirEvento(xmlPath.toStdString(), xmlPath.toStdString());
+    return true;
+}
+
+
 

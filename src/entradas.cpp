@@ -32,6 +32,7 @@ Entradas::Entradas(QWidget *parent)
     , ui(new Ui::Entradas)
 {
     ui->setupUi(this);
+
     empresaValues = Configuracao::get_All_Empresa_Values();
     db = QSqlDatabase::database();
     financeiroValues = Configuracao::get_All_Financeiro_Values();
@@ -50,6 +51,15 @@ Entradas::Entradas(QWidget *parent)
     ui->Tview_ProdutosNota->setItemDelegateForColumn(5, delegateSimNao);
     DelegateHora *delegateData = new DelegateHora(this);
     ui->Tview_Entradas->setItemDelegateForColumn(2, delegateData);
+
+    QDate hoje = QDate::currentDate();
+    QDate primeiroDia = QDate(hoje.year(), hoje.month(), 1).addMonths(-1);
+    QDate ultimoDia = QDate(hoje.year(), hoje.month(), 1).addMonths(1).addDays(-1);
+
+    ui->DateEdt_De->setDate(primeiroDia);
+    ui->DateEdt_Ate->setDate(ultimoDia);
+
+    ui->Tview_Entradas->selectRow(0);
 }
 
 Entradas::~Entradas()
@@ -126,7 +136,7 @@ void Entradas::on_Btn_ConsultarDF_clicked()
     ui->Tview_Entradas->selectRow(0);
 }
 
-void Entradas::atualizarTabela()
+void Entradas::atualizarTabela(QString whereSql)
 {
     if (!db.isOpen()) {
         if (!db.open()) {
@@ -134,8 +144,8 @@ void Entradas::atualizarTabela()
             return;
         }
     }
-
-    modelEntradas->setQuery(R"(
+    
+    QString sql = R"(
         SELECT
             c.nome AS emitente,
             n.valor_total AS valor,
@@ -150,9 +160,18 @@ void Entradas::atualizarTabela()
             ON c.id = n.id_emissorcliente
         WHERE n.finalidade = 'ENTRADA EXTERNA'
           AND n.cstat IN (100, 150)
-        ORDER BY n.dhemi DESC
-    )");
+    )";
 
+    if (!whereSql.isEmpty()) {
+        sql += " AND " + whereSql;
+    }
+
+    sql += " ORDER BY n.dhemi DESC";
+
+    qDebug() << sql;
+
+    modelEntradas->setQuery(sql);
+    ui->Tview_Entradas->selectRow(0);
 }
 
 
@@ -815,3 +834,27 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
             });
 
 }
+
+void Entradas::on_DateEdt_De_userDateChanged(const QDate &date)
+{
+    QString ate = ui->DateEdt_Ate->date().addDays(1).toString("yyyy-MM-dd");
+    QString de = date.toString("yyyy-MM-dd");
+
+    QString where = "n.dhemi BETWEEN '" + de + "' AND '" +
+        ate + "'";
+
+    atualizarTabela(where);
+}
+
+
+void Entradas::on_DateEdt_Ate_userDateChanged(const QDate &date)
+{
+    QString ate = date.addDays(1).toString("yyyy-MM-dd");
+    QString de = ui->DateEdt_De->date().toString("yyyy-MM-dd");
+
+    QString where = "n.dhemi BETWEEN '" + de + "' AND '" +
+        ate + "'";
+
+    atualizarTabela(where);
+}
+

@@ -15,6 +15,9 @@ public:
     bool abrirDanfe(int idVenda);
     void imprimirDanfe(const ACBrNFe *nf);
     void setCaminhoLogo(QString logo);
+    bool abrirDanfePorXml(const QString& xmlPath);
+
+    bool abrirDanfePorXmlEvento(const QString &xmlPath);
 private:
     QSqlDatabase db = QSqlDatabase::database();
     QLocale portugues;

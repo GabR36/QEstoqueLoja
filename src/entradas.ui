@@ -47,6 +47,96 @@ background-color:rgb(170, 170, 170);
 </string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="styleSheet">
+      <string notr="true">font: 700 15pt &quot;Ubuntu&quot;;</string>
+     </property>
+     <property name="text">
+      <string>COMPRAS</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>200</width>
+       <height>130</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>200</width>
+       <height>130</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Filtros</string>
+     </property>
+     <widget class="QWidget" name="layoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>161</width>
+        <height>88</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Período considerado:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>De:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DateEdt_De">
+           <property name="calendarPopup">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Até:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DateEdt_Ate">
+           <property name="calendarPopup">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
    <item row="1" column="1">
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
@@ -79,6 +169,19 @@ background-color:rgb(170, 170, 170);
       </widget>
      </item>
     </layout>
+   </item>
+   <item row="2" column="0">
+    <widget class="QPushButton" name="Btn_ConsultarDF">
+     <property name="minimumSize">
+      <size>
+       <width>110</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Atualizar</string>
+     </property>
+    </widget>
    </item>
    <item row="2" column="1">
     <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -128,29 +231,6 @@ background-color:rgb(170, 170, 170);
       </widget>
      </item>
     </layout>
-   </item>
-   <item row="1" column="0">
-    <widget class="QPushButton" name="Btn_ConsultarDF">
-     <property name="minimumSize">
-      <size>
-       <width>110</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Nova Consulta</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="styleSheet">
-      <string notr="true">font: 700 15pt &quot;Ubuntu&quot;;</string>
-     </property>
-     <property name="text">
-      <string>COMPRAS</string>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>

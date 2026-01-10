@@ -38,12 +38,16 @@
 #include "util/manifestadordfe.h"
 #include "util/mailmanager.h"
 #include "janelaemailcontador.h"
+#include "sobre.h"
+#include "monitorfiscal.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    QCoreApplication::setApplicationVersion("v2.3.0");
 
     SchemaManager *schemaManager = new SchemaManager(this, 7);
     //config versao 6
@@ -354,7 +358,7 @@ void MainWindow::on_Btn_Alterar_clicked()
     alterar->idAlt = productId;
     alterar->TrazerInfo(productDesc, productQuant, productPreco, productBarras, productNf, productUCom,
     produtoPrecoForn, productPorcentLucro, productNCM, productCEST, productAliquotaImp, productCsosn, productPis);
-    alterar->setWindowModality(Qt::ApplicationModal);
+    // alterar->setWindowModality(Qt::ApplicationModal);
     alterar->show();
     connect(alterar, &AlterarProduto::produtoAlterado, this,
             &MainWindow::on_Btn_Pesquisa_clicked);
@@ -896,5 +900,19 @@ void MainWindow::on_actionEnviar_triggered()
 {
     JanelaEmailContador *janelaEmail = new JanelaEmailContador();
     janelaEmail->show();
+}
+
+
+void MainWindow::on_actionSobre_triggered()
+{
+    Sobre *sobre = new Sobre();
+    sobre->show();
+}
+
+
+void MainWindow::on_actionMonitor_Fiscal_triggered()
+{
+    MonitorFiscal *monitor = new MonitorFiscal();
+    monitor->show();
 }
 

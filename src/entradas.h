@@ -46,6 +46,10 @@ private slots:
 
     void on_Tview_ProdutosNota_customContextMenuRequested(const QPoint &pos);
 
+    void on_DateEdt_De_userDateChanged(const QDate &date);
+
+    void on_DateEdt_Ate_userDateChanged(const QDate &date);
+
 private:
     Ui::Entradas *ui;
     QSqlDatabase db;
@@ -74,7 +78,7 @@ private:
     void addProdComCodBarras(QString idProd, QString codBarras);
     void atualizarProdutoNotaAdicionado(QString idProd);
     void enviarEmailNFe(QString nomeCliente, QString emailCliente, QString xmlPath, std::string pdfDanfe, QString cnpj);
-    void atualizarTabela();
+    void atualizarTabela(QString whereSql = "");
 
 signals:
     void produtoAdicionado();

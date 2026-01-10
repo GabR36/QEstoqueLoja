@@ -99,6 +99,10 @@ private slots:
 
     void on_actionEnviar_triggered();
 
+    void on_actionSobre_triggered();
+
+    void on_actionMonitor_Fiscal_triggered();
+
 private:
     Ui::MainWindow *ui;
     // ACBrNFe *acbr;

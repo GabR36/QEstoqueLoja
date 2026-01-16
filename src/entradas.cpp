@@ -665,7 +665,7 @@ void Entradas::addProdSemCodBarras(QString idProd, QString codBarras){
     qDebug() << "custo fornecedor taxas incluidas:" << custoxml.custoUnitario;
     qDebug() << "Preço fornecedor " << custoxml.precoUnitarioNota;
     double coreValue = custoxml.custoUnitario;
-    preco = portugues.toString(coreValue);
+    preco = portugues.toString(coreValue, 'f', 2);
 
     QString porcent_lucro = portugues.toString(financeiroValues.value("porcent_lucro").toFloat());
     QString pisCofins = produtoValues.value("pis_padrao");

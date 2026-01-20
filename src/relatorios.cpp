@@ -1544,10 +1544,10 @@ QMap<QString, float> relatorios::produtosMaisLucrativosAno(const QString &ano) {
             SUM(
                 pv.quantidade *
                 CASE
-                    WHEN p.preco_fornecedor IS NOT NULL THEN
+                    WHEN p.preco_fornecedor > 0 AND p.preco_fornecedor != '' THEN
                         (pv.preco_vendido - p.preco_fornecedor)
                     ELSE
-                        (pv.preco_vendido * (IFNULL(p.porcent_lucro, 0) / 100.0))
+                        (pv.preco_vendido * (p.porcent_lucro / 100.0))
                 END
             ) AS lucro_total
         FROM produtos_vendidos pv

@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    QCoreApplication::setApplicationVersion("v2.3.0");
+    QCoreApplication::setApplicationVersion("v2.4.0");
 
     SchemaManager *schemaManager = new SchemaManager(this, 7);
     //config versao 6

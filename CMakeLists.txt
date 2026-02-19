@@ -174,6 +174,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/dto/Cliente_dto.h
         src/repository/cliente_repository.h src/repository/cliente_repository.cpp
         src/services/cliente_service.h src/services/cliente_service.cpp
+        src/dto/EventoFiscal_dto.h
+        src/repository/eventofiscal_repository.h src/repository/eventofiscal_repository.cpp
+        src/services/eventofiscal_service.h src/services/eventofiscal_service.cpp
 
 
 

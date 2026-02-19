@@ -15,6 +15,7 @@
 #include "../services/produtonota_service.h"
 #include "../util/nfxmlutil.h"
 #include "../services/cliente_service.h"
+#include "../services/eventofiscal_service.h"
 
 
 class ManifestadorDFe : public QObject
@@ -40,10 +41,11 @@ private:
     ProdutoNota_service prodNotaServ;
     NfXmlUtil xmlUtil;
     Cliente_service cliServ;
+    EventoFiscal_service eveServ;
 
 
 
-    void salvarEventoNoBanco(const QString &tipo, const EventoRetornoInfo &info, const QString &chaveNFe);
+    void salvarEventoNoBanco(EventoFiscalDTO info, const QString &chaveNFe);
     void carregarConfigs();
     void processarHeaderDfe(const QString &bloco);
     void salvarNovoUltNsu(const QString &ultNsu);

@@ -428,51 +428,31 @@ bool ManifestadorDFe::enviarCienciaOperacao(const QString &chNFe, const QString 
 
 
     // Envia
-    EventoRetornoInfo info =  evento->gerarEnviarRetorno();
-    if(info.cStat == "128" || info.cStat == "135" || info.cStat == "136"){
-        salvarEventoNoBanco("Ciencia de Operacao", info, chNFe);
+    EventoFiscalDTO info =  evento->gerarEnviarRetorno();
+    if(info.cstat == "128" || info.cstat == "135" || info.cstat == "136"){
+        salvarEventoNoBanco(info, chNFe);
     }
     qDebug() << "Manifestacao enviada:";
 
-    bool sucesso = info.cStat == "128" || info.cStat == "135" || info.cStat == "136";
+    bool sucesso = info.cstat == "128" || info.cstat == "135" || info.cstat == "136";
     return sucesso;
 }
 
-void ManifestadorDFe::salvarEventoNoBanco(const QString &tipo, const EventoRetornoInfo &info, const QString &chaveNFe)
+void ManifestadorDFe::salvarEventoNoBanco(EventoFiscalDTO info, const QString &chaveNFe)
 {
-    if (!db.open()) {
-        qDebug() << "Erro ao abrir banco ao salvar evento.";
-        return;
-    }
 
-    QSqlQuery q;
     qlonglong idnf;
 
     idnf = nfServ.getIdFromChave(chaveNFe);
+    EventoFiscalDTO evento;
+    evento = info;
+    evento.idNf = idnf;
 
+    auto result = eveServ.inserir(evento);
 
-    q.prepare(R"(
-        INSERT INTO eventos_fiscais
-        (tipo_evento, id_lote, cstat, justificativa, codigo, xml_path, nprot, id_nf)
-        VALUES
-        (:tipo, :lote, :cstat, :just, :codigo, :xml, :nprot,
-            (SELECT id FROM notas_fiscais WHERE chnfe = :chave LIMIT 1)
-        )
-    )");
-
-    q.bindValue(":tipo", tipo);
-    q.bindValue(":lote", info.idLote);
-    q.bindValue(":cstat", info.cStat);
-    q.bindValue(":just", info.xMotivo);
-    q.bindValue(":codigo", "210210");
-    q.bindValue(":xml", info.xmlPath);
-    q.bindValue(":nprot", info.nProt);
-    q.bindValue(":chave", chaveNFe);
-    q.bindValue(":id_nf", idnf);
-
-    if (!q.exec())
-        qDebug() << "Erro ao salvar evento_fiscal:" << q.lastError();
-
+    if(!result.ok){
+        qDebug() << result.msg;
+    }
 }
 
 void ManifestadorDFe::consultarSePossivel(){

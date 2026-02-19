@@ -1442,9 +1442,9 @@ QMap<QString, float> relatorios::buscarValoresNfAno(const QString &ano) {
     QString tpamb = fiscalValues.value("tp_amb");
     qDebug() << ano;
     QSqlQuery query;
-    query.prepare("SELECT strftime('%m', atualizado_em) AS mes, SUM(valor_total) "
+    query.prepare("SELECT strftime('%m', dhemi) AS mes, SUM(valor_total) "
                   "FROM notas_fiscais "
-                  "WHERE (strftime('%Y', atualizado_em) = :ano "
+                  "WHERE (strftime('%Y', dhemi) = :ano "
                   "AND (cstat = '100' OR cstat = '150')) AND tp_amb = :tpamb "
                   "AND finalidade = 'NORMAL' "
                   "GROUP BY mes");

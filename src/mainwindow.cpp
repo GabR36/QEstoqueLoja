@@ -131,24 +131,24 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->Tview_Produtos, &QTableView::doubleClicked,
             this, &MainWindow::verProd);
 
-    ManifestadorDFe *manifestdfe = new ManifestadorDFe();
+    // ManifestadorDFe *manifestdfe = new ManifestadorDFe();
 
-    if(manifestdfe->possoConsultar() &&
-        fiscalValues.value("emit_nf") == "1" && fiscalValues.value("tp_amb") == "1"){
+    // if(manifestdfe->possoConsultar() &&
+    //     fiscalValues.value("emit_nf") == "1" && fiscalValues.value("tp_amb") == "1"){
 
-        try {
-            manifestdfe->consultarEManifestar();
-        }
-        catch (const std::exception &e) {
-            qDebug() << "Erro ao consultar DFE:" << e.what();
-        }
-        catch (...) {
-            qDebug() << "Erro desconhecido ao consultar DFE";
-        }
-    }else{
-        qDebug() << "Nao consultado DFE";
+    //     try {
+    //         manifestdfe->consultarEManifestar();
+    //     }
+    //     catch (const std::exception &e) {
+    //         qDebug() << "Erro ao consultar DFE:" << e.what();
+    //     }
+    //     catch (...) {
+    //         qDebug() << "Erro desconhecido ao consultar DFE";
+    //     }
+    // }else{
+    //     qDebug() << "Nao consultado DFE";
 
-    }
+    // }
 }
 
 MainWindow::~MainWindow()

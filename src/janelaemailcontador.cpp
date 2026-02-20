@@ -16,8 +16,7 @@ JanelaEmailContador::JanelaEmailContador(QWidget *parent)
     , ui(new Ui::JanelaEmailContador)
 {
     ui->setupUi(this);
-    Config_service *confServ = new Config_service(this);
-    configDTO = confServ->carregarTudo();
+    configDTO = confServ.carregarTudo();
 
     ui->Dedit_Fim->setMaximumDateTime(QDateTime::currentDateTime());
     ui->Dedit_Inicio->setMaximumDateTime(QDateTime::currentDateTime());
@@ -339,7 +338,7 @@ void JanelaEmailContador::gerarResumoPdf(const QString &filePath, QDateTime dtIn
 
     query.bindValue(":ini", dtIni.toString("yyyy-MM-dd HH:mm:ss"));
     query.bindValue(":fim", dtFim.toString("yyyy-MM-dd HH:mm:ss"));
-    query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
+    query.bindValue(":tpamb", configDTO.tpAmbFiscal);
 
     int totalRegistros = 0;
     double totalGeral = 0.0;

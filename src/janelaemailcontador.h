@@ -34,6 +34,7 @@ private:
     ConfigDTO configDTO;
     void enviarEmailContador(QString zip, QDate dtIni, QDate dtFim, QString pdfPath);
     void gerarResumoPdf(const QString &filePath, QDateTime dtIni, QDateTime dtFim);
+    Config_service confServ;
 };
 
 #endif // JANELAEMAILCONTADOR_H

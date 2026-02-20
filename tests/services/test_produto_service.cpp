@@ -247,7 +247,7 @@ void TestProdutoService::deletar_produto_ok()
 
 void TestProdutoService::deletar_produto_inexistente()
 {
-    db = TestDbFactory::create();
+    // db = TestDbFactory::create();
     Produto_Service service(db);
 
     auto r = service.deletar("999999"); // id inexistente

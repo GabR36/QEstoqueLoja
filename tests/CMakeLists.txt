@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 3.5)
 
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Qt Test
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Test Core Sql Gui Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Sql Gui Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Test Core Sql Gui Widgets Xml)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Sql Gui Widgets Xml)
 
 if(CMAKE_SYSTEM MATCHES "Windows")
     include(FetchContent)
@@ -65,6 +66,35 @@ add_executable(QEstoqueLojaTests
     ${CMAKE_SOURCE_DIR}/src/services/config_service.h
     ${CMAKE_SOURCE_DIR}/src/repository/config_repository.h
     ${CMAKE_SOURCE_DIR}/src/repository/config_repository.cpp
+    services/test_manifestadordfe.h services/test_manifestadordfe.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/manifestadordfe.h
+    ${CMAKE_SOURCE_DIR}/src/util/manifestadordfe.cpp
+    ${CMAKE_SOURCE_DIR}/src/repository/cliente_repository.cpp
+    ${CMAKE_SOURCE_DIR}/src/repository/dfeinfo_repository.cpp
+    ${CMAKE_SOURCE_DIR}/src/repository/eventofiscal_repository.cpp
+    ${CMAKE_SOURCE_DIR}/src/repository/notafiscal_repository.cpp
+    ${CMAKE_SOURCE_DIR}/src/repository/produtonota_repository.cpp
+    ${CMAKE_SOURCE_DIR}/src/services/cliente_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/services/dfe_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/services/eventofiscal_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/services/notafiscal_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/services/produtonota_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/nfxmlutil.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/NFUtilidades.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/datautil.cpp
+    ${CMAKE_SOURCE_DIR}/src/services/acbr_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/ACBrConsultaCNPJ.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/ACBrMail.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/mailmanager.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/datautil.cpp
+    ${CMAKE_SOURCE_DIR}/src/nota/ACBrNFe.cpp
+    ${CMAKE_SOURCE_DIR}/src/nota/cancelnf.cpp
+    ${CMAKE_SOURCE_DIR}/src/nota/eventocienciaop.cpp
+    ${CMAKE_SOURCE_DIR}/src/nota/nfceacbr.cpp
+    ${CMAKE_SOURCE_DIR}/src/nota/nfeacbr.cpp
+    ${CMAKE_SOURCE_DIR}/src/nota/acbrmanager.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/consultacnpjmanager.cpp
+    recursosTest.qrc
 
 
 
@@ -84,6 +114,8 @@ target_include_directories(QEstoqueLojaTests PRIVATE
     ${CMAKE_SOURCE_DIR}/src
     ${CMAKE_SOURCE_DIR}/src/util
     ${CMAKE_SOURCE_DIR}/src/services
+    ${CMAKE_SOURCE_DIR}/src/repository
+    ${CMAKE_SOURCE_DIR}/src/nota
     ${CMAKE_SOURCE_DIR}/src/dto
     ${CMAKE_SOURCE_DIR}/tests
 )
@@ -99,6 +131,7 @@ target_link_libraries(QEstoqueLojaTests PRIVATE
     Qt${QT_VERSION_MAJOR}::Gui
     zint
     Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Xml
 )
 
 

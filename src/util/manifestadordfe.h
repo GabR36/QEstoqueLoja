@@ -28,6 +28,7 @@ public:
     void consultarEBaixarXML();
     void consultaAlternada();
     void consultarSePossivel();
+    void setRetornoForcado(const QString &retorno);
 private:
     QSqlDatabase db;
     ConfigDTO configDTO;
@@ -42,6 +43,7 @@ private:
     NfXmlUtil xmlUtil;
     Cliente_service cliServ;
     EventoFiscal_service eveServ;
+    QString retornoForcado = "";
 
 
 

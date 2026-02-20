@@ -20,8 +20,6 @@ ManifestadorDFe::ManifestadorDFe(QObject *parent)
     : QObject{parent}
 {
     db = DatabaseConnection_service::db();
-    // dfeServ = new Dfe_service();
-
     Config_service confServ;
     configDTO = confServ.carregarTudo();
 
@@ -29,10 +27,14 @@ ManifestadorDFe::ManifestadorDFe(QObject *parent)
     cnpj = configDTO.cnpjEmpresa;
     cuf = configDTO.cUfFiscal;
     carregarConfigs();
+
 }
 void ManifestadorDFe::carregarConfigs(){
-    Acbr_service acbrServ;
-    acbrServ.carregarConfigParaDFE();
+    if(retornoForcado.isEmpty()){
+        Acbr_service acbrServ;
+        acbrServ.carregarConfigParaDFE();
+    }
+
 }
 
 void ManifestadorDFe::consultaAlternada(){
@@ -51,6 +53,11 @@ void ManifestadorDFe::consultaAlternada(){
 
 }
 
+void ManifestadorDFe::setRetornoForcado(const QString& retorno)
+{
+    retornoForcado = retorno;
+}
+
 
 void ManifestadorDFe::consultarEManifestar(){
     qDebug() << "consultar rodou";
@@ -66,14 +73,27 @@ void ManifestadorDFe::consultarEManifestar(){
     // }
     // qDebug() << retorno;
 
-    auto acbr = AcbrManager::instance()->nfe();
+    // auto acbr = AcbrManager::instance()->nfe();
     ultimo_nsu = dfeServ.getUltNsuResumo();
-    qDebug() << "ultimo nsu achado no banco:" << ultimo_nsu;
-    std::string retorno = acbr->DistribuicaoDFePorUltNSU(cuf.toInt(), cnpj.toStdString(), ultimo_nsu.toStdString());
-    qDebug() << "Retorno consulta DFE" << retorno;
-    // QString whole = QString::fromStdString(retorno.toStdString());
-    QString whole = QString::fromStdString(retorno);
+    // qDebug() << "ultimo nsu achado no banco:" << ultimo_nsu;
+    // std::string retorno = acbr->DistribuicaoDFePorUltNSU(cuf.toInt(), cnpj.toStdString(), ultimo_nsu.toStdString());
+    // qDebug() << "Retorno consulta DFE" << retorno;
+    // // QString whole = QString::fromStdString(retorno.toStdString());
+    // QString whole = QString::fromStdString(retorno);
 
+
+    QString whole;
+
+    if (!retornoForcado.isEmpty()) {
+        whole = retornoForcado;
+    } else {
+        auto acbr = AcbrManager::instance()->nfe();
+        whole = QString::fromStdString(
+            acbr->DistribuicaoDFePorUltNSU(cuf.toInt(), cnpj.toStdString(), ultimo_nsu.toStdString())
+            );
+        qDebug() << "Retorno consulta DFE" << whole;
+
+    }
 
     QStringList blocos = whole.split("[", Qt::SkipEmptyParts);
 
@@ -95,35 +115,21 @@ void ManifestadorDFe::consultarEManifestar(){
 
 void ManifestadorDFe::consultarEBaixarXML(){
     qDebug() << "rodou consultarEBaixarXML()";
-    auto acbr = AcbrManager::instance()->nfe();
-    ultNsuXml = dfeServ.getUltNsuXml();
-    std::string retorno = acbr->DistribuicaoDFePorUltNSU(cuf.toInt(), cnpj.toStdString(), ultNsuXml.toStdString());
-    qDebug() << "Retorno consulta DFE" << retorno;
-    qDebug() << "ult nsuxml: " << ultNsuXml;
 
-    // QFile file("retorno_distribuicao2.txt");
-    // QString retorno;
+    QString whole;
+    if(!retornoForcado.isEmpty()){
+         whole = retornoForcado;
+    }else{
 
-    // if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-    //     retorno = QString::fromUtf8(file.readAll());
-    //     file.close();
-    // } else {
-    //     qDebug() << "Erro ao abrir retorno.txt";
-    // }
+        auto acbr = AcbrManager::instance()->nfe();
+        ultNsuXml = dfeServ.getUltNsuXml();
+        std::string retorno = acbr->DistribuicaoDFePorUltNSU(cuf.toInt(), cnpj.toStdString(), ultNsuXml.toStdString());
+        qDebug() << "Retorno consulta DFE" << retorno;
+        qDebug() << "ult nsuxml: " << ultNsuXml;
+        whole = QString::fromStdString(retorno);
 
-    QString whole = QString::fromStdString(retorno);
+    }
 
-    // // --- SALVAR EM ARQUIVO TXT ---
-    // QFile file("retorno_distribuicao2.txt");
-    // if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-    //     QTextStream out(&file);
-    //     out << whole;
-    //     file.close();
-    //     qDebug() << "Arquivo salvo com sucesso!";
-    // } else {
-    //     qDebug() << "Erro ao salvar o arquivo!";
-    // }
-    // -----------------------------
     QStringList blocos = whole.split("[", Qt::SkipEmptyParts);
     novoUltNsuXml = "0";
     for (QString bloco : blocos)
@@ -278,7 +284,9 @@ void ManifestadorDFe::processarResumo(const QString &bloco)
     qDebug() << "\nResumo localizado:" << resumo.chNfe << nome;
 
     salvarResumoNota(resumo);
-    enviarCienciaOperacao(resumo.chNfe, resumo.cnpjEmit);
+    if(!retornoForcado.isEmpty()){
+        enviarCienciaOperacao(resumo.chNfe, resumo.cnpjEmit);
+    }
 }
 
 
@@ -398,8 +406,12 @@ bool ManifestadorDFe::atualizarNotaBanco(NotaFiscalDTO notaInfo){
 }
 
 bool ManifestadorDFe::salvarEmitenteCliente(NotaFiscalDTO notaInfo){
-    ClienteDTO emi = xmlUtil.getEmitenteFromXML(notaInfo.xmlPath);
 
+    ClienteDTO emi;
+
+    emi = xmlUtil.getEmitenteFromXML(notaInfo.xmlPath);
+
+    qDebug() << "CNPJ a ser adicionado/buscado" << emi.cpf;
     qlonglong total = cliServ.contarQuantosRegistrosPorCPFCNPJ(emi.cpf);
 
 

@@ -7,6 +7,8 @@
 #include "util/mailmanager.h"
 #include "configuracao.h"
 #include <QMessageBox>
+#include <QPainter>
+#include <QPdfWriter>
 
 
 JanelaEmailContador::JanelaEmailContador(QWidget *parent)
@@ -82,7 +84,7 @@ void JanelaEmailContador::atualizarContadores()
     qNotas.prepare(R"(
         SELECT finalidade, COUNT(*)
         FROM notas_fiscais
-        WHERE atualizado_em BETWEEN :ini AND :fim
+        WHERE dhemi BETWEEN :ini AND :fim
         AND tp_amb = :tpamb
         GROUP BY finalidade
     )");
@@ -171,7 +173,7 @@ void JanelaEmailContador::on_pushButton_clicked()
     qNotas.prepare(R"(
         SELECT finalidade, xml_path
         FROM notas_fiscais
-        WHERE atualizado_em BETWEEN :ini AND :fim
+        WHERE dhemi BETWEEN :ini AND :fim
         AND tp_amb = :tpamb
     )");
     qNotas.bindValue(":ini", dtIni.toString("yyyy-MM-dd HH:mm:ss"));
@@ -229,13 +231,16 @@ void JanelaEmailContador::on_pushButton_clicked()
 
     bool ok = JlCompress::compressDir(zipPath, baseDir);
 
+    QString pdfPath = baseDir + "/relatorio_NotasEmitidas.pdf";
+    gerarResumoPdf(pdfPath, dtIni, dtFim);
+
     if (!ok) {
         qDebug() << "Erro ao criar ZIP";
     } else {
         qDebug() << "ZIP criado em:" << zipPath;
     }
 
-    enviarEmailContador(zipPath, dtIni.date(), dtFim.date());
+    enviarEmailContador(zipPath, dtIni.date(), dtFim.date(), pdfPath);
 
     // remover os arquivos no tmp
 
@@ -255,7 +260,7 @@ void JanelaEmailContador::on_pushButton_clicked()
     close();
 }
 
-void JanelaEmailContador::enviarEmailContador(QString zip, QDate dtIni, QDate dtFim) {
+void JanelaEmailContador::enviarEmailContador(QString zip, QDate dtIni, QDate dtFim, QString pdfPath) {
     try {
         auto mail = MailManager::instance().mail();
 
@@ -272,6 +277,7 @@ void JanelaEmailContador::enviarEmailContador(QString zip, QDate dtIni, QDate dt
         mail->SetAssunto("Documentos Fiscais de " + configDTO.nomeEmpresa.toStdString());
         mail->AddDestinatario(configDTO.emailContador.toStdString());
         mail->AddAnexo(zip.toStdString(), "XMLs compactados");
+        mail->AddAnexo(pdfPath.toStdString(), "Resumo das Notas");
 
         mail->Enviar();
 
@@ -280,4 +286,127 @@ void JanelaEmailContador::enviarEmailContador(QString zip, QDate dtIni, QDate dt
     catch (const std::exception& e) {
         QMessageBox::warning(this, "Erro ao enviar e-mail", "O e-mail não foi enviado.");
     }
+}
+
+void JanelaEmailContador::gerarResumoPdf(const QString &filePath, QDateTime dtIni, QDateTime dtFim)
+{
+    if (!db.isOpen()) {
+        if (!db.open()) return;
+    }
+
+    QPdfWriter pdf(filePath);
+    pdf.setPageSize(QPageSize(QPageSize::A4));
+    pdf.setResolution(300);
+
+    QPainter painter(&pdf);
+
+    int margemEsquerda = 20;   // 👉 ajuste horizontal aqui
+    int margemTopo     = 120;
+    int espacamentoLinha = 60;  // 👉 AUMENTE ISSO para mais espaço
+    int y = margemTopo;
+
+    // 🔹 Título
+    painter.setFont(QFont("Arial", 16, QFont::Bold));
+    QString titulo = QString("NF Autorizadas no período de %1 até %2")
+                         .arg(dtIni.date().toString("dd/MM/yyyy"))
+                         .arg(dtFim.date().toString("dd/MM/yyyy"));
+
+    painter.drawText(margemEsquerda, y, titulo);
+    y += 80;
+
+    // 🔹 Cabeçalho
+    painter.setFont(QFont("Arial", 11, QFont::Bold));
+
+    painter.drawText(margemEsquerda, y, "Número");
+    painter.drawText(margemEsquerda + 250, y, "Emissão");
+    painter.drawText(margemEsquerda + 500, y, "Chave");
+    painter.drawText(margemEsquerda + 1700, y, "Valor Total");
+    painter.drawText(margemEsquerda + 2000, y, "Situação");
+
+    y += espacamentoLinha;
+
+    painter.setFont(QFont("Arial", 11));
+
+    QSqlQuery query(db);
+    query.prepare(R"(
+        SELECT nnf, dhemi, chnfe, valor_total, finalidade, cstat
+        FROM notas_fiscais
+        WHERE dhemi BETWEEN :ini AND :fim
+        AND tp_amb = :tpamb
+        AND finalidade != 'ENTRADA EXTERNA'
+        ORDER BY dhemi
+    )");
+
+    query.bindValue(":ini", dtIni.toString("yyyy-MM-dd HH:mm:ss"));
+    query.bindValue(":fim", dtFim.toString("yyyy-MM-dd HH:mm:ss"));
+    query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
+
+    int totalRegistros = 0;
+    double totalGeral = 0.0;
+
+    if (query.exec()) {
+        while (query.next()) {
+
+            // 🔹 quebra de página correta
+            if (y + espacamentoLinha > pdf.height() - margemTopo) {
+                pdf.newPage();
+                y = margemTopo;
+            }
+
+            QString numero = query.value("nnf").toString();
+            QDate data = query.value("dhemi").toDateTime().date();
+            QString chave = query.value("chnfe").toString();
+            double valor = query.value("valor_total").toDouble();
+            QString finalidade = query.value("finalidade").toString();
+            int cstat = query.value("cstat").toInt();
+
+            QString situacao;
+            double valorParaTotal = valor;
+
+            if (cstat == 135) {
+                situacao = "CANCELADO";
+                valorParaTotal = 0;  // subtrai do total
+            }
+            else if (finalidade == "DEVOLUCAO") {
+                situacao = "DEVOLUÇÃO";
+                valorParaTotal = -valor;  // subtrai do total
+            }
+            else {
+                situacao = "AUTORIZADA";
+            }
+
+
+            painter.drawText(margemEsquerda, y, numero);
+            painter.drawText(margemEsquerda + 250, y, data.toString("dd/MM/yyyy"));
+            painter.drawText(margemEsquerda + 500, y, chave);
+            painter.drawText(margemEsquerda + 1700, y,
+                             QLocale(QLocale::Portuguese, QLocale::Brazil)
+                                 .toCurrencyString(valorParaTotal));
+
+            painter.drawText(margemEsquerda + 2000, y, situacao);
+            // linha separadora
+            painter.drawLine(margemEsquerda, y + 15,
+                             pdf.width() - margemEsquerda, y + 15);
+
+            totalRegistros++;
+            totalGeral += valorParaTotal;
+
+            y += espacamentoLinha;
+        }
+    }
+
+    y += 60;
+    painter.setFont(QFont("Arial", 12, QFont::Bold));
+
+    painter.drawText(margemEsquerda, y,
+                     QString("Total de Registros: %1").arg(totalRegistros));
+
+    y += 40;
+
+    painter.drawText(margemEsquerda, y,
+                     QString("Valor Total Geral: %1")
+                         .arg(QLocale(QLocale::Portuguese, QLocale::Brazil)
+                                  .toCurrencyString(totalGeral)));
+
+    painter.end();
 }

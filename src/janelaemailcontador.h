@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QSqlDatabase>
 #include "services/config_service.h"
+#include <QDateTime>
 
 namespace Ui {
 class JanelaEmailContador;
@@ -31,6 +32,8 @@ private:
     QMap<QString, QStringList> xmlsPorPasta;
     void enviarEmailContador(QString zip, QDate dtIni, QDate dtFim);
     ConfigDTO configDTO;
+    void enviarEmailContador(QString zip, QDate dtIni, QDate dtFim, QString pdfPath);
+    void gerarResumoPdf(const QString &filePath, QDateTime dtIni, QDateTime dtFim);
 };
 
 #endif // JANELAEMAILCONTADOR_H

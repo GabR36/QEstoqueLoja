@@ -289,7 +289,6 @@ void ManifestadorDFe::processarResumo(const QString &bloco)
     }
 }
 
-
 void ManifestadorDFe::processarNota(const QString &bloco)
 {
     auto campoTexto = [&](const QString &nome) {

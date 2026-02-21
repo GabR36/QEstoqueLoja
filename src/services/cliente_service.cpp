@@ -31,3 +31,25 @@ Cliente_service::Resultado Cliente_service::inserirClienteEmitente(ClienteDTO em
 qlonglong Cliente_service::getIdFromCpfCnpj(const QString &cpfcnpj){
     return cliRepo.getIdFromCPFCNPJ(cpfcnpj);
 }
+
+
+QSqlQueryModel* Cliente_service::listarClientes(){
+    return cliRepo.listarClientes();
+}
+
+Cliente_service::Resultado Cliente_service::deletarCliente(qlonglong id){
+    if(id > 1){
+        if(!cliRepo.deletarCliente(id)){
+            return {false, ClienteErro::DeleteFalhou, "Ocorreu um erro ao deletar cliente"};
+        }else{
+            return {true, ClienteErro::Nenhum, ""};
+        }
+    }else{
+        return {false, ClienteErro::QuebraDeRegra, "Não é possivel deletar o cliente Consumidor."};
+    }
+
+}
+
+QSqlQueryModel* Cliente_service::pesquisar(const QString &nome){
+    return cliRepo.pesquisar(nome);
+}

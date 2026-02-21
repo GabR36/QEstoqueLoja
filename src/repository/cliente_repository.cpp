@@ -105,4 +105,68 @@ qlonglong Cliente_repository::getIdFromCPFCNPJ(const QString &cpfcnpj){
     }
 }
 
+QSqlQueryModel* Cliente_repository::listarClientes(){
+    if (!DatabaseConnection_service::open()) {
+            qDebug() << "Erro ao abrir banco (listarClientes)";
+            return nullptr;
+    }
 
+    auto *model = new QSqlQueryModel();
+    model->setQuery("SELECT * FROM clientes", db);
+
+    if (model->lastError().isValid()) {
+        qDebug() << "Erro SQL:" << model->lastError().text();
+    }
+
+    return model;
+}
+
+bool Cliente_repository::deletarCliente(qlonglong id){
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco (listarClientes)";
+        return false;
+    }
+
+    QSqlQuery q(db);
+
+    q.prepare("DELETE FROM clientes WHERE id = :valor1");
+    q.bindValue(":valor1", id);
+    if(!q.exec()){
+        qDebug() << "Não conseguiu deletar cliente";
+        return false;
+    }else{
+        return true;
+    }
+
+}
+
+QSqlQueryModel* Cliente_repository::pesquisar(const QString &nome)
+{
+    if (!DatabaseConnection_service::open()) {
+        return nullptr;
+    }
+
+    QSqlQuery query(db);
+    query.prepare(
+        "SELECT * FROM clientes "
+        "WHERE nome LIKE :nome "
+        "ORDER BY id DESC"
+        );
+
+    query.bindValue(":nome", "%" + nome + "%");
+
+    if (!query.exec()) {
+        qDebug() << "Erro ao executar consulta:" << query.lastError().text();
+        return nullptr;
+    }
+
+    auto *model = new QSqlQueryModel();
+    model->setQuery(std::move(query));
+
+    if (model->lastError().isValid()) {
+        qDebug() << "Erro no model:" << model->lastError().text();
+        return nullptr;
+    }
+
+    return model;
+}

@@ -129,7 +129,6 @@ QSqlQueryModel* Produto_Service::getProdutoPeloCodigo(const QString &codigoBarra
     return repo->getProdutoPeloCodigo(codigoBarras);
 }
 
-
 QString Produto_Service::normalizeText(const QString &text) {
     QString normalized = text.normalized(QString::NormalizationForm_D);
     QString result;

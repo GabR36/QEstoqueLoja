@@ -10,6 +10,7 @@
 #include <QRegularExpression>
 #include "util/consultacnpjmanager.h"
 #include "util/buscarcodigomunicipio.h"
+#include "infra/databaseconnection_service.h"
 
 InserirCliente::InserirCliente(QWidget *parent)
     : QWidget(parent)
@@ -17,7 +18,7 @@ InserirCliente::InserirCliente(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::Tool);
-    db = QSqlDatabase::database();
+    db = DatabaseConnection_service::db();
 
     //aplicar validators
     QIntValidator *intValidator = new QIntValidator(1, 999999, this);

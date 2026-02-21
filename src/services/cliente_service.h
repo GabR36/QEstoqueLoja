@@ -3,12 +3,15 @@
 
 #include <QObject>
 #include "../repository/cliente_repository.h"
+#include <QSqlQueryModel>
 
 enum class ClienteErro {
     Nenhum,
     CampoVazio,
     Banco,
-    InsercaoInvalida
+    InsercaoInvalida,
+    DeleteFalhou,
+    QuebraDeRegra
 };
 
 class Cliente_service : public QObject
@@ -24,6 +27,9 @@ public:
     qlonglong contarQuantosRegistrosPorCPFCNPJ(const QString &cpfcnpj);
     Cliente_service::Resultado inserirClienteEmitente(ClienteDTO emissor);
     qlonglong getIdFromCpfCnpj(const QString &cpfcnpj);
+    QSqlQueryModel *listarClientes();
+    Cliente_service::Resultado deletarCliente(qlonglong id);
+    QSqlQueryModel *pesquisar(const QString &nome);
 private:
     Cliente_repository cliRepo;
 

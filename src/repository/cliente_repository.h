@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include "../dto/Cliente_dto.h"
+#include <QSqlQueryModel>
 
 class Cliente_repository : public QObject
 {
@@ -13,6 +14,9 @@ public:
     qlonglong contarQuantosRegistrosPorCPFCNPJ(const QString &cpfcnpj);
     bool inserir(ClienteDTO cliente);
     qlonglong getIdFromCPFCNPJ(const QString &cpfcnpj);
+    QSqlQueryModel *listarClientes();
+    bool deletarCliente(qlonglong id);
+    QSqlQueryModel *pesquisar(const QString &nome);
 private:
     QSqlDatabase db;
 

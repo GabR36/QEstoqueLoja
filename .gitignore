@@ -80,3 +80,7 @@ build
 Testing
 src/Testing
 tests/Testing
+*_REMOTE_*
+*_LOCAL_*
+*_BASE_*
+*_BACKUP_*

@@ -177,6 +177,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/dto/EventoFiscal_dto.h
         src/repository/eventofiscal_repository.h src/repository/eventofiscal_repository.cpp
         src/services/eventofiscal_service.h src/services/eventofiscal_service.cpp
+        src/repository/vendas_repository.h src/repository/vendas_repository.cpp
+        src/services/vendas_service.h src/services/vendas_service.cpp
+        src/repository/entradasvendas_repository.h src/repository/entradasvendas_repository.cpp
+        src/services/entradasvendas_service.h src/services/entradasvendas_service.cpp
+        src/services/financeiro_service.h src/services/financeiro_service.cpp
 
 
 

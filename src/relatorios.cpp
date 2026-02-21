@@ -1442,9 +1442,9 @@ QMap<QString, float> relatorios::buscarValoresNfAno(const QString &ano) {
     QString tpamb = fiscalValues.value("tp_amb");
     qDebug() << ano;
     QSqlQuery query;
-    query.prepare("SELECT strftime('%m', atualizado_em) AS mes, SUM(valor_total) "
+    query.prepare("SELECT strftime('%m', dhemi) AS mes, SUM(valor_total) "
                   "FROM notas_fiscais "
-                  "WHERE (strftime('%Y', atualizado_em) = :ano "
+                  "WHERE (strftime('%Y', dhemi) = :ano "
                   "AND (cstat = '100' OR cstat = '150')) AND tp_amb = :tpamb "
                   "AND finalidade = 'NORMAL' "
                   "GROUP BY mes");
@@ -1544,10 +1544,10 @@ QMap<QString, float> relatorios::produtosMaisLucrativosAno(const QString &ano) {
             SUM(
                 pv.quantidade *
                 CASE
-                    WHEN p.preco_fornecedor IS NOT NULL THEN
+                    WHEN p.preco_fornecedor > 0 AND p.preco_fornecedor != '' THEN
                         (pv.preco_vendido - p.preco_fornecedor)
                     ELSE
-                        (pv.preco_vendido * (IFNULL(p.porcent_lucro, 0) / 100.0))
+                        (pv.preco_vendido * (p.porcent_lucro / 100.0))
                 END
             ) AS lucro_total
         FROM produtos_vendidos pv

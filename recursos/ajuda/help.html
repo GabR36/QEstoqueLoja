@@ -80,8 +80,7 @@
 	  <b>Produção:</b>: Ambiente para emitir suas notas de fato, todas notas emitidas no ambiente de produção tem valor fiscal e são
 	  de responsabilidade do usuário emissor.</p>
 	<li><b>CSC e ID CSC</b></li>
-	<p>Para conseguir o CSC e ID entre em <a href="https://receita.pr.gov.br">receita.pr.gov.br</a> e logue de preferencia com seu
-	  certificado digital, depois no menu esquerdo da página entre em DF-E > NFC-E > CSC > controle, digite seu CNPJ e busque com os filtros
+	<p>Para conseguir o CSC e ID entre no site da receita do seu estado, no paraná o link é <a href="https://receita.pr.gov.br">receita.pr.gov.br</a>, e logue de preferencia com seu certificado digital, depois no menu esquerdo da página entre em DF-E > NFC-E > CSC > controle, digite seu CNPJ e busque com os filtros
 	  homologação e produção, se não houver nenhum CSC para o ambiente use o botão "Solicitar".</p>
 	<p>O CSC deve parecer algo como GW6YWZMZKFOCFHXLH5YQEDUYLWD9KOKKVR6 e o ID CSC: 000001, <i>lembre de usar o CSC e ID CSC de produção se estiver
 	    usando o ambiente produção e o CSC e ID CSC de homologação se estiver usando o ambiente homologação.</i></p>
@@ -93,7 +92,7 @@
 	<!-- <li><b>Pasta CertificadosAC</b></li> -->
 	<!-- <p>Baixe e selecione a pasta contendo os certificados digitais da ICP-Brasil, você pode baixar o <i>arquivo único compactado da cadeia vigente</i> no site: <a href="https://www.gov.br/iti/pt-br/assuntos/repositorio/certificados-das-acs-da-icp-brasil-arquivo-unico-compactado">Certificados das ACs da ICP-Brasil - Arquivo Único Compactado</a>.</p> -->
 	<li><b>Certificado</b></li>
-	<p>Selecione o arquivo do seu certificado digital .pfx da sua empresa e preencha o campo da senha.</p>
+	<p>Selecione o arquivo do seu certificado digital .pfx da sua empresa e preencha o campo da senha. se não tiver um certificado digital cnpj converse com seu contador para obter ou compre online. O certificado deve ser modelo A1.</p>
 	<li><b>Código UF</b></li>
 	<p>Digite o código de 2 dígitos referente ao seu estado, você pode encontrar o código <a href="https://sistemasweb.agricultura.gov.br/manuais/Manual_PGA_WS/322CodigoIBGESigladaUnidadeFeder.html">aqui</a></p>
 	<li><b>Código do Município</b></li>
@@ -101,7 +100,7 @@
 	<li><b>Inscrição Estadual</b></li>
 	<p>Número referente a Inscrição Estadual da sua empresa.</p>
 	<li><b>Responsável Técnico</b></li>
-	<p>Você pode preencher os dados do responsável técnico com os dados da sua empresa como CNPJ, nome, telefone etc. mas para emitir NF-e é necessário que o CNPJ do responsável técnico esteja cadastrado como emissor na Receita(Para emitir apenas NFC-e não é necessário ainda), você pode cadastrar o seu CNPJ como <i>emissor próprio</i> no site da <a href="https://receita.pr.gov.br">receita</a> indo em <i>UPD > Cadastro de Fornecedor</i> no menu lateral, solicite o cadastro como <b> Fornecedor Próprio</b>, deve ser simples e você precisará levar alguns documentos listados no estabelecimento referenciado.<i> Você não precisa preencher os dados referentes a Hash e ID CSRT por enquanto</i>. 
+	<p>Você pode preencher os dados do responsável técnico com os dados da sua empresa como CNPJ, nome, telefone etc. mas para emitir NF-e é necessário que o CNPJ do responsável técnico esteja cadastrado como emissor na Receita, você pode cadastrar o seu CNPJ como <i>emissor próprio</i> no site da receita do seu estado, no Paraná o link é <a href="https://receita.pr.gov.br">receita</a> indo em <i>UPD > Cadastro de Fornecedor</i> no menu lateral, solicite o cadastro como <b> Fornecedor Próprio</b>, deve ser simples e você precisará levar alguns documentos listados no estabelecimento referenciado.<i> Você não precisa preencher os dados referentes a Hash e ID CSRT por enquanto</i>. Após isso você deve cadastastrar o sistema em UPD>Sistema, pode colocar qualquer nome e versão mas lembre-se de cadastrar o sistema com as funções "Emissao NF-e" e Emissao NFC-e", o útimo passo é cadastrar a autorização de uso sua no sistema agora cadastrado, em UPD>autorização de uso>Cadastro de autorização de uso. Se tudo foi feito corretamente você deve conseguir emitir notas-fiscais com seu cnpj como responsável técnico(no Paraná no ambiente de homologação é necessário tambem criar o CSRT no site da receita também).
       </ul>
       <h3 id="conf-produto">Produto</h3>
       <p>Use esta aba para setar valores padrão da aba "imposto" do cadastro de produtos, essa aba é mais util se você emite nota fiscal. Confira com seu contador quais valores preencher principalmente para CSOSN e PIS/COFINS, visto que terão impacto no quanto de imposto você vai pagar.

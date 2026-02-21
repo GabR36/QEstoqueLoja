@@ -26,6 +26,7 @@
 #include <QSqlError>
 #include <QDebug>
 #include "delegatehora.h"
+#include "util/ibptutil.h"
 
 Entradas::Entradas(QWidget *parent)
     : QWidget(parent)
@@ -665,7 +666,7 @@ void Entradas::addProdSemCodBarras(QString idProd, QString codBarras){
     qDebug() << "custo fornecedor taxas incluidas:" << custoxml.custoUnitario;
     qDebug() << "Preço fornecedor " << custoxml.precoUnitarioNota;
     double coreValue = custoxml.custoUnitario;
-    preco = portugues.toString(coreValue);
+    preco = portugues.toString(coreValue, 'f', 2);
 
     QString porcent_lucro = portugues.toString(financeiroValues.value("porcent_lucro").toFloat());
     QString pisCofins = produtoValues.value("pis_padrao");
@@ -802,14 +803,8 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
         }
     }
 
-    if (produto["aliquota_imposto"].toDouble() != produtoNota["aliquota_imposto"].toDouble()) {
-        if (produto["aliquota_imposto"].toDouble() == 0) {
-            resultado["aliquota_imposto"] = produtoNota["aliquota_imposto"].toDouble();
-        }
-        else {
-            resultado["aliquota_imposto"] = produto["aliquota_imposto"].toDouble();
-        }
-    }
+    IbptUtil *util = new IbptUtil(this);
+    resultado["aliquota_imposto"] = util->get_Aliquota_From_Csv(resultado["ncm"].toString());
 
     db.close();
 

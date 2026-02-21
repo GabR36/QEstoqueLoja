@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    QCoreApplication::setApplicationVersion("v2.3.0");
+    QCoreApplication::setApplicationVersion("v2.4.0");
 
     SchemaManager *schemaManager = new SchemaManager(this, 7);
     //config versao 6
@@ -132,9 +132,19 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::verProd);
 
     ManifestadorDFe *manifestdfe = new ManifestadorDFe();
+
     if(manifestdfe->possoConsultar() &&
         fiscalValues.value("emit_nf") == "1" && fiscalValues.value("tp_amb") == "1"){
-        manifestdfe->consultarEManifestar();
+
+        try {
+            manifestdfe->consultarEManifestar();
+        }
+        catch (const std::exception &e) {
+            qDebug() << "Erro ao consultar DFE:" << e.what();
+        }
+        catch (...) {
+            qDebug() << "Erro desconhecido ao consultar DFE";
+        }
     }else{
         qDebug() << "Nao consultado DFE";
 

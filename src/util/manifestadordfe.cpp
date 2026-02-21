@@ -395,7 +395,6 @@ void ManifestadorDFe::processarResumo(const QString &bloco)
     enviarCienciaOperacao(resumo.chave, resumo.cnpjEmit);
 }
 
-
 void ManifestadorDFe::processarNota(const QString &bloco)
 {
     auto campoTexto = [&](const QString &nome) {

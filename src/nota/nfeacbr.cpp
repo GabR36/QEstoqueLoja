@@ -1013,7 +1013,8 @@ QString NfeACBR::gerarEnviar(){
 
         qDebug() << "Retorno SEFAZ:" << ret;
         return ret;
-        //nfce->Imprimir("", 1, "", true, std::nullopt, std::nullopt, std::nullopt);
+        // nfe->Imprimir("", 1, "", true, std::nullopt, std::nullopt, std::nullopt);
+        // nfe->GravarXml(0, "xml_autorizado_nota_"+ numero.toStdString() + ".xml", "./xml");
 
     }
     catch (std::exception &e) {

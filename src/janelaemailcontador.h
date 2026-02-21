@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QSqlDatabase>
+#include <QDateTime>
 
 namespace Ui {
 class JanelaEmailContador;
@@ -31,7 +32,8 @@ private:
     QMap<QString, QString> contadorValues;
     QMap<QString, QString> empresaValues;
     QMap<QString, QString> fiscalValues;
-    void enviarEmailContador(QString zip, QDate dtIni, QDate dtFim);
+    void enviarEmailContador(QString zip, QDate dtIni, QDate dtFim, QString pdfPath);
+    void gerarResumoPdf(const QString &filePath, QDateTime dtIni, QDateTime dtFim);
 };
 
 #endif // JANELAEMAILCONTADOR_H

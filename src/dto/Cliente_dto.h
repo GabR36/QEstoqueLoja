@@ -11,7 +11,7 @@ struct ClienteDTO {
     QString dataNasc;
     QString dataCadastro;
     bool ehPf;
-    qlonglong numeroEnd;
+    qlonglong numeroEnd = 0;
     QString bairro;
     QString xMun;
     QString cMun;

@@ -182,6 +182,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/repository/entradasvendas_repository.h src/repository/entradasvendas_repository.cpp
         src/services/entradasvendas_service.h src/services/entradasvendas_service.cpp
         src/services/financeiro_service.h src/services/financeiro_service.cpp
+        src/services/consultacnpj_service.h src/services/consultacnpj_service.cpp
 
 
 

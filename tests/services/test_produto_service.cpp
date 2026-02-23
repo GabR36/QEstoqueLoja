@@ -318,8 +318,6 @@ void TestProdutoService::alterar_produto_ok()
     QCOMPARE(q2.value("csosn").toString(), QString("500"));
 }
 
-
-
 void TestProdutoService::cleanup()
 {
     QSqlQuery q(db);

@@ -95,6 +95,7 @@ add_executable(QEstoqueLojaTests
     ${CMAKE_SOURCE_DIR}/src/nota/acbrmanager.cpp
     ${CMAKE_SOURCE_DIR}/src/util/consultacnpjmanager.cpp
     recursosTest.qrc
+    services/test_cliente_service.h services/test_cliente_service.cpp
 
 
 

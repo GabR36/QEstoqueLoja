@@ -31,6 +31,8 @@ public:
     Cliente_service::Resultado deletarCliente(qlonglong id);
     QSqlQueryModel *pesquisar(const QString &nome);
     Cliente_service::Resultado inserirCliente(ClienteDTO cliente);
+    ClienteDTO getClienteByID(qlonglong id);
+    Cliente_service::Resultado updateCliente(qlonglong id, ClienteDTO cliente);
 private:
     Cliente_repository cliRepo;
 

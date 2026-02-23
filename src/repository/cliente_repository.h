@@ -17,6 +17,8 @@ public:
     QSqlQueryModel *listarClientes();
     bool deletarCliente(qlonglong id);
     QSqlQueryModel *pesquisar(const QString &nome);
+    ClienteDTO getClienteByID(qlonglong id);
+    bool updateCliente(qlonglong id, ClienteDTO cliente);
 private:
     QSqlDatabase db;
 

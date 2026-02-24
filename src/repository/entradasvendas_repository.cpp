@@ -99,3 +99,42 @@ double EntradasVendas_repository::getValorTotalEntradasFromClientes(qlonglong id
     db.close();
     return totalEntradas;
 }
+
+QList<EntradaVendaDTO> EntradasVendas_repository::getEntradasFromVenda(qlonglong idvenda){
+    QList<EntradaVendaDTO>lista;
+
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco de dados nao abriu getEntradaFromVenda()";
+        return lista;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("SELECT total, data_hora, forma_pagamento, valor_recebido, troco, "
+                  "taxa, valor_final, desconto FROM entradas_vendas WHERE "
+                  "id_venda = :idvenda");
+    query.bindValue(":idvenda", idvenda);
+
+    if(!query.exec()){
+        qDebug() << "Query não executou getEntradaFromVenda()";
+        db.close();
+        return lista;
+    }
+
+    while(query.next()){
+        EntradaVendaDTO dto;
+        dto.dataHora = query.value("data_hora").toString();
+        dto.desconto = query.value("desconto").toDouble();
+        dto.formaPagamento = query.value("forma_pagamento").toString();
+        dto.taxa = query.value("taxa").toDouble();
+        dto.total = query.value("total").toDouble();
+        dto.troco = query.value("troco").toDouble();
+        dto.valorFinal = query.value("valor_final").toDouble();
+        dto.valorRecebido = query.value("valor_recebido").toDouble();
+        dto.idVenda = idvenda;
+        lista.append(dto);
+    }
+    db.close();
+    return lista;
+
+}
+

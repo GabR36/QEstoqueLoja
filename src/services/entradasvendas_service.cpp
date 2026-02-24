@@ -17,3 +17,7 @@ double EntradasVendas_service::getValorUltimoPagamentoFromCliente(qlonglong idcl
 double EntradasVendas_service::getValorTotalEntradasFromClientes(qlonglong idcliente){
     return entradaRepo.getValorTotalEntradasFromClientes(idcliente);
 }
+
+QList<EntradaVendaDTO> EntradasVendas_service::getEntradasFromVenda(qlonglong idvenda){
+    return entradaRepo.getEntradasFromVenda(idvenda);
+}

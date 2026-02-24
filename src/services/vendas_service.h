@@ -3,6 +3,10 @@
 
 #include <QObject>
 #include "../repository/vendas_repository.h"
+#include <QSqlQueryModel>
+#include <QPair>
+#include <QDate>
+#include "../dto/Vendas_dto.h"
 
 enum class VendasErro {
     Nenhum,
@@ -25,6 +29,9 @@ public:
     explicit Vendas_service(QObject *parent = nullptr);
     qlonglong getQuantidadeComprasCliente(qlonglong idcli);
     double getValorTotalVendasPrazoCliente(qlonglong idcliente);
+    QSqlQueryModel *listarVendas();
+    QPair<QDate, QDate> getMinMaxData();
+    VendasDTO getVenda(qlonglong id);
 private:
     Vendas_repository vendasRepo;
 

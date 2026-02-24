@@ -3,6 +3,9 @@
 
 #include <QObject>
 #include <QSqlDatabase>
+#include "../dto/EntradaVenda_dto.h"
+#include <QList>
+
 
 class EntradasVendas_repository : public QObject
 {
@@ -12,6 +15,7 @@ public:
     QDateTime getDataUltimoPagamentoFromCliente(qlonglong idcliente);
     double getValorUltimoPagamentoFromCliente(qlonglong idcliente);
     double getValorTotalEntradasFromClientes(qlonglong idcliente);
+    QList<EntradaVendaDTO> getEntradasFromVenda(qlonglong idvenda);
 private:
     QSqlDatabase db;
 

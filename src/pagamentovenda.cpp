@@ -487,7 +487,7 @@ void pagamentoVenda::terminarPagamento(){
 
     }
     if(ui->CheckImprimirCNF->isChecked()){
-        Vendas::imprimirReciboVenda(idVenda);
+        Vendas::imprimirReciboVenda(idVenda.toLongLong());
     }
 
     db.close();

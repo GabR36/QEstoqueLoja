@@ -4,7 +4,8 @@
 #include <QObject>
 #include "../repository/entradasvendas_repository.h"
 #include <QLocale>
-
+#include "../dto/EntradaVenda_dto.h"
+#include <QList>
 
 enum class EntradasVendasErro {
     Nenhum,
@@ -28,6 +29,7 @@ public:
     double getValorUltimoPagamentoFromCliente(qlonglong idcliente);
     double getValorTotalEntradasFromClientes(qlonglong idcliente);
     QDateTime getDataUltimoPagamentoFromCliente(qlonglong idcliente);
+    QList<EntradaVendaDTO> getEntradasFromVenda(qlonglong idvenda);
 private:
     EntradasVendas_repository entradaRepo;
     QLocale locale;

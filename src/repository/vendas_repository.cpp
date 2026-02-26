@@ -62,25 +62,33 @@ double Vendas_repository::getValorTotalVendasPrazoCliente(qlonglong idcliente){
     db.close();
     return totalVendas;
 }
+void Vendas_repository::listarVendas(QSqlQueryModel *model)
+{
 
-QSqlQueryModel* Vendas_repository::listarVendas(){
-    if (!DatabaseConnection_service::open()) {
-        qDebug() << "Erro ao abrir banco (listarCompras)";
-        return nullptr;
+    if (!model) {
+        qDebug() << "Model inválido em listarVendas";
+        return;
     }
 
-    auto *model = new QSqlQueryModel();
-    model->setQuery("SELECT id, valor_final,forma_pagamento, data_hora, "
-                    "cliente, esta_pago, total, desconto, taxa, "
-                    "valor_recebido, id_cliente, troco FROM vendas2 ORDER BY id DESC", db);
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco (listarVendas)";
+        return;
+    }
+
+    model->setQuery(
+        "SELECT id, valor_final, forma_pagamento, data_hora, "
+        "cliente, esta_pago, total, desconto, taxa, "
+        "valor_recebido, id_cliente, troco "
+        "FROM vendas2 ORDER BY id DESC",
+        db
+        );
 
     if (model->lastError().isValid()) {
         qDebug() << "Erro SQL:" << model->lastError().text();
     }
-    db.close();
-    return model;
-}
 
+    db.close();
+}
 QPair<QDate, QDate> Vendas_repository::getMinMaxData(){
     QPair<QDate, QDate> dataRange;
     if (!DatabaseConnection_service::open()) {
@@ -146,4 +154,134 @@ VendasDTO Vendas_repository::getVenda(qlonglong id){
     }
     return result;
 
+}
+
+void Vendas_repository::listarVendasDeAteFormaPagamento(
+    QSqlQueryModel *model,
+    const QString& de,
+    const QString& ate,
+    VendasUtil::VendasFormaPagamento formaPag)
+{
+    if (!model) {
+        qDebug() << "Model inválido em listarVendasDeAteFormaPagamento";
+        return;
+    }
+
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco";
+        return;
+    }
+
+    QSqlQuery query(db);
+
+    QString sql =
+        "SELECT id, valor_final, forma_pagamento, data_hora, cliente, "
+        "esta_pago, total, desconto, taxa, valor_recebido, troco "
+        "FROM vendas2 "
+        "WHERE data_hora BETWEEN :de AND :ate ";
+
+    // Adiciona filtro de forma de pagamento
+    if (formaPag != VendasUtil::VendasFormaPagamento::Nenhuma) {
+        sql += "AND forma_pagamento = :formaPag ";
+    }
+
+    sql += "ORDER BY id DESC";
+
+    query.prepare(sql);
+
+    query.bindValue(":de", de);
+    query.bindValue(":ate", ate);
+
+    // Converter enum para string do banco
+    if (formaPag != VendasUtil::VendasFormaPagamento::Nenhuma) {
+
+        QString formaString;
+
+        switch (formaPag) {
+        case VendasUtil::VendasFormaPagamento::Dinheiro:
+            formaString = "Dinheiro";
+            break;
+        case VendasUtil::VendasFormaPagamento::Credito:
+            formaString = "Crédito";
+            break;
+        case VendasUtil::VendasFormaPagamento::Debito:
+            formaString = "Débito";
+            break;
+        case VendasUtil::VendasFormaPagamento::Pix:
+            formaString = "Pix";
+            break;
+        case VendasUtil::VendasFormaPagamento::Prazo:
+            formaString = "Prazo";
+            break;
+        case VendasUtil::VendasFormaPagamento::NaoSei:
+            formaString = "Não Sei";
+            break;
+        default:
+            break;
+        }
+
+        query.bindValue(":formaPag", formaString);
+    }
+
+    if (!query.exec()) {
+        qDebug() << "Erro SQL:" << query.lastError().text();
+        db.close();
+        return;
+    }
+
+    model->setQuery(query);
+
+    db.close();
+}
+
+ResumoVendasDTO Vendas_repository::calcularResumo(
+    const QString& dataDe,
+    const QString& dataAte,
+    bool somentePrazo,
+    qlonglong idCliente)
+{
+    ResumoVendasDTO resumo;
+
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco (calcularResumo)";
+        return resumo;
+    }
+
+    QSqlQuery query(db);
+
+    QString where = " WHERE data_hora BETWEEN :de AND :ate ";
+
+    if (somentePrazo)
+        where += " AND forma_pagamento = 'Prazo' ";
+
+    if (idCliente > 0)
+        where += " AND id_cliente = :idCliente ";
+
+    // TOTAL E QUANTIDADE
+    query.prepare(
+        "SELECT SUM(total - desconto), COUNT(*) "
+        "FROM vendas2 " + where
+        );
+
+    query.bindValue(":de", dataDe);
+    query.bindValue(":ate", dataAte);
+
+    if (idCliente > 0)
+        query.bindValue(":idCliente", idCliente);
+
+    if (query.exec() && query.next()) {
+        resumo.total = query.value(0).toDouble();
+        resumo.quantidade = query.value(1).toInt();
+    }
+
+    // PEGAR PORCENTAGEM DE LUCRO
+    query.prepare("SELECT value FROM config WHERE key = 'porcent_lucro'");
+    if (query.exec() && query.next()) {
+        double porcent = query.value(0).toDouble() / 100.0;
+        resumo.lucro = resumo.total * porcent / (1.0 + porcent);
+    }
+
+    db.close();
+
+    return resumo;
 }

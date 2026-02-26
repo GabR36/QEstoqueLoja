@@ -10,6 +10,8 @@
 #include "entradasvendasprazo.h"
 #include "nota/DanfeUtil.h"
 #include "nota/nfeacbr.h"
+#include "services/vendas_service.h"
+#include "services/produtovenda_service.h"
 
 
 namespace Ui {
@@ -29,8 +31,7 @@ public:
     void atualizarTabelas();
     QLocale portugues;
     QList<QList<QVariant>> rowDataList;
-    static bool imprimirReciboVenda( QString idVenda);
-    static QStringList getProdutosVendidos( QString idVenda);
+    static bool imprimirReciboVenda(qlonglong idvenda);
     void actionAbrirPagamentosVenda(QString id_venda);
 
 
@@ -62,9 +63,11 @@ private slots:
 
     void on_Tview_ProdutosVendidos_customContextMenuRequested(const QPoint &pos);
 
+    void on_cb_BuscaVendasPrazo_checkStateChanged(const Qt::CheckState &arg1);
+
 private:
     // void LabelLucro();
-    void LabelLucro(QString whereQueryData, QString whereQueryPrazo, QString whereQueryCliente);
+    void LabelLucro(QString de, QString ate);
     QSqlQueryModel *modeloProdVendidos = new QSqlQueryModel;
     QSqlQueryModel *modeloVendas2 = new QSqlQueryModel;
     Ui::Vendas *ui;
@@ -85,6 +88,9 @@ private:
     QString dataGlobal;
     QString salvarEvento(QString retorno, int id_nf);
     QString salvarDevolucaoNf(QString retornoEnvio, int idnf, NfeACBR *devolNfe);
+    Vendas_service vendaServ;
+    ProdutoVenda_service prodVendaServ;
+
 signals:
     void vendaConcluidaVendas();
     void pagamentosConcluidos();

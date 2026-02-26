@@ -10,9 +10,9 @@ class ProdutoVenda_service : public QObject
     Q_OBJECT
 public:
     explicit ProdutoVenda_service(QObject *parent = nullptr);
-    QSqlQueryModel *listarProdutosVenda();
+    void listarProdutosVenda(QSqlQueryModel *model);
     QList<ProdutoVendidoDTO> getProdutosVendidos(qlonglong idVenda);
-    QSqlQueryModel *listarProdutosVendidosFromVenda(qlonglong idvenda);
+    void listarProdutosVendidosFromVenda(qlonglong idvenda, QSqlQueryModel *model);
 private:
     ProdutoVenda_repository prodVendaRepo;
 signals:

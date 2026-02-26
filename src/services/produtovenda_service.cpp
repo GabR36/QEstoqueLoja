@@ -4,14 +4,14 @@ ProdutoVenda_service::ProdutoVenda_service(QObject *parent)
     : QObject{parent}
 {}
 
-QSqlQueryModel* ProdutoVenda_service::listarProdutosVenda(){
-    return prodVendaRepo.listarProdutosVenda();
+void ProdutoVenda_service::listarProdutosVenda(QSqlQueryModel *model){
+    return prodVendaRepo.listarProdutosVenda(model);
 }
 
 QList<ProdutoVendidoDTO> ProdutoVenda_service::getProdutosVendidos(qlonglong idVenda){
     return prodVendaRepo.getProdutosVendidos(idVenda);
 }
 
-QSqlQueryModel *ProdutoVenda_service::listarProdutosVendidosFromVenda(qlonglong idvenda){
-    return prodVendaRepo.listarProdutosVendidosFromVenda(idvenda);
+void ProdutoVenda_service::listarProdutosVendidosFromVenda(qlonglong idvenda, QSqlQueryModel *model){
+    return prodVendaRepo.listarProdutosVendidosFromVenda(idvenda, model);
 }

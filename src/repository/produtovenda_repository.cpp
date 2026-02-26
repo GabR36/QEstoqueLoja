@@ -9,20 +9,24 @@ ProdutoVenda_repository::ProdutoVenda_repository(QObject *parent)
     db = DatabaseConnection_service::db();
 }
 
-QSqlQueryModel *ProdutoVenda_repository::listarProdutosVenda(){
+void ProdutoVenda_repository::listarProdutosVenda(QSqlQueryModel *model){
     if (!DatabaseConnection_service::open()) {
         qDebug() << "Erro ao abrir banco (listarProdutosVenda)";
-        return nullptr;
+        return;
     }
 
-    auto *model = new QSqlQueryModel();
-    model->setQuery("SELECT * FROM produtos_vendidos", db);
+    if (!model) {
+        qDebug() << "Model inválido em listarProdutosVenda";
+        return;
+    }
 
+    model->setQuery("SELECT * FROM produtos_vendidos",db);
     if (model->lastError().isValid()) {
         qDebug() << "Erro SQL:" << model->lastError().text();
     }
-    // db.close();
-    return model;
+
+    db.close();
+
 }
 
 QList<ProdutoVendidoDTO> ProdutoVenda_repository::getProdutosVendidos(qlonglong idVenda)
@@ -65,31 +69,42 @@ QList<ProdutoVendidoDTO> ProdutoVenda_repository::getProdutosVendidos(qlonglong 
     return lista;
 }
 
-QSqlQueryModel *ProdutoVenda_repository::listarProdutosVendidosFromVenda(qlonglong idvenda){
-    if (!DatabaseConnection_service::open()) {
-        qDebug() << "Erro ao abrir banco (listarProdutosVenda)";
-        return nullptr;
+void ProdutoVenda_repository::listarProdutosVendidosFromVenda(
+    qlonglong idvenda,
+    QSqlQueryModel* model)
+{
+    if (!model) {
+        qDebug() << "Model inválido em listarProdutosVendidosFromVenda";
+        return;
     }
 
-    auto *model = new QSqlQueryModel();
-    QSqlQuery q(db);
-    q.prepare(
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco (listarProdutosVendidosFromVenda)";
+        return;
+    }
+
+    QSqlQuery query(db);
+    query.prepare(
         "SELECT pv.id, p.descricao, pv.quantidade, pv.preco_vendido "
         "FROM produtos_vendidos pv "
         "JOIN produtos p ON pv.id_produto = p.id "
         "WHERE pv.id_venda = :idvenda"
         );
-    q.bindValue(":idvenda", idvenda);
-    if (!q.exec()) {
-        qDebug() << "Erro ao executar:" << q.lastError().text();
+
+    query.bindValue(":idvenda", idvenda);
+
+    if (!query.exec()) {
+        qDebug() << "Erro ao executar query:" << query.lastError().text();
+        db.close();
+        return;
     }
-    model->setQuery(q);
+
+    model->setQuery(query);
 
     if (model->lastError().isValid()) {
-        qDebug() << "Erro SQL:" << model->lastError().text();
+        qDebug() << "Erro ao setar model:" << model->lastError().text();
     }
-    // db.close();
-    return model;
-}
 
+    db.close();
+}
 

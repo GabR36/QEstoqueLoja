@@ -7,6 +7,7 @@
 #include <QPair>
 #include <QDate>
 #include "../dto/Vendas_dto.h"
+#include "../dto/ResumoVendas_dto.h"
 
 enum class VendasErro {
     Nenhum,
@@ -29,9 +30,11 @@ public:
     explicit Vendas_service(QObject *parent = nullptr);
     qlonglong getQuantidadeComprasCliente(qlonglong idcli);
     double getValorTotalVendasPrazoCliente(qlonglong idcliente);
-    QSqlQueryModel *listarVendas();
+    void listarVendas(QSqlQueryModel *model);
     QPair<QDate, QDate> getMinMaxData();
     VendasDTO getVenda(qlonglong id);
+    ResumoVendasDTO calcularResumo(const QString &dataDe, const QString &dataAte, bool somentePrazo, qlonglong idCliente);
+    void listarVendasDeAteFormaPag(QSqlQueryModel *model, QString de, QString ate, VendasUtil::VendasFormaPagamento formaPag);
 private:
     Vendas_repository vendasRepo;
 

@@ -189,6 +189,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/services/produtovenda_service.h src/services/produtovenda_service.cpp
         src/services/recibo_service.h src/services/recibo_service.cpp
         src/dto/EntradaVenda_dto.h
+        src/dto/ResumoVendas_dto.h
+        src/util/vendasutil.h src/util/vendasutil.cpp
 
 
 

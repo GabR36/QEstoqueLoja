@@ -13,6 +13,7 @@ public:
     bool salvarResNFe(NotaFiscalDTO resumoNota);
     qlonglong getIdFromChave(QString chnfe);
     bool updateWhereChave(NotaFiscalDTO dto, QString chave);
+    qlonglong getIdFromIdVenda(qlonglong idvenda);
 private:
     QSqlDatabase db;
 

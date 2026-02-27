@@ -30,6 +30,7 @@ public:
     double getValorTotalEntradasFromClientes(qlonglong idcliente);
     QDateTime getDataUltimoPagamentoFromCliente(qlonglong idcliente);
     QList<EntradaVendaDTO> getEntradasFromVenda(qlonglong idvenda);
+    EntradasVendas_service::Resultado deletarPorIdVenda(qlonglong idvenda);
 private:
     EntradasVendas_repository entradaRepo;
     QLocale locale;

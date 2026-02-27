@@ -138,3 +138,23 @@ QList<EntradaVendaDTO> EntradasVendas_repository::getEntradasFromVenda(qlonglong
 
 }
 
+bool EntradasVendas_repository::deletarPorIdVenda(qlonglong idvenda){
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco de dados nao abriu deletarPorIdVenda()";
+        return false;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("DELETE FROM entradas_vendas WHERE id_venda = :idvenda");
+    query.bindValue(":idvenda", idvenda);
+
+    if(!query.exec()){
+        qDebug() << "query nao rodou deletarPorIdVenda";
+        db.close();
+        return false;
+    }else{
+        db.close();
+        return true;
+    }
+}
+

@@ -22,6 +22,7 @@ public:
     VendasDTO getVenda(qlonglong id);
     ResumoVendasDTO calcularResumo(const QString &dataDe, const QString &dataAte, bool somentePrazo, qlonglong idCliente);
     void listarVendasDeAteFormaPagamento(QSqlQueryModel *model, const QString &de, const QString &ate, VendasUtil::VendasFormaPagamento formaPag);
+    bool deletarVenda(qlonglong id);
 private:
     QSqlDatabase db;
 

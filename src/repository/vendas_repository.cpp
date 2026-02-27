@@ -285,3 +285,23 @@ ResumoVendasDTO Vendas_repository::calcularResumo(
 
     return resumo;
 }
+
+bool Vendas_repository::deletarVenda(qlonglong id){
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco (deletarVenda)";
+        return false;
+    }
+
+    QSqlQuery query(db);
+
+    query.prepare("DELETE FROM vendas2 WHERE id = :id");
+    query.bindValue(":id", id);
+    if(!query.exec()){
+        qDebug()<< "Não executou query deletarVenda";
+        db.close();
+        return false;
+    }else{
+        db.close();
+        return true;
+    }
+}

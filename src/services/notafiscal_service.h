@@ -23,6 +23,7 @@ public:
     NotaFiscal_service::Resultado salvarResNfe(NotaFiscalDTO resumoNota);
     qlonglong getIdFromChave(QString chnfe);
     NotaFiscal_service::Resultado updateWhereChave(NotaFiscalDTO dto, QString chave);
+    qlonglong getIdFromIdVenda(qlonglong idvenda);
 private:
     notafiscal_repository notaRepo;
 

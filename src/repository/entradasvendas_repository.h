@@ -16,6 +16,7 @@ public:
     double getValorUltimoPagamentoFromCliente(qlonglong idcliente);
     double getValorTotalEntradasFromClientes(qlonglong idcliente);
     QList<EntradaVendaDTO> getEntradasFromVenda(qlonglong idvenda);
+    bool deletarPorIdVenda(qlonglong idvenda);
 private:
     QSqlDatabase db;
 

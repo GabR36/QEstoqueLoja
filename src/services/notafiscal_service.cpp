@@ -28,4 +28,7 @@ NotaFiscal_service::Resultado NotaFiscal_service::updateWhereChave(NotaFiscalDTO
     }
 }
 
+qlonglong NotaFiscal_service::getIdFromIdVenda(qlonglong idvenda){
+    return notaRepo.getIdFromIdVenda(idvenda);
+}
 

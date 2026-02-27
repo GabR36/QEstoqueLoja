@@ -1,7 +1,7 @@
 #include "produtovenda_repository.h"
 #include "../infra/databaseconnection_service.h"
 #include <QSqlQuery>
-
+#include <QDebug>
 
 ProdutoVenda_repository::ProdutoVenda_repository(QObject *parent)
     : QObject{parent}
@@ -107,4 +107,48 @@ void ProdutoVenda_repository::listarProdutosVendidosFromVenda(
 
     db.close();
 }
+
+bool ProdutoVenda_repository::deletarProdutoVendido(qlonglong id){
+
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco (listarProdutosVendidosFromVenda)";
+        return false;
+    }
+
+    QSqlQuery query(db);
+
+    query.prepare("DELETE FROM produtos_vendidos WHERE id = :id");
+    query.bindValue(":id", id);
+
+    if(!query.exec()){
+        qDebug() << "Query DeletarProdutoVendido nao rodou";
+        return false;
+    }else{
+        qDebug() << "Produto Venda Deletado.";
+        return true;
+    }
+
+}
+
+bool ProdutoVenda_repository::deletarPorIdVenda(qlonglong idvenda){
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco (deletarPorIdVenda)";
+        return false;
+    }
+
+    QSqlQuery query(db);
+
+    query.prepare("DELETE FROM produtos_vendidos WHERE id_venda = :idvenda");
+    query.bindValue(":idvenda", idvenda);
+
+    if(!query.exec()){
+        qDebug() << "Query não rodou deletarPorIdVenda";
+        db.close();
+        return false;
+    }else{
+        db.close();
+        return true;
+    }
+}
+
 

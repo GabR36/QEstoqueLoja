@@ -15,3 +15,21 @@ QList<ProdutoVendidoDTO> ProdutoVenda_service::getProdutosVendidos(qlonglong idV
 void ProdutoVenda_service::listarProdutosVendidosFromVenda(qlonglong idvenda, QSqlQueryModel *model){
     return prodVendaRepo.listarProdutosVendidosFromVenda(idvenda, model);
 }
+
+ProdutoVenda_service::Resultado ProdutoVenda_service::deletarProdutoVendido(qlonglong id){
+    if(!prodVendaRepo.deletarProdutoVendido(id)){
+        return {false, ProdutoVendaErro::Deletar, "Erro ao deletar produto."};
+    }else{
+        return {true, ProdutoVendaErro::Nenhum, "Produto deletado com sucesso."};
+    }
+}
+
+ProdutoVenda_service::Resultado ProdutoVenda_service::deletarProdutosVendidosPorIdVenda(qlonglong idvenda){
+    if(!prodVendaRepo.deletarPorIdVenda(idvenda)){
+        return {false, ProdutoVendaErro::Deletar, "Erro ao deletar produtos vendidos"};
+    }else{
+        return {true, ProdutoVendaErro::Nenhum, "Produtos Vendidos Deletados com sucesso"};
+    }
+}
+
+

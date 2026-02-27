@@ -12,7 +12,8 @@
 #include "nota/nfeacbr.h"
 #include "services/vendas_service.h"
 #include "services/produtovenda_service.h"
-
+#include "services/notafiscal_service.h"
+#include "services/eventofiscal_service.h"
 
 namespace Ui {
 class Vendas;
@@ -36,7 +37,6 @@ public:
 
 
     void AtualizarTabelasSinal();
-    int getNfId(int id_venda);
     void deletarVenda(bool cancelarNf);
 public slots:
     void imprimirReciboVendaSelec(QString id); //precisa ser slot :(
@@ -86,10 +86,11 @@ private:
     int IDCLIENTE = 0;
     void abrirDanfeXml(QString id_Venda);
     QString dataGlobal;
-    QString salvarEvento(QString retorno, int id_nf);
-    QString salvarDevolucaoNf(QString retornoEnvio, int idnf, NfeACBR *devolNfe);
+    QString salvarDevolucaoNf(QString retornoEnvio, qlonglong idnf, NfeACBR *devolNfe);
     Vendas_service vendaServ;
     ProdutoVenda_service prodVendaServ;
+    NotaFiscal_service notaServ;
+    EventoFiscal_service eventoServ;
 
 signals:
     void vendaConcluidaVendas();

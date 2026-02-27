@@ -4,12 +4,14 @@
 #include <QObject>
 #include "../repository/eventofiscal_repository.h"
 #include "../dto/EventoFiscal_dto.h"
+#include "../nota/cancelnf.h"
 
 enum class EventoFiscalErro{
     Nenhum,
     Banco,
     InsercaoInvalida,
-    UpdateInvalido
+    UpdateInvalido,
+    EnvioEvento,
 };
 
 
@@ -24,6 +26,7 @@ public:
     };
     explicit EventoFiscal_service(QObject *parent = nullptr);
     EventoFiscal_service::Resultado inserir(EventoFiscalDTO evento);
+    EventoFiscal_service::Resultado enviarCancelamento(qlonglong idnf);
 private:
     EventoFiscal_repository eventoRepo;
 

@@ -131,3 +131,30 @@ bool notafiscal_repository::updateWhereChave(NotaFiscalDTO dto, QString chave){
     qDebug() << "Linhas afetadas:" << q.numRowsAffected();
     return true;
 }
+
+qlonglong notafiscal_repository::getIdFromIdVenda(qlonglong idvenda){
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "Banco nao abriu getIdFromIdVenda()";
+        return -1;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("SELECT id FROM notas_fiscais WHERE id_venda = :idvenda");
+    query.bindValue(":idvenda", idvenda);
+
+    if(!query.exec()){
+        qDebug() << "Query getIdFromIdVenda não rodou";
+        db.close();
+        return -1;
+    }
+
+
+    qlonglong idRetorno = -1;
+
+    if(!query.next()){
+        return -1;
+    }else{
+        idRetorno = query.value(0).toLongLong();
+    }
+    return idRetorno;
+}

@@ -8,8 +8,8 @@
 
 void TestProdutoService::inserir_produto_ok()
 {
-    db = DatabaseConnection_service::db();
-    Produto_Service service(db);
+    Produto_Service service;
+
 
     ProdutoDTO p;
     p.quantidade = 10.00;
@@ -29,15 +29,16 @@ void TestProdutoService::inserir_produto_ok()
     auto r = service.inserir(p);
 
     QVERIFY(r.ok == true);
-
-
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco nao aberto teste produtos";
+    }
     QSqlQuery query(db);
-    query.exec("SELECT * FROM produtos ORDER BY id DESC LIMIT 1");
+    query.exec("SELECT * FROM produtos ORDER BY id DESC");
     QString desc, codbarras, nf, ucom, ncm, cest, csosn, pis;
     double preco, precoforn, quant, aliquota, percentlucro;
 
     while(query.next()){
-        quant = query.value("quantidade").toFloat();
+        quant = query.value("quantidade").toDouble();
         desc = query.value("descricao").toString();
         preco = query.value("preco").toDouble();
         codbarras = query.value("codigo_barras").toString();
@@ -51,7 +52,7 @@ void TestProdutoService::inserir_produto_ok()
         csosn = query.value("csosn").toString();
         pis = query.value("pis").toString();
     }
-
+    db.close();
     QCOMPARE(quant, 10);
     QCOMPARE(desc, "Produto Teste");
     QCOMPARE(preco, 5.5);
@@ -68,10 +69,16 @@ void TestProdutoService::inserir_produto_ok()
 
 }
 
+void TestProdutoService::init()
+{
+    db = DatabaseConnection_service::db();
+}
+
+
 
 void TestProdutoService::inserir_produto_errado()
 {
-    Produto_Service service(db);
+    Produto_Service service;
 
     ProdutoDTO p;
     p.quantidade = 0;
@@ -93,10 +100,14 @@ void TestProdutoService::inserir_produto_errado()
     QVERIFY(!r.ok);
 
     QSqlQuery query(db);
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco nao aberto teste produtos";
+    }
     QVERIFY(query.exec("SELECT COUNT(*) FROM produtos"));
     QVERIFY(query.next());
 
     int count = query.value(0).toInt();
+    db.close();
 
     QCOMPARE(count, 0);
 }
@@ -104,7 +115,7 @@ void TestProdutoService::inserir_produto_errado()
 
 void TestProdutoService::erro_codigo_barras_existente()
 {
-    Produto_Service service(db);
+    Produto_Service service;
 
     ProdutoDTO p;
     p.quantidade = 1;
@@ -130,7 +141,7 @@ void TestProdutoService::erro_codigo_barras_existente()
 
 void TestProdutoService::erro_preco_invalido()
 {
-    Produto_Service service(db);
+    Produto_Service service;
 
     ProdutoDTO p;
     p.quantidade = 1;
@@ -155,7 +166,7 @@ void TestProdutoService::erro_preco_invalido()
 
 void TestProdutoService::erro_quantidade_invalida()
 {
-    Produto_Service service(db);
+    Produto_Service service;
 
     ProdutoDTO p;
     p.quantidade = 0;
@@ -180,7 +191,7 @@ void TestProdutoService::erro_quantidade_invalida()
 
 void TestProdutoService::erro_ncm_nf()
 {
-    Produto_Service service(db);
+    Produto_Service service;
 
     ProdutoDTO p;
     p.quantidade = 1;
@@ -205,7 +216,7 @@ void TestProdutoService::erro_ncm_nf()
 
 void TestProdutoService::deletar_produto_ok()
 {
-    Produto_Service service(db);
+    Produto_Service service;
 
     // inserir produto
     ProdutoDTO p;
@@ -226,6 +237,10 @@ void TestProdutoService::deletar_produto_ok()
     auto r = service.inserir(p);
     QVERIFY(r.ok);
 
+
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco nao aberto teste produtos";
+    }
     // pegar id
     QSqlQuery q(db);
     QVERIFY(q.exec("SELECT id FROM produtos WHERE codigo_barras = 'DEL123'"));
@@ -237,6 +252,9 @@ void TestProdutoService::deletar_produto_ok()
     QVERIFY(rd.ok);
 
     // validar no banco
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco nao aberto teste produtos";
+    }
     QSqlQuery q2(db);
     QVERIFY(q2.exec("SELECT COUNT(*) FROM produtos WHERE id = " + id));
     QVERIFY(q2.next());
@@ -248,7 +266,7 @@ void TestProdutoService::deletar_produto_ok()
 void TestProdutoService::deletar_produto_inexistente()
 {
     // db = TestDbFactory::create();
-    Produto_Service service(db);
+    Produto_Service service;
 
     auto r = service.deletar("999999"); // id inexistente
     QVERIFY(!r.ok);
@@ -258,7 +276,7 @@ void TestProdutoService::deletar_produto_inexistente()
 
 void TestProdutoService::alterar_produto_ok()
 {
-    Produto_Service service(db);
+    Produto_Service service;
 
     // inserir produto original
     ProdutoDTO p;
@@ -277,7 +295,9 @@ void TestProdutoService::alterar_produto_ok()
     p.pis = "1";
 
     QVERIFY(service.inserir(p).ok);
-
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco nao aberto teste produtos";
+    }
     // pegar id
     QSqlQuery q(db);
     QVERIFY(q.exec("SELECT id FROM produtos WHERE codigo_barras = 'ALT001'"));
@@ -302,7 +322,9 @@ void TestProdutoService::alterar_produto_ok()
 
     auto r = service.alterarVerificarCodigoBarras(novo, "ALT001", id);
     QVERIFY(r.ok);
-
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco nao aberto teste produtos";
+    }
     // validar banco
     QSqlQuery q2(db);
     QVERIFY(q2.exec("SELECT * FROM produtos WHERE id = " + id));
@@ -320,6 +342,9 @@ void TestProdutoService::alterar_produto_ok()
 
 void TestProdutoService::cleanup()
 {
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco nao aberto teste produtos";
+    }
     QSqlQuery q(db);
     q.exec("DELETE FROM produtos");
 }

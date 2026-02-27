@@ -3,19 +3,19 @@
 #include <QSqlError>
 #include <QDebug>
 #include "../services/Produto_service.h"
+#include "../infra/databaseconnection_service.h"
 
-Produto_Repository::Produto_Repository(QSqlDatabase db)
-    : db(db)
+Produto_Repository::Produto_Repository(QObject *parent)
+: QObject{parent}
 {
+    db = DatabaseConnection_service::db();
 }
 
 bool Produto_Repository::codigoBarrasExiste(const QString &codigo)
 {
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            qDebug() << "Erro ao abrir banco (codigoBarrasExiste)";
-            return false;
-        }
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao salvar resumo nota";
+        return false;
     }
 
     QSqlQuery query(db);
@@ -24,20 +24,20 @@ bool Produto_Repository::codigoBarrasExiste(const QString &codigo)
 
     if (!query.exec()) {
         qDebug() << "SQL ERROR:" << query.lastError().text();
+        db.close();
         return false;
     }
 
     query.next();
+    db.close();
     return query.value(0).toInt() > 0;
 }
 
 bool Produto_Repository::inserir(const ProdutoDTO &p, QString &erroSQL)
 {
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            erroSQL = "Erro ao abrir banco de dados";
-            return false;
-        }
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao salvar resumo nota";
+        return false;
     }
 
     QSqlQuery query(db);
@@ -68,19 +68,18 @@ bool Produto_Repository::inserir(const ProdutoDTO &p, QString &erroSQL)
         erroSQL = query.lastError().text();
         qDebug() << "[SQL ERROR]" << erroSQL;
         qDebug() << "[SQL QUERY]" << query.lastQuery();
+        db.close();
         return false;
     }
-
+    db.close();
     return true;
 }
 
 QSqlQueryModel* Produto_Repository::listarProdutos()
 {
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            qDebug() << "Erro ao abrir banco (listarProdutos)";
-            return nullptr;
-        }
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao salvar resumo nota";
+        return nullptr;
     }
 
     auto *model = new QSqlQueryModel();
@@ -89,16 +88,14 @@ QSqlQueryModel* Produto_Repository::listarProdutos()
     if (model->lastError().isValid()) {
         qDebug() << "Erro SQL:" << model->lastError().text();
     }
-
+    db.close();
     return model;
 }
 
 QSqlQueryModel* Produto_Repository::getProdutoPeloCodigo(const QString &codigoBarras){
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            qDebug() << "Erro ao abrir banco (listarProdutos)";
-            return nullptr;
-        }
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao salvar resumo nota";
+        return nullptr;
     }
 
     auto *model = new QSqlQueryModel();
@@ -110,18 +107,16 @@ QSqlQueryModel* Produto_Repository::getProdutoPeloCodigo(const QString &codigoBa
     if (model->lastError().isValid()) {
         qDebug() << "Erro SQL:" << model->lastError().text();
     }
-
+    db.close();
     return model;
 }
 
 
 bool Produto_Repository::deletar(const QString &id, QString &erroSQL)
 {
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            erroSQL = "Erro ao abrir banco de dados";
-            return false;
-        }
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao salvar resumo nota";
+        return false;
     }
 
     QSqlQuery query(db);
@@ -130,25 +125,25 @@ bool Produto_Repository::deletar(const QString &id, QString &erroSQL)
 
     if (!query.exec()) {
         erroSQL = query.lastError().text();
+        db.close();
         return false;
     }
 
     if (query.numRowsAffected() == 0) {
         erroSQL = "Produto não encontrado para exclusão.";
+        db.close();
         return false;
     }
-
+    db.close();
     return true;
 }
 
 QSqlQueryModel* Produto_Repository::pesquisar(const QStringList &palavras,
                                               const QString &textoNormalizado)
 {
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            qDebug() << "Erro ao abrir banco de dados (pesquisar)";
-            return nullptr;
-        }
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao salvar resumo nota";
+        return nullptr;
     }
 
     QString sql = "SELECT * FROM produtos WHERE ";
@@ -178,12 +173,13 @@ QSqlQueryModel* Produto_Repository::pesquisar(const QStringList &palavras,
 
     if (!query.exec()) {
         qDebug() << "[SQL ERROR]" << query.lastError().text();
+        db.close();
         return nullptr;
     }
 
     auto *model = new QSqlQueryModel();
     model->setQuery(query);
-
+    db.close();
     return model;
 }
 
@@ -192,6 +188,10 @@ bool Produto_Repository::alterar(
     const QString &id,
     QString &erro
     ){
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao salvar resumo nota";
+        return false;
+    }
     QSqlQuery query(db);
 
     query.prepare(R"(
@@ -229,9 +229,10 @@ bool Produto_Repository::alterar(
 
     if (!query.exec()) {
         erro = query.lastError().text();
+        db.close();
         return false;
     }
-
+    db.close();
     return true;
 }
 
@@ -239,12 +240,9 @@ bool Produto_Repository::alterar(
 QStringList Produto_Repository::listarLocais()
 {
     QStringList sugestoes;
-
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            qDebug() << "Erro ao abrir banco (listarLocais)";
-            return sugestoes;
-        }
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao salvar resumo nota";
+        return sugestoes;
     }
 
     QSqlQuery query(db);
@@ -255,17 +253,15 @@ QStringList Produto_Repository::listarLocais()
     } else {
         qDebug() << "Erro SQL listarLocais:" << query.lastError().text();
     }
-
+    db.close();
     return sugestoes;
 }
 
 bool Produto_Repository::atualizarLocal(int id, const QString &local, QString &erroSQL)
 {
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            erroSQL = "Erro ao abrir banco";
-            return false;
-        }
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao salvar resumo nota";
+        return false;
     }
 
     QSqlQuery query(db);
@@ -275,10 +271,31 @@ bool Produto_Repository::atualizarLocal(int id, const QString &local, QString &e
 
     if (!query.exec()) {
         erroSQL = query.lastError().text();
+        db.close();
         return false;
     }
-
+    db.close();
     return true;
 }
 
+bool Produto_Repository::updateAumentarQuantidadeProduto(qlonglong idprod, double quantia){
+    if (!db.isOpen()) {
+        if (!db.open()) {
+            qDebug() << "Erro ao abrir banco";
+            return false;
+        }
+    }
+    QSqlQuery query(db);
+    query.prepare("UPDATE produtos SET quantidade = quantidade + :quant WHERE id = :id");
+    query.bindValue(":quant", quantia);
+    query.bindValue(":id", idprod);
 
+    if(!query.exec()){
+        qDebug() << "Query updateAumentarQuantidadeProduto nao rodou.";
+        db.close();
+        return false;
+    }else{
+        db.close();
+        return true;
+    }
+}

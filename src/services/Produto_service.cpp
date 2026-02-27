@@ -1,12 +1,14 @@
 #include "Produto_service.h"
 #include <QSqlQuery>
 #include <cmath>
+Produto_Service::Produto_Service(QObject *parent)
+    : QObject{parent},
+    portugues(QLocale(QLocale::Portuguese, QLocale::Brazil))
 
-Produto_Service::Produto_Service(QSqlDatabase db)
-    : db(db),
-    portugues(QLocale(QLocale::Portuguese, QLocale::Brazil)),
-    repo(new Produto_Repository(db))
-{}
+{
+
+}
+
 Produto_Service::Resultado Produto_Service::validar(const ProdutoDTO &p)
 {
     if (p.descricao.trimmed().isEmpty()) {
@@ -26,7 +28,7 @@ Produto_Service::Resultado Produto_Service::validar(const ProdutoDTO &p)
 
 bool Produto_Service::codigoBarrasExiste(const QString &codigo)
 {
-    return repo->codigoBarrasExiste(codigo);
+    return repo.codigoBarrasExiste(codigo);
 }
 ProdutoDTO Produto_Service::converterDadosParaDB(const ProdutoDTO &p)
 {
@@ -94,7 +96,7 @@ Produto_Service::Resultado Produto_Service::inserir(const ProdutoDTO &p)
     Resultado v2 = validarConversao(p);
     if (!v2.ok) return v2;
 
-    if (repo->codigoBarrasExiste(p.codigoBarras)) {
+    if (repo.codigoBarrasExiste(p.codigoBarras)) {
         return {false, ProdutoErro::CodigoBarrasExistente,
                 "Código de barras já existe."};
     }
@@ -102,7 +104,7 @@ Produto_Service::Resultado Produto_Service::inserir(const ProdutoDTO &p)
     ProdutoDTO dbData = converterDadosParaDB(p);
 
     QString erroSQL;
-    if (!repo->inserir(dbData, erroSQL)) {
+    if (!repo.inserir(dbData, erroSQL)) {
         return {false, ProdutoErro::ErroBanco, erroSQL};
     }
 
@@ -112,7 +114,7 @@ Produto_Service::Resultado Produto_Service::inserir(const ProdutoDTO &p)
 Produto_Service::Resultado Produto_Service::deletar(const QString &id){
     QString errosql = "";
 
-    if(!repo->deletar(id, errosql)){
+    if(!repo.deletar(id, errosql)){
         return {false, ProdutoErro::ErroBanco, errosql};
     }else{
         return {true, ProdutoErro::Nenhum, ""};
@@ -122,11 +124,11 @@ Produto_Service::Resultado Produto_Service::deletar(const QString &id){
 
 QSqlQueryModel* Produto_Service::listarProdutos()
 {
-    return repo->listarProdutos();
+    return repo.listarProdutos();
 }
 
 QSqlQueryModel* Produto_Service::getProdutoPeloCodigo(const QString &codigoBarras){
-    return repo->getProdutoPeloCodigo(codigoBarras);
+    return repo.getProdutoPeloCodigo(codigoBarras);
 }
 
 QString Produto_Service::normalizeText(const QString &text) {
@@ -166,12 +168,12 @@ QSqlQueryModel* Produto_Service::pesquisar(const QString &texto)
     QString normalizado = normalizeText(texto);
 
     if (normalizado.trimmed().isEmpty()) {
-        return repo->listarProdutos(); // fallback padrão
+        return repo.listarProdutos(); // fallback padrão
     }
 
     QStringList palavras = normalizado.split(" ", Qt::SkipEmptyParts);
 
-    return repo->pesquisar(palavras, normalizado);
+    return repo.pesquisar(palavras, normalizado);
 }
 
 Produto_Service::Resultado Produto_Service::alterarVerificarCodigoBarras(const ProdutoDTO &p,
@@ -184,7 +186,7 @@ Produto_Service::Resultado Produto_Service::alterarVerificarCodigoBarras(const P
     if (!v2.ok) return v2;
 
     if(codigo != p.codigoBarras){
-        if (repo->codigoBarrasExiste(p.codigoBarras)) {
+        if (repo.codigoBarrasExiste(p.codigoBarras)) {
             return {false, ProdutoErro::CodigoBarrasExistente,
                     "Esse código de barras já foi registrado."};
         }
@@ -196,7 +198,7 @@ Produto_Service::Resultado Produto_Service::alterarVerificarCodigoBarras(const P
     ProdutoDTO dbData = converterDadosParaDB(p);
 
     QString erroSQL;
-    if (!repo->alterar(dbData, id, erroSQL)) {
+    if (!repo.alterar(dbData, id, erroSQL)) {
         return {false, ProdutoErro::ErroBanco, erroSQL};
     }
 
@@ -210,7 +212,7 @@ Produto_Service::Resultado Produto_Service::alterar(const ProdutoDTO &p, const Q
     Resultado v2 = validarConversao(p);
     if (!v2.ok) return v2;
 
-    if (repo->codigoBarrasExiste(p.codigoBarras)) {
+    if (repo.codigoBarrasExiste(p.codigoBarras)) {
         return {false, ProdutoErro::CodigoBarrasExistente,
                 "Esse código de barras já foi registrado."};
     }
@@ -219,7 +221,7 @@ Produto_Service::Resultado Produto_Service::alterar(const ProdutoDTO &p, const Q
     ProdutoDTO dbData = converterDadosParaDB(p);
 
     QString erroSQL;
-    if (!repo->alterar(dbData, id, erroSQL)) {
+    if (!repo.alterar(dbData, id, erroSQL)) {
         return {false, ProdutoErro::ErroBanco, erroSQL};
     }
 
@@ -228,20 +230,29 @@ Produto_Service::Resultado Produto_Service::alterar(const ProdutoDTO &p, const Q
 
 QStringList Produto_Service::obterSugestoesLocal()
 {
-    return repo->listarLocais();
+    return repo.listarLocais();
 }
 
-Produto_Service::Resultado Produto_Service::atualizarLocalProduto(int id, const QString &novoLocal)
+Produto_Service::Resultado Produto_Service::atualizarLocalProduto(qlonglong id, const QString &novoLocal)
 {
     if (novoLocal.trimmed().isEmpty()) {
         return {false, ProdutoErro::CampoVazio, "Local não pode ser vazio."};
     }
 
     QString erroSQL;
-    if (!repo->atualizarLocal(id, novoLocal.trimmed(), erroSQL)) {
+    if (!repo.atualizarLocal(id, novoLocal.trimmed(), erroSQL)) {
         return {false, ProdutoErro::ErroBanco, erroSQL};
     }
 
     return {true, ProdutoErro::Nenhum, ""};
+}
+
+Produto_Service::Resultado Produto_Service::updateAumentarQuantidadeProduto(qlonglong idprod,
+                                                                            double quantia ){
+    if(!repo.updateAumentarQuantidadeProduto(idprod, quantia)){
+        return {false, ProdutoErro::Update, "Erro ao atualizar quantia produto."};
+    }else{
+        return {true, ProdutoErro::Nenhum, "Quantia atualizada com sucesso"};
+    }
 }
 

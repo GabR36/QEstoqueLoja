@@ -54,7 +54,6 @@ InserirProduto::InserirProduto(QWidget *parent)
 
     //desativa campo CEST
     ui->Ledit_CEST->setEnabled(false);
-    service = new Produto_Service(db);
 
     on_Ledit_NCM_editingFinished();
 
@@ -120,7 +119,7 @@ void InserirProduto::on_Ledit_CBarras_returnPressed()
     }
 
 
-    if (service->codigoBarrasExiste(codigo)) {
+    if (service.codigoBarrasExiste(codigo)) {
         QMessageBox::warning(this, "Erro",
                              "Esse código de barras já foi registrado.\n" + codigo);
 
@@ -150,7 +149,7 @@ void InserirProduto::on_Btn_Enviar_clicked()
     p.csosn = ui->Ledit_CSOSN->text();
     p.pis = ui->Ledit_PIS->text();
 
-    auto r = service->inserir(p);
+    auto r = service.inserir(p);
 
     if (!r.ok) {
 
@@ -202,7 +201,7 @@ void InserirProduto::on_Ledit_PrecoFornecedor_textChanged(const QString &arg1)
 
     atualizando = true;
 
-    double precoFinal = service->calcularPrecoFinal(precoFornecedor, percentualLucro);
+    double precoFinal = service.calcularPrecoFinal(precoFornecedor, percentualLucro);
 
     ui->Ledit_PrecoFinal->setText(portugues.toString(precoFinal, 'f', 2));
 
@@ -220,7 +219,7 @@ void InserirProduto::on_Ledit_PercentualLucro_textChanged(const QString &arg1)
     double percentualLucro = portugues.toDouble(arg1, &ok2);
 
     if (ok1 && ok2) {
-        double precoFinal = service->calcularPrecoFinal(precoFornecedor, percentualLucro);
+        double precoFinal = service.calcularPrecoFinal(precoFornecedor, percentualLucro);
         ui->Ledit_PrecoFinal->setText(portugues.toString(precoFinal, 'f', 2));
     }
 
@@ -238,7 +237,7 @@ void InserirProduto::on_Ledit_PrecoFinal_textChanged(const QString &arg1)
     double precoFinal = portugues.toDouble(arg1, &ok2);
 
     if (ok1 && ok2 && precoFornecedor != 0.0) {
-        double percentualLucro = service->calcularPercentualLucro(precoFornecedor, precoFinal);
+        double percentualLucro = service.calcularPercentualLucro(precoFornecedor, precoFinal);
         ui->Ledit_PercentualLucro->setText(portugues.toString(percentualLucro, 'f', 2));
     }
 

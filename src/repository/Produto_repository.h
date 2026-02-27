@@ -5,10 +5,11 @@
 #include <QSqlQueryModel>
 #include "../dto/Produto_dto.h"
 
-class Produto_Repository
+class Produto_Repository : public QObject
 {
+    Q_OBJECT
 public:
-    explicit Produto_Repository(QSqlDatabase db);
+    explicit Produto_Repository(QObject *parent = nullptr);
 
     bool codigoBarrasExiste(const QString &codigo);
     bool inserir(const ProdutoDTO &p, QString &erroSQL);
@@ -19,6 +20,7 @@ public:
     bool alterar(const ProdutoDTO &p, const QString &id, QString &erro);
     QStringList listarLocais();
     bool atualizarLocal(int id, const QString &local, QString &erroSQL);
+    bool updateAumentarQuantidadeProduto(qlonglong idprod, double quantia);
 private:
     QSqlDatabase db;
 };

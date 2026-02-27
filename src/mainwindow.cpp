@@ -60,7 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
     iniciarMigration();
     db = DatabaseConnection_service::db();
 
-    produtoService = new Produto_Service(db);
+    produtoService = new Produto_Service();
 
 
     // configuracao do modelo e view produtos

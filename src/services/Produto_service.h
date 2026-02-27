@@ -17,18 +17,20 @@ enum class ProdutoErro {
     ConversaoPrecoInvalida,
     QuantidadeInvalida,
     ErroBanco,
-    PrecoInvalido
+    PrecoInvalido,
+    Update
 };
 
-class Produto_Service
+class Produto_Service : QObject
 {
+    Q_OBJECT
 public:
   struct Resultado {
     bool ok;
     ProdutoErro erro = ProdutoErro::Nenhum;
     QString msg;
   };
-  explicit Produto_Service(QSqlDatabase db);
+  explicit Produto_Service(QObject *parent = nullptr);
 
   Resultado validar(const ProdutoDTO &p);
   Resultado inserir(const ProdutoDTO &p);
@@ -49,11 +51,13 @@ public:
   IbptUtil ibpt;
   ProdutoDTO converterDadosParaDB(const ProdutoDTO &p);
   Produto_Service::Resultado validarConversao(const ProdutoDTO &p);
-  Produto_Repository *repo;
+  Produto_Repository repo;
   Resultado alterar(const ProdutoDTO &p, const QString &id);
   Resultado alterarVerificarCodigoBarras(const ProdutoDTO &p, const QString &codigo, const QString &id);
   QStringList obterSugestoesLocal();
-  Resultado atualizarLocalProduto(int id, const QString &novoLocal);
+  Resultado atualizarLocalProduto(qlonglong id, const QString &novoLocal);
+  Produto_Service::Resultado updateAumentarQuantidadeProduto(qlonglong idprod, double quantia);
+  private slots:
 };
 
 #endif

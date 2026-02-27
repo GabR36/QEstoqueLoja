@@ -3,6 +3,7 @@
 #include "../db/test_db_factory.h"
 #include <QSqlQuery>
 #include <QTest>
+#include "infra/databaseconnection_service.h"
 
 test_cliente_service::test_cliente_service(QObject *parent)
     : QObject{parent}
@@ -13,7 +14,7 @@ test_cliente_service::test_cliente_service(QObject *parent)
 
 void test_cliente_service::init()
 {
-    db = TestDbFactory::create();
+    db = DatabaseConnection_service::db();
 }
 
 void test_cliente_service::inserir_cliente_nome_vazio()
@@ -92,6 +93,9 @@ void test_cliente_service::deletar_cliente_ok()
 
     QVERIFY(service.inserirCliente(c).ok);
 
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco nao aberto teste produtos";
+    }
     QSqlQuery q(db);
     QVERIFY(q.exec("SELECT id FROM clientes WHERE cpf = '44444444444'"));
     QVERIFY(q.next());
@@ -100,6 +104,10 @@ void test_cliente_service::deletar_cliente_ok()
 
     auto r = service.deletarCliente(id);
     QVERIFY(r.ok);
+
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco nao aberto teste produtos";
+    }
 
     QSqlQuery q2(db);
     QVERIFY(q2.exec("SELECT COUNT(*) FROM clientes WHERE id = " + QString::number(id)));
@@ -129,7 +137,9 @@ void test_cliente_service::alterar_cliente_ok()
     c.ehPf = true;
 
     QVERIFY(service.inserirCliente(c).ok);
-
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco nao aberto teste produtos";
+    }
     QSqlQuery q(db);
     QVERIFY(q.exec("SELECT id FROM clientes WHERE cpf = '55555555555'"));
     QVERIFY(q.next());
@@ -144,6 +154,9 @@ void test_cliente_service::alterar_cliente_ok()
     auto r = service.updateCliente(id, novo);
     QVERIFY(r.ok);
 
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco nao aberto teste produtos";
+    }
     QSqlQuery q2(db);
     QVERIFY(q2.exec("SELECT nome FROM clientes WHERE id = " + QString::number(id)));
     QVERIFY(q2.next());

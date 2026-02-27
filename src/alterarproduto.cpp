@@ -44,7 +44,7 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
     }
     //desativa campo cest
     ui->Ledit_AltCEST->setEnabled(false);
-    produtoService = new Produto_Service(db);
+    produtoService = new Produto_Service();
 
 
 }

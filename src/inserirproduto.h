@@ -46,7 +46,7 @@ private:
     bool atualizando = false; // Flag para evitar loops recursivos
     //bool eventFilter(QObject *watched, QEvent *event) override;
     IbptUtil *util;
-    Produto_Service *service;
+    Produto_Service service;
     ConfigDTO configDTO;
 
     void carregarConfiguracoes();

@@ -22,6 +22,7 @@ private slots:
     void deletar_produto_ok();
     void deletar_produto_inexistente();
     void alterar_produto_ok();
+    void init();
 };
 
 #endif // TEST_PRODUTO_SERVICE_H

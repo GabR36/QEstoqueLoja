@@ -32,4 +32,18 @@ ProdutoVenda_service::Resultado ProdutoVenda_service::deletarProdutosVendidosPor
     }
 }
 
+bool ProdutoVenda_service::temApenasUmProduto(qlonglong idvenda){
+    int quantidadeProds = prodVendaRepo.contarProdutosVendidosFromVenda(idvenda);
+    if(quantidadeProds == 1){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+ProdutoVendidoDTO ProdutoVenda_service::getProdutoVendido(qlonglong id){
+    return prodVendaRepo.getProdutoVendido(id);
+}
+
+
 

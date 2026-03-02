@@ -14,6 +14,7 @@
 #include "services/produtovenda_service.h"
 #include "services/notafiscal_service.h"
 #include "services/eventofiscal_service.h"
+#include "services/Produto_service.h"
 
 namespace Ui {
 class Vendas;
@@ -55,8 +56,6 @@ private slots:
 
     void on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos);
 
-    void on_testebutton_clicked();
-
     void on_cb_BuscaVendasPrazo_stateChanged(int arg1);
 
     void on_Btn_AbrirPag_clicked();
@@ -81,7 +80,6 @@ private:
     void Teste();
     QString idVendaSelec;
     void devolverProdutoVenda(QString id_venda, QString id_prod_vend);
-    void devolverProduto(QString id_prod_vend, QString id_produto, QString qntd);
     void mostrarVendasCliente(int idCliente);
     int IDCLIENTE = 0;
     void abrirDanfeXml(QString id_Venda);
@@ -91,6 +89,7 @@ private:
     ProdutoVenda_service prodVendaServ;
     NotaFiscal_service notaServ;
     EventoFiscal_service eventoServ;
+    Produto_Service prodServ;
 
 signals:
     void vendaConcluidaVendas();

@@ -27,6 +27,7 @@ enum class VendasErro {
     NotaFiscal,
     ProdutoVendido,
     EntradasVendas,
+    UpdateFalhou
 
 };
 
@@ -50,6 +51,8 @@ public:
     Vendas_service::Resultado deletarVenda(qlonglong id);
     Vendas_service::Resultado deletarVendaRegraNegocio(qlonglong idVenda, bool cancelarNf);
     bool vendaPossuiNota(qlonglong idVenda);
+    Vendas_service::Resultado updateNewTotalTrocoValorFinal(double total, double troco, double valorFinal, qlonglong id);
+    Vendas_service::Resultado devolverProdutoRegraNegocio(qlonglong idProdVend, qlonglong idVenda);
 private:
     QSqlDatabase db;
     Vendas_repository vendasRepo;

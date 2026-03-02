@@ -15,6 +15,8 @@ public:
     void listarProdutosVendidosFromVenda(qlonglong idvenda, QSqlQueryModel *model);
     bool deletarProdutoVendido(qlonglong id);
     bool deletarPorIdVenda(qlonglong idvenda);
+    int contarProdutosVendidosFromVenda(qlonglong idvenda);
+    ProdutoVendidoDTO getProdutoVendido(qlonglong id);
 private:
     QSqlDatabase db;
 

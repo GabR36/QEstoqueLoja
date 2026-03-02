@@ -29,8 +29,11 @@ public:
     void listarProdutosVendidosFromVenda(qlonglong idvenda, QSqlQueryModel *model);
     ProdutoVenda_service::Resultado deletarProdutoVendido(qlonglong id);
     ProdutoVenda_service::Resultado deletarProdutosVendidosPorIdVenda(qlonglong idvenda);
+    bool temApenasUmProduto(qlonglong idvenda);
+    ProdutoVendidoDTO getProdutoVendido(qlonglong id);
 private:
     ProdutoVenda_repository prodVendaRepo;
+
 signals:
 };
 

@@ -305,3 +305,27 @@ bool Vendas_repository::deletarVenda(qlonglong id){
         return true;
     }
 }
+
+bool Vendas_repository::updateNewTotalTrocoValorFinal(double total, double troco, double valorFinal,
+                                                      qlonglong id){
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco (updateNewTotalTrocoValorFinal)";
+        return false;
+    }
+
+    QSqlQuery query(db);
+
+    query.prepare("UPDATE vendas2 SET total = :total, troco = :troco, valor_final = :final "
+                  "WHERE id = :id");
+    query.bindValue(":total", total);
+    query.bindValue(":troco", troco);
+    query.bindValue(":final", valorFinal);
+    query.bindValue(":id", id);
+    if(!query.exec()){
+        qDebug() << "Query não rodou updateNewTotalTrocoValorFinal";
+        db.close();
+        return false;
+    }
+    db.close();
+    return true;
+}

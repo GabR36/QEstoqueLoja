@@ -1,5 +1,5 @@
 #include "vendas_service.h"
-
+#include <QDebug>
 
 Vendas_service::Vendas_service(QObject *parent)
     : QObject{parent}
@@ -93,4 +93,54 @@ Vendas_service::deletarVendaRegraNegocio(qlonglong idVenda, bool cancelarNf)
 bool Vendas_service::vendaPossuiNota(qlonglong idVenda)
 {
     return notaServ.getIdFromIdVenda(idVenda) != -1;
+}
+
+Vendas_service::Resultado Vendas_service::updateNewTotalTrocoValorFinal(double total, double troco, double valorFinal, qlonglong id){
+    if(!vendasRepo.updateNewTotalTrocoValorFinal(total, troco, valorFinal, id)){
+        return {false, VendasErro::UpdateFalhou,  "Erro ao atualizar valores"};
+    }else{
+        return {true, VendasErro::Nenhum, "Update OK"};
+    }
+}
+
+
+Vendas_service::Resultado Vendas_service::devolverProdutoRegraNegocio(qlonglong idProdVend,
+                                                                                  qlonglong idVenda){
+    ProdutoVendidoDTO produtoVendido = prodVendaServ.getProdutoVendido(idProdVend);
+
+    qDebug() << "id_produto: " << produtoVendido.idProduto;
+    qDebug() << "qntd: " << produtoVendido.quantidade;
+    qDebug() << "preco_vend: " << produtoVendido.precoVendido;
+
+    // deletar registro do produto devolvido
+    auto result = prodVendaServ.deletarProdutoVendido(idProdVend);
+    if(!result.ok){
+        return {false, VendasErro::DeleteFalhou, result.msg};
+    }
+
+    auto result1 = prodServ.updateAumentarQuantidadeProduto(produtoVendido.idProduto, produtoVendido.quantidade);
+    if(!result1.ok){
+        return {false, VendasErro::UpdateFalhou, result1.msg};
+    }
+
+    VendasDTO venda = getVenda(idVenda);
+    qDebug() << "total: " + QString::number(venda.total);
+    qDebug() << "taxa: " + QString::number(venda.taxa);
+    qDebug() << "desconto: " + QString::number(venda.desconto);
+    qDebug() << "recebido: " + QString::number(venda.valorRecebido);
+
+    // mudar o registro da venda para retirar o valor do produto devolvido
+
+    double taxa = 1 + venda.taxa/100;
+    double totalSub = produtoVendido.quantidade * produtoVendido.precoVendido;
+    double totalNovo = venda.total - totalSub;
+    double valorFinalNovo = (totalNovo - venda.desconto)*taxa;
+    double trocoNovo = venda.valorRecebido - valorFinalNovo;
+
+    auto result2 = updateNewTotalTrocoValorFinal(totalNovo, trocoNovo, valorFinalNovo, idVenda);
+    if(!result2.ok){
+        return {false, VendasErro::UpdateFalhou, result2.msg};
+    }
+
+    return {true, VendasErro::Nenhum, "Produto Devolvido com sucesso"};
 }

@@ -151,4 +151,53 @@ bool ProdutoVenda_repository::deletarPorIdVenda(qlonglong idvenda){
     }
 }
 
+int ProdutoVenda_repository::contarProdutosVendidosFromVenda(qlonglong idvenda){
+    int quantidade = 0;
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco (contarProdutosVendidosFromVenda)";
+        return -1;
+    }
 
+
+    QSqlQuery query(db);
+
+    query.prepare("SELECT COUNT() FROM produtos_vendidos WHERE id_venda = :idvenda");
+    query.bindValue(":idvenda", idvenda);
+
+    if(!query.exec()){
+        db.close();
+        return -1;
+    }else{
+        quantidade = query.value(0).toInt();
+    }
+
+    db.close();
+    return quantidade;
+}
+
+ProdutoVendidoDTO ProdutoVenda_repository::getProdutoVendido(qlonglong id){
+    ProdutoVendidoDTO prod;
+
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco (getProdutoVendido)";
+        return prod;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("SELECT id_produto, quantidade, preco_vendido FROM produtos_vendidos "
+                  "WHERE id = :id");
+    query.bindValue(":id", id);
+    if(!query.exec()){
+        qDebug() << "Query getProdutoVendido nao rodou";
+        db.close();
+        return prod;
+    }
+
+    while (query.next()) {
+        prod.idProduto = query.value(0).toLongLong();
+        prod.quantidade = query.value(1).toDouble();
+        prod.precoVendido = query.value(2).toDouble();
+    }
+    return prod;
+
+}

@@ -4,6 +4,10 @@
 #include <QObject>
 #include <QDomElement>
 
+#include "../dto/ProdutoNota_dto.h"
+#include "../dto/NotaFiscal_dto.h"
+#include "../dto/Cliente_dto.h"
+
 
 struct CustoItem {
     double custoUnitario = 0;
@@ -28,6 +32,9 @@ public:
 
     static double getDouble(const QString &str);
     CustoItem calcularCustoItemSN(const QString &xmlPath, int nItem);
+    NotaFiscalDTO lerNotaFiscalDoXML(const QString &xmlPath);
+    QList<ProdutoNotaDTO> carregarProdutosDaNFe(const QString &xml_path, qlonglong id_nf);
+    ClienteDTO getEmitenteFromXML(const QString &xmlPath);
 private:
     QDomElement findTag(QDomElement parent, const QString &tagName);
 

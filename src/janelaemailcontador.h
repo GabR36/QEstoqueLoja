@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QSqlDatabase>
+#include "services/config_service.h"
 #include <QDateTime>
 
 namespace Ui {
@@ -29,11 +30,11 @@ private:
     QSqlDatabase db;
     void atualizarContadores();
     QMap<QString, QStringList> xmlsPorPasta;
-    QMap<QString, QString> contadorValues;
-    QMap<QString, QString> empresaValues;
-    QMap<QString, QString> fiscalValues;
+    void enviarEmailContador(QString zip, QDate dtIni, QDate dtFim);
+    ConfigDTO configDTO;
     void enviarEmailContador(QString zip, QDate dtIni, QDate dtFim, QString pdfPath);
     void gerarResumoPdf(const QString &filePath, QDateTime dtIni, QDateTime dtFim);
+    Config_service confServ;
 };
 
 #endif // JANELAEMAILCONTADOR_H

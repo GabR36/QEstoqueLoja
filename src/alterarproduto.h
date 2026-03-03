@@ -6,6 +6,7 @@
 #include <QLocale>
 #include <QSet>
 #include "util/ibptutil.h"
+#include "../services/Produto_service.h"
 
 
 namespace Ui {
@@ -49,6 +50,9 @@ private:
     QSet<QString> generatedNumbers;
     bool atualizando = false;
     IbptUtil *util = new IbptUtil();
+    Produto_Service *produtoService;
+    QSqlDatabase db;
+
 signals:
     void produtoAlterado();
 };

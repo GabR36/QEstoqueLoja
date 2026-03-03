@@ -75,3 +75,12 @@ CMakeLists.txt.user*
 # Estoque
 estoque.txt
 build
+
+# Test
+Testing
+src/Testing
+tests/Testing
+*_REMOTE_*
+*_LOCAL_*
+*_BASE_*
+*_BACKUP_*

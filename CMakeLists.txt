@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.5)
 
 project(QEstoqueLoja VERSION 0.1 LANGUAGES CXX)
 
+enable_testing()
+add_subdirectory(tests)
 
 
 set(CMAKE_AUTOUIC ON)
@@ -121,7 +123,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/nota/ACBrNFeImport.h
         src/nota/nfceacbr.h src/nota/nfceacbr.cpp
         src/nota/nfeacbr.h src/nota/nfeacbr.cpp
-        src/schemamanager.h src/schemamanager.cpp
         src/nota/cancelnf.h src/nota/cancelnf.cpp
         src/util/ACBrConsultaCNPJ.cpp src/util/ACBrConsultaCNPJ.h
         src/util/consultacnpjmanager.h src/util/consultacnpjmanager.cpp
@@ -145,8 +146,56 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/delegateambiente.h src/delegateambiente.cpp
         Imagens/recursosImg.qrc
 
-    )
+        src/services/Produto_service.h src/services/Produto_service.cpp
+        src/dto/Produto_dto.h
+        src/repository/Produto_repository.h
+        src/repository/Produto_repository.cpp
+        src/util/printutil.h src/util/printutil.cpp
+        src/services/barcode_service.h src/services/barcode_service.cpp
+        src/util/codigobarrasutil.h src/util/codigobarrasutil.cpp
+        src/services/acbr_service.h src/services/acbr_service.cpp
+        src/services/schemamigration_service.h src/services/schemamigration_service.cpp
+        src/infra/apppath_service.h src/infra/apppath_service.cpp
+        src/infra/databaseconnection_service.h src/infra/databaseconnection_service.cpp
+        src/services/schemamigration_service.cpp src/services/schemamigration_service.h
+        src/dto/Config_dto.h
+        src/repository/config_repository.h src/repository/config_repository.cpp
+        src/services/config_service.h src/services/config_service.cpp
+        src/services/imagestorage_service.h src/services/imagestorage_service.cpp
+        src/repository/dfeinfo_repository.h src/repository/dfeinfo_repository.cpp
+        src/services/dfe_service.h src/services/dfe_service.cpp
+        src/dto/NotaFiscal_dto.h
+        src/repository/notafiscal_repository.h src/repository/notafiscal_repository.cpp
+        src/util/datautil.h src/util/datautil.cpp
+        src/services/notafiscal_service.h src/services/notafiscal_service.cpp
+        src/dto/ProdutoNota_dto.h
+        src/repository/produtonota_repository.h src/repository/produtonota_repository.cpp
+        src/services/produtonota_service.h src/services/produtonota_service.cpp
+        src/dto/Cliente_dto.h
+        src/repository/cliente_repository.h src/repository/cliente_repository.cpp
+        src/services/cliente_service.h src/services/cliente_service.cpp
+        src/dto/EventoFiscal_dto.h
+        src/repository/eventofiscal_repository.h src/repository/eventofiscal_repository.cpp
+        src/services/eventofiscal_service.h src/services/eventofiscal_service.cpp
+        src/repository/vendas_repository.h src/repository/vendas_repository.cpp
+        src/services/vendas_service.h src/services/vendas_service.cpp
+        src/repository/entradasvendas_repository.h src/repository/entradasvendas_repository.cpp
+        src/services/entradasvendas_service.h src/services/entradasvendas_service.cpp
+        src/services/financeiro_service.h src/services/financeiro_service.cpp
+        src/services/consultacnpj_service.h src/services/consultacnpj_service.cpp
+        src/dto/Vendas_dto.h
+        src/dto/ProdutoVendido_dto.h
+        src/repository/produtovenda_repository.h src/repository/produtovenda_repository.cpp
+        src/services/produtovenda_service.h src/services/produtovenda_service.cpp
+        src/services/recibo_service.h src/services/recibo_service.cpp
+        src/dto/EntradaVenda_dto.h
+        src/dto/ResumoVendas_dto.h
+        src/util/vendasutil.h src/util/vendasutil.cpp
 
+
+
+
+    )
 
 
 # Define target properties for Android with Qt 6 as:
@@ -278,4 +327,5 @@ endif()
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(QEstoqueLoja)
 endif()
+
 

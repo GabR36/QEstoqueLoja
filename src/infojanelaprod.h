@@ -14,7 +14,7 @@ class InfoJanelaProd : public QDialog
     Q_OBJECT
 
 public:
-    explicit InfoJanelaProd(QWidget *parent = nullptr, int id = 1);
+    explicit InfoJanelaProd(QWidget *parent = nullptr, QString id = "1");
     ~InfoJanelaProd();
 
 private:

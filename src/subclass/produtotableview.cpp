@@ -62,7 +62,7 @@ QSqlQueryModel *ProdutoTableView::getModel(){
     return model;
 
 }
-int ProdutoTableView::getIdProdSelected(){
+QString ProdutoTableView::getIdProdSelected(){
     QItemSelectionModel *selectionModel = this->selectionModel();
     QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
 
@@ -70,12 +70,12 @@ int ProdutoTableView::getIdProdSelected(){
         int selectedRow = selectedIndexes.first().row();
         QModelIndex idIndex = model->index(selectedRow, 0);
 
-        int id = model->data(idIndex).toInt();
+        QString id = model->data(idIndex).toString();
         return id;
     }
 }
 void ProdutoTableView::verProd(){
-    int id = getIdProdSelected();
+    QString id = getIdProdSelected();
     InfoJanelaProd *janelaProd = new InfoJanelaProd(this, id);
     janelaProd->show();
 }

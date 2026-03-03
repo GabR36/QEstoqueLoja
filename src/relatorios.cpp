@@ -31,6 +31,7 @@
 #include <QSql>
 #include "configuracao.h"
 #include <QStandardPaths>
+#include "../services/Produto_service.h"
 //#include <QDebug>;
 
 relatorios::relatorios(QWidget *parent)
@@ -40,7 +41,8 @@ relatorios::relatorios(QWidget *parent)
     ui->setupUi(this);
     ui->tabWidget->setCurrentIndex(1);
     ui->Stacked_Estoque->setCurrentIndex(3);
-    fiscalValues = Configuracao::get_All_Fiscal_Values();
+    Config_service *confServ = new Config_service(this);
+    configDTO = confServ->carregarTudo();
 
     connect(ui->CBox_EstoqueMain, QOverload<int>::of(&QComboBox::currentIndexChanged),
             ui->Stacked_Estoque, &QStackedWidget::setCurrentIndex);
@@ -1115,7 +1117,7 @@ void relatorios::on_Ledit_PesquisaProduto_textChanged(const QString &arg1)
 {
 
     QString inputText = ui->Ledit_PesquisaProduto->text();
-    QString normalizadoPesquisa = MainWindow::normalizeText(inputText);
+    QString normalizadoPesquisa = Produto_Service::normalizeText(inputText);
 
     // Dividir a string em palavras usando split por espaços em branco
     QStringList palavras = normalizadoPesquisa.split(" ", Qt::SkipEmptyParts);
@@ -1439,7 +1441,6 @@ void relatorios::on_Tview_ProdutosSelec_customContextMenuRequested(const QPoint 
 QMap<QString, float> relatorios::buscarValoresNfAno(const QString &ano) {
 
     QMap<QString, float> valores;
-    QString tpamb = fiscalValues.value("tp_amb");
     qDebug() << ano;
     QSqlQuery query;
     query.prepare("SELECT strftime('%m', dhemi) AS mes, SUM(valor_total) "
@@ -1449,7 +1450,7 @@ QMap<QString, float> relatorios::buscarValoresNfAno(const QString &ano) {
                   "AND finalidade = 'NORMAL' "
                   "GROUP BY mes");
     query.bindValue(":ano", ano);
-    query.bindValue(":tpamb", tpamb);
+    query.bindValue(":tpamb", configDTO.tpAmbFiscal);
 
     if (query.exec()) {
         while (query.next()) {

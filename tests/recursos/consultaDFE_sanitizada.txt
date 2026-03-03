@@ -1,0 +1,113 @@
+Retorno consulta DFE "[DistribuicaoDFe]
+CStat=138
+CUF=0
+DhRecbto=
+Msg=Documento(s) localizado(s)
+VerAplic=1.7.6
+Versao=1.01
+XMotivo=Documento(s) localizado(s)
+arquivo=99999999999999999999550010000000011000000000-nfe.xml
+dhResp=17/02/2026 11:24:19
+indCont=0
+maxNSU=000000000000986
+tpAmb=1
+ultNSU=000000000000986
+
+[ResDFe001]
+CNPJ=
+CNPJCPF=00000000000191
+CNPJDest=
+CStat=0
+IE=0000000000
+NSU=000000000000971
+XML=<?xml version="1.0" encoding="UTF-8"?>
+<resNFe versao="1.01">
+  <chNFe>99999999999999999999550010000000011000000000</chNFe>
+  <CNPJ>00000000000191</CNPJ>
+  <xNome>EMPRESA TESTE LTDA</xNome>
+  <IE>0000000000</IE>
+  <dhEmi>2026-02-03T14:38:10-03:00</dhEmi>
+  <tpNF>1</tpNF>
+  <vNF>648.04</vNF>
+  <digVal>ABCDEF123456=</digVal>
+  <dhRecbto>2026-02-03T14:38:37-03:00</dhRecbto>
+  <nProt>999999999999999</nProt>
+  <cSitNFe>1</cSitNFe>
+</resNFe>
+arquivo=/tmp/teste/resNFe.xml
+cSitNFe=1
+chDFe=99999999999999999999550010000000011000000000
+dhEmi=03/02/2026 14:38:10
+dhRecbto=03/02/2026 14:38:37
+nProt=999999999999999
+schema=resNFe
+tpNF=1
+vNF=648,04
+xNome=EMPRESA TESTE LTDA
+
+[ResDFe002]
+CNPJCPF=00000000000191
+IE=0000000000
+NSU=000000000000972
+XML=<?xml version="1.0" encoding="UTF-8"?>
+<nfeProc versao="4.00">
+  <NFe>
+    <infNFe Id="NFe99999999999999999999550010000000011000000000" versao="4.00">
+      <ide>
+        <cUF>41</cUF>
+        <mod>55</mod>
+        <serie>1</serie>
+        <nNF>1</nNF>
+        <dhEmi>2026-02-03T14:38:10-03:00</dhEmi>
+        <tpNF>1</tpNF>
+        <tpAmb>1</tpAmb>
+      </ide>
+      <emit>
+        <CNPJ>00000000000191</CNPJ>
+        <xNome>EMPRESA TESTE LTDA</xNome>
+        <IE>0000000000</IE>
+      </emit>
+      <dest>
+        <CNPJ>11111111000191</CNPJ>
+        <xNome>CLIENTE TESTE LTDA</xNome>
+      </dest>
+      <det nItem="1">
+        <prod>
+          <cProd>001</cProd>
+          <xProd>PRODUTO TESTE</xProd>
+          <CFOP>5102</CFOP>
+          <uCom>UN</uCom>
+          <qCom>1</qCom>
+          <vUnCom>648.04</vUnCom>
+          <vProd>648.04</vProd>
+        </prod>
+      </det>
+      <total>
+        <ICMSTot>
+          <vProd>648.04</vProd>
+          <vNF>648.04</vNF>
+        </ICMSTot>
+      </total>
+    </infNFe>
+    <protNFe versao="4.00">
+      <infProt>
+        <tpAmb>1</tpAmb>
+        <chNFe>99999999999999999999550010000000011000000000</chNFe>
+        <dhRecbto>2026-02-03T14:38:37-03:00</dhRecbto>
+        <nProt>999999999999999</nProt>
+        <cStat>100</cStat>
+        <xMotivo>Autorizado o uso da NF-e</xMotivo>
+      </infProt>
+    </protNFe>
+  </NFe>
+</nfeProc>
+arquivo=../../../tests/recursos/xml_procnfe.xml
+cSitNFe=1
+chDFe=99999999999999999999550010000000011000000000
+dhEmi=03/02/2026 14:38:10
+dhRecbto=03/02/2026 14:38:37
+nProt=999999999999999
+schema=procNFe
+tpNF=1
+vNF=648,04
+xNome=EMPRESA TESTE LTDA

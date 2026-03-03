@@ -34,10 +34,9 @@ Entradas::Entradas(QWidget *parent)
 {
     ui->setupUi(this);
 
-    empresaValues = Configuracao::get_All_Empresa_Values();
     db = QSqlDatabase::database();
-    financeiroValues = Configuracao::get_All_Financeiro_Values();
-    produtoValues = Configuracao::get_All_Produto_Values();
+    Config_service *confServ = new Config_service(this);
+    configDTO = confServ->carregarTudo();
 
     carregarTabela();
     connect(ui->Tview_Entradas->selectionModel(),
@@ -125,7 +124,7 @@ void Entradas::salvarRegistroDFe(
 void Entradas::on_Btn_ConsultarDF_clicked()
 {
     ManifestadorDFe *manifestdfe = new ManifestadorDFe(this);
-    if(manifestdfe->possoConsultar()){
+    if(dfeServ.possoConsultar()){
 
         manifestdfe->consultaAlternada();
         QMessageBox::information(this, "Resposta", "Consulta realizada com sucesso.");
@@ -481,7 +480,7 @@ void Entradas::enviarEmailNFe(QString nomeCliente, QString emailCliente,
         pdfFile.close();
 
         QString corpo;
-        QString nomeEmpresa = empresaValues.value("nome_empresa");
+        QString nomeEmpresa = configDTO.nomeEmpresa;
         QString dataFormatada = portugues.toString(
             data,
             "dddd, dd 'de' MMMM 'de' yyyy 'às' HH:mm"
@@ -498,7 +497,7 @@ void Entradas::enviarEmailNFe(QString nomeCliente, QString emailCliente,
         mail->Limpar();
         mail->LimparAnexos();
         mail->AddCorpoAlternativo(corpo.toStdString());
-        mail->SetAssunto("Nota Fiscal Eletrônica de " + empresaValues.value("nome_empresa").toStdString());
+        mail->SetAssunto("Nota Fiscal Eletrônica de " + configDTO.nomeEmpresa.toStdString());
         mail->AddDestinatario(emailCliente.toStdString());
         mail->AddAnexo(xmlPath.toStdString(), "XML NFe", 0);
         mail->AddAnexo(pdfPath.toStdString(), "DANFE (PDF)", 0);
@@ -668,9 +667,9 @@ void Entradas::addProdSemCodBarras(QString idProd, QString codBarras){
     double coreValue = custoxml.custoUnitario;
     preco = portugues.toString(coreValue, 'f', 2);
 
-    QString porcent_lucro = portugues.toString(financeiroValues.value("porcent_lucro").toFloat());
-    QString pisCofins = produtoValues.value("pis_padrao");
-    QString csosnPadrao = produtoValues.value("csosn_padrao");
+    QString porcent_lucro = portugues.toString(configDTO.porcentLucroFinanceiro);
+    QString pisCofins = configDTO.pisPadraoProduto;
+    QString csosnPadrao = configDTO.csosnPadraoProduto;
 
     InserirProduto *addProd = new InserirProduto();
     addProd->preencherCamposProduto(
@@ -779,7 +778,7 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
     }
 
     if (produto["preco_fornecedor"].toDouble() != produtoNota["preco"].toDouble()) {
-        float porcent_lucro = financeiroValues.value("porcent_lucro").toDouble();
+        double porcent_lucro = configDTO.porcentLucroFinanceiro;
         resultado["preco"] = produtoNota["preco"].toDouble() * (porcent_lucro/100 + 1);
         resultado["porcent_lucro"] = porcent_lucro;
         resultado["preco_fornecedor"] = produtoNota["preco"].toDouble();
@@ -803,8 +802,12 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
         }
     }
 
-    IbptUtil *util = new IbptUtil(this);
-    resultado["aliquota_imposto"] = util->get_Aliquota_From_Csv(resultado["ncm"].toString());
+    qDebug() << "teste antes: " << resultado["ncm"];
+
+    if (resultado.contains("ncm")) {
+        IbptUtil *util = new IbptUtil(this);
+        resultado["aliquota_imposto"] = util->get_Aliquota_From_Csv(resultado["ncm"].toString());
+    }
 
     db.close();
 
@@ -813,6 +816,8 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
     qDebug() << "produtoNota: " << produtoNota;
 
     qDebug() << "resultado: " << resultado;
+
+    qDebug() << "teste: " << (produto["ncm"].toString() != produtoNota["ncm"].toString());
 
     MergeProdutos *janelaMerge = new MergeProdutos(produto, produtoNota, resultado);
     janelaMerge->show();

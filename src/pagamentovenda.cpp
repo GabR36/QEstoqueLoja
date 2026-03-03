@@ -16,12 +16,14 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
     // // QMessageBox::warning(this,"Erro",nfce->getVersaoLib());
     rowDataList = listaProdutos;
 
-    fiscalValues = Configuracao::get_All_Fiscal_Values();
-    empresaValues = Configuracao::get_All_Empresa_Values();
+
+    Config_service *confServ = new Config_service(this);
+    configDTO = confServ->carregarTudo();
+
     this->idCliente = idCliente;
     //mostra as opçoes relacionadas a nf e
 
-    if(fiscalValues.value("emit_nf") == "1"){
+    if(configDTO.emitNfFiscal){
         ui->FrameNF->setVisible(true);
         ui->Ledit_NNF->setVisible(true);
         ui->Lbl_NNF->setVisible(true);
@@ -227,13 +229,13 @@ void pagamentoVenda::salvarNfeBD(NfeACBR *nfe){
     query.bindValue(":xml_path", nfe->getXmlPath());
     query.bindValue(":valortotal", QString::number(nfe->getVNF()));
     query.bindValue(":modelo", "55");
-    query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
+    query.bindValue(":tpamb", configDTO.tpAmbFiscal);
     query.bindValue(":atualizado_em", dataIngles.toString("yyyy-MM-dd hh:mm:ss"));
     query.bindValue(":id_venda", idVenda);
-    query.bindValue(":cnpjemit", empresaValues.value("cnpj_empresa"));
+    query.bindValue(":cnpjemit", configDTO.cnpjEmpresa);
     query.bindValue(":chnfe", nfe->getChaveNf());
     query.bindValue(":nprot", nProt);
-    query.bindValue(":cuf", fiscalValues.value("cuf"));
+    query.bindValue(":cuf", configDTO.cUfFiscal);
     query.bindValue(":finalidade", "NORMAL");
     query.bindValue(":saida", "1");
     query.bindValue(":dhemi", nfe->getDhEmiConvertida());
@@ -273,13 +275,13 @@ void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
     query.bindValue(":xml_path", nfce->getXmlPath());
     query.bindValue(":valortotal", QString::number(nfce->getVNF()));
     query.bindValue(":modelo", "65");
-    query.bindValue(":tpamb", fiscalValues.value("tp_amb"));
+    query.bindValue(":tpamb", configDTO.tpAmbFiscal);
     query.bindValue(":atualizado_em", dataIngles.toString("yyyy-MM-dd hh:mm:ss"));
     query.bindValue(":id_venda", idVenda);
-    query.bindValue(":cnpjemit", empresaValues.value("cnpj_empresa"));
+    query.bindValue(":cnpjemit", configDTO.cnpjEmpresa);
     query.bindValue(":chnfe", nfce->getChaveNf());
     query.bindValue(":nprot", nProt);
-    query.bindValue(":cuf", fiscalValues.value("cuf"));
+    query.bindValue(":cuf", configDTO.cUfFiscal);
     query.bindValue(":finalidade", "NORMAL");
     query.bindValue(":saida", "1");
     query.bindValue(":dhemi", nfce->getDhEmiConvertida());
@@ -412,7 +414,7 @@ void pagamentoVenda::terminarPagamento(){
         return;
     }
 
-    if((existeItensComNcmVazio(rowDataList, emitTodosNf)) && (fiscalValues.value("emit_nf") == "1" && okEmitir)
+    if((existeItensComNcmVazio(rowDataList, emitTodosNf)) && (configDTO.emitNfFiscal && okEmitir)
         && (ui->CBox_ModeloEmit->currentIndex() != 2)){
         QMessageBox::StandardButton resposta;
         resposta = QMessageBox::question(this,
@@ -485,11 +487,11 @@ void pagamentoVenda::terminarPagamento(){
 
     }
     if(ui->CheckImprimirCNF->isChecked()){
-        Vendas::imprimirReciboVenda(idVenda);
+        Vendas::imprimirReciboVenda(idVenda.toLongLong());
     }
 
     db.close();
-    if(fiscalValues.value("emit_nf") == "1" && okEmitir){ // se a config estiver ativada para emitir
+    if(configDTO.emitNfFiscal && okEmitir){ // se a config estiver ativada para emitir
 
         if(ui->CBox_ModeloEmit->currentIndex() == 0){
 
@@ -569,7 +571,7 @@ void pagamentoVenda::enviarEmailNFe(QString nomeCliente, QString emailCliente,
         pdfFile.close();
 
         QString corpo;
-        QString nomeEmpresa = empresaValues.value("nome_empresa");
+        QString nomeEmpresa = configDTO.nomeEmpresa;
         QString dataFormatada = portugues.toString(
             data,
             "dddd, dd 'de' MMMM 'de' yyyy 'às' HH:mm"
@@ -585,7 +587,7 @@ void pagamentoVenda::enviarEmailNFe(QString nomeCliente, QString emailCliente,
         mail->Limpar();
         mail->LimparAnexos();
         mail->AddCorpoAlternativo(corpo.toStdString());
-        mail->SetAssunto("Nota Fiscal Eletrônica de " + empresaValues.value("nome_empresa").toStdString());
+        mail->SetAssunto("Nota Fiscal Eletrônica de " + configDTO.nomeEmpresa.toStdString());
         mail->AddDestinatario(emailCliente.toStdString());
         mail->AddAnexo(xmlPath.toStdString(), "XML NFe", 0);
         mail->AddAnexo(pdfPath.toStdString(), "DANFE (PDF)", 0);

@@ -18,11 +18,11 @@ DanfeUtil::DanfeUtil(QObject *parent)
         }
     }
 
-    //caminhoReportNFe = QStandardPaths::AppConfigLocation(QStandardPaths::GenericDataLocation) + "/reports/DANFE-NFe.xml";
-    //caminhoReportNFCe = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/reports/DANFE-NFCe.xml";
-    empresaValues = Configuracao::get_All_Empresa_Values();
+
+    Config_service *confServ = new Config_service(this);
+    configDTO = confServ->carregarTudo();
     QString caminhoCompletoLogo = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
-                              "/imagens/" + QFileInfo(empresaValues.value("caminho_logo_empresa")).fileName();
+                              "/imagens/" + QFileInfo(configDTO.logoPathEmpresa).fileName();
     caminhoLogo = caminhoCompletoLogo;
 }
 bool DanfeUtil::abrirDanfe(int idVenda){

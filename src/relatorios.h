@@ -16,7 +16,7 @@
 #include <QStandardItemModel>
 #include <QMenu>
 #include <QAction>
-
+#include "services/config_service.h"
 namespace Ui {
 class relatorios;
 }
@@ -78,6 +78,7 @@ private:
     QStandardItemModel *modeloSelecionados = new QStandardItemModel;
     QStringList clientesComId;
     QAction *actionMenuDeletarProd;
+    ConfigDTO configDTO;
 
 
     void configurarJanelaQuantVendas();

@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>recursos/consultaDFE_sanitizada.txt</file>
+        <file>recursos/xml_procnfe.xml</file>
+    </qresource>
+</RCC>

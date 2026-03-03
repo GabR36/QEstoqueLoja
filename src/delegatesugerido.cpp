@@ -8,6 +8,7 @@
 #include "mainwindow.h"
 #include <QStyledItemDelegate>
 #include "util/NfUtilidades.h"
+#include "../services/Produto_service.h"
 
 DelegateSugerido::DelegateSugerido(QObject *parent)
     : QStyledItemDelegate(parent)
@@ -122,9 +123,8 @@ void DelegateSugerido::setModelData(QWidget *editor,
 
         QString texto = le->text();
 
-        // 🔥 NORMALIZA AQUI
         if (chave == "descricao") {
-            texto = MainWindow::normalizeText(texto);
+            texto = Produto_Service::normalizeText(texto);
         }
 
         model->setData(index, texto);

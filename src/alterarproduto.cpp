@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QDoubleValidator>
 #include "util/NfUtilidades.h"
+#include "util/codigobarrasutil.h"
 
 AlterarProduto::AlterarProduto(QWidget *parent) :
     QDialog(parent),
@@ -12,6 +13,7 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
 {
     ui->setupUi(this);
     util->setParent(this);
+    db = QSqlDatabase::database();
 
     ui->Lbl_AltCEST->setVisible(false);
     ui->Ledit_AltCEST->setVisible(false);
@@ -35,9 +37,6 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
 
     ui->Btn_GerarCod->setIcon(QIcon(":/QEstoqueLOja/restart.svg"));
 
-
-
-    //
     ui->Ledit_AltDesc->setMaxLength(120);
     //add todas as unidades comerciais no combo box do header NFutilidades
     for (int i = 0; i < unidadesComerciaisCount; ++i) {
@@ -45,6 +44,8 @@ AlterarProduto::AlterarProduto(QWidget *parent) :
     }
     //desativa campo cest
     ui->Ledit_AltCEST->setEnabled(false);
+    produtoService = new Produto_Service();
+
 
 }
 
@@ -90,176 +91,42 @@ AlterarProduto::~AlterarProduto()
     ui->Lbl_AltNCMDesc->setText(util->get_Descricao_NCM(ncm));
 }
 
-void AlterarProduto::on_Btn_AltAceitar_accepted()
-{
-    QString desc = ui->Ledit_AltDesc->text();
-    QString quant = ui->Ledit_AltQuant->text();
-    QString preco = ui->Ledit_AltPreco->text();
-    QString barras = ui->Ledit_AltBarras->text();
-    bool nf = ui->Check_AltNf->isChecked();
-    QString precoForn = ui->Ledit_AltPrecoFornecedor->text();
-    QString porcentLucro = ui->Ledit_AltPercentualLucro->text();
-    QString uCom = ui->CBox_AltUCom->currentText();
-    QString ncm = ui->Ledit_AltNCM->text();
-    QString cest = ui->Ledit_AltCEST->text();
-    QString aliquotaImp = ui->Ledit_AltAliquota->text();
-    QString csosn = ui->Ledit_AltCSOSN->text();
-    QString pis = ui->Ledit_AltPIS->text();
+ void AlterarProduto::on_Btn_AltAceitar_accepted()
+ {
+     ProdutoDTO p;
 
+     // leitura da UI
+     p.descricao = ui->Ledit_AltDesc->text();
+     p.quantidade = portugues.toFloat(ui->Ledit_AltQuant->text());
+     p.preco = portugues.toDouble(ui->Ledit_AltPreco->text());
+     p.codigoBarras = ui->Ledit_AltBarras->text();
+     p.nf = ui->Check_AltNf->isChecked();
+     p.precoFornecedor = portugues.toDouble(ui->Ledit_AltPrecoFornecedor->text());
+     p.percentLucro = portugues.toDouble(ui->Ledit_AltPercentualLucro->text());
+     p.uCom = ui->CBox_AltUCom->currentText();
+     p.ncm = ui->Ledit_AltNCM->text();
+     p.cest = ui->Ledit_AltCEST->text();
+     p.aliquotaIcms = portugues.toDouble(ui->Ledit_AltAliquota->text());
+     p.csosn = ui->Ledit_AltCSOSN->text();
+     p.pis = ui->Ledit_AltPIS->text();
 
-    // Converta o texto para um número
-    bool conversionOk, conversionOkQuant;
-    double price = portugues.toDouble(preco, &conversionOk);
-    portugues.toFloat(quant, &conversionOkQuant);
-    if (porcentLucro.trimmed().isEmpty()) {
-        QMessageBox::warning(this, "Erro", "O campo 'Percentual de Lucro' não pode estar vazio.");
-        ui->Ledit_AltPercentualLucro->setFocus();
-        return;
-    }
-    if(precoForn.trimmed().isEmpty()){
-        precoForn = "";
-    }else{
-        precoForn = QString::number(portugues.toDouble(precoForn));
-    }
-    if ((ncm.trimmed().isEmpty() && nf) || (ncm.length() != 8 && nf)) {
-        QMessageBox::StandardButton reply = QMessageBox::question(
-            this,
-            "Aviso",
-            "O campo NCM está errado.\n"
-            "Produtos sem NCM não poderão ser utilizados na emissão de nota fiscal.\n"
-            "Deseja salvar o produto mesmo assim?",
-            QMessageBox::Yes | QMessageBox::No
-            );
+     auto res = produtoService->alterarVerificarCodigoBarras(p, barrasAlt, idAlt);
 
-        if (reply == QMessageBox::No) {
-            ui->Ledit_AltNCM->setFocus();
-            return; // cancela o envio
-        }
-    }
-    porcentLucro = QString::number(portugues.toFloat(porcentLucro));
-    aliquotaImp = QString::number(portugues.toFloat(aliquotaImp));
-    // Verifique se a conversão foi bem-sucedida e se o preço é maior que zero
-    if (conversionOk && price >= 0)
-    {
-        if (conversionOkQuant){
-            // verificar se o codigo de barras ja existe
-            if(!janelaPrincipal->db.open()){
-                qDebug() << "erro ao abrir banco de dados. botao alterar.";
-            }
-            QSqlQuery query;
+     if (!res.ok) {
+         QMessageBox::warning(this, "Erro", res.msg);
+         return;
+     }
 
-            query.prepare("SELECT COUNT(*) FROM produtos WHERE codigo_barras = :codigoBarras");
-            query.bindValue(":codigoBarras", barras);
-            if (!query.exec()) {
-                qDebug() << "Erro na consulta: contagem codigo barras";
-            }
-            query.next();
-            bool barrasExiste = query.value(0).toInt() > 0 && barras != "" && barras != barrasAlt;
-            qDebug() << barras;
-            if (!barrasExiste){
-                QString nfAltString = nfAlt ? "1" : "0";
-                QString nfString = nf ? "1" : "0";
-                // Cria uma mensagem de confirmação
-                QMessageBox::StandardButton resposta;
-                resposta = QMessageBox::question(
-                    nullptr,
-                    "Confirmação",
-                    "Tem certeza que deseja alterar o produto:\n\n"
-                    "id: " + idAlt + "\n"
-                                  "Descrição: " + descAlt + "\n"
-                                    "Quantidade: " + quantAlt + "\n"
-                                     "UCom: " + ucomAlt + "\n"
-                                     "Preço Fornecedor: " + precoFornAlt + "\n"
-                                     "Porcentagem Lucro: " + porcentLucroAlt + "\n"
-                                     "Preço: " + precoAlt + "\n"
-                                     "Código de Barras: " + barrasAlt + "\n"
-                                      "NF: " + nfAltString  + "\n\n"
-                                        "NCM: " + ncmAlt + "\n"
-                                   "CEST: " + cestAlt + "\n"
-                                    "Aliquota Imp: " + aliquotaImpAlt + "\n"
-                                    "CSOSN: " + csosnAlt + "\n"
-                                     "PIS: " +  pisAlt + "\n"
+     emit produtoAlterado();
+     accept();
+ }
 
-                                        "Para: \n\n"
-                                        "Descrição: " + desc + "\n"
-                                 "Quantidade: " + quant + "\n"
-                                  "UCom: " + uCom + "\n"
-                                 "Preço Fornecedor: " + precoForn + "\n"
-                                "Porcentagem Lucro: " + porcentLucro + "\n"
-                                  "Preço: " + preco + "\n"
-                                  "Código de Barras: " + barras + "\n"
-                                   "NF: " + nfString + "\n\n"
-                                     "NCM: " + ncm + "\n"
-                                   "CEST: " + cest + "\n"
-                                    "Aliquota Imp: " + aliquotaImp + "\n"
-                                    "CSOSN: " + csosn + "\n"
-                                    "PIS: " +  pis + "\n",
-
-                    QMessageBox::Yes | QMessageBox::No
-                    );
-                // Verifica a resposta do usuário
-                if (resposta == QMessageBox::Yes) {
-                    // alterar banco de dados
-                    if(!janelaPrincipal->db.open()){
-                        qDebug() << "erro ao abrir banco de dados. botao alterar->aceitar.";
-                    }
-                    QSqlQuery query;
-                    query.prepare("UPDATE produtos SET quantidade = :valor2, descricao = :valor3, preco = :valor4, "
-                                  "codigo_barras = :valor5, nf = :valor6, un_comercial = :ucom,"
-                                  "preco_fornecedor = :precoforn, porcent_lucro = :porcentlucro,"
-                                  "ncm = :ncm, cest = :cest, aliquota_imposto = :aliquotaimp,"
-                                  "csosn = :csosn, pis = :pis  WHERE id = :valor1");
-                    query.bindValue(":valor1", idAlt);
-                    query.bindValue(":valor2", QString::number(portugues.toFloat(quant)));
-                    query.bindValue(":valor3", MainWindow::normalizeText(desc));
-                    query.bindValue(":valor4", QString::number(portugues.toFloat(preco)));
-                    query.bindValue(":valor5", barras);
-                    query.bindValue(":valor6", nf);
-                    query.bindValue(":ucom", uCom);
-                    query.bindValue(":precoforn", precoForn);
-                    query.bindValue(":porcentlucro", porcentLucro);
-                    query.bindValue(":ncm", ncm);
-                    query.bindValue(":cest", cest);
-                    query.bindValue(":aliquotaimp", aliquotaImp);
-                    query.bindValue(":csosn", csosn);
-                    query.bindValue(":pis", pis);
-                    if (query.exec()) {
-                        qDebug() << "Alteracao bem-sucedida!";
-                    } else {
-                        qDebug() << "Erro na alteracao: ";
-                    }
-                    // mostrar na tableview
-                    emit produtoAlterado();
-                   // janelaPrincipal->atualizarTableview();
-                    QSqlDatabase::database().close();
-                }
-                else {
-                    // O usuário escolheu não alterar o produto
-                    qDebug() << "A alteraçao do produto foi cancelada.";
-                }
-            }
-            else {
-                QMessageBox::warning(this, "Erro", "Esse código de barras já foi registrado.");
-            }
-        }
-        else {
-            // a quantidade é invalida
-            QMessageBox::warning(this, "Erro", "Por favor, insira uma quantiade válida.");
-            ui->Ledit_AltQuant->setFocus();
-        }
-
-    }
-    else
-    {
-        // Exiba uma mensagem de erro se o preço não for válido
-        QMessageBox::warning(this, "Erro", "Por favor, insira um preço válido.");
-    }
-}
 
 
 void AlterarProduto::on_Btn_GerarCod_clicked()
 {
-    ui->Ledit_AltBarras->setText(janelaPrincipal->gerarNumero());
+    QString codigo = CodigoBarrasUtil::gerarNumeroCodigoBarrasNaoFiscal();
+    ui->Ledit_AltBarras->setText(codigo);
 }
 
 void AlterarProduto::on_Ledit_AltNCM_editingFinished()
@@ -279,7 +146,7 @@ void AlterarProduto::on_Ledit_AltPrecoFornecedor_textChanged(const QString &arg1
     float percentualLucro = portugues.toFloat(ui->Ledit_AltPercentualLucro->text());
 
     atualizando = true;
-    double precoFinal = precoFornecedor * (1.0 + percentualLucro / 100.0);
+    double precoFinal = produtoService->calcularPrecoFinal(precoFornecedor, percentualLucro);
     ui->Ledit_AltPreco->setText(portugues.toString(precoFinal, 'f', 2));
     atualizando = false;
 }
@@ -294,7 +161,7 @@ void AlterarProduto::on_Ledit_AltPercentualLucro_textChanged(const QString &arg1
     double percentualLucro = portugues.toDouble(arg1, &ok2);
 
     if (ok1 && ok2) {
-        double precoFinal = precoFornecedor * (1.0 + percentualLucro / 100.0);
+        double precoFinal = produtoService->calcularPrecoFinal(precoFornecedor, percentualLucro);
         ui->Ledit_AltPreco->setText(portugues.toString(precoFinal, 'f', 2));
     }
 
@@ -313,7 +180,8 @@ void AlterarProduto::on_Ledit_AltPreco_textChanged(const QString &arg1)
     double precoFinal = portugues.toDouble(arg1, &ok2);
 
     if (ok1 && ok2 && precoFornecedor != 0.0) {
-        double percentualLucro = ((precoFinal - precoFornecedor) / precoFornecedor) * 100.0;
+        double percentualLucro = produtoService->calcularPercentualLucro(precoFornecedor,
+                                                                         precoFinal);
         ui->Ledit_AltPercentualLucro->setText(portugues.toString(percentualLucro, 'f', 2));
     }
 

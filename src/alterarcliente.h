@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QSqlDatabase>
+#include "services/cliente_service.h"
 
 namespace Ui {
 class AlterarCliente;
@@ -28,6 +29,7 @@ private:
     QSqlDatabase db =  QSqlDatabase::database();
     QString id;
     bool atualizando;
+    Cliente_service cliServ;
 
 signals:
     void clienteAtualizado();

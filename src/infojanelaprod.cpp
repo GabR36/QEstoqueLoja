@@ -4,12 +4,12 @@
 #include <QSqlQuery>
 #include <QSqlError>
 
-InfoJanelaProd::InfoJanelaProd(QWidget *parent, int id)
+InfoJanelaProd::InfoJanelaProd(QWidget *parent, QString id)
     : QDialog(parent)
     , ui(new Ui::InfoJanelaProd)
 {
     ui->setupUi(this);
-    ui->Lbl_ID->setText(QString::number(id));
+    ui->Lbl_ID->setText(id);
 
     if(!db.open()){
         qDebug() << "nao abriu bd janela info prod";

@@ -7,6 +7,7 @@
 #include <qmap.h>
 #include "nota/nfceacbr.h"
 #include "nota/nfeacbr.h"
+#include "services/config_service.h"
 
 class pagamentoVenda : public pagamento
 {
@@ -29,8 +30,6 @@ private:
         xMunCli, cMunCli, ufCli, cepCli, ieCli;
     int indIeCLi = 0;
     bool ehPfCli = false;
-    QMap<QString, QString> fiscalValues;
-    QMap<QString, QString> empresaValues;
     bool emitTodosNf = false;
     QString cStat, xMotivo, msg, nProt;
     bool existeItensComNcmVazio(QList<QList<QVariant> > listaProdutos, bool somenteNf);
@@ -41,6 +40,7 @@ private:
     void salvarNfeBD(NfeACBR *nfe);
     QString dhemiRet;
     void enviarEmailNFe(QString nomeCliente, QString emailCliente, QString xmlPath, std::string pdfDanfe);
+    ConfigDTO configDTO;
 signals:
     void gerarEnviarNf();
 

@@ -7,3 +7,12 @@ const QString unidadesComerciais[] = {
 };
 
 const int unidadesComerciaisCount = sizeof(unidadesComerciais) / sizeof(QString);
+
+
+const QString EVENTO_CARTA_CORRECAO = "110110";
+const QString EVENTO_CANCELAMENTO = "110111";
+
+const QString EVENTO_CONFIRMACAO_OPERACAO = "210200";
+const QString EVENTO_CIENCIA_OPERACAO = "210210";
+const QString EVENTO_DESCONHECIMENTO = "210220";
+const QString EVENTO_OPERACAO_NAO_REALIZADA = "210240";

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QSqlDatabase>
+#include "services/cliente_service.h"
 
 namespace Ui {
 class InserirCliente;
@@ -27,6 +28,8 @@ private slots:
 private:
     Ui::InserirCliente *ui;
     QSqlDatabase db;
+    Cliente_service cliServ;
+    ClienteDTO clienteDTO;
 signals:
     void clienteInserido();
 };

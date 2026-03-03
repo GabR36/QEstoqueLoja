@@ -9,6 +9,7 @@
 #include <QVector>
 #include <QLocale>
 #include <sstream>
+#include "../services/config_service.h"
 
 class NfceACBR : public QObject
 {
@@ -34,8 +35,8 @@ private:
     QSqlDatabase db;
     QLocale portugues;
     std::stringstream ini;
-    QMap<QString, QString> fiscalValues;
-    QMap<QString, QString> empresaValues;
+    ConfigDTO configDTO;
+
 
     QString caminhoXml;
     std::string tpAmb, cuf, cnf, cnpjEmit;

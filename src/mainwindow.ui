@@ -580,20 +580,6 @@ font-size: 15px;</string>
      <height>20</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuGerarrelat_rios">
-    <property name="title">
-     <string>Relatórios</string>
-    </property>
-    <widget class="QMenu" name="menuGerar_lista_Produtos_PDF">
-     <property name="title">
-      <string>Gerar lista Produtos PDF</string>
-     </property>
-     <addaction name="actionTodos_Produtos"/>
-     <addaction name="actionApenas_NF"/>
-    </widget>
-    <addaction name="menuGerar_lista_Produtos_PDF"/>
-    <addaction name="actionGerar_Relat_rio_CSV"/>
-   </widget>
    <widget class="QMenu" name="menuVendas">
     <property name="title">
      <string>Vendas</string>
@@ -627,7 +613,6 @@ font-size: 15px;</string>
    </widget>
    <addaction name="menuEditar"/>
    <addaction name="menuVendas"/>
-   <addaction name="menuGerarrelat_rios"/>
    <addaction name="menuEmail"/>
    <addaction name="menuFiscal"/>
    <addaction name="menuAjuda"/>

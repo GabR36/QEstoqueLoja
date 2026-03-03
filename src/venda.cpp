@@ -17,7 +17,8 @@
 #include <QStringListModel>
 #include "inserircliente.h"
 #include "infojanelaprod.h"
-
+#include "../services/Produto_service.h"
+#include "services/config_service.h"
 
 venda::venda(QWidget *parent) :
     QWidget(parent),
@@ -167,15 +168,18 @@ venda::venda(QWidget *parent) :
         validarCliente(true); // Mostra mensagens para o usuário
     });
 
-    fiscalValues = Configuracao::get_All_Fiscal_Values();
-    QString tipoAmb = fiscalValues.value("tp_amb");
-    QString emitirNf = fiscalValues.value("emit_nf");
 
-    if (tipoAmb == "1" && emitirNf == "1") {
-        ui->Lbl_TpAmb->setText("🟢 Amb: Produção");
+    Config_service *confServ = new Config_service(this);
+
+    configDTO = confServ->carregarTudo();
+    bool tipoAmb = configDTO.tpAmbFiscal;
+    bool emitirNf = configDTO.emitNfFiscal;
+
+    if (tipoAmb == 1 && emitirNf == 1) {
+        ui->Lbl_TpAmb->setText("Ambiente: Produção");
         ui->Lbl_TpAmb->setStyleSheet("color: white; background-color: green; font-weight: bold; padding: 4px; border-radius: 5px;");
-    } else if(emitirNf == "1"){
-        ui->Lbl_TpAmb->setText("🟠 Amb: Homologação");
+    } else if(emitirNf == 1){
+        ui->Lbl_TpAmb->setText("Ambiente: Homologação");
         ui->Lbl_TpAmb->setStyleSheet("color: white; background-color: orange; font-weight: bold; padding: 4px; border-radius: 5px;");
     }
     connect(ui->Tview_Produtos, &QTableView::doubleClicked,
@@ -387,7 +391,7 @@ void venda::on_Btn_Pesquisa_clicked()
 {
 
     QString inputText = ui->Ledit_Pesquisa->text();
-    QString normalizadoPesquisa = MainWindow::normalizeText(inputText);
+    QString normalizadoPesquisa = Produto_Service::normalizeText(inputText);
 
     // Dividir a string em palavras usando split por espaços em branco
     QStringList palavras = normalizadoPesquisa.split(" ", Qt::SkipEmptyParts);
@@ -648,7 +652,7 @@ void venda::on_Btn_NovoCliente_clicked()
     connect(inserirCliente, &InserirCliente::clienteInserido, this, &venda::selecionarClienteNovo);
     inserirCliente->show();
 }
-int venda::getIdProdSelected(){
+QString venda::getIdProdSelected(){
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
 
@@ -656,13 +660,13 @@ int venda::getIdProdSelected(){
         int selectedRow = selectedIndexes.first().row();
         QModelIndex idIndex = ui->Tview_Produtos->model()->index(selectedRow, 0);
 
-        int id = ui->Tview_Produtos->model()->data(idIndex).toInt();
+        QString id = ui->Tview_Produtos->model()->data(idIndex).toString();
         return id;
     }
 }
 
 void venda::verProd(){
-    int id = getIdProdSelected();
+    QString id = getIdProdSelected();
     InfoJanelaProd *janelaProd = new InfoJanelaProd(this, id);
     janelaProd->show();
 }

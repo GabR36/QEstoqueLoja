@@ -9,6 +9,7 @@
 #include <QVector>
 #include <QLocale>
 #include <sstream>
+#include "../services/config_service.h"
 
 class NfeACBR : public QObject
 {
@@ -52,6 +53,7 @@ private:
     std::string nnf = "1";
     int mod, tpEmis;
     QString serieNf;
+    ConfigDTO configDTO;
 
     QString cpfCliente;
     bool ehPfCliente, emitirApenasNf;

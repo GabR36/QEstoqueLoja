@@ -11,19 +11,20 @@ NfceACBR::NfceACBR(QObject *parent)
     //pega o ponteiro da lib acbr do singleton
     nfce = AcbrManager::instance()->nfe();
     db = QSqlDatabase::database();
-    fiscalValues = Configuracao::get_All_Fiscal_Values();
-    empresaValues = Configuracao::get_All_Empresa_Values();
 
-    cnpjEmit = empresaValues.value("cnpj_empresa").toStdString();
+    Config_service *confServ = new Config_service(this);
+    configDTO = confServ->carregarTudo();
+
+    cnpjEmit = configDTO.cnpjEmpresa.toStdString();
     //valores padrao
     serieNf = "1";
     tpEmis = 1;
-    tpAmb = (fiscalValues.value("tp_amb") == "0" ? "1" : "0");
+    tpAmb = (configDTO.tpAmbFiscal == 0 ? "1" : "0");
 
     caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/xmlNf";
     nfce->LimparLista();//evita acumular notas
     //carregarConfig();
-    usarIBS = fiscalValues.value("usar_ibs").toInt();
+    usarIBS = configDTO.usarIbsFiscal;
 
 }
 
@@ -78,8 +79,8 @@ int NfceACBR::getProximoNNF(){
         return -1;
     }
 
-    int tpAmb = fiscalValues.value("tp_amb").toInt(); // 1 = produção, 0 = homologação
-    QString chaveConfig = (tpAmb == 0) ? "nnf_homolog" : "nnf_prod";
+    bool tpAmb = configDTO.tpAmbFiscal; // 1 = produção, 0 = homologação
+    int chaveConfig = (tpAmb == 0) ? configDTO.nnfHomologFiscal : configDTO.nnfProdFiscal;
     QSqlQuery query;
     query.prepare(
         "SELECT nnf FROM notas_fiscais "
@@ -98,7 +99,7 @@ int NfceACBR::getProximoNNF(){
         } else {
             // Nenhuma nota no banco para este ambiente usa valor configurado manualmente
             bool ok;
-            int ultimaConfigurada = fiscalValues.value(chaveConfig).toInt(&ok);
+            int ultimaConfigurada = chaveConfig;
             if (ok && ultimaConfigurada > 0) {
                 return ultimaConfigurada + 1;
             } else {
@@ -371,7 +372,7 @@ QString NfceACBR::getDhEmiConvertida(){
 
 void NfceACBR::ide()
 {
-    cuf = fiscalValues.value("cuf").toStdString();
+    cuf = configDTO.cUfFiscal.toStdString();
     std::string data = QDateTime::currentDateTime().toString("dd/MM/yyyy").toStdString();
     dataHora = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm").toStdString();
     mod = 65;
@@ -411,17 +412,17 @@ void NfceACBR::ide()
 
 void NfceACBR::emite()
 {
-    std::string xNome = empresaValues.value("nome_empresa").toStdString();
-    std::string xFant = empresaValues.value("nfant_empresa").toStdString();
-    std::string ie = fiscalValues.value("iest").toStdString();
-    std::string xLgr = empresaValues.value("endereco_empresa").toStdString();
-    std::string nro = empresaValues.value("numero_empresa").toStdString();
-    std::string cMun = fiscalValues.value("cmun").toStdString();
-    std::string xMun = empresaValues.value("cidade_empresa").toStdString();
-    std::string uf = empresaValues.value("estado_empresa").toStdString();
-    std::string fone = empresaValues.value("telefone_empresa").toStdString();
-    std::string xBairro = empresaValues.value("bairro_empresa").toStdString();
-    std::string cep = empresaValues.value("cep_empresa").toStdString();
+    std::string xNome = configDTO.nomeEmpresa.toStdString();
+    std::string xFant = configDTO.nomeFantasiaEmpresa.toStdString();
+    std::string ie = configDTO.iEstadFiscal.toStdString();
+    std::string xLgr = configDTO.enderecoEmpresa.toStdString();
+    std::string nro = configDTO.numeroEmpresa.toStdString();
+    std::string cMun = configDTO.cMunFiscal.toStdString();
+    std::string xMun = configDTO.cidadeEmpresa.toStdString();
+    std::string uf = configDTO.estadoEmpresa.toStdString();
+    std::string fone = configDTO.telefoneEmpresa.toStdString();
+    std::string xBairro = configDTO.bairroEmpresa.toStdString();
+    std::string cep = configDTO.cepEmpresa.toStdString();
 
     ini << "[Emitente]\n";
     ini << "CNPJCPF=" << cnpjEmit << "\n";
@@ -451,7 +452,7 @@ void NfceACBR::dest()
         ini << "indIEDest=9\n";
     }
 
-    if (fiscalValues.value("tp_amb") == "0" && cpfCliente != "") {
+    if (configDTO.tpAmbFiscal == 0 && cpfCliente != "") {
         ini << "xNome=NF-E EMITIDA EM AMBIENTE DE HOMOLOGACAO - SEM VALOR FISCAL\n";
     }
 
@@ -652,10 +653,10 @@ void NfceACBR::pag()
 
 void NfceACBR::infRespTec()
 {
-    std::string cnpjRT = fiscalValues.value("cnpj_rt").toStdString();
-    std::string xContato = fiscalValues.value("nome_rt").toStdString();
-    std::string emailRT = fiscalValues.value("email_rt").toStdString();
-    std::string foneRT = fiscalValues.value("fone_rt").toStdString();
+    std::string cnpjRT = configDTO.cnpjRTFiscal.toStdString();
+    std::string xContato = configDTO.nomeRTFiscal.toStdString();
+    std::string emailRT = configDTO.emailRTFiscal.toStdString();
+    std::string foneRT = configDTO.foneRTFiscal.toStdString();
 
     ini << "[infRespTec]\n";
     ini << "CNPJ=" << cnpjRT << "\n";

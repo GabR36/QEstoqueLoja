@@ -5,6 +5,8 @@
 #include "../nota/acbrmanager.h"
 #include <sstream>
 #include <QMap>
+#include "../services/config_service.h"
+#include "../dto/EventoFiscal_dto.h"
 
 struct EventoRetornoInfo {
     QString cStat;
@@ -23,14 +25,14 @@ public:
 
     QString gerarEnviar();
     QString getCampo(const QString &texto, const QString &campo);
-    EventoRetornoInfo gerarEnviarRetorno();
+    EventoFiscalDTO gerarEnviarRetorno();
 private:
     std::stringstream ini;
     QMap<QString, QString> fiscalValues;
     QMap<QString, QString> empresaValues;
     QString chnfe_global;
     ACBrNFe *acbr;
-
+    ConfigDTO configDTO;
 
 
     void preencherEvento();

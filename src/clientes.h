@@ -6,6 +6,11 @@
 #include <QSqlQueryModel>
 #include <QItemSelection>
 #include <QLocale>
+#include <QSqlQueryModel>
+#include "services/cliente_service.h"
+#include "services/vendas_service.h"
+#include "services/financeiro_service.h"
+#include "services/entradasvendas_service.h"
 
 namespace Ui {
 class Clientes;
@@ -20,11 +25,8 @@ public:
     ~Clientes();
 
     void atualizarTableview();
-    int getQuantCompras(int idCliente);
-    QString getDataUltimoPagamento(int idCliente);
-    double getValorUltimoPagamento(int idCliente);
-    double getValorDevido(int idCliente);
     void atualizarInfosSinal();
+    void atualizarTabelaClientes();
 private slots:
     void on_Btn_Alterar_clicked();
 
@@ -39,11 +41,14 @@ private slots:
 private:
     Ui::Clientes *ui;
     QSqlDatabase db = QSqlDatabase::database();
-    QSqlQueryModel *model = new QSqlQueryModel;
+    QSqlQueryModel *model = nullptr;
     QLocale portugues;
-    int IDCLIENTE = 0;
+    qlonglong IDCLIENTE = 0;
     void atualizarInfos(const QItemSelection &selected, const QItemSelection &);
-
+    Cliente_service cliServ;
+    Vendas_service vendaServ;
+    Financeiro_service financeiroServ;
+    EntradasVendas_service entradaServ;
 };
 
 #endif // CLIENTES_H

@@ -10,6 +10,12 @@
 #include <QLocale>
 #include <sstream>
 #include "../services/config_service.h"
+#include "../dto/NotaFiscal_dto.h"
+#include "../services/notafiscal_service.h"
+#include "../dto/ProdutoVendido_dto.h"
+#include "../services/Produto_service.h"
+#include "../dto/ProdutoParaNFe_dto.h"
+#include "../dto/NFRetorno_dto.h"
 
 class NfeACBR : public QObject
 {
@@ -17,7 +23,7 @@ class NfeACBR : public QObject
 public:
     explicit NfeACBR(QObject *parent = nullptr, bool saida = 1, bool devolucao = 0);
     QString getVersaoLib();
-    int getProximoNNF();
+    qlonglong getProximoNNF();
     void setNNF(int nNF);
     void setProdutosVendidos(QList<QList<QVariant> > produtosVendidos, bool emitirTodos);
     void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco,
@@ -39,6 +45,8 @@ public:
     void setProdutosNota(QList<qlonglong> &idsProduto);
 
     std::string getPdfDanfe();
+    void setProdutosVendidosNew(QList<ProdutoVendidoDTO> listaProds, bool emitirTodos);
+    NotaFiscalDTO gerarEnviarRetorno();
 private:
     ACBrNFe *nfe;
     QSqlDatabase db;
@@ -59,7 +67,7 @@ private:
     bool ehPfCliente, emitirApenasNf;
     int quantProds;
     QVector<float> vTotTribProduto;
-    QVector<float> descontoProd;
+    // QVector<float> descontoProd;
     QList<QList<QVariant>>listaProdutos;
     double descontoNf,trocoNf,vPagNf, vNf;
     QString indPagNf,tPagNf;
@@ -82,6 +90,7 @@ private:
     };
 
     tipoNota tipo;
+    QList<ProdutoParaNFeDTO> listaProdutosNFe;
 
     void carregarConfig();
     void ide();
@@ -98,10 +107,14 @@ private:
 
     bool isValidGTIN(const QString &gtin);
     void aplicarDescontoTotal(float descontoTotal);
-    float corrigirTaxa(float taxaAntiga, float desconto);
+    double corrigirTaxa(double taxaAntiga, double desconto);
     void aplicarAcrescimoProporcional(float taxaPercentual);
 
     QString cfopDevolucao(const QString &cfopOriginal);
+    NotaFiscal_service notaServ;
+    Produto_Service prodServ;
+
+    double getSomaValorTotalProdutos();
 signals:
 };
 

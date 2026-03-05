@@ -21,6 +21,7 @@ public:
     QStringList listarLocais();
     bool atualizarLocal(int id, const QString &local, QString &erroSQL);
     bool updateAumentarQuantidadeProduto(qlonglong idprod, double quantia);
+    ProdutoDTO getProduto(qlonglong id);
 private:
     QSqlDatabase db;
 };

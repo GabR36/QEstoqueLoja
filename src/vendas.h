@@ -84,7 +84,6 @@ private:
     int IDCLIENTE = 0;
     void abrirDanfeXml(QString id_Venda);
     QString dataGlobal;
-    QString salvarDevolucaoNf(QString retornoEnvio, qlonglong idnf, NfeACBR *devolNfe);
     Vendas_service vendaServ;
     ProdutoVenda_service prodVendaServ;
     NotaFiscal_service notaServ;

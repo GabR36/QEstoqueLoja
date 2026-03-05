@@ -279,11 +279,9 @@ bool Produto_Repository::atualizarLocal(int id, const QString &local, QString &e
 }
 
 bool Produto_Repository::updateAumentarQuantidadeProduto(qlonglong idprod, double quantia){
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            qDebug() << "Erro ao abrir banco";
-            return false;
-        }
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao updateAumentarQuantidadeProduto";
+        return false;
     }
     QSqlQuery query(db);
     query.prepare("UPDATE produtos SET quantidade = quantidade + :quant WHERE id = :id");
@@ -298,4 +296,42 @@ bool Produto_Repository::updateAumentarQuantidadeProduto(qlonglong idprod, doubl
         db.close();
         return true;
     }
+}
+
+ProdutoDTO Produto_Repository::getProduto(qlonglong id){
+    ProdutoDTO prod;
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao updateAumentarQuantidadeProduto";
+        return prod;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("SELECT quantidade, descricao, preco, codigo_barras, nf, un_comercial, "
+                  "preco_fornecedor, porcent_lucro, ncm, cest, aliquota_imposto, csosn, pis, local "
+                  "FROM produtos WHERE id = :id");
+    query.bindValue(":id", id);
+    if(!query.exec()){
+        qDebug() << "Query nao rodou getProduto()";
+        db.close();
+        return prod;
+    }
+
+    while(query.next()){
+        prod.aliquotaIcms = query.value("aliquota_imposto").toDouble();
+        prod.cest = query.value("cest").toString();
+        prod.codigoBarras = query.value("codigo_barras").toString();
+        prod.csosn = query.value("csosn").toString();
+        prod.descricao = query.value("descricao").toString();
+        prod.ncm = query.value("ncm").toString();
+        prod.nf = query.value("nf").toBool();
+        prod.percentLucro = query.value("porcent_lucro").toDouble();
+        prod.pis = query.value("pis").toString();
+        prod.preco = query.value("preco").toDouble();
+        prod.precoFornecedor = query.value("preco_fornecedor").toDouble();
+        prod.quantidade = query.value("quantidade").toDouble();
+        prod.uCom = query.value("un_comercial").toString();
+    }
+
+    db.close();
+    return prod;
 }

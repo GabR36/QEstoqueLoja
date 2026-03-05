@@ -57,6 +57,7 @@ public:
   QStringList obterSugestoesLocal();
   Resultado atualizarLocalProduto(qlonglong id, const QString &novoLocal);
   Produto_Service::Resultado updateAumentarQuantidadeProduto(qlonglong idprod, double quantia);
+  ProdutoDTO getProduto(qlonglong id);
   private slots:
 };
 

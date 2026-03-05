@@ -5,6 +5,7 @@
 #include <fstream>
 #include <qrandom.h>
 #include <QSqlError>
+#include "../util/datautil.h"
 
 NfeACBR::NfeACBR(QObject *parent, bool saida, bool devolucao)
     : QObject{parent}
@@ -99,52 +100,20 @@ QString NfeACBR::getXmlPath() {
     return ret;
 }
 
-
-
 QString NfeACBR::getVersaoLib(){
     return QString::fromStdString(nfe->Versao());
 }
 
-int NfeACBR::getProximoNNF(){
-    if (!db.open()) {
-        qDebug() << "Erro ao abrir banco de dados em getProximoNNF";
-        return -1;
-    }
-
+qlonglong NfeACBR::getProximoNNF(){
     bool tpAmb = configDTO.tpAmbFiscal; // 1 = produção, 0 = homologação
-    int chaveConfig = (tpAmb == 0) ? configDTO.nnfHomologNfeFiscal : configDTO.nnfProdNfeFiscal;
-    QSqlQuery query;
-    query.prepare(
-        "SELECT nnf FROM notas_fiscais "
-        "WHERE modelo = :modelo AND serie = :serie AND tp_amb = :tp_amb AND finalidade != 'ENTRADA EXTERNA' "
-        "ORDER BY nnf DESC "
-        "LIMIT 1"
-        );
-    query.bindValue(":modelo", "55");             // NF-e
-    query.bindValue(":serie", serieNf);           // série
-    query.bindValue(":tp_amb", tpAmb);            // ambiente atual
 
-    if (query.exec()) {
-        if (query.next()) {
-            int ultimoNNF = query.value(0).toInt();
-            return ultimoNNF + 1;
-        } else {
-            // Nenhuma nota no banco para este ambiente usa valor configurado manualmente
-            bool ok;
-            int ultimaConfigurada = chaveConfig;
-            if (ok && ultimaConfigurada > 0) {
-                return ultimaConfigurada + 1;
-            } else {
-                return 1; // valor de fallback
-            }
-        }
-    } else {
-        qWarning() << "Erro na consulta NNF:" << query.lastError().text();
-        return -1;
-    }
+    int nnfConfigurado = (tpAmb == 0)
+                             ? configDTO.nnfHomologNfeFiscal
+                             : configDTO.nnfProdNfeFiscal;
 
-
+    return notaServ.getProximoNNF(serieNf, tpAmb, nnfConfigurado);
 }
+
 QString NfeACBR::getCnpjEmit(){
     return QString::fromStdString(cnpjEmit);
 }
@@ -332,6 +301,57 @@ void NfeACBR::setProdutosNota(QList<qlonglong> &idsProduto)
     qDebug() << "Produtos carregados de produtos_nota:" << quantProds;
 }
 
+void NfeACBR::setProdutosVendidosNew(QList<ProdutoVendidoDTO> listaProds, bool emitirTodos){
+
+    emitirApenasNf = !emitirTodos;
+
+    for(const ProdutoVendidoDTO &produto : listaProds){
+
+        ProdutoDTO prodFiscal = prodServ.getProduto(produto.idProduto);
+
+        // Filtrar por campo nf
+        if(!emitirTodos && prodFiscal.nf != 1){
+            continue;
+        }
+
+        double valorTotal = produto.quantidade * produto.precoVendido;
+
+        QString codigoBarras = prodFiscal.codigoBarras;
+
+        if(!isValidGTIN(codigoBarras)){
+            codigoBarras = "SEM GTIN";
+        }
+
+        QString cfopFinal = "5102";
+
+        if(tipo == devolucaoVenda){
+            cfopFinal = "1202";
+        } else if(tipo == devolucaoFornecedor){
+            cfopFinal = "5411";
+        }
+        // Exemplo simples: você pode armazenar tudo numa struct interna
+        ProdutoParaNFeDTO p;
+
+        p.idProduto        = produto.idProduto;
+        p.quantidade       = produto.quantidade;
+        p.valorUnitario    = produto.precoVendido;
+        p.valorTotal       = valorTotal;
+        p.codigoBarras     = codigoBarras;
+        p.uCom             = prodFiscal.uCom;
+        p.ncm              = prodFiscal.ncm;
+        p.cest             = prodFiscal.cest;
+        p.csosn            = prodFiscal.csosn;
+        p.pis              = prodFiscal.pis;
+        p.aliquotaIcms  = prodFiscal.aliquotaIcms;
+        p.cfop             = cfopFinal;
+        p.descricao = prodFiscal.descricao;
+
+        listaProdutosNFe.append(p);
+    }
+
+    quantProds = listaProdutosNFe.size();
+}
+
 void NfeACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool emitirTodos){
     if (!db.open()) {
         qDebug() << "não abriu bd setprodutosvendidos";
@@ -434,46 +454,44 @@ void NfeACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool 
     listaProdutos = produtosFiltrados;
 }
 
-float NfeACBR::corrigirTaxa(float taxaAntiga, float desconto){
-    float taxaConvertida = (taxaAntiga / 100) + 1;
-    float taxaNova = 0.0;
-    float valorTotalProdutos = 0.0;
-    for (int i = 0; i < listaProdutos.size(); ++i) {
-        valorTotalProdutos += listaProdutos[i][4].toDouble();
-    }
+double NfeACBR::corrigirTaxa(double taxaAntiga, double desconto){
+    double taxaConvertida = (taxaAntiga / 100) + 1;
+    double taxaNova = 0.0;
+    double valorTotalProdutos = getSomaValorTotalProdutos();
     taxaNova = (valorTotalProdutos - desconto) * taxaConvertida + desconto;
     return ((taxaNova/valorTotalProdutos) - 1) * 100;
 }
 
+double NfeACBR::getSomaValorTotalProdutos(){
+    double valorTotalProdutos;
+    for (int i = 0; i < listaProdutosNFe.size(); ++i) {
+        valorTotalProdutos += listaProdutosNFe[i].valorTotal;
+    }
+    return valorTotalProdutos;
+}
+
 
 void NfeACBR::aplicarDescontoTotal(float descontoTotal) {
-    descontoProd.clear();  // Limpa o vetor, caso já tenha valores anteriores
-
-    double totalGeral = 0.0;
-
-    // 1. Soma total da venda (valor dos produtos)
-    for (const QList<QVariant>& produto : listaProdutos) {
-        totalGeral += produto[4].toDouble(); // produto[4] é valorTotal
-    }
+    double totalGeral = getSomaValorTotalProdutos();
 
     double descontoAcumulado = 0.0;
 
-    for (int i = 0; i < listaProdutos.size(); ++i) {
+    for (int i = 0; i < listaProdutosNFe.size(); ++i) {
         double descontoItem = 0.0;
-        double valorTotalProduto = listaProdutos[i][4].toDouble();
+        double valorTotalProduto = listaProdutosNFe[i].valorTotal;
 
-        if (i < listaProdutos.size() - 1) {
+        if (i < listaProdutosNFe.size() - 1) {
             // 2. Calcula desconto proporcional e arredonda com 2 casas
             double proporcao = valorTotalProduto / totalGeral;
-            descontoItem = qRound64(descontoNf * proporcao * 100.0) / 100.0;
+            descontoItem = qRound64(descontoTotal * proporcao * 100.0) / 100.0;
             descontoAcumulado += descontoItem;
         } else {
             // 3. Último produto compensa a diferença para fechar o total
-            descontoItem = qRound64((descontoNf - descontoAcumulado) * 100.0) / 100.0;
+            descontoItem = qRound64((descontoTotal - descontoAcumulado) * 100.0) / 100.0;
         }
 
         // 4. Adiciona no vetor
-        descontoProd.append(descontoItem);
+        listaProdutosNFe[i].desconto = descontoItem;
     }
 }
 
@@ -508,45 +526,42 @@ void NfeACBR::setPagamentoValores(QString formaPag, float desconto,float recebid
 
 void NfeACBR::aplicarAcrescimoProporcional(float taxaPercentual)
 {
-    double totalOriginal = 0.0;
-    for (const QList<QVariant>& produto : listaProdutos) {
-        double valorTotalProd = produto[4].toDouble();
-        totalOriginal += valorTotalProd;
-    }
+    double totalOriginal = getSomaValorTotalProdutos();
 
     double totalComAcrescimo = qRound64(totalOriginal * (1.0 + taxaPercentual / 100.0) * 100.0) / 100.0;
     double somaDistribuida = 0.0;
 
-    for (int i = 0; i < listaProdutos.size(); ++i) {
-        QList<QVariant>& produto = listaProdutos[i];
+    for (int i = 0; i < listaProdutosNFe.size(); ++i) {
+        ProdutoParaNFeDTO produto = listaProdutosNFe[i];
 
-        float quant = produto[1].toFloat();
-        double valorTotalProdOriginal = produto[4].toDouble();
+        double quant = produto.quantidade;
+        double valorTotalProdOriginal = produto.valorTotal;
 
         // Distribui proporcionalmente com base no total original
         double proporcao = valorTotalProdOriginal / totalOriginal;
         double valorTotalComAcrescimo = qRound64((totalComAcrescimo * proporcao) * 100.0) / 100.0;
         double valorUnitarioComAcrescimo = qRound64((valorTotalComAcrescimo / quant) * 100.0) / 100.0;
 
-        produto[4] = valorTotalComAcrescimo;
-        produto[3] = valorUnitarioComAcrescimo;
+        produto.valorTotal = valorTotalComAcrescimo;
+        produto.valorUnitario = valorUnitarioComAcrescimo;
 
         somaDistribuida += valorTotalComAcrescimo;
     }
 
     // Compensar diferença de centavos no último item
     double diferenca = totalComAcrescimo - somaDistribuida;
-    if (!listaProdutos.isEmpty()) {
-        QList<QVariant>& ultimo = listaProdutos.last();
-        float quant = ultimo[1].toFloat();
+    if (!listaProdutosNFe.isEmpty()) {
+        ProdutoParaNFeDTO ultimo = listaProdutos.last();
+        double quant = ultimo.quantidade;
 
-        double novoTotal = ultimo[4].toDouble() + diferenca;
+        double novoTotal = ultimo.valorTotal + diferenca;
         double novoUnit = qRound64((novoTotal / quant) * 100.0) / 100.0;
 
-        ultimo[4] = novoTotal;
-        ultimo[3] = novoUnit;
+        ultimo.valorTotal = novoTotal;
+        ultimo.valorUnitario = novoUnit;
     }
 }
+
 void NfeACBR::carregarConfig(){
     nfe->ConfigGravarValor("NFe", "ModeloDF", "0");  // NFe = 0
     nfe->ConfigGravarValor("NFe", "VersaoDF", "3");
@@ -746,8 +761,8 @@ void NfeACBR::carregarProds()
     aplicarDescontoTotal(descontoNf);
     aplicarAcrescimoProporcional(taxaPercentual);
 
-    for (int i = 0; i < listaProdutos.size(); ++i) {
-        QList<QVariant> produto = listaProdutos[i];
+    for (int i = 0; i < listaProdutosNFe.size(); ++i) {
+        ProdutoParaNFeDTO produto = listaProdutosNFe[i];
         int item = i + 1;
 
         // Garante numeração com 3 dígitos (001, 002, 003...)
@@ -765,18 +780,18 @@ void NfeACBR::carregarProds()
         std::string secGIBSMUN = "[gIBSMun" + idx + "]";
         std::string secGCBS    = "[gCBS" + idx + "]";
 
-        QString cProd = produto[0].toString();
-        QString qCom  = QString::number(produto[1].toDouble(), 'f', 2);
-        QString xProd = produto[2].toString();
-        QString vUnCom = QString::number(produto[3].toDouble(), 'f', 2);
-        QString vProd = QString::number(produto[4].toDouble(), 'f', 2);
-        QString cEAN = produto[5].toString();
-        QString uCom = produto[6].toString();
-        QString ncm  = produto[7].toString();
-        QString csosn = produto[10].toString();
-        QString pis = produto[11].toString();
-        float vDesc = descontoProd[i];
-        QString CFOP = produto[12].toString();
+        QString cProd = QString::number(produto.idProduto);
+        QString qCom  = QString::number(produto.quantidade, 'f', 2);
+        QString xProd = produto.descricao;
+        QString vUnCom = QString::number(produto.valorUnitario, 'f', 2);
+        QString vProd = QString::number(produto.valorTotal, 'f', 2);
+        QString cEAN = produto.codigoBarras;
+        QString uCom = produto.uCom;
+        QString ncm  = produto.ncm;
+        QString csosn = produto.csosn;
+        QString pis = produto.pis;
+        float vDesc = produto.desconto;
+        QString CFOP = produto.cfop;
         qDebug() << "CFOP do produto:" << CFOP;
         if(tipo == devolucaoFornecedor){
             csosn = configDTO.csosnPadraoProduto;
@@ -844,19 +859,20 @@ void NfeACBR::carregarProds()
 
 void NfeACBR::total()
 {
-    totalGeral = 0.0;
+    totalGeral = getSomaValorTotalProdutos();
     double vSeg = 0.0;
     double vFrete = 0.0;
     double totalTributo = 0.0;
 
-    for (const QList<QVariant>& produto : listaProdutos) {
-        if (produto.size() >= 5) {
-            totalGeral += produto[4].toDouble();
-        }
-    }
+    // for (const QList<QVariant>& produto : listaProdutos) {
+    //     if (produto.size() >= 5) {
+    //         totalGeral += produto[4].toDouble();
+    //     }
+    // }
 
     vNf = totalGeral + vSeg + vFrete - descontoNf;
 
+    // nao sei oque faz
     for (int i = 0; i < vTotTribProduto.size(); ++i) {
         totalTributo += vTotTribProduto[i];
     }
@@ -1032,8 +1048,62 @@ std::string NfeACBR::getPdfDanfe(){
 }
 
 
+NFRetornoDTO NfeACBR::gerarEnviarRetorno(){
+    NFRetornoDTO nota;
+    QString retorno = gerarEnviar();
+
+    if (retorno.isEmpty()) {
+        return nota;
+    }
+
+    QStringList linhas = retorno.split('\n', Qt::SkipEmptyParts);
+    QString cStat, xMotivo, msg, nProt;
 
 
+    QString finalidade;
+    switch(tipo){
+    case devolucaoVenda:
+        finalidade = "DEVOLUCAO";
+        // Processa todas as linhas do retorno do ACBr
+        for (const QString &linha : linhas) {
+            QString linhaTrim = linha.trimmed(); // Remove espaços e quebras de linha
+            if (linhaTrim.startsWith("CStat="))
+                cStat = linhaTrim.section('=', 1).trimmed();
+            else if (linhaTrim.startsWith("XMotivo="))
+                xMotivo = linhaTrim.section('=', 1).trimmed();
+            else if (linhaTrim.startsWith("Msg="))
+                msg = linhaTrim.section('=', 1).trimmed();
+            else if (linhaTrim.startsWith("NProt=") || linhaTrim.startsWith("nProt="))
+                nProt = linhaTrim.section('=', 1).trimmed();
+        }
+        nota.chNfe = getChaveNf();
+        nota.cnpjEmit = getCnpjEmit();
+        nota.cstat = cStat;
+        nota.cuf = getCuf();
+        nota.dhEmi = getDhEmiConvertida();
+        nota.finalidade = finalidade;
+        nota.modelo = "55";
+        nota.nnf = getNNF();
+        nota.nProt = nProt;
+        nota.serie = getSerie();
+        nota.tpAmb = getTpAmb().toInt();
+        nota.valorTotal = getVNF();
+        nota.xmlPath = getXmlPath();
+        nota.xMotivo = xMotivo;
+        nota.msg = msg;
+        return nota;
 
+        break;
+    case devolucaoFornecedor:
+        finalidade = "DEVOLUCAO";
+        break;
+    case saidaNormal:
+        finalidade = "NORMAL";
+        break;
+    default:
+        finalidade = "N";
+        break;
 
+    }
 
+}

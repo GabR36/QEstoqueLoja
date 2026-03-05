@@ -32,3 +32,18 @@ qlonglong NotaFiscal_service::getIdFromIdVenda(qlonglong idvenda){
     return notaRepo.getIdFromIdVenda(idvenda);
 }
 
+qlonglong NotaFiscal_service::getProximoNNF(QString serie, bool tpAmb, qlonglong nnfConfigurado){
+    return notaRepo.getProximoNNF(serie, tpAmb, nnfConfigurado);
+}
+
+NotaFiscalDTO NotaFiscal_service::getNotaNormalFromIdVenda(qlonglong idvenda){
+    return notaRepo.getNotaNormalFromIdVenda(idvenda);
+}
+
+NotaFiscal_service::Resultado NotaFiscal_service::inserir(NotaFiscalDTO nota){
+    if(!notaRepo.inserir(nota)){
+        return {false, NotaErro::Salvar, "Erro ao inserir Nota Fiscal"};
+    }else{
+        return {true, NotaErro::Nenhum, "Nota salva com sucesso."};
+    }
+}

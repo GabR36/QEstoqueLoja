@@ -256,3 +256,7 @@ Produto_Service::Resultado Produto_Service::updateAumentarQuantidadeProduto(qlon
     }
 }
 
+ProdutoDTO Produto_Service::getProduto(qlonglong id){
+    return repo.getProduto(id);
+}
+

@@ -53,12 +53,12 @@ Acbr_service::Resultado Acbr_service::configurar(const QString &versaoApp)
     std::string tpAmb = (configDTO.tpAmbFiscal == 0 ? "1" : "0");
     QString caminhoCompletoLogo = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
                                   "/imagens/" + QFileInfo(configDTO.logoPathEmpresa).fileName();
-    std::string idCsrt = cleanStr(configDTO.idCSRTFiscal);
-    std::string csrt = cleanStr(configDTO.hashCSRTFiscal);
+    std::string idCsrt = configDTO.idCSRTFiscal.toStdString();
+    std::string csrt = configDTO.hashCSRTFiscal.toStdString();
+    qDebug() << "CSRT:" << csrt;
 
     if(certificadoPath == "")
         return {false, AcbrErro::CampoVazio, "Caminho do certificado não configurado"};
-
     if(schemaPath == "")
         return {false, AcbrErro::CampoVazio, "Schema não configurado"};
 

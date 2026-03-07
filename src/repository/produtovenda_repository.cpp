@@ -153,21 +153,24 @@ bool ProdutoVenda_repository::deletarPorIdVenda(qlonglong idvenda){
 
 int ProdutoVenda_repository::contarProdutosVendidosFromVenda(qlonglong idvenda){
     int quantidade = 0;
+
     if (!DatabaseConnection_service::open()) {
         qDebug() << "Erro ao abrir banco (contarProdutosVendidosFromVenda)";
         return -1;
     }
 
-
     QSqlQuery query(db);
 
-    query.prepare("SELECT COUNT() FROM produtos_vendidos WHERE id_venda = :idvenda");
+    query.prepare("SELECT COUNT(*) FROM produtos_vendidos WHERE id_venda = :idvenda");
     query.bindValue(":idvenda", idvenda);
 
     if(!query.exec()){
+        qDebug() << "Erro SQL:" << query.lastError();
         db.close();
         return -1;
-    }else{
+    }
+
+    if(query.next()){
         quantidade = query.value(0).toInt();
     }
 

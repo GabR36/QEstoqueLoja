@@ -823,7 +823,7 @@ border-radius: 0px;</string>
                    <bool>true</bool>
                   </property>
                   <property name="maxLength">
-                   <number>20</number>
+                   <number>60</number>
                   </property>
                  </widget>
                 </item>

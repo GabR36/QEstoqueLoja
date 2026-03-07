@@ -34,7 +34,9 @@ ProdutoVenda_service::Resultado ProdutoVenda_service::deletarProdutosVendidosPor
 
 bool ProdutoVenda_service::temApenasUmProduto(qlonglong idvenda){
     int quantidadeProds = prodVendaRepo.contarProdutosVendidosFromVenda(idvenda);
+    qDebug() << "Quantidade de produto da venda: " << quantidadeProds;
     if(quantidadeProds == 1){
+
         return true;
     }else{
         return false;

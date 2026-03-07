@@ -313,10 +313,11 @@ qlonglong notafiscal_repository::getIdNotaNormalFromIdVenda(qlonglong idvenda){
         db.close();
         return -1;
     }
-    qlonglong id;
-    while(query.next()){
+    qlonglong id = -1;
+    if(query.next()){
         id = query.value(0).toLongLong();
     }
+    db.close();
     return id;
 
 }

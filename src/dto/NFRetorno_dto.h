@@ -10,7 +10,7 @@ struct NFRetornoDTO {
     QString modelo;
     int tpAmb;
     QString xmlPath;
-    double valorTotal;
+    double valorTotal = 0;
     QString cnpjEmit;
     QString chNfe;
     QString nProt;
@@ -19,5 +19,5 @@ struct NFRetornoDTO {
     QString dhEmi;
     QString xMotivo;
     QString msg;
-}
+};
 #endif // NFRETORNO_DTO_H

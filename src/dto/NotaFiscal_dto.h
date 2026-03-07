@@ -9,7 +9,7 @@ struct NotaFiscalDTO {
     QString modelo;
     int tpAmb;
     QString xmlPath;
-    double valorTotal;
+    double valorTotal = 0;
     QString atualizadoEm;
     qlonglong idVenda;
     QString cnpjEmit;

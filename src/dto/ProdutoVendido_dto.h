@@ -6,8 +6,8 @@
 struct ProdutoVendidoDTO {
     qlonglong idProduto;
     qlonglong idVenda;
-    double quantidade;
-    double precoVendido;
+    double quantidade = 0;
+    double precoVendido = 0;
     // campos nao pertencentes a tabela do banco de dados
     QString descricao;
 };

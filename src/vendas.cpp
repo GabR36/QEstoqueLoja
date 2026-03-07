@@ -383,8 +383,6 @@ void Vendas::on_Tview_ProdutosVendidos_customContextMenuRequested(const QPoint &
         return;
     }
 
-    QLocale usa(QLocale::English, QLocale::UnitedStates);   // <<< NOVO
-
     QMenu menu(this);
     actionMenuDevolverProd = new QAction("Devolver Produto(s)", this);
 
@@ -400,111 +398,40 @@ void Vendas::on_Tview_ProdutosVendidos_customContextMenuRequested(const QPoint &
 
         if (resposta == QMessageBox::Yes) {
 
-            QList<QList<QVariant>> produtosVendidosList;
-            QSqlQuery query;
-            QList<QString> listaIdProdutosVendidos;
+            QList<ProdutoVendidoDTO> listaProdsVendidos;
+            QList<QString> listaIdProdsVendidos;
 
             for (const QModelIndex &index : selectedRows) {
 
                 QModelIndex idRegistroVendaIndex = ui->Tview_ProdutosVendidos->model()->index(index.row(), 0);
-                QModelIndex descIndex            = ui->Tview_ProdutosVendidos->model()->index(index.row(), 1);
-                QModelIndex qntdIndex            = ui->Tview_ProdutosVendidos->model()->index(index.row(), 2);
-                QModelIndex precoIndex           = ui->Tview_ProdutosVendidos->model()->index(index.row(), 3);
+                qlonglong idRegistroVenda = ui->Tview_ProdutosVendidos->model()->data(idRegistroVendaIndex).toLongLong();
 
-                QString idRegistroVenda = ui->Tview_ProdutosVendidos->model()->data(idRegistroVendaIndex).toString();
-                listaIdProdutosVendidos.append(idRegistroVenda);
-
-                // ------------------------------
-                // QUANTIDADE (formato USA)
-                // ------------------------------
-                QString qtdStrOriginal = ui->Tview_ProdutosVendidos->model()->data(qntdIndex).toString();
-
-                // limpa e converte
-                QString qtdClean = qtdStrOriginal;
-                qtdClean.replace(',', '.'); // caso venha em BR
-                double qtdNum = qtdClean.toDouble();
-
-                // sempre formatar com ponto e 4 casas
-                QString quantidadeUSA = usa.toString(qtdNum, 'f', 4);
-
-                // ------------------------------
-                // PREÇO UNITÁRIO (formato USA)
-                // ------------------------------
-                QString precoStrOriginal = ui->Tview_ProdutosVendidos->model()->data(precoIndex).toString();
-
-                QString precoClean = precoStrOriginal;
-                precoClean.replace(',', '.');
-                double precoNum = precoClean.toDouble();
-
-                // formato US com 2 casas
-                QString precoUSA = usa.toString(precoNum, 'f', 2);
-
-                // ----------------------------------------------------
-                // BUSCA O ID REAL DO PRODUTO
-                // ----------------------------------------------------
-                QString idProduto;
-                {
-                    db.open();
-                    query.prepare("SELECT id_produto FROM produtos_vendidos WHERE id = :id_registro");
-                    query.bindValue(":id_registro", idRegistroVenda);
-                    if (query.exec() && query.next()) {
-                        idProduto = query.value(0).toString();
-                    } else {
-                        qWarning() << "Erro ao buscar id_produto para produtos_vendidos.id =" << idRegistroVenda
-                                   << ":" << query.lastError().text();
-                        continue;
-                    }
-                }
-
-                // ----------------------------------------------------
-                // MONTA LISTA  agora em FORMATO USA
-                // ----------------------------------------------------
-                QList<QVariant> produtoInfo;
-
-                produtoInfo << idProduto       // ID real do produto
-                            << quantidadeUSA   // quantidade US
-                            << ui->Tview_ProdutosVendidos->model()->data(descIndex)
-                            << precoUSA;       // preço US
-
-                produtosVendidosList.append(produtoInfo);
+                ProdutoVendidoDTO prodVend = prodVendaServ.getProdutoVendido(idRegistroVenda);
+                listaProdsVendidos.append(prodVend);
+                listaIdProdsVendidos.append(QString::number(idRegistroVenda));
             }
 
-
-            // Envio normal para NFe...
-            if (!db.open()) {
-                qDebug() << "banco nao abriu para pegar chavenf";
-            }
-
-            query.prepare("SELECT chnfe FROM notas_fiscais WHERE id_venda = :idvenda AND finalidade = 'NORMAL'");
-            query.bindValue(":idvenda", idVendaSelec);
-
-            QString chnfe;
             bool temNota = false;
+            temNota = notaServ.temNotaNormal(idVendaSelec.toLongLong());
+            qDebug() << "tem nota?: " << temNota;
+            qDebug() << "Qtd produtos devolução:" << listaProdsVendidos.size();
+            qDebug() << "preco vendido ultimo produto vendido selec" << listaProdsVendidos.last().precoVendido;
 
-            if (query.exec() && query.next()) {
-                chnfe = query.value(0).toString();
-                temNota = true;
-            }
 
             if (temNota) {
-                NfeACBR *nfe = new NfeACBR(this, false, true);
-                nfe->setNNF(nfe->getProximoNNF());
-                nfe->setNfRef(chnfe);
-                nfe->setProdutosVendidos(produtosVendidosList, false);
-
-                QString retorno = nfe->gerarEnviar();
-                QString msg = salvarDevolucaoNf(retorno, notaServ.getIdFromIdVenda(idVendaSelec.toLongLong()), nfe);
-                QMessageBox::information(this, "Aviso", msg);
+                auto result = fiscalServ.enviarNfeDevolucaoPadrao(idVendaSelec.toLongLong(),
+                                                                  listaProdsVendidos);
+                QMessageBox::information(this, "Aviso", result.msg);
+                if(!result.ok){
+                    qDebug() << result.msg;
+                    return;
+                }
             }
 
             // devolução normal do produto
-            for (int i = 0; i < listaIdProdutosVendidos.size(); i++) {
-                devolverProdutoVenda(idVendaSelec, listaIdProdutosVendidos[i]);
-            }
+            for (int i = 0; i < listaProdsVendidos.size(); i++) {
 
-            qDebug() << "Produtos enviados p/ NFe (USA):";
-            for (const auto &linha : produtosVendidosList) {
-                qDebug() << linha;
+                devolverProdutoVenda(idVendaSelec, listaIdProdsVendidos[i]);
             }
 
             atualizarTabelas();

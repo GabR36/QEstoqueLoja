@@ -15,6 +15,7 @@
 #include "services/notafiscal_service.h"
 #include "services/eventofiscal_service.h"
 #include "services/Produto_service.h"
+#include "services/fiscalemitter_service.h"
 
 namespace Ui {
 class Vendas;
@@ -89,6 +90,7 @@ private:
     NotaFiscal_service notaServ;
     EventoFiscal_service eventoServ;
     Produto_Service prodServ;
+    FiscalEmitter_service fiscalServ;
 
 signals:
     void vendaConcluidaVendas();

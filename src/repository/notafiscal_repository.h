@@ -17,6 +17,7 @@ public:
     qlonglong getProximoNNF(QString serie, bool tpAmb, qlonglong nnfConfigurado);
     NotaFiscalDTO getNotaNormalFromIdVenda(qlonglong idvenda);
     bool inserir(NotaFiscalDTO nota);
+    qlonglong getIdNotaNormalFromIdVenda(qlonglong idvenda);
 private:
     QSqlDatabase db;
 

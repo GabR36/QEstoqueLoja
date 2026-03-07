@@ -28,6 +28,7 @@ public:
     qlonglong getProximoNNF(QString serie, bool tpAmb, qlonglong nnfConfigurado);
     NotaFiscalDTO getNotaNormalFromIdVenda(qlonglong idvenda);
     NotaFiscal_service::Resultado inserir(NotaFiscalDTO nota);
+    bool temNotaNormal(qlonglong idvenda);
 private:
     notafiscal_repository notaRepo;
 

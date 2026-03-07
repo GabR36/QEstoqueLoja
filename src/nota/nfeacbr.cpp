@@ -294,7 +294,7 @@ void NfeACBR::setProdutosNota(QList<qlonglong> &idsProduto)
         produtosFinal.append(produto);
     }
 
-    listaProdutos = produtosFinal;
+    // listaProdutos = produtosFinal;
     quantProds = produtosFinal.size();
     vTotTribProduto.resize(produtosFinal.size());
 
@@ -302,7 +302,6 @@ void NfeACBR::setProdutosNota(QList<qlonglong> &idsProduto)
 }
 
 void NfeACBR::setProdutosVendidosNew(QList<ProdutoVendidoDTO> listaProds, bool emitirTodos){
-
     emitirApenasNf = !emitirTodos;
 
     for(const ProdutoVendidoDTO &produto : listaProds){
@@ -345,6 +344,10 @@ void NfeACBR::setProdutosVendidosNew(QList<ProdutoVendidoDTO> listaProds, bool e
         p.aliquotaIcms  = prodFiscal.aliquotaIcms;
         p.cfop             = cfopFinal;
         p.descricao = prodFiscal.descricao;
+
+        qDebug() << "descricao: " << p.descricao;
+        qDebug() << "valorUnitario: " << p.valorUnitario;
+        qDebug() << "valorTotal: " << p.valorTotal;
 
         listaProdutosNFe.append(p);
     }
@@ -451,7 +454,7 @@ void NfeACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool 
 
     quantProds = produtosFiltrados.size();
     vTotTribProduto.resize(produtosFiltrados.size());
-    listaProdutos = produtosFiltrados;
+    // listaProdutos = produtosFiltrados;
 }
 
 double NfeACBR::corrigirTaxa(double taxaAntiga, double desconto){
@@ -551,7 +554,7 @@ void NfeACBR::aplicarAcrescimoProporcional(float taxaPercentual)
     // Compensar diferença de centavos no último item
     double diferenca = totalComAcrescimo - somaDistribuida;
     if (!listaProdutosNFe.isEmpty()) {
-        ProdutoParaNFeDTO ultimo = listaProdutos.last();
+        ProdutoParaNFeDTO ultimo = listaProdutosNFe.last();
         double quant = ultimo.quantidade;
 
         double novoTotal = ultimo.valorTotal + diferenca;
@@ -1030,7 +1033,7 @@ QString NfeACBR::gerarEnviar(){
         qDebug() << "Retorno SEFAZ:" << ret;
         return ret;
         // nfe->Imprimir("", 1, "", true, std::nullopt, std::nullopt, std::nullopt);
-        // nfe->GravarXml(0, "xml_autorizado_nota_"+ numero.toStdString() + ".xml", "./xml");
+        // nfe->GravarXml(0, "xml_autorizado_nota_"+ nnf() + ".xml", "./xml");
     }
     catch (std::exception &e) {
         qDebug() << "Erro std::exception:" << e.what();

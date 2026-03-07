@@ -46,7 +46,7 @@ public:
 
     std::string getPdfDanfe();
     void setProdutosVendidosNew(QList<ProdutoVendidoDTO> listaProds, bool emitirTodos);
-    NotaFiscalDTO gerarEnviarRetorno();
+    NFRetornoDTO gerarEnviarRetorno();
 private:
     ACBrNFe *nfe;
     QSqlDatabase db;
@@ -68,8 +68,7 @@ private:
     int quantProds;
     QVector<float> vTotTribProduto;
     // QVector<float> descontoProd;
-    QList<QList<QVariant>>listaProdutos;
-    double descontoNf,trocoNf,vPagNf, vNf;
+    double descontoNf,trocoNf,vPagNf, vNf = 0;
     QString indPagNf,tPagNf;
     float taxaPercentual;
     double totalGeral;

@@ -184,7 +184,7 @@ ProdutoVendidoDTO ProdutoVenda_repository::getProdutoVendido(qlonglong id){
     }
 
     QSqlQuery query(db);
-    query.prepare("SELECT id_produto, quantidade, preco_vendido FROM produtos_vendidos "
+    query.prepare("SELECT id_produto, id_venda, quantidade, preco_vendido FROM produtos_vendidos "
                   "WHERE id = :id");
     query.bindValue(":id", id);
     if(!query.exec()){
@@ -194,9 +194,10 @@ ProdutoVendidoDTO ProdutoVenda_repository::getProdutoVendido(qlonglong id){
     }
 
     while (query.next()) {
-        prod.idProduto = query.value(0).toLongLong();
-        prod.quantidade = query.value(1).toDouble();
-        prod.precoVendido = query.value(2).toDouble();
+        prod.idProduto = query.value("id_produto").toLongLong();
+        prod.idVenda = query.value("id_venda").toLongLong();
+        prod.quantidade = query.value("quantidade").toDouble();
+        prod.precoVendido = query.value("preco_vendido").toDouble();
     }
     return prod;
 

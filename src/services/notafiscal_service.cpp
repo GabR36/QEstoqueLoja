@@ -47,3 +47,13 @@ NotaFiscal_service::Resultado NotaFiscal_service::inserir(NotaFiscalDTO nota){
         return {true, NotaErro::Nenhum, "Nota salva com sucesso."};
     }
 }
+
+bool NotaFiscal_service::temNotaNormal(qlonglong idvenda){
+    qlonglong id = notaRepo.getIdNotaNormalFromIdVenda(idvenda);
+
+    if(id != -1){
+        return true;
+    }else{
+        return false;
+    }
+}

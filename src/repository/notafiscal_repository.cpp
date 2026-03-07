@@ -299,3 +299,24 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
         return true;
     }
 }
+
+qlonglong notafiscal_repository::getIdNotaNormalFromIdVenda(qlonglong idvenda){
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao salvar resumo nota";
+        return -1;
+    }
+    QSqlQuery query(db);
+    query.prepare("SELECT id FROM notas_fiscais WHERE id_venda = :idvenda AND finalidade = 'NORMAL'");
+    query.bindValue(":idvenda", idvenda);
+    if(!query.exec()){
+        qDebug() << "Query nao rodou getIdNotaNormalFromIdVenda";
+        db.close();
+        return -1;
+    }
+    qlonglong id;
+    while(query.next()){
+        id = query.value(0).toLongLong();
+    }
+    return id;
+
+}

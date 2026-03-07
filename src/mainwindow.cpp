@@ -519,9 +519,8 @@ void MainWindow::on_actionDocumenta_o_triggered()
 
 void MainWindow::atualizarConfigAcbr(){
     qDebug() << " tentou atualizar acbr config";
-        auto *acbrService = new Acbr_service(this);
-        auto res = acbrService->configurar(VERSAO_QE);
-        acbrService->configurar(VERSAO_QE);
+        Acbr_service acbrService;
+        auto res = acbrService.configurar(VERSAO_QE);
         if(!res.ok){
             if(res.erro != AcbrErro::NaoEmitindoNf){
                 QMessageBox::critical(this, "Erro", res.msg);

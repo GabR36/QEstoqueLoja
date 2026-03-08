@@ -27,9 +27,9 @@ public:
     qlonglong contarQuantosRegistrosPorCPFCNPJ(const QString &cpfcnpj);
     Cliente_service::Resultado inserirClienteEmitente(ClienteDTO emissor);
     qlonglong getIdFromCpfCnpj(const QString &cpfcnpj);
-    QSqlQueryModel *listarClientes();
+    void listarClientes(QSqlQueryModel *model);
     Cliente_service::Resultado deletarCliente(qlonglong id);
-    QSqlQueryModel *pesquisar(const QString &nome);
+    void pesquisar(QSqlQueryModel* model, const QString &nome);
     Cliente_service::Resultado inserirCliente(ClienteDTO cliente);
     ClienteDTO getClienteByID(qlonglong id);
     Cliente_service::Resultado updateCliente(qlonglong id, ClienteDTO cliente);

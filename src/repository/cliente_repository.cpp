@@ -109,20 +109,21 @@ qlonglong Cliente_repository::getIdFromCPFCNPJ(const QString &cpfcnpj){
     }
 }
 
-QSqlQueryModel* Cliente_repository::listarClientes(){
-    if (!DatabaseConnection_service::open()) {
-            qDebug() << "Erro ao abrir banco (listarClientes)";
-            return nullptr;
+void Cliente_repository::listarClientes(QSqlQueryModel *model)
+{
+    if (!model) {
+        qDebug() << "Model inválido em listarVendasDeAteFormaPagamento";
+        return;
     }
 
-    auto *model = new QSqlQueryModel();
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco";
+        return;
+    }
+
     model->setQuery("SELECT * FROM clientes", db);
 
-    if (model->lastError().isValid()) {
-        qDebug() << "Erro SQL:" << model->lastError().text();
-    }
     db.close();
-    return model;
 }
 
 bool Cliente_repository::deletarCliente(qlonglong id){
@@ -146,10 +147,16 @@ bool Cliente_repository::deletarCliente(qlonglong id){
 
 }
 
-QSqlQueryModel* Cliente_repository::pesquisar(const QString &nome)
+void Cliente_repository::pesquisar(QSqlQueryModel *model, const QString &nome)
 {
+    if (!model) {
+        qDebug() << "Model inválido em Cliente_repository::pesquisar";
+        return;
+    }
+
     if (!DatabaseConnection_service::open()) {
-        return nullptr;
+        qDebug() << "Erro ao abrir banco";
+        return;
     }
 
     QSqlQuery query(db);
@@ -163,20 +170,15 @@ QSqlQueryModel* Cliente_repository::pesquisar(const QString &nome)
 
     if (!query.exec()) {
         qDebug() << "Erro ao executar consulta:" << query.lastError().text();
-        db.close();
-        return nullptr;
+        return;
     }
 
-    auto *model = new QSqlQueryModel();
-    model->setQuery(std::move(query));
+    model->setQuery(query);
 
     if (model->lastError().isValid()) {
         qDebug() << "Erro no model:" << model->lastError().text();
-        db.close();
-        return nullptr;
+        return;
     }
-    db.close();
-    return model;
 }
 
 ClienteDTO Cliente_repository::getClienteByID(qlonglong id){

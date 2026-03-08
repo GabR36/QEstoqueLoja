@@ -31,8 +31,9 @@ VendasDTO Vendas_service::getVenda(qlonglong id){
 void Vendas_service::listarVendasDeAteFormaPag(QSqlQueryModel *model,
                                                QString de,
                                                QString ate,
-                                               VendasUtil::VendasFormaPagamento formaPag){
-    return vendasRepo.listarVendasDeAteFormaPagamento(model, de, ate, formaPag);
+                                               VendasUtil::VendasFormaPagamento formaPag,
+                                               qlonglong idcliente){
+    return vendasRepo.listarVendasDeAteFormaPagamento(model, de, ate, formaPag, idcliente);
 }
 
 ResumoVendasDTO Vendas_service::calcularResumo(
@@ -144,3 +145,10 @@ Vendas_service::Resultado Vendas_service::devolverProdutoRegraNegocio(qlonglong 
 
     return {true, VendasErro::Nenhum, "Produto Devolvido com sucesso"};
 }
+
+void Vendas_service::listarVendasCliente(QSqlQueryModel *model, qlonglong idcliente)
+{
+    return vendasRepo.listarVendasCliente(model, idcliente);
+}
+
+

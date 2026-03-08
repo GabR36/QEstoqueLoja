@@ -121,17 +121,21 @@ void Vendas::on_Btn_InserirVenda_clicked()
 }
 
 void Vendas::atualizarTabelas(){
+    if(IDCLIENTE != 0){
+        mostrarVendasCliente(IDCLIENTE);
+    }else{
+        vendaServ.listarVendas(modeloVendas2);
+        // ui->Tview_Vendas2->setModel(modeloVendas2);
 
-    vendaServ.listarVendas(modeloVendas2);
-    // ui->Tview_Vendas2->setModel(modeloVendas2);
+        prodVendaServ.listarProdutosVendidosFromVenda(idVendaSelec.toLongLong(), modeloProdVendidos);
+        // ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
 
-    prodVendaServ.listarProdutosVendidosFromVenda(idVendaSelec.toLongLong(), modeloProdVendidos);
-    // ui->Tview_ProdutosVendidos->setModel(modeloProdVendidos);
+        QModelIndex firstIndex = modeloVendas2->index(0, 0);
 
-    QModelIndex firstIndex = modeloVendas2->index(0, 0);
+        ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
+        qDebug() << "tabelas vendas atualizadas;";
+    }
 
-    ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
-    qDebug() << "tabelas vendas atualizadas;";
 }
 
 void Vendas::handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
@@ -257,7 +261,7 @@ void Vendas::filtrarData(QString de1, QString ate1){
     if(ui->cb_BuscaVendasPrazo->isChecked()){
         formaPag = VendasUtil::VendasFormaPagamento::Prazo;
     }
-    vendaServ.listarVendasDeAteFormaPag(modeloVendas2, de1, ate1, formaPag);
+    vendaServ.listarVendasDeAteFormaPag(modeloVendas2, de1, ate1, formaPag, IDCLIENTE);
     ui->Tview_Vendas2->selectionModel()->select(QModelIndex(modeloVendas2->index(0, 0)), QItemSelectionModel::Select);
 
 }
@@ -442,41 +446,22 @@ void Vendas::on_Tview_ProdutosVendidos_customContextMenuRequested(const QPoint &
     menu.exec(ui->Tview_ProdutosVendidos->viewport()->mapToGlobal(pos));
 }
 
-void Vendas::mostrarVendasCliente(int idCliente) {
+void Vendas::mostrarVendasCliente(qlonglong idCliente) {
     if (idCliente == 0) {
         qDebug() << "ID do cliente inválido.";
         return;
     }
 
-    if (!db.isOpen() && !db.open()) {
-        qDebug() << "Erro ao abrir banco de dados em mostrarVendasCliente: " << db.lastError().text();
-        return;
-    }
-    //qDebug() << "IdCliente: " + QString::number(idCliente);
-    QSqlQuery query;
-    query.prepare("SELECT nome FROM clientes WHERE id = :idcliente");
-    query.bindValue(":idcliente", idCliente);
-    QString nomeCliente;
-    query.exec();
-    while(query.next()){
-        nomeCliente = query.value(0).toString();
-    }
+    ClienteDTO cliente = cliServ.getClienteByID(idCliente);
+    QString nomeCliente = cliente.nome;
 
-    // Passa diretamente a string SQL para o modelo
-    modeloVendas2->setQuery("SELECT id, valor_final, forma_pagamento, data_hora, "
-                            "cliente, esta_pago, total, desconto, taxa, valor_recebido, "
-                            "troco FROM vendas2 WHERE id_cliente = " + QString::number(idCliente) +
-                                " ORDER BY id DESC", db);
+    vendaServ.listarVendasCliente(modeloVendas2, idCliente);
 
-    if (modeloVendas2->lastError().isValid()) {
-        qDebug() << "Erro ao carregar modelo de vendas: " << modeloVendas2->lastError().text();
-    }
-    db.close();
     ui->Btn_InserirVenda->setDisabled(true);
     ui->Btn_InserirVenda->setVisible(false);
     ui->Lbl_ClienteHeader->setText(nomeCliente);
 
-    filtrarData(de,ate);
+    // filtrarData(de,ate);
 }
 
 void Vendas::abrirDanfeXml(QString id_Venda){

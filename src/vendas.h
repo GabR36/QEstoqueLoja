@@ -16,6 +16,7 @@
 #include "services/eventofiscal_service.h"
 #include "services/Produto_service.h"
 #include "services/fiscalemitter_service.h"
+#include "services/cliente_service.h"
 
 namespace Ui {
 class Vendas;
@@ -81,7 +82,7 @@ private:
     void Teste();
     QString idVendaSelec;
     void devolverProdutoVenda(QString id_venda, QString id_prod_vend);
-    void mostrarVendasCliente(int idCliente);
+    void mostrarVendasCliente(qlonglong idCliente);
     int IDCLIENTE = 0;
     void abrirDanfeXml(QString id_Venda);
     QString dataGlobal;
@@ -91,6 +92,7 @@ private:
     EventoFiscal_service eventoServ;
     Produto_Service prodServ;
     FiscalEmitter_service fiscalServ;
+    Cliente_service cliServ;
 
 signals:
     void vendaConcluidaVendas();

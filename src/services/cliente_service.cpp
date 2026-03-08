@@ -34,8 +34,8 @@ qlonglong Cliente_service::getIdFromCpfCnpj(const QString &cpfcnpj){
 }
 
 
-QSqlQueryModel* Cliente_service::listarClientes(){
-    return cliRepo.listarClientes();
+void Cliente_service::listarClientes(QSqlQueryModel *model){
+    return cliRepo.listarClientes(model);
 }
 
 Cliente_service::Resultado Cliente_service::deletarCliente(qlonglong id){
@@ -51,8 +51,8 @@ Cliente_service::Resultado Cliente_service::deletarCliente(qlonglong id){
 
 }
 
-QSqlQueryModel* Cliente_service::pesquisar(const QString &nome){
-    return cliRepo.pesquisar(nome);
+void Cliente_service::pesquisar(QSqlQueryModel* model, const QString &nome){
+    return cliRepo.pesquisar(model, nome);
 }
 
 

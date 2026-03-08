@@ -20,7 +20,7 @@ Clientes::Clientes(QWidget *parent)
 
 
     model = new QSqlQueryModel(this);
-    model = cliServ.listarClientes();
+    cliServ.listarClientes(model);
     ui->Tview_Clientes->setModel(model);
 
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
@@ -76,8 +76,7 @@ void Clientes::on_Btn_Alterar_clicked()
 }
 
 void Clientes::atualizarTabelaClientes(){
-    model = cliServ.listarClientes();
-    ui->Tview_Clientes->setModel(model);
+    cliServ.listarClientes(model);
 }
 
 
@@ -187,7 +186,6 @@ void Clientes::atualizarInfos(const QItemSelection &selected, const QItemSelecti
 void Clientes::on_Ledit_Pesquisa_textChanged(const QString &arg1)
 {
     QString inputText = ui->Ledit_Pesquisa->text();
-    model = cliServ.pesquisar(inputText);
-    ui->Tview_Clientes->setModel(model);
+    cliServ.pesquisar(model, inputText);
 }
 

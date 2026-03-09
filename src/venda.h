@@ -9,6 +9,9 @@
 #include "mainwindow.h"
 #include <QLocale>
 #include "dto/Config_dto.h"
+#include "services/Produto_service.h"
+#include "services/cliente_service.h"
+
 
 namespace Ui {
 class venda;
@@ -28,19 +31,17 @@ public:
     QIcon deletar;
 
 
+
 protected:
     void handleSelectionChangeProdutos(const QItemSelection &selected, const QItemSelection &deselected);
 
     void keyPressEvent(QKeyEvent *event) override;
 
     void focusInEvent(QFocusEvent *event) override;
-
-    bool verificarNomeIdCliente(const QString &nome, int id);
-    QPair<QString, int> extrairNomeId(const QString &texto);
     int validarCliente(bool mostrarMensagens);
     void atualizarListaCliente();
-    void selecionarClienteNovo();
     void atualizarTotalProduto();
+    void selecionarClienteNovo();
 private slots:
     void on_Btn_SelecionarProduto_clicked();
 
@@ -71,6 +72,9 @@ private:
     ConfigDTO configDTO;
     QString getIdProdSelected();
     void verProd();
+    Produto_Service prodServ;
+    Cliente_service cliServ;
+    QList<ProdutoVendidoDTO> obterProdutosSelecionados();
 signals:
     void vendaConcluida();
 

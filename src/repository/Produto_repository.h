@@ -13,15 +13,16 @@ public:
 
     bool codigoBarrasExiste(const QString &codigo);
     bool inserir(const ProdutoDTO &p, QString &erroSQL);
-    QSqlQueryModel* listarProdutos();
     QSqlQueryModel *getProdutoPeloCodigo(const QString &codigoBarras);
     bool deletar(const QString &id, QString &erroSQL);
-    QSqlQueryModel *pesquisar(const QStringList &palavras, const QString &textoNormalizado);
     bool alterar(const ProdutoDTO &p, const QString &id, QString &erro);
     QStringList listarLocais();
     bool atualizarLocal(int id, const QString &local, QString &erroSQL);
     bool updateAumentarQuantidadeProduto(qlonglong idprod, double quantia);
     ProdutoDTO getProduto(qlonglong id);
+    void listarProdutos(QSqlQueryModel *model);
+    void pesquisar(const QStringList &palavras, const QString &textoNormalizado, QSqlQueryModel *model);
+    ProdutoDTO getProdutoPeloCodBarras(const QString &codigo);
 private:
     QSqlDatabase db;
 };

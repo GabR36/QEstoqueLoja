@@ -19,6 +19,9 @@ public:
     void pesquisar(QSqlQueryModel *model, const QString &nome);
     ClienteDTO getClienteByID(qlonglong id);
     bool updateCliente(qlonglong id, ClienteDTO cliente);
+    QList<ClienteDTO> getListAllClientes();
+    bool verificarNomeId(const QString &nome, qlonglong id);
+    ClienteDTO buscarClientePorNomeAproximado(const QString &nome);
 private:
     QSqlDatabase db;
 

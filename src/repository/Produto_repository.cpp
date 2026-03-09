@@ -75,21 +75,19 @@ bool Produto_Repository::inserir(const ProdutoDTO &p, QString &erroSQL)
     return true;
 }
 
-QSqlQueryModel* Produto_Repository::listarProdutos()
+void Produto_Repository::listarProdutos(QSqlQueryModel* model)
 {
+    if (!model) {
+        qDebug() << "Model inválido em listarProdutos";
+        return;
+    }
     if(!DatabaseConnection_service::open()){
         qDebug() << "db nao aberto ao salvar resumo nota";
-        return nullptr;
+        return;
     }
-
-    auto *model = new QSqlQueryModel();
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC", db);
 
-    if (model->lastError().isValid()) {
-        qDebug() << "Erro SQL:" << model->lastError().text();
-    }
     db.close();
-    return model;
 }
 
 QSqlQueryModel* Produto_Repository::getProdutoPeloCodigo(const QString &codigoBarras){
@@ -138,12 +136,17 @@ bool Produto_Repository::deletar(const QString &id, QString &erroSQL)
     return true;
 }
 
-QSqlQueryModel* Produto_Repository::pesquisar(const QStringList &palavras,
-                                              const QString &textoNormalizado)
+void Produto_Repository::pesquisar(const QStringList &palavras,
+                                              const QString &textoNormalizado, QSqlQueryModel* model)
 {
+    if (!model) {
+        qDebug() << "Model inválido em pesquisar";
+        return;
+    }
+
     if(!DatabaseConnection_service::open()){
         qDebug() << "db nao aberto ao salvar resumo nota";
-        return nullptr;
+        return;
     }
 
     QString sql = "SELECT * FROM produtos WHERE ";
@@ -174,13 +177,11 @@ QSqlQueryModel* Produto_Repository::pesquisar(const QStringList &palavras,
     if (!query.exec()) {
         qDebug() << "[SQL ERROR]" << query.lastError().text();
         db.close();
-        return nullptr;
+        return;
     }
 
-    auto *model = new QSqlQueryModel();
     model->setQuery(query);
     db.close();
-    return model;
 }
 
 bool Produto_Repository::alterar(
@@ -330,6 +331,44 @@ ProdutoDTO Produto_Repository::getProduto(qlonglong id){
         prod.precoFornecedor = query.value("preco_fornecedor").toDouble();
         prod.quantidade = query.value("quantidade").toDouble();
         prod.uCom = query.value("un_comercial").toString();
+    }
+
+    db.close();
+    return prod;
+}
+
+ProdutoDTO Produto_Repository::getProdutoPeloCodBarras(const QString &codigo){
+    ProdutoDTO prod;
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao getProdutoPeloCodBarras";
+        return prod;
+    }
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM produtos WHERE codigo_barras = :cod");
+    query.bindValue(":cod", codigo);
+
+    if(!query.exec()){
+        qDebug() << " Query não executou getProdutoPeloCodBarras";
+        db.close();
+        return prod;
+    }
+
+    while(query.next()){
+        prod.id = query.value("id").toLongLong();
+        prod.quantidade = query.value("quantidade").toDouble();
+        prod.descricao = query.value("descricao").toString();
+        prod.preco =query.value("preco").toDouble();
+        prod.codigoBarras = query.value("codigo_barras").toString();
+        prod.nf = query.value("nf").toBool();
+        prod.uCom = query.value("un_comercial").toString();
+        prod.precoFornecedor = query.value("preco_fornecedor").toDouble();
+        prod.percentLucro = query.value("porcent_lucro").toDouble();
+        prod.ncm = query.value("ncm").toString();
+        prod.cest = query.value("cest").toString();
+        prod.aliquotaIcms = query.value("aliquota_imposto").toDouble();
+        prod.csosn = query.value("csosn").toString();
+        prod.pis = query.value("pis").toString();
+        prod.local = query.value("local").toString();
     }
 
     db.close();

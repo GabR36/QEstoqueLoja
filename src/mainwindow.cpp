@@ -187,8 +187,7 @@ void MainWindow::setarIconesJanela(){
 
 void MainWindow::atualizarTableview()
 {
-    model = produtoService->listarProdutos();
-    ui->Tview_Produtos->setModel(model);
+    produtoService->listarProdutos(model);
 }
 
 
@@ -235,14 +234,13 @@ void MainWindow::on_Btn_Pesquisa_clicked()
 {
     QString inputText = ui->Ledit_Pesquisa->text();
 
-    auto model = produtoService->pesquisar(inputText);
+    produtoService->pesquisar(inputText, model);
 
     if (!model) {
         QMessageBox::warning(this, "Erro", "Erro ao realizar a pesquisa.");
         return;
     }
 
-    ui->Tview_Produtos->setModel(model);
 }
 
 void MainWindow::on_Btn_Alterar_clicked()

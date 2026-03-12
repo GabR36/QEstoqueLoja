@@ -47,5 +47,12 @@ ProdutoVendidoDTO ProdutoVenda_service::getProdutoVendido(qlonglong id){
     return prodVendaRepo.getProdutoVendido(id);
 }
 
+ProdutoVenda_service::Resultado ProdutoVenda_service::inserir(ProdutoVendidoDTO prod){
+    if(!prodVendaRepo.inserir(prod)){
+        return {false, ProdutoVendaErro::Salvar, "Erro ao inserir Produto Vendido."};
+    }else{
+        return {true, ProdutoVendaErro::Nenhum, "Produto Vendido salvo com sucesso."};
+    }
+}
 
 

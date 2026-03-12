@@ -6,15 +6,16 @@
 #include "util/mailmanager.h"
 #include <QDir>
 
-pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString total, QString cliente, QString data, int idCliente, QWidget *parent)
+
+pagamentoVenda::pagamentoVenda(QList<ProdutoVendidoDTO> listaProdutos, QString total, QString cliente,
+                               QString data, qlonglong idCliente, QWidget *parent)
     : pagamento(total, cliente, data, parent)
 {
 
     nfce = new NfceACBR(this);
     nfe = new NfeACBR(this, true, false);
 
-    // // QMessageBox::warning(this,"Erro",nfce->getVersaoLib());
-    rowDataList = listaProdutos;
+    listaProds = listaProdutos;
 
 
     Config_service *confServ = new Config_service(this);
@@ -27,7 +28,8 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
         ui->FrameNF->setVisible(true);
         ui->Ledit_NNF->setVisible(true);
         ui->Lbl_NNF->setVisible(true);
-        ui->Ledit_NNF->setText(QString::number(nfce->getProximoNNF()));
+        QString nnf = QString::number(notaServ.getProximoNNF(configDTO.tpAmbFiscal,ModeloNota::NFCe));
+        ui->Ledit_NNF->setText(nnf);
         ui->CBox_ModeloEmit->setVisible(true);
         ui->RadioBtn_EmitNfApenas->setVisible(true);
         ui->RadioBtn_EmitNfTodos->setVisible(true);
@@ -43,48 +45,23 @@ pagamentoVenda::pagamentoVenda(QList<QList<QVariant>> listaProdutos, QString tot
     }
 
     //pega os dados do cliente necessários
-    if(!db.open()){
-        qDebug() << "erro bd cliente";
-    }else{
-        QSqlQuery query;
-        query.prepare("SELECT cpf, eh_pf, nome, email, telefone, endereco, "
-                      "numero_end, bairro, xMun, cMun, uf, cep, indIEDest, ie"
-                      "  FROM clientes WHERE id = :idcliente");
-        query.bindValue(":idcliente", idCliente);
-        if (!query.exec()) {
-            qDebug() << "cliente nao encontrado";
-        }
-        while(query.next()) {
-            cpfCli = query.value(0).toString();
-            ehPfCli = query.value(1).toBool();
-            nomeCli = query.value(2).toString();
-            emailCli = query.value(3).toString();
-            telefoneCli = query.value(4).toString();
-            enderecoCli = query.value(5).toString();
-            numeroCli = query.value(6).toString();
-            bairroCli = query.value(7).toString();
-            xMunCli = query.value(8).toString();
-            cMunCli = query.value(9).toString();
-            ufCli = query.value(10).toString();
-            cepCli = query.value(11).toString();
-            indIeCLi = query.value(12).toInt();
-            ieCli = query.value(13).toString();
-        }
-    }
-    ui->Ledit_CpfCnpjCliente->setText(cpfCli);
+    CLIENTE = cliServ.getClienteByID(idCliente);
+    ui->Ledit_CpfCnpjCliente->setText(CLIENTE.cpf);
 
 }
 
 void pagamentoVenda::on_CBox_ModeloEmit_currentIndexChanged(int index)
 {
     if(index == 0){
-        ui->Ledit_NNF->setText(QString::number(nfce->getProximoNNF()));
+        ui->Ledit_NNF->setText(QString::number(notaServ.getProximoNNF(configDTO.tpAmbFiscal,
+                                                                                ModeloNota::NFCe)));
         ui->RadioBtn_EmitNfApenas->setVisible(true);
         ui->RadioBtn_EmitNfTodos->setVisible(true);
         ui->Ledit_NNF->setVisible(true);
         ui->Lbl_NNF->setVisible(true);
     }else if(index == 1){
-        ui->Ledit_NNF->setText(QString::number(nfe->getProximoNNF()));
+        ui->Ledit_NNF->setText(QString::number(notaServ.getProximoNNF(configDTO.tpAmbFiscal,
+                                                                                ModeloNota::NFe)));
         ui->RadioBtn_EmitNfApenas->setVisible(true);
         ui->RadioBtn_EmitNfTodos->setVisible(true);
         ui->Ledit_NNF->setVisible(true);
@@ -97,56 +74,6 @@ void pagamentoVenda::on_CBox_ModeloEmit_currentIndexChanged(int index)
         ui->Lbl_NNF->setVisible(false);
     }else{
 
-    }
-}
-
-QString pagamentoVenda::enviarNfce(NfceACBR *nfce) {
-    QString retorno = nfce->gerarEnviar();
-
-    if (retorno.isEmpty())
-        return "Erro: Nenhum retorno do ACBr";
-
-    QStringList linhas = retorno.split(QRegularExpression("[\r\n]+"), Qt::SkipEmptyParts);
-    bool dentroNFe = false;
-
-    for (const QString &linha : linhas) {
-        QString l = linha.trimmed();
-
-        if (l.startsWith('[')) {
-            dentroNFe = l.startsWith("[NFe");  // só começar a pegar dados da nota dentro da seção NFe
-            continue;
-        }
-
-        if (!dentroNFe)
-            continue;  // ignora seção [Envio]
-
-        QString key = l.section('=', 0, 0).trimmed();
-        QString value = l.section('=', 1).trimmed();
-
-        key = key.toLower(); // normaliza
-
-        if (key == "cstat")
-            cStat = value;
-        else if (key == "xmotivo")
-            xMotivo = value;
-        else if (key == "msg")
-            msg = value;
-        else if (key == "nprot")
-            nProt = value;
-    }
-    qDebug() << "Retorno ACBr:" << retorno;
-    qDebug() << "cStat:" << cStat << "xMotivo:" << xMotivo << "nProt:" << nProt;
-
-
-    if (cStat == "100") {
-        return QString("Nota Autorizada!\ncStat:%1\nmotivo:%2\nprotocolo:%3")
-        .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo, nProt);
-    } else if (!cStat.isEmpty()) {
-        return QString("Nota Rejeitada\ncStat:%1\nmotivo:%2")
-        .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo);
-    } else {
-        return QString("Erro: Resposta inesperada do ACBr\n-> %1")
-        .arg(retorno.left(300));
     }
 }
 
@@ -286,7 +213,6 @@ void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
     query.bindValue(":saida", "1");
     query.bindValue(":dhemi", nfce->getDhEmiConvertida());
 
-
     qDebug() << "idvenda: " << idVenda;
     if (query.exec()) {
         qDebug() << "Salvou nota no banco!";
@@ -298,15 +224,7 @@ void pagamentoVenda::salvarNfceBD(NfceACBR *nfce){
 }
 
 void pagamentoVenda::terminarPagamento(){
-    QDateTime dataIngles = portugues.toDateTime(dataGlobal, "dd-MM-yyyy hh:mm:ss");
     // inserir a venda
-
-    // adicionar ao banco de dados
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao aceitar venda.";
-    }
-    QSqlQuery query;
-
     QString troco = ui->Lbl_Troco->text();
     QString recebido = ui->Ledit_Recebido->text();
     QString forma_pagamento = ui->CBox_FormaPagamento->currentText();
@@ -314,6 +232,7 @@ void pagamentoVenda::terminarPagamento(){
     QString valor_final = ui->Lbl_TotalTaxa->text();
     QString descontoInicial = ui->Ledit_Desconto->text();
     QString desconto;
+
     if (ui->CheckPorcentagem->isChecked()){
         desconto = portugues.toString((portugues.toFloat(descontoInicial)/100)*portugues.toFloat(totalGlobal));
     }
@@ -321,221 +240,119 @@ void pagamentoVenda::terminarPagamento(){
         desconto = descontoInicial;
     }
 
-
-    //se emitir NFE
-
-    if(ui->CBox_ModeloEmit->currentIndex() == 1 && (nomeCli.isEmpty() ||
-        emailCli.isEmpty() ||
-        enderecoCli.isEmpty() || cpfCli.isEmpty() || numeroCli.isEmpty() ||
-        bairroCli.isEmpty() || xMunCli.isEmpty() || cMunCli.isEmpty() ||
-        ufCli.isEmpty() || cepCli.isEmpty())){
-        QMessageBox::warning(this,"Erro", "Cliente com dados incompletos para emitir NF-E");
-        return;
-    }
-    bool okEmitir = true;
     if(ui->RadioBtn_EmitNfTodos->isChecked()){
         emitTodosNf = true;
     }else{
         emitTodosNf = false;
     }
-    if(!emitTodosNf && !existeProdutosComNF(rowDataList) ){
-        okEmitir = false;
-        QMessageBox::warning(this,"Atenção", "Não foram encontrados produtos NF na venda, "
-                                              "portanto não será emitido nota");
+
+    QDateTime dataIngles = portugues.toDateTime(dataGlobal, "dd-MM-yyyy hh:mm:ss");
+
+    VendasDTO  newVenda;
+    newVenda.clienteNome = CLIENTE.nome;
+    newVenda.dataHora = dataIngles.toString("yyyy-MM-dd hh:mm:ss");
+    newVenda.desconto = portugues.toDouble(desconto);
+    newVenda.formaPagamento = forma_pagamento;
+    if(newVenda.formaPagamento == "Prazo"){
+        newVenda.estaPago = false;
     }else{
-        okEmitir = true;
+        newVenda.estaPago = true;
     }
-    // validar line edits
+    newVenda.idCliente = idCliente;
+    newVenda.taxa = portugues.toDouble(taxa);
+    newVenda.total = portugues.toDouble(totalGlobal);
+    newVenda.troco = portugues.toDouble(troco);
+    newVenda.valorFinal = portugues.toDouble(valor_final);
+    newVenda.valorRecebido = portugues.toDouble(recebido);
 
-    // desconto
-    bool conversionOkDesconto;
-    // tentar converter para float e ser menor ou igual ao valor final
-    qDebug() << "validar valor desconto";
-    qDebug() << desconto;
-    bool menorQueTotal = portugues.toFloat(desconto, &conversionOkDesconto) <= portugues.toFloat(totalGlobal);
-    qDebug() << conversionOkDesconto;
-    if (!menorQueTotal){
-        conversionOkDesconto = false;
-    }
-    if(forma_pagamento == "Prazo" && idCliente == 1){
-        QMessageBox::warning(this,"Erro", "Especifique um cliente diferente para vender à prazo!");
+    ClienteDTO cli = CLIENTE;
+    cli.cpf = ui->Ledit_CpfCnpjCliente->text().trimmed();
+
+    auto result = vendaServ.inserirVendaRegraDeNegocio(newVenda, listaProds);
+    if(!result.ok){
+        QMessageBox::warning(this, "Erro", result.msg);
         return;
-    };
-    qDebug() << conversionOkDesconto;
-    if (!conversionOkDesconto){
-        // algo deu errado na conversao, desconto nao validado
-        // inserir mensagem de erro e impedir insersao de venda
-        QMessageBox::warning(this, "Erro", "Por favor, insira um desconto válido.");
-        return;
-    }
-    QString cpf = ui->Ledit_CpfCnpjCliente->text().trimmed();
-    if(cpf != ""){
-        if (ehPfCli == true && cpf.length() != 11){
-            QMessageBox::warning(this, "Erro", "Por favor, insira um cpf com 11 digitos.");
-            return;
-        }
-        if (ehPfCli == false && cpf.length() != 14){
-            QMessageBox::warning(this, "Erro", "Por favor, insira um cnpj com 14 digitos.");
-            return;
-        }
-    }
-
-
-    // recebido
-    qDebug() << "validar valor recebido";
-    qDebug() << recebido;
-    bool conversionOkRecebido;
-    // testar se o recebido consegue ser convertido em float e se é maior ou igual ao valor final
-    bool maiorQueTotal = portugues.toFloat(recebido, &conversionOkRecebido) >= portugues.toFloat(valor_final);
-    qDebug() << conversionOkRecebido;
-    if (!maiorQueTotal){
-        // caso não seja maior ou igual que o total avalie como erro.
-        conversionOkRecebido = false;
-    }
-    qDebug() << conversionOkRecebido;
-    if (!conversionOkRecebido){
-        // algo deu errado na conversao, recebido nao validado
-        // inserir mensagem de erro e impedir insersao de venda
-        QMessageBox::warning(this, "Erro", "Por favor, insira um valor recebido válido.");
-        return;
-    }
-
-    // taxa
-    qDebug() << "validar taxa";
-    qDebug() << recebido;
-    bool conversionOkTaxa;
-    // testar se a taxa consegue ser converido em float
-    portugues.toFloat(taxa, &conversionOkTaxa);
-    qDebug() << conversionOkTaxa;
-    if (!conversionOkTaxa){
-        // algo deu errado na conversao, troco nao validado
-        // inserir mensagem de erro e impedir insersao de venda
-        QMessageBox::warning(this, "Erro", "Por favor, insira uma taxa válida.");
-        return;
-    }
-
-    if((existeItensComNcmVazio(rowDataList, emitTodosNf)) && (configDTO.emitNfFiscal && okEmitir)
-        && (ui->CBox_ModeloEmit->currentIndex() != 2)){
-        QMessageBox::StandardButton resposta;
-        resposta = QMessageBox::question(this,
-                                         "Atenção", "Existem produtos com NCM vazio ou igual a '0000000', Deseja continuar mesmo assim?",
-                                         QMessageBox::Yes | QMessageBox::No);
-        if(resposta == QMessageBox::No){
-            return;
-        }
-    }
-
-
-
-    query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, "
-                  "valor_recebido, troco, taxa, valor_final, desconto, id_cliente, esta_pago) "
-                  "VALUES (:valor1, :valor2, :valor3, :valor4, :valor5, :valor6, :valor7, "
-                  ":valor8, :valor9, :valor10, :valor11)");
-    query.bindValue(":valor1", clienteGlobal);
-
-    // precisa converter para notacao usa para inserir no banco de dados
-    query.bindValue(":valor2", QString::number(portugues.toFloat(totalGlobal)));
-    // inserir a data do dateedit
-    query.bindValue(":valor3", dataIngles.toString("yyyy-MM-dd hh:mm:ss"));
-    //
-    query.bindValue(":valor4", forma_pagamento);
-    // precisa converter para notacao usa para inserir no banco de dados
-    query.bindValue(":valor5", QString::number(portugues.toFloat(recebido), 'f', 2));
-    query.bindValue(":valor6", QString::number(portugues.toFloat(troco), 'f', 2));
-    query.bindValue(":valor7", QString::number(portugues.toFloat(taxa), 'f', 2));
-    query.bindValue(":valor8", QString::number(portugues.toFloat(valor_final), 'f', 2));
-    query.bindValue(":valor9", QString::number(portugues.toFloat(desconto), 'f', 2));
-    query.bindValue(":valor10", QString::number(idCliente));
-    if(forma_pagamento == "Prazo"){
-        query.bindValue(":valor11", "0");
     }else{
-        query.bindValue(":valor11", "1");
-
+        newVenda.id = result.idVendaInserida;
     }
 
+    //se emitir NFE
 
-    if (query.exec()) {
-        idVenda = query.lastInsertId().toString();
-        qDebug() << "Inserção bem-sucedida!";
-    } else {
-        qDebug() << "Erro na inserção: ";
-    }
-    // inserir os produtos da venda
+    // if(ui->CBox_ModeloEmit->currentIndex() == 1 && (nomeCli.isEmpty() ||
+    //     emailCli.isEmpty() ||
+    //     enderecoCli.isEmpty() || cpfCli.isEmpty() || numeroCli.isEmpty() ||
+    //     bairroCli.isEmpty() || xMunCli.isEmpty() || cMunCli.isEmpty() ||
+    //     ufCli.isEmpty() || cepCli.isEmpty())){
+    //     QMessageBox::warning(this,"Erro", "Cliente com dados incompletos para emitir NF-E");
+    //     return;
+    // }
 
-    // adicionar ao banco de dados
-    for (const QList<QVariant> &rowdata : rowDataList) {
-        query.prepare("INSERT INTO produtos_vendidos (id_produto, quantidade, preco_vendido, id_venda) VALUES (:valor1, :valor2, :valor3, :valor4)");
-        query.bindValue(":valor1", rowdata[0]);
-        // precisa converter para notacao usa para inserir no banco de dados
-        query.bindValue(":valor2", rowdata[1].toString());
-        query.bindValue(":valor3", rowdata[3].toString());
-        query.bindValue(":valor4", idVenda);
-        if (query.exec()) {
-            qDebug() << "Inserção prod_vendidos bem-sucedida!";
-        } else {
-            qDebug() << "Erro na inserção prod_vendidos: ";
-        }
-        query.prepare("UPDATE produtos SET quantidade = quantidade - :valor2 WHERE id = :valor1");
-        query.bindValue(":valor1", rowdata[0]);
-        // precisa converter para notacao usa para inserir no banco de dados
-        query.bindValue(":valor2", rowdata[1].toString());
-        if (query.exec()) {
-            qDebug() << "update quantidade bem-sucedida!";
-        } else {
-            qDebug() << "Erro na update quantidade: ";
-        }
-
-    }
     if(ui->CheckImprimirCNF->isChecked()){
         Vendas::imprimirReciboVenda(idVenda.toLongLong());
     }
 
-    db.close();
+    bool okEmitir = true;
+
     if(configDTO.emitNfFiscal && okEmitir){ // se a config estiver ativada para emitir
 
-        if(ui->CBox_ModeloEmit->currentIndex() == 0){
+        if(ui->CBox_ModeloEmit->currentIndex() == 0){ // se emitir NFCE
+
+            qlonglong nnf = ui->Ledit_NNF->text().toLongLong();
+            auto result1 = fiscalServ.enviarNfcePadrao(newVenda, listaProds, nnf, cli, emitTodosNf, false);
+
+            if(!result1.ok && result1.erro == FiscalEmitterErro::NCMInvalido){
+                QMessageBox::StandardButton resposta;
+                resposta = QMessageBox::question(this,
+                                                 "Atenção", result1.msg + "\nDeseja continuar mesmo assim?",
+                                                 QMessageBox::Yes | QMessageBox::No);
+                if(resposta == QMessageBox::No){
+                    return;
+                }
+                if(resposta == QMessageBox::Yes){
+                    result1 = fiscalServ.enviarNfcePadrao(newVenda, listaProds, nnf, cli,
+                                                         emitTodosNf, true);;
+                }
+            }
 
             if (!waitDialog) {
                 waitDialog = new WaitDialog(this);
             }
-            nfce->setNNF(ui->Ledit_NNF->text().toInt());
-            nfce->setCliente(cpf, ehPfCli);
-            nfce->setProdutosVendidos(rowDataList, emitTodosNf);
-            nfce->setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
             waitDialog->setMessage("Aguardando resposta do servidor...");
             waitDialog->show();
             waitDialog->allowClose();
-            waitDialog->setMessage(enviarNfce(nfce));
-
-            if(cStat == "100" || cStat == "150"){
-                salvarNfceBD(nfce); //salva nfce no banco
+            if(!result1.ok){
+                waitDialog->setMessage(result1.msg);
+            }else{
+                waitDialog->setMessage(result1.msg);
                 QTimer::singleShot(1500, waitDialog, &WaitDialog::close); //fecha depois de 2 seg
             }
 
         }else if(ui->CBox_ModeloEmit->currentIndex() == 1){
-            if (!waitDialog) {
-                waitDialog = new WaitDialog(this);
-            }
 
-            nfe->setNNF(ui->Ledit_NNF->text().toInt());
-            nfe->setCliente(ehPfCli, cpfCli, nomeCli, indIeCLi, emailCli, enderecoCli,
-                            numeroCli, bairroCli, cMunCli, xMunCli, ufCli, cepCli, ieCli);
-            nfe->setProdutosVendidos(rowDataList, emitTodosNf);
-            nfe->setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
 
-            waitDialog->setMessage("Aguardando resposta do servidor...");
-            waitDialog->show();
-            waitDialog->allowClose();
-            waitDialog->setMessage(enviarNfe(nfe));
-            if(cStat == "100" || cStat == "150"){
-                salvarNfeBD(nfe); //salva nfe no banco
-                if(nfe->getTpAmb() == "1"){
-                    enviarEmailNFe(nomeCli, emailCli, nfe->getXmlPath(),
-                                   nfe->getPdfDanfe());
-                }
-                QTimer::singleShot(1500, waitDialog, &WaitDialog::close); //fecha depois de 2 seg
+            // if (!waitDialog) {
+            //     waitDialog = new WaitDialog(this);
+            // }
 
-            }
+            // nfe->setNNF(ui->Ledit_NNF->text().toInt());
+            // nfe->setCliente(ehPfCli, cpfCli, nomeCli, indIeCLi, emailCli, enderecoCli,
+            //                 numeroCli, bairroCli, cMunCli, xMunCli, ufCli, cepCli, ieCli);
+            // nfe->setProdutosVendidos(rowDataList, emitTodosNf);
+            // nfe->setPagamentoValores(forma_pagamento,portugues.toFloat(desconto),portugues.toFloat(recebido), portugues.toFloat(troco), taxa.toFloat());
+
+            // waitDialog->setMessage("Aguardando resposta do servidor...");
+            // waitDialog->show();
+            // waitDialog->allowClose();
+            // waitDialog->setMessage(enviarNfe(nfe));
+            // if(cStat == "100" || cStat == "150"){
+            //     salvarNfeBD(nfe); //salva nfe no banco
+            //     if(nfe->getTpAmb() == "1"){
+            //         enviarEmailNFe(nomeCli, emailCli, nfe->getXmlPath(),
+            //                        nfe->getPdfDanfe());
+            //     }
+            //     QTimer::singleShot(1500, waitDialog, &WaitDialog::close); //fecha depois de 2 seg
+
+            // }
         }else if(ui->CBox_ModeloEmit->currentIndex() == 2){
         }
 
@@ -597,79 +414,5 @@ void pagamentoVenda::enviarEmailNFe(QString nomeCliente, QString emailCliente,
     }
     catch (const std::exception& e) {
         qDebug() << "email não enviado NFE";
-    }
-}
-
-bool pagamentoVenda::existeItensComNcmVazio(QList<QList<QVariant>> listaProdutos, bool somenteNf) {
-    QSqlQuery query;
-    db.open();
-
-    for (const QList<QVariant> &produto : listaProdutos) {
-        if (produto.isEmpty())
-            continue;
-
-        QVariant idProduto = produto.at(0);
-
-        QString sql = "SELECT ncm, nf FROM produtos WHERE id = :id";
-        query.prepare(sql);
-        query.bindValue(":id", idProduto);
-
-        if (!query.exec()) {
-            qWarning() << "Erro ao consultar produto ID" << idProduto << ":" << query.lastError().text();
-            continue;
-        }
-
-        if (query.next()) {
-            QString ncm = query.value("ncm").toString().trimmed();
-            bool nf = query.value("nf").toBool();
-
-            if (somenteNf && !nf) {
-                // pula este produto, pois nf não é true
-                continue;
-            }
-
-            if (ncm.isEmpty() || ncm == "00000000") {
-                qDebug() << "Produto ID" << idProduto << "com NCM inválido:" << ncm;
-                return true;
-            }
-        } else {
-            qWarning() << "Produto ID" << idProduto << "não encontrado no banco de dados.";
-        }
-    }
-
-    return false;
-}
-bool pagamentoVenda::existeProdutosComNF(QList<QList<QVariant>> listaProdutos){
-    QSqlQuery query;
-    db.open();
-    int quantidadeProdutosNF = 0;
-
-    for (const QList<QVariant> &produto : listaProdutos) {
-        if (produto.isEmpty())
-            continue;
-        QVariant idProduto = produto.at(0);
-
-        QString sql = "SELECT nf FROM produtos WHERE id = :id";
-        query.prepare(sql);
-        query.bindValue(":id", idProduto);
-
-        if (!query.exec()) {
-            qWarning() << "Erro ao consultar produto ID" << idProduto << ":" << query.lastError().text();
-            continue;
-        }
-        if (query.next()) {
-            bool nf = query.value("nf").toBool();
-
-            if (nf) {
-                quantidadeProdutosNF++;
-            }
-        } else {
-            qWarning() << "Produto ID" << idProduto << "não encontrado no banco de dados.";
-        }
-    }
-    if(quantidadeProdutosNF > 0){
-        return true;
-    }else{
-        return false;
     }
 }

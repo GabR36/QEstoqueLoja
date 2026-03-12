@@ -202,6 +202,7 @@ ClienteDTO Cliente_repository::getClienteByID(qlonglong id){
     }
 
     query.next();
+    cli.id = id;
     cli.nome = query.value(0).toString();
     cli.email = query.value(1).toString();
     cli.telefone = query.value(2).toString();

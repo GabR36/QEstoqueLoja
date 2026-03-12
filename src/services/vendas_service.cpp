@@ -152,3 +152,43 @@ void Vendas_service::listarVendasCliente(QSqlQueryModel *model, qlonglong idclie
 }
 
 
+Vendas_service::ResultadoInsercaoRN Vendas_service::inserirVendaRegraDeNegocio(VendasDTO venda,
+                                                                     QList<ProdutoVendidoDTO> listaProds){
+
+    //  ser menor ou igual ao valor final
+    bool menorQueTotal = venda.desconto <= venda.total;
+
+    if (!menorQueTotal){
+        return {false, VendasErro::QuebraDeRegra, "Valor do desconto maior que o total.", -1};
+    }
+
+    if(venda.formaPagamento == "Prazo" && venda.idCliente <= 1){
+        return {false, VendasErro::QuebraDeRegra, "Cliente não especificado para venda a prazo.", -1};
+    }
+
+    // testar se o recebido é maior ou igual ao valor final
+    if (!venda.valorRecebido >= venda.valorFinal){
+        // caso não seja maior ou igual que o total avalie como erro.
+        return {false, VendasErro::QuebraDeRegra, "Valor Recebido deve ser maior que o valor final.", -1};
+    }
+    qlonglong idVenda = vendasRepo.inserir(venda);
+    if(idVenda <= 0){
+        return{false, VendasErro::InsercaoInvalida, "Erro ao inserir venda no banco de dados.", -1};
+    }
+
+    for(int i = 0; i < listaProds.size(); i++){
+        ProdutoVendidoDTO prod = listaProds[i];
+        prod.idVenda = idVenda;
+        auto result = prodVendaServ.inserir(prod);
+        if(!result.ok){
+            return {false, VendasErro::InsercaoInvalida, result.msg, -1};
+        }
+        auto result2 = prodServ.updateDiminuirQuantidadeProduto(prod.idProduto, prod.quantidade);
+        if(!result2.ok){
+            return {false, VendasErro::UpdateFalhou, result2.msg, -1};
+        }
+    }
+
+    return{true, VendasErro::Nenhum, "Sucesso ao inserir venda.", idVenda};
+
+}

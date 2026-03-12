@@ -61,7 +61,7 @@ void NfeACBR::setNfRef(QString chnfe){
     refNfe = chnfe;
 }
 
-int NfeACBR::getNNF(){
+qlonglong NfeACBR::getNNF(){
     return std::stoi(nnf);
 }
 QString NfeACBR::getChaveNf(){
@@ -107,11 +107,7 @@ QString NfeACBR::getVersaoLib(){
 qlonglong NfeACBR::getProximoNNF(){
     bool tpAmb = configDTO.tpAmbFiscal; // 1 = produção, 0 = homologação
 
-    int nnfConfigurado = (tpAmb == 0)
-                             ? configDTO.nnfHomologNfeFiscal
-                             : configDTO.nnfProdNfeFiscal;
-
-    return notaServ.getProximoNNF(serieNf, tpAmb, nnfConfigurado);
+    return notaServ.getProximoNNF(serieNf, tpAmb, ModeloNota::NFe);
 }
 
 QString NfeACBR::getCnpjEmit(){
@@ -303,7 +299,7 @@ void NfeACBR::setProdutosNota(QList<qlonglong> &idsProduto)
 
 void NfeACBR::setProdutosVendidosNew(QList<ProdutoVendidoDTO> listaProds, bool emitirTodos){
     emitirApenasNf = !emitirTodos;
-
+    QList<ProdutoParaNFeDTO> lista;
     for(const ProdutoVendidoDTO &produto : listaProds){
 
         ProdutoDTO prodFiscal = prodServ.getProduto(produto.idProduto);
@@ -349,9 +345,9 @@ void NfeACBR::setProdutosVendidosNew(QList<ProdutoVendidoDTO> listaProds, bool e
         qDebug() << "valorUnitario: " << p.valorUnitario;
         qDebug() << "valorTotal: " << p.valorTotal;
 
-        listaProdutosNFe.append(p);
+        lista.append(p);
     }
-
+    listaProdutosNFe = lista;
     quantProds = listaProdutosNFe.size();
 }
 

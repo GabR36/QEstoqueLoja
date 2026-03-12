@@ -264,3 +264,12 @@ ProdutoDTO Produto_Service::getProdutoPeloCodBarras(const QString &codigo){
     return repo.getProdutoPeloCodBarras(codigo);
 }
 
+Produto_Service::Resultado Produto_Service::updateDiminuirQuantidadeProduto(qlonglong idprod,
+                                                                            double quantia ){
+    if(!repo.updateDiminuirQuantidadeProduto(idprod, quantia)){
+        return {false, ProdutoErro::Update, "Erro ao atualizar quantia produto."};
+    }else{
+        return {true, ProdutoErro::Nenhum, "Quantia atualizada com sucesso"};
+    }
+}
+

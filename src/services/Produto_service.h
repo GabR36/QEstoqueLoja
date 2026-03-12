@@ -59,6 +59,7 @@ public:
   Produto_Service::Resultado updateAumentarQuantidadeProduto(qlonglong idprod, double quantia);
   ProdutoDTO getProduto(qlonglong id);
   ProdutoDTO getProdutoPeloCodBarras(const QString &codigo);
+  Produto_Service::Resultado updateDiminuirQuantidadeProduto(qlonglong idprod, double quantia);
   private slots:
 };
 

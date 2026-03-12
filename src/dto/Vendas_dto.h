@@ -3,6 +3,7 @@
 #include <QString>
 
 struct VendasDTO {
+    qlonglong id;
     QString clienteNome;
     QString dataHora;
     double total = 0;

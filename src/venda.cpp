@@ -206,7 +206,7 @@ venda::~venda()
 {
     delete ui;
 }
-int venda::validarCliente(bool mostrarMensagens)
+qlonglong venda::validarCliente(bool mostrarMensagens)
 {
     auto resultado =
         cliServ.validarClienteTexto(ui->Ledit_Cliente->text());
@@ -377,7 +377,7 @@ QList<ProdutoVendidoDTO> venda::obterProdutosSelecionados()
 
 void venda::on_Btn_Aceitar_clicked()
 {
-    int idCliente = validarCliente(true);
+    qlonglong idCliente = validarCliente(true);
 
     if (idCliente < 0)
         return;

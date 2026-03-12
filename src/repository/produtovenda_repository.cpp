@@ -205,3 +205,27 @@ ProdutoVendidoDTO ProdutoVenda_repository::getProdutoVendido(qlonglong id){
     return prod;
 
 }
+
+bool ProdutoVenda_repository::inserir(ProdutoVendidoDTO prod){
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco (inserir)";
+        return false;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO produtos_vendidos (id_produto, id_venda, quantidade, preco_vendido) VALUES "
+                  "(:idprod, :idvenda, :quantidade, :precovendido)");
+
+    query.bindValue(":idprod", prod.idProduto);
+    query.bindValue(":idvenda", prod.idVenda);
+    query.bindValue(":quantidade", prod.quantidade);
+    query.bindValue(":precovendido", prod.precoVendido);
+
+    if(!query.exec()){
+        qDebug() << "Query não executou  inserir produto vendido.";
+        db.close();
+        return false;
+    }
+    db.close();
+    return true;
+}

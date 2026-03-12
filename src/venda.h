@@ -38,7 +38,7 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
 
     void focusInEvent(QFocusEvent *event) override;
-    int validarCliente(bool mostrarMensagens);
+    qlonglong validarCliente(bool mostrarMensagens);
     void atualizarListaCliente();
     void atualizarTotalProduto();
     void selecionarClienteNovo();

@@ -25,6 +25,7 @@ public:
     bool updateNewTotalTrocoValorFinal(double total, double troco, double valorFinal, qlonglong id);
     void listarVendasCliente(QSqlQueryModel *model, qlonglong idcliente);
     void listarVendasDeAteFormaPagamento(QSqlQueryModel *model, const QString &de, const QString &ate, VendasUtil::VendasFormaPagamento formaPag, qlonglong idCliente);
+    qlonglong inserir(VendasDTO venda);
 private:
     QSqlDatabase db;
 

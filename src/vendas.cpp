@@ -472,7 +472,6 @@ void Vendas::abrirDanfeXml(QString id_Venda){
         QMessageBox::warning(this, "Aviso", "Não foi possivel gerar DANFE com essa venda");
 
     }
-
 }
 
 void Vendas::on_cb_BuscaVendasPrazo_checkStateChanged(const Qt::CheckState &arg1)

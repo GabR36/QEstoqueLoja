@@ -23,6 +23,7 @@ public:
     void listarProdutos(QSqlQueryModel *model);
     void pesquisar(const QStringList &palavras, const QString &textoNormalizado, QSqlQueryModel *model);
     ProdutoDTO getProdutoPeloCodBarras(const QString &codigo);
+    bool updateDiminuirQuantidadeProduto(qlonglong idprod, double quantia);
 private:
     QSqlDatabase db;
 };

@@ -166,7 +166,7 @@ qlonglong notafiscal_repository::getIdFromIdVenda(qlonglong idvenda){
 }
 
 
-qlonglong notafiscal_repository::getProximoNNF(QString serie, bool tpAmb, qlonglong nnfConfigurado){
+qlonglong notafiscal_repository::getProximoNNF55(QString serie, bool tpAmb, qlonglong nnfConfigurado){
     if(!DatabaseConnection_service::open()){
         qDebug() << "Banco nao abriu getProximoNNF()";
         return -1;
@@ -185,6 +185,49 @@ qlonglong notafiscal_repository::getProximoNNF(QString serie, bool tpAmb, qlongl
         );
 
     query.bindValue(":modelo", "55");
+    query.bindValue(":serie", serie);
+    query.bindValue(":tp_amb", tpAmb);
+
+    if(!query.exec()){
+        qWarning() << "Erro na consulta NNF:" << query.lastError().text();
+        db.close();
+        return -1;
+    }
+
+    if(query.next()){
+        int ultimoNNF = query.value(0).toInt();
+        db.close();
+        return ultimoNNF + 1;
+    }
+
+    // Se não encontrou nenhuma nota
+    if(nnfConfigurado > 0){
+        db.close();
+        return nnfConfigurado + 1;
+    }
+    db.close();
+    return 1; // fallback final
+}
+
+qlonglong notafiscal_repository::getProximoNNF65(QString serie, bool tpAmb, qlonglong nnfConfigurado){
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "Banco nao abriu getProximoNNF()";
+        return -1;
+    }
+
+    QSqlQuery query(db);
+
+    query.prepare(
+        "SELECT nnf FROM notas_fiscais "
+        "WHERE modelo = :modelo "
+        "AND serie = :serie "
+        "AND tp_amb = :tp_amb "
+        "AND finalidade != 'ENTRADA EXTERNA' "
+        "ORDER BY nnf DESC "
+        "LIMIT 1"
+        );
+
+    query.bindValue(":modelo", "65");
     query.bindValue(":serie", serie);
     query.bindValue(":tp_amb", tpAmb);
 
@@ -261,9 +304,10 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
     QString dataFormatada = DataUtil::getDataAgoraUS();
     QSqlQuery query(db);
 
-    QString dhemi = nota.dhEmi;
-    QDateTime dt = QDateTime::fromString(dhemi, "dd/MM/yyyy HH:mm:ss");
-    QString dhemiFormatada = dt.toString("yyyy-MM-dd HH:mm:ss");
+    // QString dhemi = nota.dhEmi;
+    // QDateTime dt = QDateTime::fromString(dhemi, "dd/MM/yyyy HH:mm:ss");
+    // QString dhemiFormatada = dt.toString("yyyy-MM-dd HH:mm:ss");
+    // qDebug() << "dhemi formatada:" << dhemiFormatada;
 
     query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, tp_amb, xml_path, valor_total, "
                   "atualizado_em, id_venda, "
@@ -286,7 +330,7 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
     query.bindValue(":finalidade", nota.finalidade);
     query.bindValue(":saida", nota.saida);
     query.bindValue(":idnfref", nota.idNfRef);
-    query.bindValue(":dhemi", dhemiFormatada);
+    query.bindValue(":dhemi", nota.dhEmi);
     query.bindValue(":idemissor", nota.idEmissorCliente);
 
     if(!query.exec()){

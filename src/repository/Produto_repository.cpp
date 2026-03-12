@@ -374,3 +374,23 @@ ProdutoDTO Produto_Repository::getProdutoPeloCodBarras(const QString &codigo){
     db.close();
     return prod;
 }
+
+bool Produto_Repository::updateDiminuirQuantidadeProduto(qlonglong idprod, double quantia){
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao updateDiminuirQuantidadeProduto";
+        return false;
+    }
+    QSqlQuery query(db);
+    query.prepare("UPDATE produtos SET quantidade = quantidade - :quant WHERE id = :id");
+    query.bindValue(":quant", quantia);
+    query.bindValue(":id", idprod);
+
+    if(!query.exec()){
+        qDebug() << "Query updateAumentarQuantidadeProduto nao rodou.";
+        db.close();
+        return false;
+    }else{
+        db.close();
+        return true;
+    }
+}

@@ -353,3 +353,39 @@ void Vendas_repository::listarVendasCliente(QSqlQueryModel *model, qlonglong idc
     db.close();
 }
 
+qlonglong Vendas_repository::inserir(VendasDTO venda){
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco inserir venda";
+        return -1;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, "
+                  "valor_recebido, troco, taxa, valor_final, desconto, id_cliente, esta_pago) "
+                  "VALUES (:cliente, :total, :datahora, :formapag, :recebido, :troco, :taxa, "
+                  ":valorfinal, :desconto, :idcliente, :estapago)");
+
+    query.bindValue(":cliente", venda.clienteNome);
+    query.bindValue(":total", venda.total);
+    query.bindValue(":datahora", venda.dataHora);
+    query.bindValue(":formapag", venda.formaPagamento);
+    query.bindValue(":recebido", venda.valorRecebido);
+    query.bindValue(":troco", venda.troco);
+    query.bindValue(":taxa", venda.taxa);
+    query.bindValue(":valorfinal", venda.valorFinal);
+    query.bindValue(":desconto", venda.desconto);
+    query.bindValue(":idcliente", venda.idCliente);
+    query.bindValue(":estapago", venda.estaPago);
+
+    if(!query.exec()){
+        qDebug() << "Query não executou inserir venda()";
+        db.close();
+        return -1;
+    }
+
+    qlonglong idVenda = query.lastInsertId().toInt();
+
+    db.close();
+    return idVenda;
+}
+

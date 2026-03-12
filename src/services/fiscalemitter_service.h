@@ -7,6 +7,8 @@
 #include "notafiscal_service.h"
 #include "../dto/Vendas_dto.h"
 #include "Produto_service.h"
+#include "../nota/nfceacbr.h"
+#include "../dto/Cliente_dto.h"
 
 enum class FiscalEmitterErro{
     Nenhum,
@@ -17,7 +19,9 @@ enum class FiscalEmitterErro{
     ErroAoEnviar,
     Recusado,
     InfoInsuficiente,
-    ProdutosSemNF
+    ProdutosSemNF,
+    QuebraDeRegra,
+    NCMInvalido
 };
 
 class FiscalEmitter_service : public QObject
@@ -31,6 +35,9 @@ public:
     };
     explicit FiscalEmitter_service(QObject *parent = nullptr);
     FiscalEmitter_service::Resultado enviarNfeDevolucaoPadrao(qlonglong idvenda, QList<ProdutoVendidoDTO> listaProds);
+    FiscalEmitter_service::Resultado enviarNfcePadrao(VendasDTO venda, QList<ProdutoVendidoDTO> listaProds,
+                                                      qlonglong nnf, ClienteDTO cliente, bool emitirTodos,
+                                                      bool ignorarNCM);
 private:
     NotaFiscal_service notaServ;
     Produto_Service prodServ;

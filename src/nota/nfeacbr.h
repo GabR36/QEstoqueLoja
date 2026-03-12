@@ -28,7 +28,7 @@ public:
     void setProdutosVendidos(QList<QList<QVariant> > produtosVendidos, bool emitirTodos);
     void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco,
                              float taxa);
-    int getNNF();
+    qlonglong getNNF();
     int getSerie();
     QString gerarEnviar();
     QString getXmlPath();

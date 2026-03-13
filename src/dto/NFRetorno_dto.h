@@ -1,8 +1,9 @@
-#ifndef NOTAFISCAL_DTO_H
-#define NOTAFISCAL_DTO_H
+#ifndef NFRETORNO_DTO_H
+#define NFRETORNO_DTO_H
+
 #include <QString>
 
-struct NotaFiscalDTO {
+struct NFRetornoDTO {
     QString cstat;
     qlonglong nnf;
     int serie;
@@ -10,17 +11,13 @@ struct NotaFiscalDTO {
     int tpAmb;
     QString xmlPath;
     double valorTotal = 0;
-    QString atualizadoEm;
-    qlonglong idVenda;
     QString cnpjEmit;
     QString chNfe;
     QString nProt;
     QString cuf;
     QString finalidade;
-    bool saida;
-    qlonglong idNfRef;
     QString dhEmi;
-    qlonglong idEmissorCliente;
+    QString xMotivo;
+    QString msg;
 };
-
-#endif // NOTAFISCAL_DTO_H
+#endif // NFRETORNO_DTO_H

@@ -3,6 +3,7 @@
 #include <QString>
 
 struct ClienteDTO {
+    qlonglong id;
     QString nome;
     QString email;
     QString telefone;

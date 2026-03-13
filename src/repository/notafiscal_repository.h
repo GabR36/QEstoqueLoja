@@ -14,6 +14,11 @@ public:
     qlonglong getIdFromChave(QString chnfe);
     bool updateWhereChave(NotaFiscalDTO dto, QString chave);
     qlonglong getIdFromIdVenda(qlonglong idvenda);
+    qlonglong getProximoNNF55(QString serie, bool tpAmb, qlonglong nnfConfigurado);
+    NotaFiscalDTO getNotaNormalFromIdVenda(qlonglong idvenda);
+    bool inserir(NotaFiscalDTO nota);
+    qlonglong getIdNotaNormalFromIdVenda(qlonglong idvenda);
+    qlonglong getProximoNNF65(QString serie, bool tpAmb, qlonglong nnfConfigurado);
 private:
     QSqlDatabase db;
 

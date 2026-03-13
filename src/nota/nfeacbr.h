@@ -10,6 +10,13 @@
 #include <QLocale>
 #include <sstream>
 #include "../services/config_service.h"
+#include "../dto/NotaFiscal_dto.h"
+#include "../services/notafiscal_service.h"
+#include "../dto/ProdutoVendido_dto.h"
+#include "../services/Produto_service.h"
+#include "../dto/ProdutoParaNFe_dto.h"
+#include "../dto/NFRetorno_dto.h"
+#include "../dto/Cliente_dto.h"
 
 class NfeACBR : public QObject
 {
@@ -17,19 +24,17 @@ class NfeACBR : public QObject
 public:
     explicit NfeACBR(QObject *parent = nullptr, bool saida = 1, bool devolucao = 0);
     QString getVersaoLib();
-    int getProximoNNF();
+    qlonglong getProximoNNF();
     void setNNF(int nNF);
     void setProdutosVendidos(QList<QList<QVariant> > produtosVendidos, bool emitirTodos);
     void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco,
                              float taxa);
-    int getNNF();
+    qlonglong getNNF();
     int getSerie();
     QString gerarEnviar();
     QString getXmlPath();
     double getVNF();
-    void setCliente(bool ehPf, QString cpf, QString nome, int indiedest, QString email,
-                    QString lgr, QString nro, QString bairro, QString cmun, QString xmun,
-                    QString uf, QString cep, QString ie);
+    void setCliente(ClienteDTO cliente);
     QString getChaveNf();
     void setNfRef(QString chnfe);
     QString getTpAmb();
@@ -39,6 +44,8 @@ public:
     void setProdutosNota(QList<qlonglong> &idsProduto);
 
     std::string getPdfDanfe();
+    void setProdutosVendidosNew(QList<ProdutoVendidoDTO> listaProds, bool emitirTodos);
+    NFRetornoDTO gerarEnviarRetorno();
 private:
     ACBrNFe *nfe;
     QSqlDatabase db;
@@ -59,9 +66,8 @@ private:
     bool ehPfCliente, emitirApenasNf;
     int quantProds;
     QVector<float> vTotTribProduto;
-    QVector<float> descontoProd;
-    QList<QList<QVariant>>listaProdutos;
-    double descontoNf,trocoNf,vPagNf, vNf;
+    // QVector<float> descontoProd;
+    double descontoNf,trocoNf,vPagNf, vNf = 0;
     QString indPagNf,tPagNf;
     float taxaPercentual;
     double totalGeral;
@@ -82,6 +88,7 @@ private:
     };
 
     tipoNota tipo;
+    QList<ProdutoParaNFeDTO> listaProdutosNFe;
 
     void carregarConfig();
     void ide();
@@ -98,10 +105,14 @@ private:
 
     bool isValidGTIN(const QString &gtin);
     void aplicarDescontoTotal(float descontoTotal);
-    float corrigirTaxa(float taxaAntiga, float desconto);
+    double corrigirTaxa(double taxaAntiga, double desconto);
     void aplicarAcrescimoProporcional(float taxaPercentual);
 
     QString cfopDevolucao(const QString &cfopOriginal);
+    NotaFiscal_service notaServ;
+    Produto_Service prodServ;
+
+    double getSomaValorTotalProdutos();
 signals:
 };
 

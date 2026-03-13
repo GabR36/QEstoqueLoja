@@ -191,6 +191,9 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/dto/EntradaVenda_dto.h
         src/dto/ResumoVendas_dto.h
         src/util/vendasutil.h src/util/vendasutil.cpp
+        src/services/fiscalemitter_service.h src/services/fiscalemitter_service.cpp
+        src/dto/ProdutoParaNFe_dto.h
+        src/dto/NFRetorno_dto.h
 
 
 

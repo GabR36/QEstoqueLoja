@@ -31,6 +31,7 @@ public:
     ProdutoVenda_service::Resultado deletarProdutosVendidosPorIdVenda(qlonglong idvenda);
     bool temApenasUmProduto(qlonglong idvenda);
     ProdutoVendidoDTO getProdutoVendido(qlonglong id);
+    ProdutoVenda_service::Resultado inserir(ProdutoVendidoDTO prod);
 private:
     ProdutoVenda_repository prodVendaRepo;
 

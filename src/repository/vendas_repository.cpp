@@ -160,7 +160,8 @@ void Vendas_repository::listarVendasDeAteFormaPagamento(
     QSqlQueryModel *model,
     const QString& de,
     const QString& ate,
-    VendasUtil::VendasFormaPagamento formaPag)
+    VendasUtil::VendasFormaPagamento formaPag,
+    qlonglong idCliente)
 {
     if (!model) {
         qDebug() << "Model inválido em listarVendasDeAteFormaPagamento";
@@ -180,7 +181,12 @@ void Vendas_repository::listarVendasDeAteFormaPagamento(
         "FROM vendas2 "
         "WHERE data_hora BETWEEN :de AND :ate ";
 
-    // Adiciona filtro de forma de pagamento
+    // filtro por cliente
+    if (idCliente > 0) {
+        sql += "AND id_cliente = :idCliente ";
+    }
+
+    // filtro por forma pagamento
     if (formaPag != VendasUtil::VendasFormaPagamento::Nenhuma) {
         sql += "AND forma_pagamento = :formaPag ";
     }
@@ -192,32 +198,22 @@ void Vendas_repository::listarVendasDeAteFormaPagamento(
     query.bindValue(":de", de);
     query.bindValue(":ate", ate);
 
-    // Converter enum para string do banco
+    if (idCliente > 0) {
+        query.bindValue(":idCliente", idCliente);
+    }
+
     if (formaPag != VendasUtil::VendasFormaPagamento::Nenhuma) {
 
         QString formaString;
 
         switch (formaPag) {
-        case VendasUtil::VendasFormaPagamento::Dinheiro:
-            formaString = "Dinheiro";
-            break;
-        case VendasUtil::VendasFormaPagamento::Credito:
-            formaString = "Crédito";
-            break;
-        case VendasUtil::VendasFormaPagamento::Debito:
-            formaString = "Débito";
-            break;
-        case VendasUtil::VendasFormaPagamento::Pix:
-            formaString = "Pix";
-            break;
-        case VendasUtil::VendasFormaPagamento::Prazo:
-            formaString = "Prazo";
-            break;
-        case VendasUtil::VendasFormaPagamento::NaoSei:
-            formaString = "Não Sei";
-            break;
-        default:
-            break;
+        case VendasUtil::VendasFormaPagamento::Dinheiro: formaString = "Dinheiro"; break;
+        case VendasUtil::VendasFormaPagamento::Credito: formaString = "Crédito"; break;
+        case VendasUtil::VendasFormaPagamento::Debito: formaString = "Débito"; break;
+        case VendasUtil::VendasFormaPagamento::Pix: formaString = "Pix"; break;
+        case VendasUtil::VendasFormaPagamento::Prazo: formaString = "Prazo"; break;
+        case VendasUtil::VendasFormaPagamento::NaoSei: formaString = "Não Sei"; break;
+        default: break;
         }
 
         query.bindValue(":formaPag", formaString);
@@ -225,13 +221,10 @@ void Vendas_repository::listarVendasDeAteFormaPagamento(
 
     if (!query.exec()) {
         qDebug() << "Erro SQL:" << query.lastError().text();
-        db.close();
         return;
     }
 
     model->setQuery(query);
-
-    db.close();
 }
 
 ResumoVendasDTO Vendas_repository::calcularResumo(
@@ -329,3 +322,70 @@ bool Vendas_repository::updateNewTotalTrocoValorFinal(double total, double troco
     db.close();
     return true;
 }
+
+void Vendas_repository::listarVendasCliente(QSqlQueryModel *model, qlonglong idcliente)
+{
+    if (!model) {
+        qDebug() << "Model inválido em listarVendasDeAteFormaPagamento";
+        return;
+    }
+
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco";
+        return;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("SELECT id, valor_final, forma_pagamento, data_hora, cliente, "
+            "esta_pago, total, desconto, taxa, valor_recebido, troco "
+            "FROM vendas2 "
+            "WHERE id_cliente = :idcli ORDER BY id DESC");
+    query.bindValue(":idcli", idcliente);
+
+    if (!query.exec()) {
+        qDebug() << "Erro SQL:" << query.lastError().text();
+        db.close();
+        return;
+    }
+
+    model->setQuery(query);
+
+    db.close();
+}
+
+qlonglong Vendas_repository::inserir(VendasDTO venda){
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco inserir venda";
+        return -1;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, "
+                  "valor_recebido, troco, taxa, valor_final, desconto, id_cliente, esta_pago) "
+                  "VALUES (:cliente, :total, :datahora, :formapag, :recebido, :troco, :taxa, "
+                  ":valorfinal, :desconto, :idcliente, :estapago)");
+
+    query.bindValue(":cliente", venda.clienteNome);
+    query.bindValue(":total", venda.total);
+    query.bindValue(":datahora", venda.dataHora);
+    query.bindValue(":formapag", venda.formaPagamento);
+    query.bindValue(":recebido", venda.valorRecebido);
+    query.bindValue(":troco", venda.troco);
+    query.bindValue(":taxa", venda.taxa);
+    query.bindValue(":valorfinal", venda.valorFinal);
+    query.bindValue(":desconto", venda.desconto);
+    query.bindValue(":idcliente", venda.idCliente);
+    query.bindValue(":estapago", venda.estaPago);
+
+    if(!query.exec()){
+        qDebug() << "Query não executou inserir venda()";
+        db.close();
+        return -1;
+    }
+
+    qlonglong idVenda = query.lastInsertId().toInt();
+
+    db.close();
+    return idVenda;
+}
+

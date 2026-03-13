@@ -17,6 +17,7 @@ public:
     bool deletarPorIdVenda(qlonglong idvenda);
     int contarProdutosVendidosFromVenda(qlonglong idvenda);
     ProdutoVendidoDTO getProdutoVendido(qlonglong id);
+    bool inserir(ProdutoVendidoDTO prod);
 private:
     QSqlDatabase db;
 

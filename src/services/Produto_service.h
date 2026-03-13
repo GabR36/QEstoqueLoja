@@ -41,11 +41,11 @@ public:
   double calcularPercentualLucro(double precoFornecedor, double precoFinal);
   static double round2(double v);
   static float round2f(float v);
-  QSqlQueryModel *listarProdutos();
+  void listarProdutos(QSqlQueryModel *model);
   QSqlQueryModel *getProdutoPeloCodigo(const QString &codigoBarras);
   Resultado deletar(const QString &id);
   static QString normalizeText(const QString &text);
-  QSqlQueryModel *pesquisar(const QString &texto);
+  void pesquisar(const QString &texto, QSqlQueryModel *);
   QSqlDatabase db;
   QLocale portugues;
   IbptUtil ibpt;
@@ -57,6 +57,9 @@ public:
   QStringList obterSugestoesLocal();
   Resultado atualizarLocalProduto(qlonglong id, const QString &novoLocal);
   Produto_Service::Resultado updateAumentarQuantidadeProduto(qlonglong idprod, double quantia);
+  ProdutoDTO getProduto(qlonglong id);
+  ProdutoDTO getProdutoPeloCodBarras(const QString &codigo);
+  Produto_Service::Resultado updateDiminuirQuantidadeProduto(qlonglong idprod, double quantia);
   private slots:
 };
 

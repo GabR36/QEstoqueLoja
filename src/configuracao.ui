@@ -799,7 +799,7 @@ border-radius: 0px;</string>
                 <item>
                  <widget class="QLineEdit" name="Ledt_IdCsrtRespTec">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="maxLength">
                    <number>20</number>
@@ -813,17 +813,17 @@ border-radius: 0px;</string>
                 <item>
                  <widget class="QLabel" name="label_27">
                   <property name="text">
-                   <string>HASH CSRT:</string>
+                   <string>CSRT:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLineEdit" name="Ledt_HashCsrtRespTec">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="maxLength">
-                   <number>20</number>
+                   <number>60</number>
                   </property>
                  </widget>
                 </item>

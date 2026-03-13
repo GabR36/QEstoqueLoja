@@ -3,15 +3,16 @@
 #include <QString>
 
 struct VendasDTO {
+    qlonglong id;
     QString clienteNome;
     QString dataHora;
-    double total;
+    double total = 0;
     QString formaPagamento;
-    double valorRecebido;
-    double troco;
-    double taxa;
-    double valorFinal;
-    double desconto;
+    double valorRecebido = 0;
+    double troco = 0;
+    double taxa = 0;
+    double valorFinal = 0;
+    double desconto = 0;
     bool estaPago;
     qlonglong idCliente;
 };

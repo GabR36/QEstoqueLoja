@@ -187,8 +187,7 @@ void MainWindow::setarIconesJanela(){
 
 void MainWindow::atualizarTableview()
 {
-    model = produtoService->listarProdutos();
-    ui->Tview_Produtos->setModel(model);
+    produtoService->listarProdutos(model);
 }
 
 
@@ -235,14 +234,13 @@ void MainWindow::on_Btn_Pesquisa_clicked()
 {
     QString inputText = ui->Ledit_Pesquisa->text();
 
-    auto model = produtoService->pesquisar(inputText);
+    produtoService->pesquisar(inputText, model);
 
     if (!model) {
         QMessageBox::warning(this, "Erro", "Erro ao realizar a pesquisa.");
         return;
     }
 
-    ui->Tview_Produtos->setModel(model);
 }
 
 void MainWindow::on_Btn_Alterar_clicked()
@@ -519,9 +517,8 @@ void MainWindow::on_actionDocumenta_o_triggered()
 
 void MainWindow::atualizarConfigAcbr(){
     qDebug() << " tentou atualizar acbr config";
-        auto *acbrService = new Acbr_service(this);
-        auto res = acbrService->configurar(VERSAO_QE);
-        acbrService->configurar(VERSAO_QE);
+        Acbr_service acbrService;
+        auto res = acbrService.configurar(VERSAO_QE);
         if(!res.ok){
             if(res.erro != AcbrErro::NaoEmitindoNf){
                 QMessageBox::critical(this, "Erro", res.msg);

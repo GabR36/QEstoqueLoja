@@ -26,21 +26,11 @@ private slots:
 private:
     void terminarPagamento() override;
     int idCliente;
-    NfceACBR *nfce;
-    NfeACBR *nfe;
     WaitDialog* waitDialog = nullptr;
     QString erroNf;
     QString idVenda;
-    // QString nomeCli, emailCli, telefoneCli, enderecoCli, cpfCli, numeroCli, bairroCli,
-    //     xMunCli, cMunCli, ufCli, cepCli, ieCli;
-    // int indIeCLi = 0;
-    // bool ehPfCli = false;
     bool emitTodosNf = false;
     QString cStat, xMotivo, msg, nProt;
-    QString enviarNfce(NfceACBR *nfce);
-    void salvarNfceBD(NfceACBR *nfce);
-    QString enviarNfe(NfeACBR *nfe);
-    void salvarNfeBD(NfeACBR *nfe);
     QString dhemiRet;
     void enviarEmailNFe(QString nomeCliente, QString emailCliente, QString xmlPath, std::string pdfDanfe);
     ConfigDTO configDTO;

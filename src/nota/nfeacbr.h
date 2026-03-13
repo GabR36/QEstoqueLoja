@@ -16,6 +16,7 @@
 #include "../services/Produto_service.h"
 #include "../dto/ProdutoParaNFe_dto.h"
 #include "../dto/NFRetorno_dto.h"
+#include "../dto/Cliente_dto.h"
 
 class NfeACBR : public QObject
 {
@@ -33,9 +34,7 @@ public:
     QString gerarEnviar();
     QString getXmlPath();
     double getVNF();
-    void setCliente(bool ehPf, QString cpf, QString nome, int indiedest, QString email,
-                    QString lgr, QString nro, QString bairro, QString cmun, QString xmun,
-                    QString uf, QString cep, QString ie);
+    void setCliente(ClienteDTO cliente);
     QString getChaveNf();
     void setNfRef(QString chnfe);
     QString getTpAmb();

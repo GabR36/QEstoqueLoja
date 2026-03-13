@@ -133,24 +133,22 @@ void NfeACBR::setNNF(int nNF){
     qDebug() << "NNF após set:" << QString::fromStdString(nnf);
 }
 
-void NfeACBR::setCliente(bool ehPf, QString cpf, QString nome, int indiedest,
-                          QString email, QString lgr, QString nro, QString bairro, QString cmun, QString xmun,
-                          QString uf, QString cep, QString ie){
+void NfeACBR::setCliente(ClienteDTO cliente){
 
-    ehPfCli = ehPf;
-    nomeCli = nome;
-    indiedestCli = indiedest;
-    emailCli = email;
-    lgrCli = lgr;
-    nroCli = nro;
-    bairroCli = bairro;
-    cmunCli = cmun;
-    xmunCli = xmun;
-    ufCli = uf;
-    cepCli = cep;
-    ieCli = ie;
-    cpfCli = cpf;
-    qDebug() << cpfCli << ehPfCli;
+    ehPfCli = cliente.ehPf;
+    nomeCli = cliente.nome;
+    indiedestCli = cliente.indIeDest;
+    emailCli = cliente.email;
+    lgrCli = cliente.endereco;
+    nroCli = QString::number(cliente.numeroEnd);
+    bairroCli = cliente.bairro;
+    cmunCli = cliente.cMun;
+    xmunCli = cliente.xMun;
+    ufCli = cliente.uf;
+    cepCli = cliente.cep;
+    ieCli = cliente.ie;
+    cpfCli = cliente.cpf;
+    // qDebug() << cpfCli << ehPfCli;
 
 }
 
@@ -1098,6 +1096,34 @@ NFRetornoDTO NfeACBR::gerarEnviarRetorno(){
         break;
     case saidaNormal:
         finalidade = "NORMAL";
+        // Processa todas as linhas do retorno do ACBr
+        for (const QString &linha : linhas) {
+            QString linhaTrim = linha.trimmed(); // Remove espaços e quebras de linha
+            if (linhaTrim.startsWith("CStat="))
+                cStat = linhaTrim.section('=', 1).trimmed();
+            else if (linhaTrim.startsWith("XMotivo="))
+                xMotivo = linhaTrim.section('=', 1).trimmed();
+            else if (linhaTrim.startsWith("Msg="))
+                msg = linhaTrim.section('=', 1).trimmed();
+            else if (linhaTrim.startsWith("NProt=") || linhaTrim.startsWith("nProt="))
+                nProt = linhaTrim.section('=', 1).trimmed();
+        }
+        nota.chNfe = getChaveNf();
+        nota.cnpjEmit = getCnpjEmit();
+        nota.cstat = cStat;
+        nota.cuf = getCuf();
+        nota.dhEmi = getDhEmiConvertida();
+        nota.finalidade = finalidade;
+        nota.modelo = "55";
+        nota.nnf = getNNF();
+        nota.nProt = nProt;
+        nota.serie = getSerie();
+        nota.tpAmb = getTpAmb().toInt();
+        nota.valorTotal = getVNF();
+        nota.xmlPath = getXmlPath();
+        nota.xMotivo = xMotivo;
+        nota.msg = msg;
+        return nota;
         break;
     default:
         finalidade = "N";

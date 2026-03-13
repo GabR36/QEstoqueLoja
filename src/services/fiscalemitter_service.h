@@ -38,6 +38,7 @@ public:
     FiscalEmitter_service::Resultado enviarNfcePadrao(VendasDTO venda, QList<ProdutoVendidoDTO> listaProds,
                                                       qlonglong nnf, ClienteDTO cliente, bool emitirTodos,
                                                       bool ignorarNCM);
+    FiscalEmitter_service::Resultado enviarNFePadrao(VendasDTO venda, QList<ProdutoVendidoDTO> listaProds, qlonglong nnf, ClienteDTO cliente, bool emitirTodos, bool ignorarNCM);
 private:
     NotaFiscal_service notaServ;
     Produto_Service prodServ;

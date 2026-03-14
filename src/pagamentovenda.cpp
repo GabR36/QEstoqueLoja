@@ -3,8 +3,6 @@
 #include <QTimer>
 #include "configuracao.h"
 #include <QSqlError>
-#include "util/mailmanager.h"
-#include <QDir>
 
 
 pagamentoVenda::pagamentoVenda(QList<ProdutoVendidoDTO> listaProdutos, QString total, QString cliente,
@@ -149,6 +147,10 @@ void pagamentoVenda::terminarPagamento(){
                                                  "Atenção", result1.msg + "\nDeseja continuar mesmo assim?",
                                                  QMessageBox::Yes | QMessageBox::No);
                 if(resposta == QMessageBox::No){
+                    auto r1 = vendaServ.deletarVendaRegraNegocio(newVenda.id, false);
+                    if(!r1.ok){
+                        QMessageBox::warning(this,"Erro", r1.msg);
+                    }
                     return;
                 }
                 if(resposta == QMessageBox::Yes){
@@ -165,6 +167,10 @@ void pagamentoVenda::terminarPagamento(){
             waitDialog->allowClose();
             if(!result1.ok){
                 waitDialog->setMessage(result1.msg);
+                auto r1 = vendaServ.deletarVendaRegraNegocio(newVenda.id, false);
+                if(!r1.ok){
+                    QMessageBox::warning(this,"Erro", r1.msg);
+                }
             }else{
                 waitDialog->setMessage(result1.msg);
                 QTimer::singleShot(1500, waitDialog, &WaitDialog::close); //fecha depois de 2 seg
@@ -182,6 +188,10 @@ void pagamentoVenda::terminarPagamento(){
                                                  "Atenção", result1.msg + "\nDeseja continuar mesmo assim?",
                                                  QMessageBox::Yes | QMessageBox::No);
                 if(resposta == QMessageBox::No){
+                    auto r1 = vendaServ.deletarVendaRegraNegocio(newVenda.id, false);
+                    if(!r1.ok){
+                        QMessageBox::warning(this,"Erro", r1.msg);
+                    }
                     return;
                 }
                 if(resposta == QMessageBox::Yes){
@@ -198,13 +208,17 @@ void pagamentoVenda::terminarPagamento(){
             waitDialog->allowClose();
             if(!result1.ok){
                 waitDialog->setMessage(result1.msg);
+                auto r1 = vendaServ.deletarVendaRegraNegocio(newVenda.id, false);
+                if(!r1.ok){
+                    QMessageBox::warning(this,"Erro", r1.msg);
+                }
                 return;
             }else{
                 waitDialog->setMessage(result1.msg);
                 QTimer::singleShot(1500, waitDialog, &WaitDialog::close); //fecha depois de 2 seg
             }
 
-        }else if(ui->CBox_ModeloEmit->currentIndex() == 2){
+        }else if(ui->CBox_ModeloEmit->currentIndex() == 2){ // nao emitir nf
         }
 
     }
@@ -214,56 +228,3 @@ void pagamentoVenda::terminarPagamento(){
 
 }
 
-void pagamentoVenda::enviarEmailNFe(QString nomeCliente, QString emailCliente,
-                                    QString xmlPath, std::string pdfDanfe){
-
-    try {
-
-        QDateTime data = portugues.toDateTime(dataGlobal, "dd-MM-yyyy hh:mm:ss");
-
-        auto mail = MailManager::instance().mail();
-        QByteArray pdfBytes = QByteArray::fromBase64(
-            QByteArray::fromStdString(pdfDanfe)
-            );
-        QString pdfPath =
-            QDir::tempPath() + "/DANFE_" +
-            QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss") +
-            ".pdf";
-
-        QFile pdfFile(pdfPath);
-        if (!pdfFile.open(QIODevice::WriteOnly)) {
-            qDebug() << "Erro ao criar PDF DANFE";
-            return;
-        }
-        pdfFile.write(pdfBytes);
-        pdfFile.close();
-
-        QString corpo;
-        QString nomeEmpresa = configDTO.nomeEmpresa;
-        QString dataFormatada = portugues.toString(
-            data,
-            "dddd, dd 'de' MMMM 'de' yyyy 'às' HH:mm"
-            );
-
-        corpo = "Olá " + nomeCliente + "\n\n"
-                                       "Agradecemos por comprar da " + nomeEmpresa + "!\n"
-                                       "em anexo, você encontrará os arquivos referentes à "
-                                "Nota Fiscal da compra de " +
-                                       dataFormatada + ".\n\n"
-                                       "Cordialmente,\n\n" +
-                                       nomeEmpresa;
-        mail->Limpar();
-        mail->LimparAnexos();
-        mail->AddCorpoAlternativo(corpo.toStdString());
-        mail->SetAssunto("Nota Fiscal Eletrônica de " + configDTO.nomeEmpresa.toStdString());
-        mail->AddDestinatario(emailCliente.toStdString());
-        mail->AddAnexo(xmlPath.toStdString(), "XML NFe", 0);
-        mail->AddAnexo(pdfPath.toStdString(), "DANFE (PDF)", 0);
-
-        mail->Enviar();
-        qDebug() << "email enviado NFE";
-    }
-    catch (const std::exception& e) {
-        qDebug() << "email não enviado NFE";
-    }
-}

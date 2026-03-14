@@ -12,6 +12,7 @@
 #include "services/cliente_service.h"
 #include "services/vendas_service.h"
 #include "services/notafiscal_service.h"
+#include "services/email_service.h"
 
 class pagamentoVenda : public pagamento
 {
@@ -32,7 +33,6 @@ private:
     bool emitTodosNf = false;
     QString cStat, xMotivo, msg, nProt;
     QString dhemiRet;
-    void enviarEmailNFe(QString nomeCliente, QString emailCliente, QString xmlPath, std::string pdfDanfe);
     ConfigDTO configDTO;
     ProdutoVenda_service prodVendaServ;
     Cliente_service cliServ;
@@ -40,6 +40,7 @@ private:
     Vendas_service vendaServ;
     FiscalEmitter_service fiscalServ;
     NotaFiscal_service notaServ;
+    Email_service emailServ;
 signals:
     void gerarEnviarNf();
 

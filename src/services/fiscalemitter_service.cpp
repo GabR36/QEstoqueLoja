@@ -4,7 +4,9 @@
 
 FiscalEmitter_service::FiscalEmitter_service(QObject *parent)
     : QObject{parent}
-{}
+{
+    confDTO = confServ.carregarTudo();
+}
 
 FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNfeDevolucaoPadrao(qlonglong idvenda,
                                                                 QList<ProdutoVendidoDTO> listaProds){
@@ -319,7 +321,10 @@ FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNFePadrao(VendasDT
     if(!result.ok){
         return {false, FiscalEmitterErro::Salvar, "Erro ao salvar nota fiscal."};
     }else{
-        QString msg = "Nota enviada e salva com sucesso. CStat:" + nota.cstat;
+        QDateTime datavenda = QDateTime::fromString(nota.atualizadoEm, "yyyy-MM-dd HH:mm:ss");
+        auto r = emailServ.enviarEmailNFe(cliente.nome, cliente.email, nota.xmlPath,
+                                          nfe->getPdfDanfe(), datavenda, confDTO.nomeEmpresa);
+        QString msg = "Nota enviada e salva com sucesso. CStat:" + nota.cstat + "\n" + r.msg;
         return{true, FiscalEmitterErro::Nenhum, msg};
     }
 

@@ -9,6 +9,8 @@
 #include "Produto_service.h"
 #include "../nota/nfceacbr.h"
 #include "../dto/Cliente_dto.h"
+#include "email_service.h"
+#include "config_service.h"
 
 enum class FiscalEmitterErro{
     Nenhum,
@@ -33,6 +35,14 @@ public:
         FiscalEmitterErro erro = FiscalEmitterErro::Nenhum;
         QString msg;
     };
+
+    // struct ResultadoNFe {
+    //     bool ok = false;
+    //     FiscalEmitterErro erro = FiscalEmitterErro::Nenhum;
+    //     QString msg = "ERRO";
+    //     QString xmlPath = "";
+    //     std::string pdfDanfe = "";
+    // };
     explicit FiscalEmitter_service(QObject *parent = nullptr);
     FiscalEmitter_service::Resultado enviarNfeDevolucaoPadrao(qlonglong idvenda, QList<ProdutoVendidoDTO> listaProds);
     FiscalEmitter_service::Resultado enviarNfcePadrao(VendasDTO venda, QList<ProdutoVendidoDTO> listaProds,
@@ -42,6 +52,10 @@ public:
 private:
     NotaFiscal_service notaServ;
     Produto_Service prodServ;
+    Email_service emailServ;
+    Config_service confServ;
+    ConfigDTO confDTO;
+
 
 signals:
 };

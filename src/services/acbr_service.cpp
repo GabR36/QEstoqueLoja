@@ -55,6 +55,9 @@ Acbr_service::Resultado Acbr_service::configurar(const QString &versaoApp)
                                   "/imagens/" + QFileInfo(configDTO.logoPathEmpresa).fileName();
     std::string idCsrt = configDTO.idCSRTFiscal.toStdString();
     std::string csrt = configDTO.hashCSRTFiscal.toStdString();
+
+    std::string tlsEmail = (configDTO.tlsEmail == 0 ? "0" : "1");
+    std::string sslEmail = (configDTO.sslEmail == 0 ? "0" : "1");
     qDebug() << "CSRT:" << csrt;
 
     if(certificadoPath == "")
@@ -130,8 +133,8 @@ Acbr_service::Resultado Acbr_service::configurar(const QString &versaoApp)
     mail->ConfigGravarValor("Email", "Usuario", configDTO.usuarioEmail.toStdString());
     mail->ConfigGravarValor("Email", "Senha", configDTO.senhaEmail.toStdString());
     mail->ConfigGravarValor("Email", "Porta", configDTO.portaEmail.toStdString());
-    mail->ConfigGravarValor("Email", "SSL", QVariant(configDTO.sslEmail).toString().toStdString());
-    mail->ConfigGravarValor("Email", "TLS", QVariant(configDTO.tlsEmail).toString().toStdString());
+    mail->ConfigGravarValor("Email", "SSL", sslEmail);
+    mail->ConfigGravarValor("Email", "TLS", tlsEmail);
     mail->ConfigGravar("");
 
     return {true, AcbrErro::Nenhum, ""};

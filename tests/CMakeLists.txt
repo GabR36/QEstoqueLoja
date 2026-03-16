@@ -40,6 +40,8 @@ set(TEST_SOURCES
     # services
     services/test_produto_service.cpp
     services/test_barcode_service.cpp
+    services/test_vendas_service.cpp
+    services/test_produtovenda_service.cpp
 )
 
 # ==============================
@@ -96,6 +98,15 @@ add_executable(QEstoqueLojaTests
     ${CMAKE_SOURCE_DIR}/src/util/consultacnpjmanager.cpp
     recursosTest.qrc
     services/test_cliente_service.h services/test_cliente_service.cpp
+    services/test_vendas_service.h services/test_vendas_service.cpp
+    services/test_produtovenda_service.h services/test_produtovenda_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/services/vendas_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/repository/vendas_repository.cpp
+    ${CMAKE_SOURCE_DIR}/src/services/produtovenda_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/repository/produtovenda_repository.cpp
+    ${CMAKE_SOURCE_DIR}/src/services/entradasvendas_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/repository/entradasvendas_repository.cpp
+    ${CMAKE_SOURCE_DIR}/src/util/vendasutil.cpp
 
 
 

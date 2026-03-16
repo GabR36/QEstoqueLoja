@@ -388,70 +388,70 @@ void Entradas::on_Tview_ProdutosNota_customContextMenuRequested(const QPoint &po
 }
 
 void Entradas::devolverProdutos(QList<qlonglong> &idsProduto){
-    if(!db.isOpen()){
-        if(!db.open()){
-            qDebug() << "Banco nao abriu devolverProdutos()";
-        }
-    }
-    // void NfeACBR::setCliente(bool ehPf, QString cpf, QString nome, int indiedest,
-    //                          QString email, QString lgr, QString nro, QString bairro, QString cmun, QString xmun,
-    //                          QString uf, QString cep, QString ie
-    QSqlQuery query;
-    query.prepare("SELECT id_emissorcliente, chnfe FROM notas_fiscais WHERE id = :idnota");
-    query.bindValue(":idnota", id_nf_selec);
-    QString idcliente, chavenfe;
-    if(query.exec()){
-        while(query.next()){
-            idcliente = query.value(0).toString();
-            chavenfe = query.value(1).toString();
-        }
-    }else{
-        qDebug() << "QUERY nao rodou para achar o idclienteemissor em devolverproduto";
-        return;
-    }
+    // if(!db.isOpen()){
+    //     if(!db.open()){
+    //         qDebug() << "Banco nao abriu devolverProdutos()";
+    //     }
+    // }
+    // // void NfeACBR::setCliente(bool ehPf, QString cpf, QString nome, int indiedest,
+    // //                          QString email, QString lgr, QString nro, QString bairro, QString cmun, QString xmun,
+    // //                          QString uf, QString cep, QString ie
+    // QSqlQuery query;
+    // query.prepare("SELECT id_emissorcliente, chnfe FROM notas_fiscais WHERE id = :idnota");
+    // query.bindValue(":idnota", id_nf_selec);
+    // QString idcliente, chavenfe;
+    // if(query.exec()){
+    //     while(query.next()){
+    //         idcliente = query.value(0).toString();
+    //         chavenfe = query.value(1).toString();
+    //     }
+    // }else{
+    //     qDebug() << "QUERY nao rodou para achar o idclienteemissor em devolverproduto";
+    //     return;
+    // }
 
-    Cliente dest;
+    // Cliente dest;
 
-    query.prepare("SELECT eh_pf, cpf, nome, indIEDest, email, endereco, numero_end, bairro, "
-                  "cMun, xMun, uf, cep, ie FROM clientes WHERE id = :idcliente");
-    query.bindValue(":idcliente", idcliente);
+    // query.prepare("SELECT eh_pf, cpf, nome, indIEDest, email, endereco, numero_end, bairro, "
+    //               "cMun, xMun, uf, cep, ie FROM clientes WHERE id = :idcliente");
+    // query.bindValue(":idcliente", idcliente);
 
-    if(query.exec()){
-        while(query.next()){
-            dest.nome = query.value("nome").toString();
-            dest.ehpf = query.value("eh_pf").toBool();
-            dest.cpfcnpj = query.value("cpf").toString();
-            dest.indiedest = query.value("indIEDest").toInt();
-            dest.email = query.value("email").toString();
-            dest.endereco = query.value("endereco").toString();
-            dest.numero_end = query.value("numero_end").toString();
-            dest.bairro = query.value("bairro").toString();
-            dest.cmun = query.value("cMun").toString();
-            dest.xmun = query.value("xMun").toString();
-            dest.uf = query.value("uf").toString();
-            dest.cep = query.value("cep").toString();
-            dest.ie = query.value("ie").toString();
-        }
-    }else{
-        qDebug() << "QUERY nao rodou para achar as infos do idclienteemissor em devolverproduto";
-        return;
-    }
+    // if(query.exec()){
+    //     while(query.next()){
+    //         dest.nome = query.value("nome").toString();
+    //         dest.ehpf = query.value("eh_pf").toBool();
+    //         dest.cpfcnpj = query.value("cpf").toString();
+    //         dest.indiedest = query.value("indIEDest").toInt();
+    //         dest.email = query.value("email").toString();
+    //         dest.endereco = query.value("endereco").toString();
+    //         dest.numero_end = query.value("numero_end").toString();
+    //         dest.bairro = query.value("bairro").toString();
+    //         dest.cmun = query.value("cMun").toString();
+    //         dest.xmun = query.value("xMun").toString();
+    //         dest.uf = query.value("uf").toString();
+    //         dest.cep = query.value("cep").toString();
+    //         dest.ie = query.value("ie").toString();
+    //     }
+    // }else{
+    //     qDebug() << "QUERY nao rodou para achar as infos do idclienteemissor em devolverproduto";
+    //     return;
+    // }
 
-    nfe->setNNF(nfe->getProximoNNF());
-    nfe->setNfRef(chavenfe);
-    nfe->setProdutosNota(idsProduto);
-    nfe->setCliente(dest.ehpf, dest.cpfcnpj, dest.nome, dest.indiedest, dest.email,
-    dest.endereco, dest.numero_end, dest.bairro, dest.cmun, dest.xmun, dest.uf, dest.cep,
-    dest.ie);
-    QString retorno = nfe->gerarEnviar();
-    QString msg = salvarDevolucaoNf(retorno, QString::number(id_nf_selec), nfe, idsProduto);
-    QMessageBox::information(this, "Aviso", msg);
+    // nfe->setNNF(nfe->getProximoNNF());
+    // nfe->setNfRef(chavenfe);
+    // nfe->setProdutosNota(idsProduto);
+    // nfe->setCliente(dest.ehpf, dest.cpfcnpj, dest.nome, dest.indiedest, dest.email,
+    // dest.endereco, dest.numero_end, dest.bairro, dest.cmun, dest.xmun, dest.uf, dest.cep,
+    // dest.ie);
+    // QString retorno = nfe->gerarEnviar();
+    // QString msg = salvarDevolucaoNf(retorno, QString::number(id_nf_selec), nfe, idsProduto);
+    // QMessageBox::information(this, "Aviso", msg);
 
-    if(cstatRetornado == "100" || cstatRetornado == "150" && nfe->getTpAmb() == "1"){
-        enviarEmailNFe(dest.nome, dest.email, nfe->getXmlPath(), nfe->getPdfDanfe(), dest.cpfcnpj);
-    }
+    // if(cstatRetornado == "100" || cstatRetornado == "150" && nfe->getTpAmb() == "1"){
+    //     enviarEmailNFe(dest.nome, dest.email, nfe->getXmlPath(), nfe->getPdfDanfe(), dest.cpfcnpj);
+    // }
 
-    db.close();
+    // db.close();
 
 }
 

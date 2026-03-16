@@ -692,7 +692,18 @@ void NfceACBR::ibscbsTotais()
     ini << "vCredPresCondSus=0,00\n\n";
 }
 
+void NfceACBR::setRetornoForcado(const QString &retorno)
+{
+    retornoForcado = retorno;
+}
+
 QString NfceACBR::gerarEnviar(){
+
+    if (!retornoForcado.isEmpty()) {
+        // Calcula vNf a partir dos produtos já carregados, sem chamar a lib
+        total();
+        return retornoForcado;
+    }
 
     ini.str("");  // Limpar conteúdo anterior
     ini.clear();
@@ -757,6 +768,8 @@ NFRetornoDTO NfceACBR::gerarEnviarRetorno(){
 
     QStringList linhas = retorno.split('\n', Qt::SkipEmptyParts);
 
+    QString nomeArq, chDFe;
+
     for (const QString &linha : linhas) {
         QString linhaTrim = linha.trimmed(); // Remove espaços e quebras de linha
         if (linhaTrim.startsWith("CStat="))
@@ -767,13 +780,17 @@ NFRetornoDTO NfceACBR::gerarEnviarRetorno(){
             msg = linhaTrim.section('=', 1).trimmed();
         else if (linhaTrim.startsWith("NProt=") || linhaTrim.startsWith("nProt="))
             nProt = linhaTrim.section('=', 1).trimmed();
+        else if (linhaTrim.startsWith("NomeArq="))
+            nomeArq = linhaTrim.section('=', 1).trimmed();
+        else if (linhaTrim.startsWith("chDFe="))
+            chDFe = linhaTrim.section('=', 1).trimmed();
     }
 
     qDebug() << "Retorno ACBr:" << retorno;
     qDebug() << "cStat:" << cStat << "xMotivo:" << xMotivo << "nProt:" << nProt;
 
     QString tpamb = (QString::fromStdString(tpAmb) == "1" ? "0" : "1");
-    nota.chNfe = getChaveNf();
+    nota.chNfe = !retornoForcado.isEmpty() ? chDFe : getChaveNf();
     nota.cnpjEmit = configDTO.cnpjEmpresa;
     nota.cstat = cStat;
     nota.cuf = configDTO.cUfFiscal;
@@ -785,7 +802,7 @@ NFRetornoDTO NfceACBR::gerarEnviarRetorno(){
     nota.serie = getSerie();
     nota.tpAmb = tpamb.toInt();
     nota.valorTotal = getVNF();
-    nota.xmlPath = getXmlPath();
+    nota.xmlPath = !retornoForcado.isEmpty() ? nomeArq : getXmlPath();
     nota.xMotivo = xMotivo;
     nota.msg = msg;
     return nota;

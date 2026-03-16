@@ -37,6 +37,7 @@ public:
     QString getDhEmiConvertida();
     NFRetornoDTO gerarEnviarRetorno();
     void setProdutosVendidosNew(QList<ProdutoVendidoDTO> listaProds, bool emitirTodos);
+    void setRetornoForcado(const QString &retorno);
 private:
     ACBrNFe *nfce;
     QSqlDatabase db;
@@ -63,6 +64,7 @@ private:
     double totalGeral;
     bool usarIBS;
     std::string dataHora;
+    QString retornoForcado = "";
     Produto_Service prodServ;
 
 

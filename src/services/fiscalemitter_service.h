@@ -44,12 +44,14 @@ public:
     //     std::string pdfDanfe = "";
     // };
     explicit FiscalEmitter_service(QObject *parent = nullptr);
+    void setRetornoForcado(const QString &retorno);
     FiscalEmitter_service::Resultado enviarNfeDevolucaoPadrao(qlonglong idvenda, QList<ProdutoVendidoDTO> listaProds);
     FiscalEmitter_service::Resultado enviarNfcePadrao(VendasDTO venda, QList<ProdutoVendidoDTO> listaProds,
                                                       qlonglong nnf, ClienteDTO cliente, bool emitirTodos,
                                                       bool ignorarNCM);
     FiscalEmitter_service::Resultado enviarNFePadrao(VendasDTO venda, QList<ProdutoVendidoDTO> listaProds, qlonglong nnf, ClienteDTO cliente, bool emitirTodos, bool ignorarNCM);
 private:
+    QString retornoForcado = "";
     NotaFiscal_service notaServ;
     Produto_Service prodServ;
     Email_service emailServ;

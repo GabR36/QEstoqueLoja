@@ -11,6 +11,7 @@
 #include "services/test_manifestadordfe.h"
 #include "services/test_vendas_service.h"
 #include "services/test_produtovenda_service.h"
+#include "services/test_fiscalemitter_service.h"
 #include <QSqlDatabase>
 
 int main(int argc, char *argv[])
@@ -29,6 +30,7 @@ int main(int argc, char *argv[])
     status |= QTest::qExec(new test_cliente_service, argc, argv);
     status |= QTest::qExec(new TestVendasService, argc, argv);
     status |= QTest::qExec(new TestProdutoVendaService, argc, argv);
+    status |= QTest::qExec(new TestFiscalEmitterService, argc, argv);
 
     return status;
 }

@@ -989,7 +989,17 @@ void NfeACBR::ibscbsTotais()
     ini << "vCredPresCondSus=0,00\n\n";
 }
 
+void NfeACBR::setRetornoForcado(const QString &retorno)
+{
+    retornoForcado = retorno;
+}
+
 QString NfeACBR::gerarEnviar(){
+
+    if (!retornoForcado.isEmpty()) {
+        total(); // calcula vNf a partir dos produtos carregados, sem chamar a lib
+        return retornoForcado;
+    }
 
     ini.str("");  // Limpar conteúdo anterior
     ini.clear();
@@ -1040,6 +1050,8 @@ QString NfeACBR::gerarEnviar(){
 }
 
 std::string NfeACBR::getPdfDanfe(){
+    if (!retornoForcado.isEmpty())
+        return "";
     std::string pdfBase64 = nfe->SalvarPDFBase64();
     return pdfBase64;
 }
@@ -1061,33 +1073,39 @@ NFRetornoDTO NfeACBR::gerarEnviarRetorno(){
     switch(tipo){
     case devolucaoVenda:
         finalidade = "DEVOLUCAO";
-        // Processa todas as linhas do retorno do ACBr
-        for (const QString &linha : linhas) {
-            QString linhaTrim = linha.trimmed(); // Remove espaços e quebras de linha
-            if (linhaTrim.startsWith("CStat="))
-                cStat = linhaTrim.section('=', 1).trimmed();
-            else if (linhaTrim.startsWith("XMotivo="))
-                xMotivo = linhaTrim.section('=', 1).trimmed();
-            else if (linhaTrim.startsWith("Msg="))
-                msg = linhaTrim.section('=', 1).trimmed();
-            else if (linhaTrim.startsWith("NProt=") || linhaTrim.startsWith("nProt="))
-                nProt = linhaTrim.section('=', 1).trimmed();
+        {
+            QString nomeArq, chDFe;
+            for (const QString &linha : linhas) {
+                QString linhaTrim = linha.trimmed();
+                if (linhaTrim.startsWith("CStat="))
+                    cStat = linhaTrim.section('=', 1).trimmed();
+                else if (linhaTrim.startsWith("XMotivo="))
+                    xMotivo = linhaTrim.section('=', 1).trimmed();
+                else if (linhaTrim.startsWith("Msg="))
+                    msg = linhaTrim.section('=', 1).trimmed();
+                else if (linhaTrim.startsWith("NProt=") || linhaTrim.startsWith("nProt="))
+                    nProt = linhaTrim.section('=', 1).trimmed();
+                else if (linhaTrim.startsWith("NomeArq="))
+                    nomeArq = linhaTrim.section('=', 1).trimmed();
+                else if (linhaTrim.startsWith("chDFe="))
+                    chDFe = linhaTrim.section('=', 1).trimmed();
+            }
+            nota.chNfe = !retornoForcado.isEmpty() ? chDFe : getChaveNf();
+            nota.cnpjEmit = getCnpjEmit();
+            nota.cstat = cStat;
+            nota.cuf = getCuf();
+            nota.dhEmi = getDhEmiConvertida();
+            nota.finalidade = finalidade;
+            nota.modelo = "55";
+            nota.nnf = getNNF();
+            nota.nProt = nProt;
+            nota.serie = getSerie();
+            nota.tpAmb = getTpAmb().toInt();
+            nota.valorTotal = getVNF();
+            nota.xmlPath = !retornoForcado.isEmpty() ? nomeArq : getXmlPath();
+            nota.xMotivo = xMotivo;
+            nota.msg = msg;
         }
-        nota.chNfe = getChaveNf();
-        nota.cnpjEmit = getCnpjEmit();
-        nota.cstat = cStat;
-        nota.cuf = getCuf();
-        nota.dhEmi = getDhEmiConvertida();
-        nota.finalidade = finalidade;
-        nota.modelo = "55";
-        nota.nnf = getNNF();
-        nota.nProt = nProt;
-        nota.serie = getSerie();
-        nota.tpAmb = getTpAmb().toInt();
-        nota.valorTotal = getVNF();
-        nota.xmlPath = getXmlPath();
-        nota.xMotivo = xMotivo;
-        nota.msg = msg;
         return nota;
 
         break;
@@ -1096,33 +1114,39 @@ NFRetornoDTO NfeACBR::gerarEnviarRetorno(){
         break;
     case saidaNormal:
         finalidade = "NORMAL";
-        // Processa todas as linhas do retorno do ACBr
-        for (const QString &linha : linhas) {
-            QString linhaTrim = linha.trimmed(); // Remove espaços e quebras de linha
-            if (linhaTrim.startsWith("CStat="))
-                cStat = linhaTrim.section('=', 1).trimmed();
-            else if (linhaTrim.startsWith("XMotivo="))
-                xMotivo = linhaTrim.section('=', 1).trimmed();
-            else if (linhaTrim.startsWith("Msg="))
-                msg = linhaTrim.section('=', 1).trimmed();
-            else if (linhaTrim.startsWith("NProt=") || linhaTrim.startsWith("nProt="))
-                nProt = linhaTrim.section('=', 1).trimmed();
+        {
+            QString nomeArq, chDFe;
+            for (const QString &linha : linhas) {
+                QString linhaTrim = linha.trimmed();
+                if (linhaTrim.startsWith("CStat="))
+                    cStat = linhaTrim.section('=', 1).trimmed();
+                else if (linhaTrim.startsWith("XMotivo="))
+                    xMotivo = linhaTrim.section('=', 1).trimmed();
+                else if (linhaTrim.startsWith("Msg="))
+                    msg = linhaTrim.section('=', 1).trimmed();
+                else if (linhaTrim.startsWith("NProt=") || linhaTrim.startsWith("nProt="))
+                    nProt = linhaTrim.section('=', 1).trimmed();
+                else if (linhaTrim.startsWith("NomeArq="))
+                    nomeArq = linhaTrim.section('=', 1).trimmed();
+                else if (linhaTrim.startsWith("chDFe="))
+                    chDFe = linhaTrim.section('=', 1).trimmed();
+            }
+            nota.chNfe = !retornoForcado.isEmpty() ? chDFe : getChaveNf();
+            nota.cnpjEmit = getCnpjEmit();
+            nota.cstat = cStat;
+            nota.cuf = getCuf();
+            nota.dhEmi = getDhEmiConvertida();
+            nota.finalidade = finalidade;
+            nota.modelo = "55";
+            nota.nnf = getNNF();
+            nota.nProt = nProt;
+            nota.serie = getSerie();
+            nota.tpAmb = getTpAmb().toInt();
+            nota.valorTotal = getVNF();
+            nota.xmlPath = !retornoForcado.isEmpty() ? nomeArq : getXmlPath();
+            nota.xMotivo = xMotivo;
+            nota.msg = msg;
         }
-        nota.chNfe = getChaveNf();
-        nota.cnpjEmit = getCnpjEmit();
-        nota.cstat = cStat;
-        nota.cuf = getCuf();
-        nota.dhEmi = getDhEmiConvertida();
-        nota.finalidade = finalidade;
-        nota.modelo = "55";
-        nota.nnf = getNNF();
-        nota.nProt = nProt;
-        nota.serie = getSerie();
-        nota.tpAmb = getTpAmb().toInt();
-        nota.valorTotal = getVNF();
-        nota.xmlPath = getXmlPath();
-        nota.xMotivo = xMotivo;
-        nota.msg = msg;
         return nota;
         break;
     default:

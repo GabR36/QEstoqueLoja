@@ -8,6 +8,11 @@ FiscalEmitter_service::FiscalEmitter_service(QObject *parent)
     confDTO = confServ.carregarTudo();
 }
 
+void FiscalEmitter_service::setRetornoForcado(const QString &retorno)
+{
+    retornoForcado = retorno;
+}
+
 FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNfeDevolucaoPadrao(qlonglong idvenda,
                                                                 QList<ProdutoVendidoDTO> listaProds){
 
@@ -138,6 +143,8 @@ FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNfcePadrao(VendasD
     }
 
     NfceACBR *nfce = new NfceACBR(this);
+    if (!retornoForcado.isEmpty())
+        nfce->setRetornoForcado(retornoForcado);
     nfce->setNNF(nnf);
     nfce->setCliente(cliente.cpf, cliente.ehPf);
     nfce->setProdutosVendidosNew(listaProds, emitirTodos);
@@ -263,6 +270,8 @@ FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNFePadrao(VendasDT
     }
 
     NfeACBR *nfe = new NfeACBR(this, true, false);
+    if (!retornoForcado.isEmpty())
+        nfe->setRetornoForcado(retornoForcado);
     nfe->setNNF(nnf);
     nfe->setCliente(cliente);
     nfe->setProdutosVendidosNew(listaProds, emitirTodos);

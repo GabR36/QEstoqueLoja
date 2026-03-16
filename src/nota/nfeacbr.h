@@ -46,6 +46,7 @@ public:
     std::string getPdfDanfe();
     void setProdutosVendidosNew(QList<ProdutoVendidoDTO> listaProds, bool emitirTodos);
     NFRetornoDTO gerarEnviarRetorno();
+    void setRetornoForcado(const QString &retorno);
 private:
     ACBrNFe *nfe;
     QSqlDatabase db;
@@ -77,6 +78,7 @@ private:
     int indiedestCli = 0;
     bool usarIBS;
     QString idDest;
+    QString retornoForcado = "";
 
     QString natOp,tpNf,finNfe,cfop, refNfe;
     std::string dataHora;

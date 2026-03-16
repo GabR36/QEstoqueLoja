@@ -15,10 +15,6 @@ pagamentoVenda::pagamentoVenda(QList<ProdutoVendidoDTO> listaProdutos, QString t
 
     listaProds = listaProdutos;
 
-
-    Config_service *confServ = new Config_service(this);
-    configDTO = confServ->carregarTudo();
-
     this->idCliente = idCliente;
     //mostra as opçoes relacionadas a nf e
 

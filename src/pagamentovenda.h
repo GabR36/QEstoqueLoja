@@ -33,7 +33,6 @@ private:
     bool emitTodosNf = false;
     QString cStat, xMotivo, msg, nProt;
     QString dhemiRet;
-    ConfigDTO configDTO;
     ProdutoVenda_service prodVendaServ;
     Cliente_service cliServ;
     ClienteDTO CLIENTE;

@@ -264,6 +264,10 @@ ProdutoDTO Produto_Service::getProdutoPeloCodBarras(const QString &codigo){
     return repo.getProdutoPeloCodBarras(codigo);
 }
 
+QVariantMap Produto_Service::getProdutoPorCodBarrasMap(const QString &codigo){
+    return repo.getProdutoPorCodBarrasMap(codigo);
+}
+
 Produto_Service::Resultado Produto_Service::updateDiminuirQuantidadeProduto(qlonglong idprod,
                                                                             double quantia ){
     if(!repo.updateDiminuirQuantidadeProduto(idprod, quantia)){

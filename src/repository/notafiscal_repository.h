@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSqlDatabase>
+#include <QSqlQueryModel>
 #include <../dto/NotaFiscal_dto.h>
 
 class notafiscal_repository : public QObject
@@ -16,9 +17,11 @@ public:
     qlonglong getIdFromIdVenda(qlonglong idvenda);
     qlonglong getProximoNNF55(QString serie, bool tpAmb, qlonglong nnfConfigurado);
     NotaFiscalDTO getNotaNormalFromIdVenda(qlonglong idvenda);
+    NotaFiscalDTO getNotaById(qlonglong id);
     bool inserir(NotaFiscalDTO nota);
     qlonglong getIdNotaNormalFromIdVenda(qlonglong idvenda);
     qlonglong getProximoNNF65(QString serie, bool tpAmb, qlonglong nnfConfigurado);
+    void listarEntradas(QSqlQueryModel *model, const QString &de = "", const QString &ate = "");
 private:
     QSqlDatabase db;
 

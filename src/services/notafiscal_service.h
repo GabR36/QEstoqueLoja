@@ -2,6 +2,7 @@
 #define NOTAFISCAL_SERVICE_H
 
 #include <QObject>
+#include <QSqlQueryModel>
 #include "../repository/notafiscal_repository.h"
 #include "config_service.h"
 
@@ -34,8 +35,10 @@ public:
     qlonglong getProximoNNF(bool tpAmb, ModeloNota mod);
     qlonglong getProximoNNF(QString serie, bool tpAmb, ModeloNota mod);
     NotaFiscalDTO getNotaNormalFromIdVenda(qlonglong idvenda);
+    NotaFiscalDTO getNotaById(qlonglong id);
     NotaFiscal_service::Resultado inserir(NotaFiscalDTO nota);
     bool temNotaNormal(qlonglong idvenda);
+    void listarEntradas(QSqlQueryModel *model, const QString &de = "", const QString &ate = "");
 private:
     notafiscal_repository notaRepo;
     Config_service confServ;

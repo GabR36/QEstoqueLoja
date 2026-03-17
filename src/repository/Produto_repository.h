@@ -3,6 +3,7 @@
 
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
+#include <QVariantMap>
 #include "../dto/Produto_dto.h"
 
 class Produto_Repository : public QObject
@@ -24,6 +25,7 @@ public:
     void pesquisar(const QStringList &palavras, const QString &textoNormalizado, QSqlQueryModel *model);
     ProdutoDTO getProdutoPeloCodBarras(const QString &codigo);
     bool updateDiminuirQuantidadeProduto(qlonglong idprod, double quantia);
+    QVariantMap getProdutoPorCodBarrasMap(const QString &codigo);
 private:
     QSqlDatabase db;
 };

@@ -24,3 +24,28 @@ ProdutoNota_service::Resultado ProdutoNota_service::inserirListaProdutos(QList<P
     return {true, ProdutoNotaErro::Nenhum, ""};
 }
 
+void ProdutoNota_service::listarPorNota(QSqlQueryModel *model, qlonglong idNf)
+{
+    prodNotaRepo.listarPorNota(model, idNf);
+}
+
+ProdutoNotaDTO ProdutoNota_service::getProdutoNota(qlonglong id){
+    return prodNotaRepo.getProdutoNota(id);
+}
+
+QString ProdutoNota_service::getXmlPathPorId(qlonglong id){
+    return prodNotaRepo.getXmlPathPorId(id);
+}
+
+bool ProdutoNota_service::marcarComoAdicionado(qlonglong id){
+    return prodNotaRepo.marcarComoAdicionado(id);
+}
+
+QVariantMap ProdutoNota_service::getProdutoNotaComXmlPath(qlonglong id){
+    return prodNotaRepo.getProdutoNotaComXmlPath(id);
+}
+
+bool ProdutoNota_service::marcarComoDevolvido(qlonglong id, qlonglong idNfDevol){
+    return prodNotaRepo.marcarComoDevolvido(id, idNfDevol);
+}
+

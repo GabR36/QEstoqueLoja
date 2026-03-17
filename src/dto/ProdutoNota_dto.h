@@ -4,6 +4,7 @@
 #include <qstring.h>
 
 struct ProdutoNotaDTO {
+    qlonglong id;
     double quantidade;
     QString descricao;
     double preco = 0;

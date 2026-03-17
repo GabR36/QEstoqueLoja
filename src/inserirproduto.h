@@ -7,6 +7,7 @@
 #include "util/ibptutil.h"
 #include "services/Produto_service.h"
 #include "services/config_service.h"
+#include "dto/Produto_dto.h"
 
 
 namespace Ui {
@@ -20,7 +21,7 @@ class InserirProduto : public QWidget
 public:
     explicit InserirProduto(QWidget *parent = nullptr);
     ~InserirProduto();
-    void preencherCamposProduto(const QString &quantidade, const QString &descricao, const QString &preco, const QString &codigoBarras, bool nf, const QString &uCom, const QString &precoFornecedor, const QString &percentLucro, const QString &ncm, const QString &aliquota, const QString &csosn, const QString &pis);
+    void preencherCamposProduto(const ProdutoDTO &prod);
 private slots:
     void on_Btn_GerarCBarras_clicked();
 

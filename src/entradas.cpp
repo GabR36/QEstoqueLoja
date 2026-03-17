@@ -33,8 +33,6 @@ Entradas::Entradas(QWidget *parent)
     , ui(new Ui::Entradas)
 {
     ui->setupUi(this);
-
-    db = QSqlDatabase::database();
     Config_service *confServ = new Config_service(this);
     configDTO = confServ->carregarTudo();
 
@@ -43,8 +41,6 @@ Entradas::Entradas(QWidget *parent)
             &QItemSelectionModel::currentRowChanged,
             this,
             &Entradas::on_EntradaSelecionada);
-
-    nfe = new NfeACBR(this, true, true);
 
     //delegate SIM VERDE NAO VERMELHO para coluna 'adicionado' da tabela produtos
     DelegatePago *delegateSimNao = new DelegatePago(this);
@@ -67,60 +63,6 @@ Entradas::~Entradas()
     delete ui;
 }
 
-QString Entradas::converterDataSefaz(const QString &data){
-    if (data.isEmpty())
-        return "";
-
-    // Formato SEFAZ: 2025-11-29T16:17:31-03:00
-    QDateTime dt = QDateTime::fromString(data, Qt::ISODate);
-
-    // Se falhar, tente sem timezone
-    if (!dt.isValid())
-        dt = QDateTime::fromString(data, "yyyy-MM-dd'T'hh:mm:ss");
-
-    if (!dt.isValid())
-        return data; // retorna como veio
-
-    return dt.toString("yyyy-MM-dd HH:mm:ss");
-}
-
-void Entradas::salvarRegistroDFe(
-    const QString &nome_emitente,
-    const QString &data_emissao,
-    const QString &vnf,
-    const QString &nsu,
-    const QString &tipo,
-    const QString &chave,
-    const QString &cnpj,
-    const QString &situacao,
-    const QString &xml,
-    const QString &data_recebimento)
-{
-    QSqlQuery query(db);
-
-    query.prepare(R"(
-        INSERT OR IGNORE INTO dfe_registros
-        (nome_emitente, data_emissao, vnf, nsu, tipo, chave, cnpj, situacao, xml_path, data_recebimento)
-        VALUES (:nome_emitente, :data_emissao, :vnf, :nsu, :tipo, :chave, :cnpj, :situacao, :xml_path, :data_recebimento)
-    )");
-
-    query.bindValue(":nome_emitente", nome_emitente);
-    query.bindValue(":data_emissao", data_emissao);
-    query.bindValue(":vnf", vnf);
-    query.bindValue(":nsu", nsu);
-    query.bindValue(":tipo", tipo);
-    query.bindValue(":chave", chave);
-    query.bindValue(":cnpj", cnpj);
-    query.bindValue(":situacao", situacao);
-
-    query.bindValue(":xml_path", xml);
-    query.bindValue(":data_recebimento", data_recebimento);
-
-    if (!query.exec()) {
-        qDebug() << "Erro ao inserir registro:" << query.lastError().text();
-    }
-}
-
 void Entradas::on_Btn_ConsultarDF_clicked()
 {
     ManifestadorDFe *manifestdfe = new ManifestadorDFe(this);
@@ -136,75 +78,17 @@ void Entradas::on_Btn_ConsultarDF_clicked()
     ui->Tview_Entradas->selectRow(0);
 }
 
-void Entradas::atualizarTabela(QString whereSql)
+void Entradas::atualizarTabela(const QString &de, const QString &ate)
 {
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            qDebug() << "Erro ao abrir banco atualizarTabela()";
-            return;
-        }
-    }
-    
-    QString sql = R"(
-        SELECT
-            c.nome AS emitente,
-            n.valor_total AS valor,
-            n.dhemi AS emissao,
-            n.cnpjemit AS cnpj,
-            n.modelo AS modelo,
-            n.chnfe AS chave,
-            n.cstat AS cstat,
-            n.id AS id_nf
-        FROM notas_fiscais n
-        LEFT JOIN clientes c
-            ON c.id = n.id_emissorcliente
-        WHERE n.finalidade = 'ENTRADA EXTERNA'
-          AND n.cstat IN (100, 150)
-    )";
-
-    if (!whereSql.isEmpty()) {
-        sql += " AND " + whereSql;
-    }
-
-    sql += " ORDER BY n.dhemi DESC";
-
-    qDebug() << sql;
-
-    modelEntradas->setQuery(sql);
+    notaServ.listarEntradas(modelEntradas, de, ate);
     ui->Tview_Entradas->selectRow(0);
 }
 
-
 void Entradas::carregarTabela()
 {
-    if(!db.isOpen()){
-        if(!db.open()){
-            qDebug() << "Erro ao abrir banco carregarTabela()";
-        }
-    }
     modelEntradas = new QSqlQueryModel(this);
-
-    modelEntradas->setQuery(R"(
-        SELECT
-            c.nome AS emitente,
-            n.valor_total AS valor,
-            n.dhemi AS emissao,
-            n.cnpjemit AS cnpj,
-            n.modelo AS modelo,
-            n.chnfe AS chave,
-            n.cstat AS cstat,
-            n.id AS id_nf
-        FROM notas_fiscais n
-        LEFT JOIN clientes c
-            ON c.id = n.id_emissorcliente
-        WHERE n.finalidade = 'ENTRADA EXTERNA'
-          AND n.cstat = 100
-        ORDER BY n.dhemi DESC
-    )");
-
-    if (modelEntradas->lastError().isValid()) {
-        qDebug() << "Erro ao carregar tabela:" << modelEntradas->lastError();
-    }
+    modelProdutosNota = new QSqlQueryModel(this);
+    atualizarTabela("", "");
 
     modelEntradas->setHeaderData(0, Qt::Horizontal, "Emitente");
     modelEntradas->setHeaderData(1, Qt::Horizontal, "Valor NF");
@@ -215,12 +99,13 @@ void Entradas::carregarTabela()
     modelEntradas->setHeaderData(6, Qt::Horizontal, "CStat");
 
     ui->Tview_Entradas->setModel(modelEntradas);
-
     ui->Tview_Entradas->resizeColumnsToContents();
     ui->Tview_Entradas->horizontalHeader()->setStretchLastSection(true);
-    ui->Tview_Entradas->setModel(modelEntradas);
     ui->Tview_Entradas->setColumnHidden(7, true); // Oculta id_nf
-    db.close();
+
+    ui->Tview_ProdutosNota->setModel(modelProdutosNota);
+    ui->Tview_ProdutosNota->horizontalHeader()->setStretchLastSection(true);
+    ui->Tview_ProdutosNota->setColumnHidden(0, true); // Oculta id
 }
 
 void Entradas::on_EntradaSelecionada(const QModelIndex &current, const QModelIndex &previous)
@@ -239,73 +124,9 @@ void Entradas::on_EntradaSelecionada(const QModelIndex &current, const QModelInd
 
 void Entradas::carregarProdutosDaNota(qlonglong id_nf)
 {
-    if(!db.isOpen()){
-        if(!db.open()){
-            qDebug() << "Erro ao abrir banco carregarProdutosDaNota()";
-        }
-    }
-    QSqlQueryModel *model = new QSqlQueryModel(this);
-
-    model->setQuery(QString(R"(
-        SELECT
-            id as id,
-            nitem AS Item,
-            quantidade AS Quantidade,
-            descricao AS Descrição,
-            preco AS Preço,
-            adicionado AS Adicionado,
-            status AS Status,
-            un_comercial AS Unidade,
-            ncm AS NCM,
-            cfop AS CFOP,
-            csosn AS CSOSN,
-            codigo_barras AS CódigoBarras
-        FROM produtos_nota
-        WHERE id_nf = %1
-        ORDER BY nitem
-    )").arg(id_nf));
-
-    if (model->lastError().isValid()) {
-        qDebug() << "Erro ao carregar produtos:" << model->lastError();
-    }
-
-    ui->Tview_ProdutosNota->setModel(model);
+    prodNotaServ.listarPorNota(modelProdutosNota, id_nf);
     ui->Tview_ProdutosNota->resizeColumnsToContents();
-    ui->Tview_ProdutosNota->horizontalHeader()->setStretchLastSection(true);
-    ui->Tview_ProdutosNota->setModel(model);
-    ui->Tview_ProdutosNota->setColumnHidden(0, true);  // esconde o id
-    db.close();
 }
-
-bool Entradas::existeCodBarras(QString codigo)
-{
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            qDebug() << "Banco nao abriu em existeCodBarras()";
-            return false;
-        }
-    }
-
-    QSqlQuery query(db);
-    query.prepare("SELECT 1 FROM produtos WHERE codigo_barras = :cod LIMIT 1");
-    query.bindValue(":cod", codigo);
-
-    if (!query.exec()) {
-        qDebug() << "Erro ao executar SELECT em existeCodBarras():" << query.lastError().text();
-        db.close();
-        return false;
-    }
-
-    // Se encontrou alguma linha, existe
-    if (query.next()) {
-        db.close();
-        return true;
-    }
-    db.close();
-    return false;
-}
-
-
 
 void Entradas::on_Tview_ProdutosNota_customContextMenuRequested(const QPoint &pos)
 {
@@ -319,29 +140,23 @@ void Entradas::on_Tview_ProdutosNota_customContextMenuRequested(const QPoint &po
     if (selecionadas.isEmpty())
         return;
 
-
-
-    QList<qlonglong> idsSelecionados;
+    // adiciona produtos selecionados a lista
+    QList<ProdutoNotaDTO> prodSelecionados;
     bool jaDevolvido = false;
 
     for (const QModelIndex &linha : selecionadas) {
-        int id = ui->Tview_ProdutosNota->model()
+        qlonglong id = ui->Tview_ProdutosNota->model()
         ->data(ui->Tview_ProdutosNota->model()->index(linha.row(), 0))
-            .toInt();
-        idsSelecionados.append(id);
+            .toLongLong();
 
-        QString status = ui->Tview_ProdutosNota->model()
-                             ->data(ui->Tview_ProdutosNota->model()->index(linha.row(), 6))
-                             .toString();
-
-        if (status.trimmed().toUpper() == "DEVOLVIDO") {
+        ProdutoNotaDTO prod = prodNotaServ.getProdutoNota(id);
+        if(!prod.descricao.isEmpty()){
+            prodSelecionados.append(prod);
+        }
+        if(prod.status == "DEVOLVIDO"){
             jaDevolvido = true;
         }
     }
-
-    // Apenas para debug
-    qDebug() << "IDs selecionados:" << idsSelecionados;
-    qDebug() << "ID do primeiro produto selecionado:" << idsSelecionados.first();
 
     QMenu menu(this);
     QAction *adicionar = menu.addAction("Adicionar ao Estoque");
@@ -363,12 +178,12 @@ void Entradas::on_Tview_ProdutosNota_customContextMenuRequested(const QPoint &po
         if (barcodePage->exec() == QDialog::Accepted) {
             QString codigoEscaneado = barcodePage->getLineEditText();
 
-            if (existeCodBarras(codigoEscaneado) && !codigoEscaneado.isEmpty()) {
+            if (prodServ.codigoBarrasExiste(codigoEscaneado) && !codigoEscaneado.isEmpty()) {
                 QMessageBox::warning(this, "Aviso", "Já existe um produto com esse código cadastrado.");
 
-                addProdComCodBarras(QString::number(idsSelecionados.first()), codigoEscaneado);
+                addProdComCodBarras(QString::number(prodSelecionados.first().id), codigoEscaneado);
             } else {
-                addProdSemCodBarras(QString::number(idsSelecionados.first()), codigoEscaneado);
+                addProdSemCodBarras(QString::number(prodSelecionados.first().id), codigoEscaneado);
             }
         }
 
@@ -378,81 +193,31 @@ void Entradas::on_Tview_ProdutosNota_customContextMenuRequested(const QPoint &po
             "Confirmação",
             QString("Tem certeza que deseja emitir uma nota de devolução de "
                     "%1 produto(s) selecionado(s)?")
-                .arg(idsSelecionados.size()),
+                .arg(prodSelecionados.size()),
             QMessageBox::Yes | QMessageBox::No
             );
         if(resposta == QMessageBox::Yes){
-            devolverProdutos(idsSelecionados);
+            devolverProdutos(prodSelecionados);
         }
     }
 }
 
-void Entradas::devolverProdutos(QList<qlonglong> &idsProduto){
-    // if(!db.isOpen()){
-    //     if(!db.open()){
-    //         qDebug() << "Banco nao abriu devolverProdutos()";
-    //     }
-    // }
-    // // void NfeACBR::setCliente(bool ehPf, QString cpf, QString nome, int indiedest,
-    // //                          QString email, QString lgr, QString nro, QString bairro, QString cmun, QString xmun,
-    // //                          QString uf, QString cep, QString ie
-    // QSqlQuery query;
-    // query.prepare("SELECT id_emissorcliente, chnfe FROM notas_fiscais WHERE id = :idnota");
-    // query.bindValue(":idnota", id_nf_selec);
-    // QString idcliente, chavenfe;
-    // if(query.exec()){
-    //     while(query.next()){
-    //         idcliente = query.value(0).toString();
-    //         chavenfe = query.value(1).toString();
-    //     }
-    // }else{
-    //     qDebug() << "QUERY nao rodou para achar o idclienteemissor em devolverproduto";
-    //     return;
-    // }
+void Entradas::devolverProdutos(QList<ProdutoNotaDTO> &produtosNota){
+    NotaFiscalDTO notaRef = notaServ.getNotaById(id_nf_selec);
+    if(notaRef.chNfe.isEmpty()){
+        QMessageBox::warning(this, "Erro", "Nota fiscal de referência não encontrada.");
+        return;
+    }
 
-    // Cliente dest;
+    ClienteDTO cliente = clienteServ.getClienteByID(notaRef.idEmissorCliente);
 
-    // query.prepare("SELECT eh_pf, cpf, nome, indIEDest, email, endereco, numero_end, bairro, "
-    //               "cMun, xMun, uf, cep, ie FROM clientes WHERE id = :idcliente");
-    // query.bindValue(":idcliente", idcliente);
+    auto resultado = fiscalEmitterServ.enviarNfeDevolucaoEntrada(id_nf_selec, produtosNota, cliente);
 
-    // if(query.exec()){
-    //     while(query.next()){
-    //         dest.nome = query.value("nome").toString();
-    //         dest.ehpf = query.value("eh_pf").toBool();
-    //         dest.cpfcnpj = query.value("cpf").toString();
-    //         dest.indiedest = query.value("indIEDest").toInt();
-    //         dest.email = query.value("email").toString();
-    //         dest.endereco = query.value("endereco").toString();
-    //         dest.numero_end = query.value("numero_end").toString();
-    //         dest.bairro = query.value("bairro").toString();
-    //         dest.cmun = query.value("cMun").toString();
-    //         dest.xmun = query.value("xMun").toString();
-    //         dest.uf = query.value("uf").toString();
-    //         dest.cep = query.value("cep").toString();
-    //         dest.ie = query.value("ie").toString();
-    //     }
-    // }else{
-    //     qDebug() << "QUERY nao rodou para achar as infos do idclienteemissor em devolverproduto";
-    //     return;
-    // }
+    QMessageBox::information(this, "Aviso", resultado.msg);
 
-    // nfe->setNNF(nfe->getProximoNNF());
-    // nfe->setNfRef(chavenfe);
-    // nfe->setProdutosNota(idsProduto);
-    // nfe->setCliente(dest.ehpf, dest.cpfcnpj, dest.nome, dest.indiedest, dest.email,
-    // dest.endereco, dest.numero_end, dest.bairro, dest.cmun, dest.xmun, dest.uf, dest.cep,
-    // dest.ie);
-    // QString retorno = nfe->gerarEnviar();
-    // QString msg = salvarDevolucaoNf(retorno, QString::number(id_nf_selec), nfe, idsProduto);
-    // QMessageBox::information(this, "Aviso", msg);
-
-    // if(cstatRetornado == "100" || cstatRetornado == "150" && nfe->getTpAmb() == "1"){
-    //     enviarEmailNFe(dest.nome, dest.email, nfe->getXmlPath(), nfe->getPdfDanfe(), dest.cpfcnpj);
-    // }
-
-    // db.close();
-
+    if(resultado.ok){
+        carregarProdutosDaNota(id_nf_selec);
+    }
 }
 
 void Entradas::enviarEmailNFe(QString nomeCliente, QString emailCliente,
@@ -510,173 +275,34 @@ void Entradas::enviarEmailNFe(QString nomeCliente, QString emailCliente,
     }
 }
 
-QString Entradas::salvarDevolucaoNf(QString retornoEnvio, QString idnf, NfeACBR *devolNfe,
-                                    QList<qlonglong> &idsProduto) {
-
-
-    if (retornoEnvio.isEmpty()) {
-        return "Erro: Nenhum retorno do ACBr";
-    }
-
-    QStringList linhas = retornoEnvio.split('\n', Qt::SkipEmptyParts);
-    QString cStat, xMotivo, msg, nProt;
-
-    // Processa todas as linhas do retorno do ACBr
-    for (const QString &linha : linhas) {
-        QString linhaTrim = linha.trimmed(); // Remove espaços e quebras de linha
-        if (linhaTrim.startsWith("CStat="))
-            cStat = linhaTrim.section('=', 1).trimmed();
-        else if (linhaTrim.startsWith("XMotivo="))
-            xMotivo = linhaTrim.section('=', 1).trimmed();
-        else if (linhaTrim.startsWith("Msg="))
-            msg = linhaTrim.section('=', 1).trimmed();
-        else if (linhaTrim.startsWith("NProt=") || linhaTrim.startsWith("nProt="))
-            nProt = linhaTrim.section('=', 1).trimmed();
-    }
-    cstatRetornado = cStat;
-    qDebug() << "Retorno ACBr: cStat=" << cStat << " xMotivo=" << xMotivo << " nProt=" << nProt;
-
-    // Confirma se a nota foi autorizada
-    if (cStat == "100" || cStat == "150") { // 150 é contingência autorizada
-        if(!db.isOpen()){
-            if(!db.open()){
-                qDebug() << "Erro ao abrir banco em salvarDevolucaoNf";
-                return "Erro: não foi possível abrir o banco de dados";
-
-            }
-        }
-
-        QSqlQuery query;
-        QString dataFormatada = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
-
-        query.prepare("INSERT INTO notas_fiscais(cstat, nnf, serie, modelo, tp_amb, xml_path, valor_total,"
-                      "atualizado_em, id_venda, cnpjemit, chnfe, nprot, cuf, finalidade, saida, id_nf_ref, dhemi) "
-                      "VALUES(:cstat, :nnf, :serie, :modelo, :tpamb, :xml_path, :valortotal, :atualizadoem,"
-                      ":id_venda, :cnpjemit, :chnfe, :nprot, :cuf, :finalidade, :saida, :id_nf_ref, :dhemi)");
-
-        query.bindValue(":cstat", cStat);
-        query.bindValue(":nnf", devolNfe->getNNF());
-        query.bindValue(":serie", devolNfe->getSerie());
-        query.bindValue(":modelo", "55");
-        query.bindValue(":tpamb", devolNfe->getTpAmb());
-        query.bindValue(":xml_path", devolNfe->getXmlPath());
-        query.bindValue(":valortotal", QString::number(devolNfe->getVNF()));
-        query.bindValue(":atualizadoem", dataFormatada);
-        query.bindValue(":id_venda", "");
-        query.bindValue(":cnpjemit", devolNfe->getCnpjEmit());
-        query.bindValue(":chnfe", devolNfe->getChaveNf());
-        query.bindValue(":nprot", nProt);
-        query.bindValue(":cuf", devolNfe->getCuf());
-        query.bindValue(":finalidade", "DEVOLUCAO");
-        query.bindValue(":saida", "1");
-        query.bindValue(":id_nf_ref", idnf);
-        query.bindValue(":dhemi", devolNfe->getDhEmiConvertida());
-
-        if (!query.exec()) {
-            qDebug() << "Erro ao inserir nota fiscal de devolução:" << query.lastError().text();
-            return QString("Erro ao salvar nota no banco: %1").arg(query.lastError().text());
-        }else{
-            lastInsertedIDNfDevol = query.lastInsertId().toString();
-            atualizarProdutoNotaAoDevolver(lastInsertedIDNfDevol, idsProduto);
-            return QString("Nota de Devolução Autorizada e Salva!\n cStat:%1 \n Motivo:%2 \n")
-                .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo, nProt);
-        }
-
-
-
-    } else {
-        // Nota rejeitada
-        return QString("Erro ao enviar Nota de Devolução.\n cStat:%1 \n motivo:%2 \n protocolo:%3")
-            .arg(cStat, xMotivo.isEmpty() ? msg : xMotivo, nProt);
-    }
-    db.close();
-}
-
-void Entradas::atualizarProdutoNotaAoDevolver(QString idNfDevol, QList<qlonglong> &idsProduto) {
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            qDebug() << "Banco nao abriu em atualizarProdutoNotaAoDevolver()";
-            return;
-        }
-    }
-
-    QSqlQuery query;
-
-    // Prepara apenas uma vez para não recriar o statement repetidamente
-    query.prepare("UPDATE produtos_nota "
-                  "SET status = 'DEVOLVIDO', id_nfDevol = :idnfdevol "
-                  "WHERE id = :idprod");
-
-    for (qlonglong idProd : idsProduto) {
-        query.bindValue(":idnfdevol", idNfDevol);
-        query.bindValue(":idprod", idProd);
-
-        if (!query.exec()) {
-            qDebug() << "Erro ao atualizar produto" << idProd
-                     << ":" << query.lastError().text();
-        }
-    }
-
-    qDebug() << "Atualização de produtos concluída.";
-}
-
 void Entradas::addProdSemCodBarras(QString idProd, QString codBarras){
-    if(!db.isOpen()){
-        if(!db.open()){
-            qDebug() << "Banco nao abriu em addProdSemCodBarras()";
-        }
-    }
-    QString quant;
-    QString desc;
-    QString preco;
-    QString cod_barras;
-    QString un_comercial;
-    QString ncm;
-    QString csosn;
-    QString pis;
-    QSqlQuery query;
-    QString xml_path;
-    int nitem;
-    query.prepare("SELECT quantidade, descricao, preco, codigo_barras, un_comercial, ncm, csosn, pis, nitem, xml_path "
-                  "FROM produtos_nota INNER JOIN notas_fiscais ON id_nf = notas_fiscais.id WHERE produtos_nota.id = :id");
-    query.bindValue(":id", idProd);
-    if(query.exec()){
-        while(query.next()){
-            quant = query.value("quantidade").toString();
-            desc = query.value("descricao").toString();
-            preco = query.value("preco").toString();
-            cod_barras = query.value("codigo_barras").toString();
-            un_comercial = query.value("un_comercial").toString();
-            ncm = query.value("ncm").toString();
-            csosn = query.value("csosn").toString();
-            pis = query.value("pis").toString();
-            nitem = query.value("nitem").toInt();
-            xml_path = query.value("xml_path").toString();
+    qlonglong id = idProd.toLongLong();
 
-        }
-    }else{
-        qDebug() << "query addProdSemCodBarras nao rodou";
-    }
-    quant = portugues.toString(quant.toFloat());
+    ProdutoNotaDTO prod = prodNotaServ.getProdutoNota(id);
+    QString xml_path = prodNotaServ.getXmlPathPorId(id);
 
     NfXmlUtil *nfutil = new NfXmlUtil(this);
-    CustoItem custoxml = nfutil->calcularCustoItemSN(xml_path, nitem);
+    CustoItem custoxml = nfutil->calcularCustoItemSN(xml_path, prod.nitem);
 
     qDebug() << "custo fornecedor taxas incluidas:" << custoxml.custoUnitario;
     qDebug() << "Preço fornecedor " << custoxml.precoUnitarioNota;
-    double coreValue = custoxml.custoUnitario;
-    preco = portugues.toString(coreValue, 'f', 2);
 
-    QString porcent_lucro = portugues.toString(configDTO.porcentLucroFinanceiro);
-    QString pisCofins = configDTO.pisPadraoProduto;
-    QString csosnPadrao = configDTO.csosnPadraoProduto;
+    ProdutoDTO novoProd;
+    novoProd.quantidade      = prod.quantidade;
+    novoProd.descricao       = prod.descricao;
+    novoProd.codigoBarras    = codBarras;
+    novoProd.nf              = true;
+    novoProd.uCom            = prod.uCom;
+    novoProd.precoFornecedor = custoxml.custoUnitario;
+    novoProd.percentLucro    = configDTO.porcentLucroFinanceiro;
+    novoProd.ncm             = prod.ncm;
+    novoProd.csosn           = configDTO.csosnPadraoProduto;
+    novoProd.pis             = configDTO.pisPadraoProduto;
 
     InserirProduto *addProd = new InserirProduto();
-    addProd->preencherCamposProduto(
-        quant, desc, "", codBarras, 1, un_comercial, preco, porcent_lucro, ncm, "", csosnPadrao,
-        pisCofins
-    );
+    addProd->preencherCamposProduto(novoProd);
     addProd->show();
+
     connect(addProd, &InserirProduto::produtoInserido, this,
             &Entradas::produtoAdicionado);
 
@@ -684,28 +310,16 @@ void Entradas::addProdSemCodBarras(QString idProd, QString codBarras){
             [=]() {
                 atualizarProdutoNotaAdicionado(idProd);
             });
+
     connect(addProd, &InserirProduto::produtoInserido, this,
             [=]() {
                 carregarProdutosDaNota(id_nf_selec);
             });
-
-    db.close();
 }
 
 void Entradas::atualizarProdutoNotaAdicionado(QString idProd){
-    if(!db.isOpen()){
-        if(!db.open()){
-            qDebug() << "Banco nao abriu atualizarProdutoNotaAdicionado";
-        }
-    }
-
-    QSqlQuery query;
-    query.prepare("UPDATE produtos_nota SET adicionado = 1 WHERE id = :id");
-    query.bindValue(":id", idProd);
-
-    if(query.exec()){
-    }else{
-        qDebug() << "query nao rodou atualizarProdutoNotaAdicionado. ";
+    if(!prodNotaServ.marcarComoAdicionado(idProd.toLongLong())){
+        qDebug() << "atualizarProdutoNotaAdicionado falhou para id:" << idProd;
         return;
     }
     qDebug() << "query update produto nota adicionado = 1 ok";
@@ -714,49 +328,18 @@ void Entradas::atualizarProdutoNotaAdicionado(QString idProd){
 
 void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
     qDebug() << idProd << codBarras;
-    if(!db.isOpen()){
-        if(!db.open()){
-            qDebug() << "Banco nao abriu em addProdComCodBarras()";
-        }
-    }
 
-    QSqlQuery query;
-
-    query.prepare("SELECT * FROM produtos WHERE produtos.codigo_barras = :codBarras");
-    query.bindValue(":codBarras", codBarras);
-    if (!query.exec()) {
-        qDebug() << "erro query addprodcombarras()";
-    }
-
-    QVector<QVariantMap> registros = DBUtil::extrairResultados(query);
-
-    if (registros.isEmpty()) {
+    QVariantMap produto = prodServ.getProdutoPorCodBarrasMap(codBarras);
+    if (produto.isEmpty()) {
         qDebug() << "Produto não encontrado";
         return;
     }
 
-    QVariantMap produto = registros.first();
-
-    QSqlQuery query2;
-
-    query2.prepare("SELECT produtos_nota.id, quantidade, descricao, preco, codigo_barras, "
-                   "un_comercial, ncm, aliquota_imposto, csosn, nitem, pis, xml_path "
-                   "FROM produtos_nota "
-                   "INNER JOIN notas_fiscais ON produtos_nota.id_nf = notas_fiscais.id "
-                   "WHERE produtos_nota.id = :idProd");
-    query2.bindValue(":idProd", idProd);
-    if (!query2.exec()) {
-        qDebug() << "erro query addprodcombarras()2";
-    }
-
-    QVector<QVariantMap> registros2 = DBUtil::extrairResultados(query2);
-
-    if (registros2.isEmpty()) {
+    QVariantMap produtoNota = prodNotaServ.getProdutoNotaComXmlPath(idProd.toLongLong());
+    if (produtoNota.isEmpty()) {
         qDebug() << "ProdutoNota não encontrado";
         return;
     }
-
-    QVariantMap produtoNota = registros2.first();
 
     NfXmlUtil *nfutil = new NfXmlUtil(this);
     CustoItem custoxml = nfutil->calcularCustoItemSN(produtoNota["xml_path"].toString(), produtoNota["nitem"].toInt());
@@ -809,8 +392,6 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
         resultado["aliquota_imposto"] = util->get_Aliquota_From_Csv(resultado["ncm"].toString());
     }
 
-    db.close();
-
     qDebug() << "produto: " << produto;
 
     qDebug() << "produtoNota: " << produtoNota;
@@ -837,24 +418,16 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
 
 void Entradas::on_DateEdt_De_userDateChanged(const QDate &date)
 {
-    QString ate = ui->DateEdt_Ate->date().addDays(1).toString("yyyy-MM-dd");
     QString de = date.toString("yyyy-MM-dd");
-
-    QString where = "n.dhemi BETWEEN '" + de + "' AND '" +
-        ate + "'";
-
-    atualizarTabela(where);
+    QString ate = ui->DateEdt_Ate->date().addDays(1).toString("yyyy-MM-dd");
+    atualizarTabela(de, ate);
 }
 
 
 void Entradas::on_DateEdt_Ate_userDateChanged(const QDate &date)
 {
-    QString ate = date.addDays(1).toString("yyyy-MM-dd");
     QString de = ui->DateEdt_De->date().toString("yyyy-MM-dd");
-
-    QString where = "n.dhemi BETWEEN '" + de + "' AND '" +
-        ate + "'";
-
-    atualizarTabela(where);
+    QString ate = date.addDays(1).toString("yyyy-MM-dd");
+    atualizarTabela(de, ate);
 }
 

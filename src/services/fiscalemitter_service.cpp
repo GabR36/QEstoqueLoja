@@ -87,6 +87,82 @@ FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNfeDevolucaoPadrao
 
 }
 
+FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNfeDevolucaoEntrada(
+    qlonglong idNfEntrada,
+    QList<ProdutoNotaDTO> produtosNota,
+    ClienteDTO cliente)
+{
+    NotaFiscalDTO notaRef = notaServ.getNotaById(idNfEntrada);
+    if(notaRef.chNfe.isEmpty()){
+        return {false, FiscalEmitterErro::InfoInsuficiente, "Chave da NF de entrada não encontrada."};
+    }
+
+    QList<qlonglong> ids;
+    for(const ProdutoNotaDTO &p : produtosNota)
+        ids.append(p.id);
+
+    NfeACBR *nfe = new NfeACBR(this, true, true);
+    nfe->setNNF(nfe->getProximoNNF());
+    nfe->setNfRef(notaRef.chNfe);
+    nfe->setProdutosNota(ids);
+    nfe->setCliente(cliente);
+
+    NFRetornoDTO notaRet = nfe->gerarEnviarRetorno();
+
+    if(notaRet.cstat.isEmpty()){
+        return {false, FiscalEmitterErro::ErroAoEnviar, "Erro ao enviar nota de devolução de entrada."};
+    }
+
+    if(notaRet.cstat != "100" && notaRet.cstat != "150"){
+        return {false, FiscalEmitterErro::Recusado,
+                QString("Nota de Devolução Recusada.\ncStat:%1\nMotivo:%2")
+                    .arg(notaRet.cstat, notaRet.xMotivo.isEmpty() ? notaRet.msg : notaRet.xMotivo)};
+    }
+
+    NotaFiscalDTO nota;
+    nota.atualizadoEm     = DataUtil::getDataAgoraUS();
+    nota.chNfe            = notaRet.chNfe;
+    nota.cnpjEmit         = notaRet.cnpjEmit;
+    nota.cstat            = notaRet.cstat;
+    nota.cuf              = notaRet.cuf;
+    nota.dhEmi            = notaRet.dhEmi;
+    nota.finalidade       = "DEVOLUCAO";
+    nota.idEmissorCliente = -1;
+    nota.idNfRef          = idNfEntrada;
+    nota.idVenda          = -1;
+    nota.modelo           = "55";
+    nota.nnf              = notaRet.nnf;
+    nota.nProt            = notaRet.nProt;
+    nota.saida            = true;
+    nota.serie            = notaRet.serie;
+    nota.tpAmb            = notaRet.tpAmb;
+    nota.valorTotal       = notaRet.valorTotal;
+    nota.xmlPath          = notaRet.xmlPath;
+
+    if(nota.xmlPath.isEmpty()){
+        return {false, FiscalEmitterErro::InfoInsuficiente, "Caminho do arquivo xml está vazio."};
+    }
+    if(nota.nnf <= 0 || nota.valorTotal <= 0){
+        return {false, FiscalEmitterErro::InfoInsuficiente, "NNF ou valor total estão vazios."};
+    }
+
+    auto result = notaServ.inserir(nota);
+    if(!result.ok){
+        return {false, FiscalEmitterErro::Salvar, "Erro ao salvar nota fiscal de devolução."};
+    }
+
+    qlonglong idNfDevol = notaServ.getIdFromChave(nota.chNfe);
+
+    for(const ProdutoNotaDTO &p : produtosNota){
+        prodNotaServ.marcarComoDevolvido(p.id, idNfDevol);
+    }
+
+    return {true, FiscalEmitterErro::Nenhum,
+            QString("Nota de Devolução Autorizada e Salva!\ncStat:%1\nMotivo:%2")
+                .arg(notaRet.cstat, notaRet.xMotivo.isEmpty() ? notaRet.msg : notaRet.xMotivo),
+            idNfDevol};
+}
+
 FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNfcePadrao(VendasDTO venda,
                                                                 QList<ProdutoVendidoDTO> listaProds,
                                                                          qlonglong nnf,

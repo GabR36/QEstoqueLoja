@@ -1,6 +1,7 @@
 #include "notafiscal_repository.h"
 #include "../infra/databaseconnection_service.h"
 #include <QSqlQuery>
+#include <QSqlError>
 #include "../util/datautil.h"
 
 notafiscal_repository::notafiscal_repository(QObject *parent)
@@ -344,6 +345,45 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
     }
 }
 
+void notafiscal_repository::listarEntradas(QSqlQueryModel *model, const QString &de, const QString &ate)
+{
+    if (!model) return;
+
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco listarEntradas()";
+        return;
+    }
+
+    QString sql = R"(
+        SELECT
+            c.nome AS emitente,
+            n.valor_total AS valor,
+            n.dhemi AS emissao,
+            n.cnpjemit AS cnpj,
+            n.modelo AS modelo,
+            n.chnfe AS chave,
+            n.cstat AS cstat,
+            n.id AS id_nf
+        FROM notas_fiscais n
+        LEFT JOIN clientes c
+            ON c.id = n.id_emissorcliente
+        WHERE n.finalidade = 'ENTRADA EXTERNA'
+          AND n.cstat IN (100, 150)
+    )";
+
+    if (!de.isEmpty() && !ate.isEmpty())
+        sql += " AND n.dhemi BETWEEN '" + de + "' AND '" + ate + "'";
+
+    sql += " ORDER BY n.dhemi DESC";
+
+    model->setQuery(sql, db);
+
+    if (model->lastError().isValid())
+        qDebug() << "Erro SQL listarEntradas:" << model->lastError().text();
+
+    db.close();
+}
+
 qlonglong notafiscal_repository::getIdNotaNormalFromIdVenda(qlonglong idvenda){
     if(!DatabaseConnection_service::open()){
         qDebug() << "db nao aberto ao salvar resumo nota";
@@ -364,4 +404,48 @@ qlonglong notafiscal_repository::getIdNotaNormalFromIdVenda(qlonglong idvenda){
     db.close();
     return id;
 
+}
+
+NotaFiscalDTO notafiscal_repository::getNotaById(qlonglong id){
+    NotaFiscalDTO nota;
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "Banco nao abriu getNotaById()";
+        return nota;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("SELECT cstat, nnf, serie, modelo, tp_amb, xml_path, valor_total, atualizado_em, "
+                  "id_venda, cnpjemit, chnfe, nprot, cuf, finalidade, saida, id_nf_ref, dhemi, "
+                  "id_emissorcliente FROM notas_fiscais WHERE id = :id");
+    query.bindValue(":id", id);
+
+    if(!query.exec()){
+        qDebug() << "Query nao rodou getNotaById";
+        db.close();
+        return nota;
+    }
+
+    if(query.next()){
+        nota.atualizadoEm      = query.value("atualizado_em").toString();
+        nota.chNfe             = query.value("chnfe").toString();
+        nota.cnpjEmit          = query.value("cnpjemit").toString();
+        nota.cstat             = query.value("cstat").toString();
+        nota.cuf               = query.value("cuf").toString();
+        nota.dhEmi             = query.value("dhemi").toString();
+        nota.finalidade        = query.value("finalidade").toString();
+        nota.idNfRef           = query.value("id_nf_ref").toLongLong();
+        nota.idEmissorCliente  = query.value("id_emissorcliente").toLongLong();
+        nota.idVenda           = query.value("id_venda").toLongLong();
+        nota.modelo            = query.value("modelo").toString();
+        nota.nnf               = query.value("nnf").toLongLong();
+        nota.nProt             = query.value("nprot").toString();
+        nota.saida             = query.value("saida").toBool();
+        nota.serie             = query.value("serie").toInt();
+        nota.tpAmb             = query.value("tp_amb").toInt();
+        nota.valorTotal        = query.value("valor_total").toDouble();
+        nota.xmlPath           = query.value("xml_path").toString();
+    }
+
+    db.close();
+    return nota;
 }

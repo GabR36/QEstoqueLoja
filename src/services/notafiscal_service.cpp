@@ -68,6 +68,10 @@ NotaFiscalDTO NotaFiscal_service::getNotaNormalFromIdVenda(qlonglong idvenda){
     return notaRepo.getNotaNormalFromIdVenda(idvenda);
 }
 
+NotaFiscalDTO NotaFiscal_service::getNotaById(qlonglong id){
+    return notaRepo.getNotaById(id);
+}
+
 NotaFiscal_service::Resultado NotaFiscal_service::inserir(NotaFiscalDTO nota){
     if(!notaRepo.inserir(nota)){
         return {false, NotaErro::Salvar, "Erro ao inserir Nota Fiscal"};
@@ -84,4 +88,9 @@ bool NotaFiscal_service::temNotaNormal(qlonglong idvenda){
     }else{
         return false;
     }
+}
+
+void NotaFiscal_service::listarEntradas(QSqlQueryModel *model, const QString &de, const QString &ate)
+{
+    notaRepo.listarEntradas(model, de, ate);
 }

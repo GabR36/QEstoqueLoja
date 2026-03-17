@@ -11,6 +11,8 @@
 #include "../dto/Cliente_dto.h"
 #include "email_service.h"
 #include "config_service.h"
+#include "produtonota_service.h"
+#include "../dto/ProdutoNota_dto.h"
 
 enum class FiscalEmitterErro{
     Nenhum,
@@ -34,6 +36,7 @@ public:
         bool ok;
         FiscalEmitterErro erro = FiscalEmitterErro::Nenhum;
         QString msg;
+        qlonglong id = -1;
     };
 
     // struct ResultadoNFe {
@@ -46,6 +49,7 @@ public:
     explicit FiscalEmitter_service(QObject *parent = nullptr);
     void setRetornoForcado(const QString &retorno);
     FiscalEmitter_service::Resultado enviarNfeDevolucaoPadrao(qlonglong idvenda, QList<ProdutoVendidoDTO> listaProds);
+    FiscalEmitter_service::Resultado enviarNfeDevolucaoEntrada(qlonglong idNfEntrada, QList<ProdutoNotaDTO> produtosNota, ClienteDTO cliente);
     FiscalEmitter_service::Resultado enviarNfcePadrao(VendasDTO venda, QList<ProdutoVendidoDTO> listaProds,
                                                       qlonglong nnf, ClienteDTO cliente, bool emitirTodos,
                                                       bool ignorarNCM);
@@ -54,6 +58,7 @@ private:
     QString retornoForcado = "";
     NotaFiscal_service notaServ;
     Produto_Service prodServ;
+    ProdutoNota_service prodNotaServ;
     Email_service emailServ;
     Config_service confServ;
     ConfigDTO confDTO;

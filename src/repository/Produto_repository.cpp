@@ -4,6 +4,7 @@
 #include <QDebug>
 #include "../services/Produto_service.h"
 #include "../infra/databaseconnection_service.h"
+#include "../util/dbutil.h"
 
 Produto_Repository::Produto_Repository(QObject *parent)
 : QObject{parent}
@@ -393,4 +394,25 @@ bool Produto_Repository::updateDiminuirQuantidadeProduto(qlonglong idprod, doubl
         db.close();
         return true;
     }
+}
+
+QVariantMap Produto_Repository::getProdutoPorCodBarrasMap(const QString &codigo){
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "erro ao abrir banco getProdutoPorCodBarrasMap";
+        return {};
+    }
+
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM produtos WHERE codigo_barras = :codigo");
+    query.bindValue(":codigo", codigo);
+
+    if(!query.exec()){
+        qDebug() << "getProdutoPorCodBarrasMap: query falhou" << query.lastError().text();
+        db.close();
+        return {};
+    }
+
+    QVector<QVariantMap> registros = DBUtil::extrairResultados(query);
+    db.close();
+    return registros.isEmpty() ? QVariantMap{} : registros.first();
 }

@@ -12,8 +12,6 @@ MonitorFiscal::MonitorFiscal(QWidget *parent)
 
     m_tipoAtual = TipoVisualizacao::NotaFiscal;
 
-    db = QSqlDatabase::database();
-
     ui->frame->setMinimumWidth(60);
     ui->frame->setMaximumWidth(150);
     ui->frame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -76,19 +74,19 @@ void MonitorFiscal::selectItem(MenuItem* item)
 }
 
 void MonitorFiscal::abrirDevolucao(){
-    AtualizarTabelaNotas("WHERE finalidade = 'DEVOLUCAO'");
+    AtualizarTabelaNotas({"DEVOLUCAO"});
 }
 
 void MonitorFiscal::abrirEntrada(){
-    AtualizarTabelaNotas("WHERE finalidade = 'ENTRADA EXTERNA' OR finalidade = 'resNFe'");
+    AtualizarTabelaNotas({"ENTRADA EXTERNA", "resNFe"});
 }
 
 void MonitorFiscal::abrirSaida(){
-    AtualizarTabelaNotas("WHERE finalidade = 'NORMAL'");
+    AtualizarTabelaNotas({"NORMAL"});
 }
 
 void MonitorFiscal::abrirEventos(){
-    AtualizarTabelaEventos("WHERE cstat != ''");
+    AtualizarTabelaEventos();
 }
 
 
@@ -97,89 +95,36 @@ MonitorFiscal::~MonitorFiscal()
     delete ui;
 }
 
-void MonitorFiscal::AtualizarTabelaNotas(QString whereSql){
-        if (!db.isOpen()) {
-            if (!db.open()) {
-                qDebug() << "Erro ao abrir banco atualizarTabela()";
-                return;
-            }
-        }
+void MonitorFiscal::AtualizarTabelaNotas(const QStringList &finalidades){
+    ui->TView_Fiscal->setModel(modelSaida);
 
-        ui->TView_Fiscal->setModel(modelSaida);
+    notaServ.listarMonitor(modelSaida, finalidades);
 
-        QString sql = R"(
-            SELECT
-                id,
-                valor_total,
-                modelo,
-                nnf,
-                dhemi,
-                tp_amb,
-                chnfe,
-                cnpjemit,
-                finalidade,
-                xml_path
-            FROM notas_fiscais )";
+    ui->TView_Fiscal->setItemDelegateForColumn(4, delegateHora);
+    ui->TView_Fiscal->setItemDelegateForColumn(5, delegateAmb);
 
-        if (!whereSql.isEmpty()) {
-            sql += whereSql;
-        }
+    modelSaida->setHeaderData(0, Qt::Horizontal, "ID");
+    modelSaida->setHeaderData(1, Qt::Horizontal, "Valor");
+    modelSaida->setHeaderData(2, Qt::Horizontal, "Modelo");
+    modelSaida->setHeaderData(3, Qt::Horizontal, "Número");
+    modelSaida->setHeaderData(4, Qt::Horizontal, "Data Emissão");
+    modelSaida->setHeaderData(5, Qt::Horizontal, "Ambiente");
+    modelSaida->setHeaderData(6, Qt::Horizontal, "Chave");
+    modelSaida->setHeaderData(7, Qt::Horizontal, "CNPJ Emitente");
+    modelSaida->setHeaderData(8, Qt::Horizontal, "Finalidade");
+    modelSaida->setHeaderData(9, Qt::Horizontal, "Caminho XML");
 
-        sql += " ORDER BY dhemi DESC";
+    ui->TView_Fiscal->setColumnHidden(0, true);
+    ui->TView_Fiscal->setColumnHidden(9, true);
 
-        modelSaida->setQuery(sql);
-
-
-        ui->TView_Fiscal->setItemDelegateForColumn(4, delegateHora);
-        ui->TView_Fiscal->setItemDelegateForColumn(5, delegateAmb);
-
-        modelSaida->setHeaderData(0, Qt::Horizontal, "ID");
-        modelSaida->setHeaderData(1, Qt::Horizontal, "Valor");
-        modelSaida->setHeaderData(2, Qt::Horizontal, "Modelo");
-        modelSaida->setHeaderData(3, Qt::Horizontal, "Número");
-        modelSaida->setHeaderData(4, Qt::Horizontal, "Data Emissão");
-        modelSaida->setHeaderData(5, Qt::Horizontal, "Ambiente");
-        modelSaida->setHeaderData(6, Qt::Horizontal, "Chave");
-        modelSaida->setHeaderData(7, Qt::Horizontal, "CNPJ Emitente");
-        modelSaida->setHeaderData(8, Qt::Horizontal, "Finalidade");
-        modelSaida->setHeaderData(9, Qt::Horizontal, "Caminho XML");
-
-
-        ui->TView_Fiscal->setColumnHidden(0, true); // Oculta id
-        ui->TView_Fiscal->setColumnHidden(9, true); // Oculta id
-
-        ui->TView_Fiscal->selectRow(0);
+    ui->TView_Fiscal->selectRow(0);
 }
 
-void MonitorFiscal::AtualizarTabelaEventos(QString whereSql){
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            qDebug() << "Erro ao abrir banco atualizarTabela()";
-            return;
-        }
-    }
-
+void MonitorFiscal::AtualizarTabelaEventos(){
     ui->TView_Fiscal->setItemDelegateForColumn(5, nullptr);
-
     ui->TView_Fiscal->setModel(modelEventos);
-    QString sql = R"(
-            SELECT
-                id,
-                tipo_evento,
-                cstat,
-                codigo,
-                atualizado_em,
-                xml_path FROM eventos_fiscais )";
 
-    if (!whereSql.isEmpty()) {
-        sql += whereSql;
-    }
-
-    sql += " ORDER BY atualizado_em DESC";
-
-
-    modelEventos->setQuery(sql);
-
+    eventoServ.listarTodos(modelEventos);
 
     modelEventos->setHeaderData(0, Qt::Horizontal, "ID");
     modelEventos->setHeaderData(1, Qt::Horizontal, "Tipo");
@@ -188,7 +133,7 @@ void MonitorFiscal::AtualizarTabelaEventos(QString whereSql){
     modelEventos->setHeaderData(4, Qt::Horizontal, "Data");
     modelEventos->setHeaderData(5, Qt::Horizontal, "Caminho XML");
 
-    ui->TView_Fiscal->setColumnHidden(0, true); // Oculta id
+    ui->TView_Fiscal->setColumnHidden(0, true);
     ui->TView_Fiscal->setColumnHidden(5, true);
 
     ui->TView_Fiscal->setColumnWidth(1, 150);

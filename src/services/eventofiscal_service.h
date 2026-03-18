@@ -2,6 +2,7 @@
 #define EVENTOFISCAL_SERVICE_H
 
 #include <QObject>
+#include <QSqlQueryModel>
 #include "../repository/eventofiscal_repository.h"
 #include "../dto/EventoFiscal_dto.h"
 #include "../nota/cancelnf.h"
@@ -27,6 +28,7 @@ public:
     explicit EventoFiscal_service(QObject *parent = nullptr);
     EventoFiscal_service::Resultado inserir(EventoFiscalDTO evento);
     EventoFiscal_service::Resultado enviarCancelamento(qlonglong idnf);
+    void listarTodos(QSqlQueryModel *model);
 private:
     EventoFiscal_repository eventoRepo;
 

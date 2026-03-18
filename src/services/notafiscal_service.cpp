@@ -94,3 +94,8 @@ void NotaFiscal_service::listarEntradas(QSqlQueryModel *model, const QString &de
 {
     notaRepo.listarEntradas(model, de, ate);
 }
+
+void NotaFiscal_service::listarMonitor(QSqlQueryModel *model, const QStringList &finalidades)
+{
+    notaRepo.listarMonitor(model, finalidades);
+}

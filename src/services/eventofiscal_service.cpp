@@ -34,3 +34,8 @@ EventoFiscal_service::Resultado EventoFiscal_service::enviarCancelamento(qlonglo
         }
     }
 }
+
+void EventoFiscal_service::listarTodos(QSqlQueryModel *model)
+{
+    eventoRepo.listarTodos(model);
+}

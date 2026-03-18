@@ -449,3 +449,41 @@ NotaFiscalDTO notafiscal_repository::getNotaById(qlonglong id){
     db.close();
     return nota;
 }
+
+void notafiscal_repository::listarMonitor(QSqlQueryModel *model, const QStringList &finalidades)
+{
+    if(!model) return;
+
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "Erro ao abrir banco listarMonitor()";
+        return;
+    }
+
+    QStringList placeholders;
+    for(const QString &f : finalidades)
+        placeholders << QString("'%1'").arg(f);
+
+    QString sql = R"(
+        SELECT
+            id,
+            valor_total,
+            modelo,
+            nnf,
+            dhemi,
+            tp_amb,
+            chnfe,
+            cnpjemit,
+            finalidade,
+            xml_path
+        FROM notas_fiscais
+        WHERE finalidade IN ()" + placeholders.join(", ") + R"()
+        ORDER BY dhemi DESC
+    )";
+
+    model->setQuery(sql, db);
+
+    if(model->lastError().isValid())
+        qDebug() << "Erro SQL listarMonitor:" << model->lastError().text();
+
+    db.close();
+}

@@ -22,6 +22,7 @@ public:
     qlonglong getIdNotaNormalFromIdVenda(qlonglong idvenda);
     qlonglong getProximoNNF65(QString serie, bool tpAmb, qlonglong nnfConfigurado);
     void listarEntradas(QSqlQueryModel *model, const QString &de = "", const QString &ate = "");
+    void listarMonitor(QSqlQueryModel *model, const QStringList &finalidades);
 private:
     QSqlDatabase db;
 

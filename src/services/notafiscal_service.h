@@ -39,6 +39,7 @@ public:
     NotaFiscal_service::Resultado inserir(NotaFiscalDTO nota);
     bool temNotaNormal(qlonglong idvenda);
     void listarEntradas(QSqlQueryModel *model, const QString &de = "", const QString &ate = "");
+    void listarMonitor(QSqlQueryModel *model, const QStringList &finalidades);
 private:
     notafiscal_repository notaRepo;
     Config_service confServ;

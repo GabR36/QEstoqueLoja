@@ -44,3 +44,30 @@ bool EventoFiscal_repository::inserir(EventoFiscalDTO evento){
     }
 
 }
+
+void EventoFiscal_repository::listarTodos(QSqlQueryModel *model)
+{
+    if(!model) return;
+
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "Erro ao abrir banco listarTodosEventos()";
+        return;
+    }
+
+    model->setQuery(R"(
+        SELECT
+            id,
+            tipo_evento,
+            cstat,
+            codigo,
+            atualizado_em,
+            xml_path
+        FROM eventos_fiscais
+        ORDER BY atualizado_em DESC
+    )", db);
+
+    if(model->lastError().isValid())
+        qDebug() << "Erro SQL listarTodosEventos:" << model->lastError().text();
+
+    db.close();
+}

@@ -61,6 +61,7 @@ public:
   ProdutoDTO getProduto(qlonglong id);
   ProdutoDTO getProdutoPeloCodBarras(const QString &codigo);
   QVariantMap getProdutoPorCodBarrasMap(const QString &codigo);
+  Resultado atualizarCamposMap(qlonglong id, const QVariantMap &campos, bool marcarNf);
   Produto_Service::Resultado updateDiminuirQuantidadeProduto(qlonglong idprod, double quantia);
   private slots:
 };

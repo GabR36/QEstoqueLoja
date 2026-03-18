@@ -268,6 +268,13 @@ QVariantMap Produto_Service::getProdutoPorCodBarrasMap(const QString &codigo){
     return repo.getProdutoPorCodBarrasMap(codigo);
 }
 
+Produto_Service::Resultado Produto_Service::atualizarCamposMap(qlonglong id, const QVariantMap &campos, bool marcarNf){
+    if(!repo.atualizarCamposMap(id, campos, marcarNf)){
+        return {false, ProdutoErro::Update, "Erro ao atualizar produto."};
+    }
+    return {true, ProdutoErro::Nenhum, ""};
+}
+
 Produto_Service::Resultado Produto_Service::updateDiminuirQuantidadeProduto(qlonglong idprod,
                                                                             double quantia ){
     if(!repo.updateDiminuirQuantidadeProduto(idprod, quantia)){

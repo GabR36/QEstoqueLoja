@@ -26,6 +26,7 @@ public:
     ProdutoDTO getProdutoPeloCodBarras(const QString &codigo);
     bool updateDiminuirQuantidadeProduto(qlonglong idprod, double quantia);
     QVariantMap getProdutoPorCodBarrasMap(const QString &codigo);
+    bool atualizarCamposMap(qlonglong id, const QVariantMap &campos, bool marcarNf);
 private:
     QSqlDatabase db;
 };

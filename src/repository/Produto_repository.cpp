@@ -396,6 +396,46 @@ bool Produto_Repository::updateDiminuirQuantidadeProduto(qlonglong idprod, doubl
     }
 }
 
+bool Produto_Repository::atualizarCamposMap(qlonglong id, const QVariantMap &campos, bool marcarNf){
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "erro ao abrir banco atualizarCamposMap";
+        return false;
+    }
+
+    QStringList sets;
+    QVariantList binds;
+
+    for(auto it = campos.constBegin(); it != campos.constEnd(); ++it){
+        sets << QString("%1 = ?").arg(it.key());
+        binds << it.value();
+    }
+
+    if(marcarNf)
+        sets << "nf = 1";
+
+    if(sets.isEmpty()){
+        db.close();
+        return true;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("UPDATE produtos SET " + sets.join(", ") + " WHERE id = ?");
+
+    for(const QVariant &v : binds)
+        query.addBindValue(v);
+
+    query.addBindValue(id);
+
+    if(!query.exec()){
+        qDebug() << "atualizarCamposMap: query falhou" << query.lastError().text();
+        db.close();
+        return false;
+    }
+
+    db.close();
+    return true;
+}
+
 QVariantMap Produto_Repository::getProdutoPorCodBarrasMap(const QString &codigo){
     if(!DatabaseConnection_service::open()){
         qDebug() << "erro ao abrir banco getProdutoPorCodBarrasMap";

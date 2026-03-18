@@ -3,10 +3,7 @@
 #include <QVariantMap>
 #include <QStandardItemModel>
 #include <QScrollBar>
-#include <QSqlQuery>
-#include <QSqlDatabase>
 #include "delegatesugerido.h"
-#include <QSqlError>
 #include <QDebug>
 
 MergeProdutos::MergeProdutos(QVariantMap produto1, QVariantMap produto2,
@@ -17,7 +14,6 @@ MergeProdutos::MergeProdutos(QVariantMap produto1, QVariantMap produto2,
     ui->setupUi(this);
     idProduto = produto1["id"].toString();
     nfProduto = produto1["nf"].toBool();
-    db = QSqlDatabase::database();
     QStandardItemModel *modeloComparacaoProd = new QStandardItemModel(this);
     this->modeloComparacaoProd = modeloComparacaoProd;
 
@@ -165,45 +161,14 @@ void MergeProdutos::on_Btn_Importar_clicked()
 
     qDebug() << "valoresSugeridos:" << valoresSugeridos;
 
-    // Monta UPDATE
-    QStringList sets;
-    QVariantList binds;
+    auto resultado = prodServ.atualizarCamposMap(idProduto.toLongLong(), valoresSugeridos, !nfProduto);
 
-    for (auto it = valoresSugeridos.constBegin(); it != valoresSugeridos.constEnd(); ++it) {
-        sets << QString("%1 = ?").arg(it.key());
-        binds << it.value();
-    }
-
-    if (!nfProduto) {
-        sets << "nf = 1";
-    }
-
-    QString sql =
-        "UPDATE produtos SET " + sets.join(", ") +
-        " WHERE id = ?";
-
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            qDebug() << "Banco nao abriu em btn_importar (mergeprodutos)";
-            return;
-        }
-    }
-
-    QSqlQuery query(db);
-    query.prepare(sql);
-
-    for (const QVariant &v : binds)
-        query.addBindValue(v);
-
-    query.addBindValue(idProduto);
-
-    if (!query.exec()) {
-        qDebug() << "Erro ao atualizar produto:" << query.lastError();
-    }else{
+    if(!resultado.ok){
+        qDebug() << "Erro ao atualizar produto:" << resultado.msg;
+    } else {
         produtoAtualizado();
     }
 
-    db.close();
     close();
 }
 void MergeProdutos::onModelDataChanged(const QModelIndex &topLeft,

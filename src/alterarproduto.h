@@ -45,8 +45,10 @@ private slots:
 
     void on_Ledit_AltPreco_textChanged(const QString &arg1);
 
-private:
+protected:
     Ui::AlterarProduto *ui;
+
+private:
     QSet<QString> generatedNumbers;
     bool atualizando = false;
     IbptUtil *util = new IbptUtil();

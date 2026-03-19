@@ -115,7 +115,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/nota/DanfeUtil.h src/nota/DanfeUtil.cpp
         src/util/NFUtilidades.cpp
         src/subclass/leditdialog.h src/subclass/leditdialog.cpp
-        src/infojanelaprod.h src/infojanelaprod.cpp src/infojanelaprod.ui
+        src/infojanelaprod.h src/infojanelaprod.cpp
 
         src/util/helppage.h src/util/helppage.cpp src/util/helppage.ui
         src/nota/acbrmanager.h src/nota/acbrmanager.cpp

@@ -192,3 +192,10 @@ Vendas_service::ResultadoInsercaoRN Vendas_service::inserirVendaRegraDeNegocio(V
     return{true, VendasErro::Nenhum, "Sucesso ao inserir venda.", idVenda};
 
 }
+
+Vendas_service::Resultado Vendas_service::atualizarEstaPago(qlonglong idVenda, bool estaPago){
+    if(!vendasRepo.atualizarEstaPago(idVenda, estaPago ? 1 : 0)){
+        return {false, VendasErro::UpdateFalhou, "Erro ao atualizar esta_pago da venda."};
+    }
+    return {true, VendasErro::Nenhum, "esta_pago atualizado com sucesso."};
+}

@@ -7,13 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>1200</width>
-    <height>600</height>
+    <height>620</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>1200</width>
-    <height>600</height>
+    <width>1000</width>
+    <height>560</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -21,99 +21,310 @@
   </property>
   <property name="styleSheet">
    <string notr="true">
-#JanelaOrcamento{
-background-color: rgb(199, 199, 199);
+#JanelaOrcamento {
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
+    stop:0 rgba(199, 199, 199, 255), stop:1 rgba(170, 170, 170, 255));
 }
-QPushButton{
-background-color: rgb(43, 132, 191);
-color: rgb(255, 255, 255);
-font-size: 15px;
-border-radius: 13px;
+QPushButton {
+  background-color: rgb(43, 132, 191);
+  color: rgb(255, 255, 255);
+  font: 600 10pt &quot;Segoe UI&quot;;
+  border-radius: 8px;
 }
-QPushButton:hover{
-	background-color: rgb(13, 92, 161);
+QPushButton:hover {
+  background-color: rgb(13, 92, 161);
 }
-QPushButton:pressed{
-color: rgb(255, 255, 255);
-	background-color: rgb(153, 193, 241);
-font-size: 15px;
-border-radius: 13px;
+QPushButton:pressed {
+  background-color: rgb(153, 193, 241);
 }
-QGroupBox{
-background-color:rgb(170, 170, 170);
-	font: 700 9pt &quot;Segoe UI&quot;;
-	font-size: 15px;
+QLineEdit, QTextEdit {
+  background-color: white;
+  border: 1px solid rgb(190, 195, 210);
+  border-radius: 5px;
+  padding: 3px 6px;
+  font: 10pt &quot;Segoe UI&quot;;
 }
-</string>
+QLineEdit:focus, QTextEdit:focus {
+  border-color: rgb(43, 132, 191);
+}
+QTableView {
+  background-color: white;
+  border: 1px solid rgb(200, 205, 215);
+  border-radius: 6px;
+  gridline-color: rgb(230, 232, 238);
+  selection-background-color: rgb(210, 228, 248);
+  selection-color: rgb(30, 50, 80);
+}
+   </string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="3">
-    <widget class="QLabel" name="label_11">
-     <property name="styleSheet">
-      <string notr="true">font: 700 15pt &quot;Ubuntu&quot;;</string>
+  <layout class="QHBoxLayout" name="mainHLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QFrame" name="leftPanel">
+     <property name="minimumSize">
+      <size>
+       <width>270</width>
+       <height>0</height>
+      </size>
      </property>
-     <property name="text">
-      <string>Criar Orçamento para Cliente:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBox">
      <property name="maximumSize">
       <size>
-       <width>400</width>
+       <width>270</width>
        <height>16777215</height>
       </size>
      </property>
-     <property name="title">
-      <string/>
+     <property name="styleSheet">
+      <string notr="true">
+#leftPanel {
+  background-color: rgb(182, 182, 182);
+  border-right: 1px solid rgb(155, 155, 155);
+}
+      </string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_18">
+     <property name="frameShape">
+      <enum>QFrame::Shape::NoFrame</enum>
+     </property>
+     <layout class="QVBoxLayout" name="leftVLayout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>14</number>
+      </property>
+      <property name="topMargin">
+       <number>14</number>
+      </property>
+      <property name="rightMargin">
+       <number>14</number>
+      </property>
+      <property name="bottomMargin">
+       <number>14</number>
+      </property>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_14">
+       <widget class="QLabel" name="label_11">
+        <property name="styleSheet">
+         <string notr="true">font: 700 11pt &quot;Segoe UI&quot;; color: rgb(30, 50, 80);</string>
+        </property>
+        <property name="text">
+         <string>Novo Orçamento</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="sep1">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>1</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(150, 150, 150);</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::HLine</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_7">
+        <property name="styleSheet">
+         <string notr="true">font: 600 9pt &quot;Segoe UI&quot;; color: rgb(60, 70, 90);</string>
+        </property>
+        <property name="text">
+         <string>Pesquisar produto</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="CustomLineEdit" name="Ledit_PesquisaProduto">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>30</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="Btn_AddProd">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>+ Adicionar Produto</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="sep2">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>8</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>8</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: transparent;</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::NoFrame</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="clienteHeaderLayout">
+        <property name="spacing">
+         <number>6</number>
+        </property>
         <item>
-         <widget class="QLabel" name="label_7">
+         <widget class="QLabel" name="label_6">
           <property name="styleSheet">
-           <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
+           <string notr="true">font: 600 9pt &quot;Segoe UI&quot;; color: rgb(60, 70, 90);</string>
           </property>
           <property name="text">
-           <string>Pesquisar:</string>
+           <string>Cliente</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="CustomLineEdit" name="Ledit_PesquisaProduto">
-          <property name="maximumSize">
+         <spacer name="clienteHeaderSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
            <size>
-            <width>1231231</width>
-            <height>16777215</height>
+            <width>40</width>
+            <height>20</height>
            </size>
           </property>
-         </widget>
+         </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="Btn_AddProd">
+         <widget class="QPushButton" name="Btn_NovoCliente">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
-            <width>0</width>
-            <height>25</height>
+            <width>100</width>
+            <height>26</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>16777215</width>
-            <height>25</height>
+            <width>100</width>
+            <height>26</height>
            </size>
           </property>
+          <property name="styleSheet">
+           <string notr="true">font: 600 8pt &quot;Segoe UI&quot;;</string>
+          </property>
           <property name="text">
-           <string>Adicionar Produto</string>
+           <string>+ Novo Cliente</string>
           </property>
          </widget>
         </item>
        </layout>
       </item>
       <item>
-       <spacer name="verticalSpacer_2">
+       <widget class="CustomLineEdit" name="Ledit_Cliente">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>30</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="sep3">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>8</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>8</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: transparent;</string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::NoFrame</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_9">
+        <property name="styleSheet">
+         <string notr="true">font: 600 9pt &quot;Segoe UI&quot;; color: rgb(60, 70, 90);</string>
+        </property>
+        <property name="text">
+         <string>Observação</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTextEdit" name="Tedit_Obs">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>130</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="leftBottomSpacer">
         <property name="orientation">
          <enum>Qt::Orientation::Vertical</enum>
         </property>
@@ -125,207 +336,191 @@ background-color:rgb(170, 170, 170);
         </property>
        </spacer>
       </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_13">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <widget class="QLabel" name="label_6">
-            <property name="styleSheet">
-             <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
-            </property>
-            <property name="text">
-             <string>Cliente:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="Btn_NovoCliente">
-            <property name="text">
-             <string>Novo Cliente</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="CustomLineEdit" name="Ledit_Cliente">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_15">
-        <property name="spacing">
-         <number>5</number>
-        </property>
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_9">
-          <property name="styleSheet">
-           <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
-          </property>
-          <property name="text">
-           <string>Observação:</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QTextEdit" name="Tedit_Obs">
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>150</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
      </layout>
     </widget>
    </item>
-   <item row="1" column="1" colspan="2">
-    <layout class="QVBoxLayout" name="verticalLayout_21">
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_17">
-       <item>
-        <widget class="QLabel" name="label_10">
-         <property name="styleSheet">
-          <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
+   <item>
+    <widget class="QWidget" name="rightContent">
+     <layout class="QVBoxLayout" name="rightVLayout">
+      <property name="spacing">
+       <number>8</number>
+      </property>
+      <property name="leftMargin">
+       <number>14</number>
+      </property>
+      <property name="topMargin">
+       <number>14</number>
+      </property>
+      <property name="rightMargin">
+       <number>14</number>
+      </property>
+      <property name="bottomMargin">
+       <number>12</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_10">
+        <property name="styleSheet">
+         <string notr="true">font: 700 9pt &quot;Segoe UI&quot;; color: rgb(45, 60, 85);</string>
+        </property>
+        <property name="text">
+         <string>Catálogo de Produtos</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="ProdutoTableView" name="Tview_ProdutosOrcamento">
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_8">
+        <property name="styleSheet">
+         <string notr="true">font: 700 9pt &quot;Segoe UI&quot;; color: rgb(45, 60, 85);</string>
+        </property>
+        <property name="text">
+         <string>Itens do Orçamento</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTableView" name="Tview_ProdutosSelec">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>130</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>180</height>
+         </size>
+        </property>
+        <property name="contextMenuPolicy">
+         <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
+        </property>
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+        </property>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+        </property>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="footerBar">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>52</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>52</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
+#footerBar {
+  background-color: rgb(190, 192, 196);
+  border-radius: 8px;
+  border: 1px solid rgb(165, 168, 175);
+}
+         </string>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::StyledPanel</enum>
+        </property>
+        <layout class="QHBoxLayout" name="footerHLayout">
+         <property name="spacing">
+          <number>12</number>
          </property>
-         <property name="text">
-          <string>Produtos:</string>
+         <property name="leftMargin">
+          <number>14</number>
          </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="ProdutoTableView" name="Tview_ProdutosOrcamento">
-         <property name="autoFillBackground">
-          <bool>true</bool>
+         <property name="topMargin">
+          <number>6</number>
          </property>
-         <property name="alternatingRowColors">
-          <bool>true</bool>
+         <property name="rightMargin">
+          <number>14</number>
          </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+         <property name="bottomMargin">
+          <number>6</number>
          </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <spacer name="verticalSpacer_3">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_16">
-       <item>
-        <widget class="QLabel" name="label_8">
-         <property name="styleSheet">
-          <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
-         </property>
-         <property name="text">
-          <string>Produtos Selecionados:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QTableView" name="Tview_ProdutosSelec">
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>150</height>
-          </size>
-         </property>
-         <property name="contextMenuPolicy">
-          <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
-         </property>
-         <property name="autoFillBackground">
-          <bool>true</bool>
-         </property>
-         <property name="alternatingRowColors">
-          <bool>true</bool>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
-         </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-         </property>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-        </widget>
-       </item>
-      </layout>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="1">
-    <widget class="QLabel" name="Lbl_TotalGeral">
-     <property name="styleSheet">
-      <string notr="true">font: 700 12pt &quot;Ubuntu&quot;;</string>
-     </property>
-     <property name="text">
-      <string>Total Geral:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QPushButton" name="Btn_Terminar">
-     <property name="minimumSize">
-      <size>
-       <width>150</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>150</width>
-       <height>40</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Visualizar/Exportar
- Orçamento</string>
-     </property>
+         <item>
+          <widget class="QLabel" name="Lbl_TotalGeral">
+           <property name="styleSheet">
+            <string notr="true">font: 700 12pt &quot;Segoe UI&quot;; color: rgb(30, 50, 80);</string>
+           </property>
+           <property name="text">
+            <string>Total Geral:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="footerSpacer">
+           <property name="orientation">
+            <enum>Qt::Orientation::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_Terminar">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>180</width>
+             <height>38</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>180</width>
+             <height>38</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Visualizar / Exportar</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

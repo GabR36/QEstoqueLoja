@@ -2,13 +2,14 @@
 #define JANELAORCAMENTO_H
 
 #include <QWidget>
-#include <QSqlDatabase>
 #include <QSqlQueryModel>
 #include <QStandardItemModel>
 #include <QLocale>
 #include <QMenu>
 #include <QAction>
 #include "services/config_service.h"
+#include "services/cliente_service.h"
+#include "services/Produto_service.h"
 
 namespace Ui {
 class JanelaOrcamento;
@@ -21,8 +22,6 @@ class JanelaOrcamento : public QWidget
 public:
     explicit JanelaOrcamento(QWidget *parent = nullptr);
     ~JanelaOrcamento();
-
-    QSqlDatabase db = QSqlDatabase::database();
 
 private slots:
     void on_Btn_AddProd_clicked();
@@ -41,11 +40,12 @@ private:
     QAction *actionMenuDeletarProd;
     ConfigDTO configDTO;
 
+    Cliente_service clienteService;
+    Produto_Service produtoService;
+
     void configurarOrcamentoEstoque();
     void atualizarListaCliente();
     int validarCliente(bool mostrarMensagens);
-    QPair<QString, int> extrairNomeId(const QString &texto);
-    bool verificarNomeIdCliente(const QString &nome, int id);
     void selecionarClienteNovo();
     QString totalGeral();
     void atualizarTotalProduto();

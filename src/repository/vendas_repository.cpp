@@ -389,3 +389,23 @@ qlonglong Vendas_repository::inserir(VendasDTO venda){
     return idVenda;
 }
 
+bool Vendas_repository::atualizarEstaPago(qlonglong idVenda, int estaPago){
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco atualizarEstaPago";
+        return false;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("UPDATE vendas2 SET esta_pago = :val WHERE id = :id");
+    query.bindValue(":val", estaPago);
+    query.bindValue(":id", idVenda);
+
+    if (!query.exec()) {
+        qDebug() << "Query nao rodou atualizarEstaPago:" << query.lastError().text();
+        db.close();
+        return false;
+    }
+    db.close();
+    return true;
+}
+

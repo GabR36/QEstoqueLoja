@@ -61,6 +61,7 @@ public:
     void listarVendasCliente(QSqlQueryModel *model, qlonglong idcliente);
     void listarVendasDeAteFormaPag(QSqlQueryModel *model, QString de, QString ate, VendasUtil::VendasFormaPagamento formaPag, qlonglong idcliente);
     Vendas_service::ResultadoInsercaoRN inserirVendaRegraDeNegocio(VendasDTO venda, QList<ProdutoVendidoDTO> listaProds);
+    Vendas_service::Resultado atualizarEstaPago(qlonglong idVenda, bool estaPago);
 private:
     QSqlDatabase db;
     Vendas_repository vendasRepo;

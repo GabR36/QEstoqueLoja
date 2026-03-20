@@ -66,12 +66,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     // configuracao do modelo e view produtos
     ui->Tview_Produtos->setModel(model);
-    model->setHeaderData(0, Qt::Horizontal, tr("ID"));
-    model->setHeaderData(1, Qt::Horizontal, tr("Quantidade"));
-    model->setHeaderData(2, Qt::Horizontal, tr("Descrição"));
-    model->setHeaderData(3, Qt::Horizontal, tr("Preço"));
-    model->setHeaderData(4, Qt::Horizontal, tr("Código de Barras"));
-    model->setHeaderData(5, Qt::Horizontal, tr("NF"));
+
 
 
     //carrega as configurações no DTO
@@ -82,6 +77,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     ui->Ledit_Pesquisa->installEventFilter(this);
     atualizarTableview();
+    model->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    model->setHeaderData(1, Qt::Horizontal, tr("Quantidade"));
+    model->setHeaderData(2, Qt::Horizontal, tr("Descrição"));
+    model->setHeaderData(3, Qt::Horizontal, tr("Preço"));
+    model->setHeaderData(4, Qt::Horizontal, tr("Código de Barras"));
+    model->setHeaderData(5, Qt::Horizontal, tr("NF"));
     //
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = model->index(0, 0);

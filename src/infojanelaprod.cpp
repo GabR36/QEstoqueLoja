@@ -13,15 +13,7 @@ InfoJanelaProd::InfoJanelaProd(QWidget *parent, QString id)
 
     ProdutoDTO p = infoService.getProduto(id.toLongLong());
 
-    TrazerInfo(p.descricao,
-               portugues.toString(p.quantidade, 'f', 2),
-               portugues.toString(p.preco, 'f', 2),
-               p.codigoBarras, p.nf, p.uCom,
-               portugues.toString(p.precoFornecedor, 'f', 2),
-               portugues.toString(p.percentLucro, 'f', 2),
-               p.ncm, p.cest,
-               portugues.toString(p.aliquotaIcms, 'f', 2),
-               p.csosn, p.pis);
+    TrazerInfo(p);
 
     // Campos readonly
     ui->Ledit_AltBarras->setReadOnly(true);

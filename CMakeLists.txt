@@ -86,6 +86,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/venda.h src/venda.cpp src/venda.ui
         Imagens/recursosImg.qrc
         src/relatorios.h src/relatorios.cpp src/relatorios.ui
+        src/janelaorcamento.h src/janelaorcamento.cpp src/janelaorcamento.ui
         src/pagamento.h src/pagamento.cpp src/pagamento.ui
 
         src/configuracao.h src/configuracao.cpp src/configuracao.ui
@@ -195,6 +196,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/services/email_service.h src/services/email_service.cpp
         src/dto/ProdutoParaNFe_dto.h
         src/dto/NFRetorno_dto.h
+        Imagens/QEstoqueLOja/logo-completo-claro.png
 
 
 

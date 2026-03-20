@@ -37,5 +37,14 @@
         <file>QEstoqueLOja/user-others.svg</file>
         <file>QEstoqueLOja/view-bank.svg</file>
         <file>QEstoqueLOja/amarok_cart_view.svg</file>
+        <file>QEstoqueLOja/light-icons/user-others.svg</file>
+        <file>QEstoqueLOja/light-icons/view-financial-account-investment-security.svg</file>
+        <file>QEstoqueLOja/light-icons/amarok_cart_remove.svg</file>
+        <file>QEstoqueLOja/light-icons/amarok_cart_view.svg</file>
+        <file>QEstoqueLOja/light-icons/amarok_cart_add.svg</file>
+        <file>QEstoqueLOja/light-icons/story-editor.svg</file>
+        <file>QEstoqueLOja/light-icons/view-task.svg</file>
+        <file>QEstoqueLOja/logo-completo-claro.png</file>
+        <file>QEstoqueLOja/light-icons/view-financial-list.svg</file>
     </qresource>
 </RCC>

@@ -61,6 +61,8 @@ private slots:
 
     void on_Btn_Relatorios_clicked();
 
+    void on_Btn_Orcamento_clicked();
+
     void on_actionRealizar_Venda_triggered();
 
     void on_Btn_AddProd_clicked();

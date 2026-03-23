@@ -45,6 +45,63 @@ bool EventoFiscal_repository::inserir(EventoFiscalDTO evento){
 
 }
 
+QMap<QString, int> EventoFiscal_repository::contarPorTipo(QDateTime dtIni, QDateTime dtFim)
+{
+    QMap<QString, int> resultado;
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco. contarPorTipo (eventos)";
+        return resultado;
+    }
+
+    QSqlQuery q(db);
+    q.prepare(R"(
+        SELECT tipo_evento, COUNT(*)
+        FROM eventos_fiscais
+        WHERE atualizado_em BETWEEN :ini AND :fim
+        GROUP BY tipo_evento
+    )");
+    q.bindValue(":ini", dtIni.toString("yyyy-MM-dd HH:mm:ss"));
+    q.bindValue(":fim", dtFim.toString("yyyy-MM-dd HH:mm:ss"));
+
+    if (q.exec()) {
+        while (q.next())
+            resultado[q.value(0).toString()] = q.value(1).toInt();
+    } else {
+        qDebug() << "Erro contarPorTipo (eventos):" << q.lastError().text();
+    }
+
+    db.close();
+    return resultado;
+}
+
+QList<QPair<QString, QString>> EventoFiscal_repository::buscarXmlsPorPeriodo(QDateTime dtIni, QDateTime dtFim)
+{
+    QList<QPair<QString, QString>> resultado;
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco. buscarXmlsPorPeriodo (eventos)";
+        return resultado;
+    }
+
+    QSqlQuery q(db);
+    q.prepare(R"(
+        SELECT tipo_evento, xml_path
+        FROM eventos_fiscais
+        WHERE atualizado_em BETWEEN :ini AND :fim
+    )");
+    q.bindValue(":ini", dtIni.toString("yyyy-MM-dd HH:mm:ss"));
+    q.bindValue(":fim", dtFim.toString("yyyy-MM-dd HH:mm:ss"));
+
+    if (q.exec()) {
+        while (q.next())
+            resultado.append({q.value("tipo_evento").toString(), q.value("xml_path").toString()});
+    } else {
+        qDebug() << "Erro buscarXmlsPorPeriodo (eventos):" << q.lastError().text();
+    }
+
+    db.close();
+    return resultado;
+}
+
 void EventoFiscal_repository::listarTodos(QSqlQueryModel *model)
 {
     if(!model) return;

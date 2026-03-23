@@ -99,3 +99,18 @@ void NotaFiscal_service::listarMonitor(QSqlQueryModel *model, const QStringList 
 {
     notaRepo.listarMonitor(model, finalidades);
 }
+
+QMap<QString, int> NotaFiscal_service::contarPorFinalidade(QDateTime dtIni, QDateTime dtFim, int tpAmb)
+{
+    return notaRepo.contarPorFinalidade(dtIni, dtFim, tpAmb);
+}
+
+QList<QPair<QString, QString>> NotaFiscal_service::buscarXmlsPorPeriodo(QDateTime dtIni, QDateTime dtFim, int tpAmb)
+{
+    return notaRepo.buscarXmlsPorPeriodo(dtIni, dtFim, tpAmb);
+}
+
+QList<NotaFiscalDTO> NotaFiscal_service::buscarPorPeriodo(QDateTime dtIni, QDateTime dtFim, int tpAmb)
+{
+    return notaRepo.buscarPorPeriodo(dtIni, dtFim, tpAmb);
+}

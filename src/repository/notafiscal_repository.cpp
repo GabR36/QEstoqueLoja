@@ -450,6 +450,107 @@ NotaFiscalDTO notafiscal_repository::getNotaById(qlonglong id){
     return nota;
 }
 
+QMap<QString, int> notafiscal_repository::contarPorFinalidade(QDateTime dtIni, QDateTime dtFim, int tpAmb)
+{
+    QMap<QString, int> resultado;
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco. contarPorFinalidade";
+        return resultado;
+    }
+
+    QSqlQuery q(db);
+    q.prepare(R"(
+        SELECT finalidade, COUNT(*)
+        FROM notas_fiscais
+        WHERE dhemi BETWEEN :ini AND :fim
+        AND tp_amb = :tpamb
+        GROUP BY finalidade
+    )");
+    q.bindValue(":ini", dtIni.toString("yyyy-MM-dd HH:mm:ss"));
+    q.bindValue(":fim", dtFim.toString("yyyy-MM-dd HH:mm:ss"));
+    q.bindValue(":tpamb", tpAmb);
+
+    if (q.exec()) {
+        while (q.next())
+            resultado[q.value(0).toString()] = q.value(1).toInt();
+    } else {
+        qDebug() << "Erro contarPorFinalidade:" << q.lastError().text();
+    }
+
+    db.close();
+    return resultado;
+}
+
+QList<QPair<QString, QString>> notafiscal_repository::buscarXmlsPorPeriodo(QDateTime dtIni, QDateTime dtFim, int tpAmb)
+{
+    QList<QPair<QString, QString>> resultado;
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco. buscarXmlsPorPeriodo (notas)";
+        return resultado;
+    }
+
+    QSqlQuery q(db);
+    q.prepare(R"(
+        SELECT finalidade, xml_path
+        FROM notas_fiscais
+        WHERE dhemi BETWEEN :ini AND :fim
+        AND tp_amb = :tpamb
+    )");
+    q.bindValue(":ini", dtIni.toString("yyyy-MM-dd HH:mm:ss"));
+    q.bindValue(":fim", dtFim.toString("yyyy-MM-dd HH:mm:ss"));
+    q.bindValue(":tpamb", tpAmb);
+
+    if (q.exec()) {
+        while (q.next())
+            resultado.append({q.value("finalidade").toString(), q.value("xml_path").toString()});
+    } else {
+        qDebug() << "Erro buscarXmlsPorPeriodo (notas):" << q.lastError().text();
+    }
+
+    db.close();
+    return resultado;
+}
+
+QList<NotaFiscalDTO> notafiscal_repository::buscarPorPeriodo(QDateTime dtIni, QDateTime dtFim, int tpAmb)
+{
+    QList<NotaFiscalDTO> resultado;
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco. buscarPorPeriodo";
+        return resultado;
+    }
+
+    QSqlQuery q(db);
+    q.prepare(R"(
+        SELECT nnf, dhemi, chnfe, valor_total, finalidade, cstat
+        FROM notas_fiscais
+        WHERE dhemi BETWEEN :ini AND :fim
+        AND tp_amb = :tpamb
+        AND finalidade != 'ENTRADA EXTERNA'
+        ORDER BY dhemi
+    )");
+    q.bindValue(":ini", dtIni.toString("yyyy-MM-dd HH:mm:ss"));
+    q.bindValue(":fim", dtFim.toString("yyyy-MM-dd HH:mm:ss"));
+    q.bindValue(":tpamb", tpAmb);
+
+    if (q.exec()) {
+        while (q.next()) {
+            NotaFiscalDTO nota;
+            nota.nnf        = q.value("nnf").toLongLong();
+            nota.dhEmi      = q.value("dhemi").toString();
+            nota.chNfe      = q.value("chnfe").toString();
+            nota.valorTotal = q.value("valor_total").toDouble();
+            nota.finalidade = q.value("finalidade").toString();
+            nota.cstat      = q.value("cstat").toString();
+            resultado.append(nota);
+        }
+    } else {
+        qDebug() << "Erro buscarPorPeriodo:" << q.lastError().text();
+    }
+
+    db.close();
+    return resultado;
+}
+
 void notafiscal_repository::listarMonitor(QSqlQueryModel *model, const QStringList &finalidades)
 {
     if(!model) return;

@@ -197,6 +197,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/dto/ProdutoParaNFe_dto.h
         src/dto/NFRetorno_dto.h
         Imagens/QEstoqueLOja/logo-completo-claro.png
+        src/repository/relatorios_repository.h src/repository/relatorios_repository.cpp
+        src/services/relatorios_service.h src/services/relatorios_service.cpp
 
 
 
@@ -324,12 +326,6 @@ add_custom_command(TARGET QEstoqueLoja POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/recursos" "${APPDATA_DIR}/recursos"
     COMMENT "Copiando reports e recursos para ${APPDATA_DIR}"
 )
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(QEstoqueLoja)
-endif()
-
-
-
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(QEstoqueLoja)
 endif()

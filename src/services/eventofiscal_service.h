@@ -3,6 +3,10 @@
 
 #include <QObject>
 #include <QSqlQueryModel>
+#include <QMap>
+#include <QList>
+#include <QPair>
+#include <QDateTime>
 #include "../repository/eventofiscal_repository.h"
 #include "../dto/EventoFiscal_dto.h"
 #include "../nota/cancelnf.h"
@@ -29,6 +33,8 @@ public:
     EventoFiscal_service::Resultado inserir(EventoFiscalDTO evento);
     EventoFiscal_service::Resultado enviarCancelamento(qlonglong idnf);
     void listarTodos(QSqlQueryModel *model);
+    QMap<QString, int>             contarPorTipo(QDateTime dtIni, QDateTime dtFim);
+    QList<QPair<QString, QString>> buscarXmlsPorPeriodo(QDateTime dtIni, QDateTime dtFim);
 private:
     EventoFiscal_repository eventoRepo;
 

@@ -3,6 +3,10 @@
 
 #include <QObject>
 #include <QSqlQueryModel>
+#include <QMap>
+#include <QList>
+#include <QPair>
+#include <QDateTime>
 #include "../repository/notafiscal_repository.h"
 #include "config_service.h"
 
@@ -40,6 +44,9 @@ public:
     bool temNotaNormal(qlonglong idvenda);
     void listarEntradas(QSqlQueryModel *model, const QString &de = "", const QString &ate = "");
     void listarMonitor(QSqlQueryModel *model, const QStringList &finalidades);
+    QMap<QString, int>             contarPorFinalidade(QDateTime dtIni, QDateTime dtFim, int tpAmb);
+    QList<QPair<QString, QString>> buscarXmlsPorPeriodo(QDateTime dtIni, QDateTime dtFim, int tpAmb);
+    QList<NotaFiscalDTO>           buscarPorPeriodo(QDateTime dtIni, QDateTime dtFim, int tpAmb);
 private:
     notafiscal_repository notaRepo;
     Config_service confServ;

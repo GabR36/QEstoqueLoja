@@ -683,21 +683,15 @@ QPushButton:pressed {
     <addaction name="actionDocumenta_o"/>
     <addaction name="actionSobre"/>
    </widget>
-   <widget class="QMenu" name="menuEmail">
-    <property name="title">
-     <string>Email</string>
-    </property>
-    <addaction name="actionEnviar"/>
-   </widget>
    <widget class="QMenu" name="menuFiscal">
     <property name="title">
      <string>Fiscal</string>
     </property>
     <addaction name="actionMonitor_Fiscal"/>
+    <addaction name="actionEnviar_Notas_Contador"/>
    </widget>
    <addaction name="menuEditar"/>
    <addaction name="menuVendas"/>
-   <addaction name="menuEmail"/>
    <addaction name="menuFiscal"/>
    <addaction name="menuAjuda"/>
   </widget>
@@ -763,6 +757,11 @@ QPushButton:pressed {
   <action name="actionMonitor_Fiscal">
    <property name="text">
     <string>Monitor Fiscal</string>
+   </property>
+  </action>
+  <action name="actionEnviar_Notas_Contador">
+   <property name="text">
+    <string>Enviar Notas ao Contador</string>
    </property>
   </action>
  </widget>

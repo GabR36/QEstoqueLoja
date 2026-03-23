@@ -39,3 +39,13 @@ void EventoFiscal_service::listarTodos(QSqlQueryModel *model)
 {
     eventoRepo.listarTodos(model);
 }
+
+QMap<QString, int> EventoFiscal_service::contarPorTipo(QDateTime dtIni, QDateTime dtFim)
+{
+    return eventoRepo.contarPorTipo(dtIni, dtFim);
+}
+
+QList<QPair<QString, QString>> EventoFiscal_service::buscarXmlsPorPeriodo(QDateTime dtIni, QDateTime dtFim)
+{
+    return eventoRepo.buscarXmlsPorPeriodo(dtIni, dtFim);
+}

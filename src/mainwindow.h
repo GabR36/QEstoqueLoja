@@ -92,7 +92,7 @@ private slots:
 
     void on_actionSobre_triggered();
 
-    void on_actionMonitor_Fiscal_triggered();
+    void on_actionEnviar_Notas_Contador_triggered();
 
 private:
     Ui::MainWindow *ui;

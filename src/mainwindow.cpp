@@ -67,8 +67,6 @@ MainWindow::MainWindow(QWidget *parent)
     // configuracao do modelo e view produtos
     ui->Tview_Produtos->setModel(model);
 
-
-
     //carrega as configurações no DTO
     Config_service *confServ = new Config_service(this);
     configDTO = confServ->carregarTudo();
@@ -544,8 +542,7 @@ void MainWindow::on_Btn_Entradas_clicked()
 
 void MainWindow::on_actionEnviar_triggered()
 {
-    JanelaEmailContador *janelaEmail = new JanelaEmailContador();
-    janelaEmail->show();
+
 }
 
 
@@ -555,10 +552,9 @@ void MainWindow::on_actionSobre_triggered()
     sobre->show();
 }
 
-
-void MainWindow::on_actionMonitor_Fiscal_triggered()
+void MainWindow::on_actionEnviar_Notas_Contador_triggered()
 {
-    MonitorFiscal *monitor = new MonitorFiscal();
-    monitor->show();
+    JanelaEmailContador *janelaEmail = new JanelaEmailContador();
+    janelaEmail->show();
 }
 

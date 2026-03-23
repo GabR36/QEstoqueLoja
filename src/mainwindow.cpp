@@ -558,3 +558,10 @@ void MainWindow::on_actionEnviar_Notas_Contador_triggered()
     janelaEmail->show();
 }
 
+
+void MainWindow::on_actionMonitor_Fiscal_triggered()
+{
+    MonitorFiscal *monitor = new MonitorFiscal();
+    monitor->show();
+}
+

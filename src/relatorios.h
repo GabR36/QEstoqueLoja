@@ -33,8 +33,6 @@ protected:
     QMap<QString,QString> fiscalValues;
 
 private slots:
-    void on_Btn_PdfGen_clicked();
-    void on_Btn_CsvGen_clicked();
 
 private:
     Ui::relatorios *ui;

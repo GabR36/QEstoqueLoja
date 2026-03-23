@@ -94,6 +94,8 @@ private slots:
 
     void on_actionEnviar_Notas_Contador_triggered();
 
+    void on_actionMonitor_Fiscal_triggered();
+
 private:
     Ui::MainWindow *ui;
     // ACBrNFe *acbr;

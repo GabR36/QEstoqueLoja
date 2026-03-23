@@ -11,8 +11,6 @@ class PDFexporter
 {
 public:
     PDFexporter();
-    static void exportarTodosProdutosParaPDF(const QString &fileName);
-    static void exportarNfProdutosParaPDF(const QString &fileName);
     static void exportarResumoContadorPdf(const QString &filePath,
                                           QDateTime dtIni, QDateTime dtFim,
                                           const QList<NotaFiscalDTO> &notas);

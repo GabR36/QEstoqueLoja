@@ -305,37 +305,6 @@ void relatorios::configurarJanelaQuantVendas()
     ui->CBox_Periodo->setCurrentIndex(1);
 }
 
-void relatorios::on_Btn_PdfGen_clicked()
-{
-    QString fileName = QFileDialog::getSaveFileName(this, "Salvar PDF", QString(), "*.pdf");
-    if (fileName.isEmpty())
-        return;
-    PDFexporter::exportarTodosProdutosParaPDF(fileName);
-}
-
-void relatorios::on_Btn_CsvGen_clicked()
-{
-    QString fileName = QFileDialog::getSaveFileName(nullptr, "Salvar Arquivo CSV", "", "Arquivos CSV (*.csv)");
-    if (fileName.isEmpty())
-        return;
-
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        qDebug() << "Erro ao abrir o arquivo para escrita.";
-        return;
-    }
-
-    QTextStream out(&file);
-    out << "ID;Quant;Desc;Preço;CodBarra;NF\n";
-
-    QList<QStringList> produtos = relatoriosServ.buscarTodosProdutosParaCsv();
-    for (const QStringList &row : produtos) {
-        out << row.join(";") << "\n";
-    }
-
-    file.close();
-}
-
 void relatorios::configurarJanelaNFValor()
 {
     ui->CBox_AnoNfValor->addItems(relatoriosServ.buscarAnosDisponiveis());

@@ -3,6 +3,7 @@
 #include "nota/DanfeUtil.h"
 #include "delegatehora.h"
 #include "delegateambiente.h"
+#include <QHeaderView>
 
 MonitorFiscal::MonitorFiscal(QWidget *parent)
     : QWidget(parent)
@@ -12,13 +13,13 @@ MonitorFiscal::MonitorFiscal(QWidget *parent)
 
     m_tipoAtual = TipoVisualizacao::NotaFiscal;
 
-    ui->frame->setMinimumWidth(60);
-    ui->frame->setMaximumWidth(150);
     ui->frame->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 
     modelSaida = new QSqlQueryModel(this);
     modelEventos = new QSqlQueryModel(this);
     ui->TView_Fiscal->setModel(modelSaida);
+    ui->TView_Fiscal->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    ui->TView_Fiscal->horizontalHeader()->setStretchLastSection(true);
 
 
     auto item1 = new MenuItem("Saída");
@@ -57,18 +58,22 @@ void MonitorFiscal::selectItem(MenuItem* item)
     // Ação por botão
     if (item->button()->text() == "Saída"){
         m_tipoAtual = TipoVisualizacao::NotaFiscal;
+        ui->labelTitulo->setText("Notas Fiscais — Saída");
         abrirSaida();
     }
     else if (item->button()->text() == "Devolução"){
         m_tipoAtual = TipoVisualizacao::NotaFiscal;
+        ui->labelTitulo->setText("Notas Fiscais — Devolução");
         abrirDevolucao();
     }
     else if (item->button()->text() == "Eventos"){
         m_tipoAtual = TipoVisualizacao::Evento;
+        ui->labelTitulo->setText("Eventos Fiscais");
         abrirEventos();
     }
     else if (item->button()->text() == "Entrada"){
         m_tipoAtual = TipoVisualizacao::NotaFiscal;
+        ui->labelTitulo->setText("Notas Fiscais — Entrada");
         abrirEntrada();
     }
 }
@@ -100,6 +105,9 @@ void MonitorFiscal::AtualizarTabelaNotas(const QStringList &finalidades){
 
     notaServ.listarMonitor(modelSaida, finalidades);
 
+    for (int i = 0; i < modelSaida->columnCount(); ++i)
+        ui->TView_Fiscal->setColumnHidden(i, false);
+
     ui->TView_Fiscal->setItemDelegateForColumn(4, delegateHora);
     ui->TView_Fiscal->setItemDelegateForColumn(5, delegateAmb);
 
@@ -121,7 +129,6 @@ void MonitorFiscal::AtualizarTabelaNotas(const QStringList &finalidades){
 }
 
 void MonitorFiscal::AtualizarTabelaEventos(){
-    ui->TView_Fiscal->setItemDelegateForColumn(5, nullptr);
     ui->TView_Fiscal->setModel(modelEventos);
 
     eventoServ.listarTodos(modelEventos);
@@ -136,7 +143,6 @@ void MonitorFiscal::AtualizarTabelaEventos(){
     ui->TView_Fiscal->setColumnHidden(0, true);
     ui->TView_Fiscal->setColumnHidden(5, true);
 
-    ui->TView_Fiscal->setColumnWidth(1, 150);
     ui->TView_Fiscal->selectRow(0);
 }
 

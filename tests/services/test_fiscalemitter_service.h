@@ -18,6 +18,10 @@ private slots:
     void enviarNfcePadrao_sem_produtos_nf();
     void enviarNFePadrao_retornoForcado_ok();
     void enviarNFePadrao_cliente_incompleto();
+    void enviarInutilizacao_retornoForcado_ok();
+    void enviarInutilizacao_motivo_curto();
+    void enviarInutilizacao_numeros_invalidos();
+    void enviarInutilizacao_retornoForcado_recusado();
 };
 
 #endif // TEST_FISCALEMITTER_SERVICE_H

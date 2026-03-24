@@ -51,6 +51,7 @@ void TestFiscalEmitterService::cleanup()
         return;
     QSqlQuery q(db);
     q.exec("DELETE FROM notas_fiscais");
+    q.exec("DELETE FROM eventos_fiscais");
     q.exec("DELETE FROM produtos");
     db.close();
 }
@@ -253,4 +254,85 @@ void TestFiscalEmitterService::enviarNFePadrao_cliente_incompleto()
 
     QVERIFY(!r.ok);
     QCOMPARE(r.erro, FiscalEmitterErro::QuebraDeRegra);
+}
+
+void TestFiscalEmitterService::enviarInutilizacao_retornoForcado_ok()
+{
+    QFile file(":/recursos/inu_sanitizada_ok.txt");
+    QVERIFY2(file.open(QIODevice::ReadOnly | QIODevice::Text),
+             "Erro ao abrir inu_sanitizada_ok.txt");
+    QString retornoFake = QString::fromUtf8(file.readAll());
+    file.close();
+    QVERIFY(!retornoFake.isEmpty());
+
+    FiscalEmitter_service service;
+    service.setRetornoForcado(retornoFake);
+
+    auto r = service.enviarInutilizacao(ModeloNF::NFCe,
+                                        "Erro de sequencia numerica no sistema",
+                                        588, 588);
+
+    QVERIFY2(r.ok, qPrintable(r.msg));
+    QCOMPARE(r.erro, FiscalEmitterErro::Nenhum);
+
+    DatabaseConnection_service::open();
+    QSqlQuery q(db);
+    q.exec("SELECT tipo_evento, cstat, nprot, codigo FROM eventos_fiscais ORDER BY id DESC LIMIT 1");
+    QVERIFY2(q.next(), "Nenhum evento fiscal inserido no banco");
+    QCOMPARE(q.value("tipo_evento").toString(), QString("INUTILIZACAO"));
+    QCOMPARE(q.value("cstat").toString(),       QString("102"));
+    QCOMPARE(q.value("nprot").toString(),       QString("141260000000000"));
+    QCOMPARE(q.value("codigo").toString(),      QString("mod65|588-588"));
+    db.close();
+}
+
+void TestFiscalEmitterService::enviarInutilizacao_motivo_curto()
+{
+    FiscalEmitter_service service;
+    auto r = service.enviarInutilizacao(ModeloNF::NFCe, "Curto", 1, 1);
+
+    QVERIFY(!r.ok);
+    QCOMPARE(r.erro, FiscalEmitterErro::QuebraDeRegra);
+}
+
+void TestFiscalEmitterService::enviarInutilizacao_numeros_invalidos()
+{
+    FiscalEmitter_service service;
+
+    auto r1 = service.enviarInutilizacao(ModeloNF::NFCe, "Justificativa valida aqui", 0, 5);
+    QVERIFY(!r1.ok);
+    QCOMPARE(r1.erro, FiscalEmitterErro::QuebraDeRegra);
+
+    auto r2 = service.enviarInutilizacao(ModeloNF::NFCe, "Justificativa valida aqui", 10, 5);
+    QVERIFY(!r2.ok);
+    QCOMPARE(r2.erro, FiscalEmitterErro::QuebraDeRegra);
+}
+
+void TestFiscalEmitterService::enviarInutilizacao_retornoForcado_recusado()
+{
+    QFile file(":/recursos/inu_sanitizada_recusado.txt");
+    QVERIFY2(file.open(QIODevice::ReadOnly | QIODevice::Text),
+             "Erro ao abrir inu_sanitizada_recusado.txt");
+    QString retornoFake = QString::fromUtf8(file.readAll());
+    file.close();
+    QVERIFY(!retornoFake.isEmpty());
+
+    FiscalEmitter_service service;
+    service.setRetornoForcado(retornoFake);
+
+    auto r = service.enviarInutilizacao(ModeloNF::NFCe,
+                                        "Erro de sequencia numerica no sistema",
+                                        588, 588);
+
+    QVERIFY(!r.ok);
+    QCOMPARE(r.erro, FiscalEmitterErro::Recusado);
+    QVERIFY2(r.msg.contains("563"), qPrintable("Esperado CStat 563 na mensagem: " + r.msg));
+
+    // nenhum evento deve ter sido salvo no banco
+    DatabaseConnection_service::open();
+    QSqlQuery q(db);
+    q.exec("SELECT COUNT(*) FROM eventos_fiscais");
+    QVERIFY(q.next());
+    QCOMPARE(q.value(0).toInt(), 0);
+    db.close();
 }

@@ -21,10 +21,9 @@ bool EventoFiscal_repository::inserir(EventoFiscalDTO evento){
 
     q.prepare(R"(
         INSERT INTO eventos_fiscais
-        (tipo_evento, id_lote, cstat, justificativa, codigo, xml_path, nprot, id_nf)
+        (tipo_evento, id_lote, cstat, justificativa, codigo, xml_path, nprot, id_nf, atualizado_em)
         VALUES
-        (:tipo, :lote, :cstat, :just, :codigo, :xml, :nprot, :idnf)
-        )
+        (:tipo, :lote, :cstat, :just, :codigo, :xml, :nprot, :idnf, :atualizado)
     )");
 
     q.bindValue(":tipo", evento.tipoEvento);
@@ -34,10 +33,11 @@ bool EventoFiscal_repository::inserir(EventoFiscalDTO evento){
     q.bindValue(":codigo", evento.codigo);
     q.bindValue(":xml", evento.xmlPath);
     q.bindValue(":nprot", evento.nProt);
-    q.bindValue(":id_nf", evento.idNf);
+    q.bindValue(":idnf", evento.idNf > 0 ? QVariant(evento.idNf) : QVariant(QMetaType(QMetaType::LongLong)));
+    q.bindValue(":atualizado", evento.atualizadoEm);
 
     if(!q.exec()){
-        qDebug() << "Query inserção evento não rodou";
+        qDebug() << "Query inserção evento não rodou:" << q.lastError().text();
         return false;
     }else{
         return true;

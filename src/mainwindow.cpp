@@ -47,6 +47,7 @@
 #include "services/schemamigration_service.h"
 #include "services/config_service.h"
 #include "services/dfe_service.h"
+#include "inutilizacaodialog.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -563,5 +564,12 @@ void MainWindow::on_actionMonitor_Fiscal_triggered()
 {
     MonitorFiscal *monitor = new MonitorFiscal();
     monitor->show();
+}
+
+
+void MainWindow::on_actionInutilizar_Numera_o_NF_triggered()
+{
+    InutilizacaoDialog *inu = new InutilizacaoDialog();
+    inu->show();
 }
 

@@ -24,7 +24,7 @@
 #include "dto/Config_dto.h"
 
 
-#define VERSAO_QE "2.4.0"
+#define VERSAO_QE "2.5.0"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -95,6 +95,8 @@ private slots:
     void on_actionEnviar_Notas_Contador_triggered();
 
     void on_actionMonitor_Fiscal_triggered();
+
+    void on_actionInutilizar_Numera_o_NF_triggered();
 
 private:
     Ui::MainWindow *ui;

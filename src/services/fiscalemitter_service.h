@@ -13,6 +13,7 @@
 #include "config_service.h"
 #include "produtonota_service.h"
 #include "../dto/ProdutoNota_dto.h"
+#include "eventofiscal_service.h"
 
 enum class FiscalEmitterErro{
     Nenhum,
@@ -26,6 +27,11 @@ enum class FiscalEmitterErro{
     ProdutosSemNF,
     QuebraDeRegra,
     NCMInvalido
+};
+
+enum ModeloNF{
+    NFCe,
+    NFE
 };
 
 class FiscalEmitter_service : public QObject
@@ -54,6 +60,7 @@ public:
                                                       qlonglong nnf, ClienteDTO cliente, bool emitirTodos,
                                                       bool ignorarNCM);
     FiscalEmitter_service::Resultado enviarNFePadrao(VendasDTO venda, QList<ProdutoVendidoDTO> listaProds, qlonglong nnf, ClienteDTO cliente, bool emitirTodos, bool ignorarNCM);
+    FiscalEmitter_service::Resultado enviarInutilizacao(ModeloNF modelo, QString motivo, qlonglong numIni, qlonglong numFinal);
 private:
     QString retornoForcado = "";
     NotaFiscal_service notaServ;
@@ -62,6 +69,7 @@ private:
     Email_service emailServ;
     Config_service confServ;
     ConfigDTO confDTO;
+    EventoFiscal_service eventoServ;
 
 
 signals:

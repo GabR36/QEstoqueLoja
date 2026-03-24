@@ -1,6 +1,8 @@
 #include "fiscalemitter_service.h"
 #include "../util/datautil.h"
 #include "../dto/Cliente_dto.h"
+#include <QDate>
+#include <QMap>
 
 FiscalEmitter_service::FiscalEmitter_service(QObject *parent)
     : QObject{parent}
@@ -415,3 +417,72 @@ FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNFePadrao(VendasDT
 
 }
 
+FiscalEmitter_service::Resultado FiscalEmitter_service::enviarInutilizacao(ModeloNF modelo, QString motivo, qlonglong numIni, qlonglong numFinal){
+    if(!confDTO.emitNfFiscal | confDTO.certificadoPathFiscal.isEmpty()){
+        return {false, FiscalEmitterErro::QuebraDeRegra, "Configurações Fiscais faltantes"};
+    }
+    if (motivo.trimmed().length() < 15)
+        return {false, FiscalEmitterErro::QuebraDeRegra, "Justificativa deve ter no mínimo 15 caracteres."};
+    if (numIni <= 0 || numFinal <= 0)
+        return {false, FiscalEmitterErro::QuebraDeRegra, "Números de NF devem ser maiores que zero."};
+    if (numFinal < numIni)
+        return {false, FiscalEmitterErro::QuebraDeRegra, "Número final não pode ser menor que o inicial."};
+
+    auto nfe = AcbrManager::instance()->nfe();
+    int ano = QDate::currentDate().year();
+    int mod = modelo == ModeloNF::NFCe ? 65 : 55;
+
+    try {
+        std::string ret = nfe->Inutilizar(
+            confDTO.cnpjEmpresa.toStdString(),
+            motivo.toStdString(),
+            ano,
+            mod,
+            1,
+            numIni,
+            numFinal
+        );
+
+        QString retorno = QString::fromStdString(ret);
+        qDebug() << "Retorno inutilização:" << retorno;
+
+        // Parseia retorno no formato "Chave=Valor" do ACBr
+        QMap<QString, QString> campos;
+        for (const QString &linha : retorno.split('\n')) {
+            int sep = linha.indexOf('=');
+            if (sep < 1) continue;
+            campos[linha.left(sep).trimmed().toLower()] = linha.mid(sep + 1).trimmed();
+        }
+
+        QString cstat   = campos.value("cstat");
+        QString nProt   = campos.value("nprot");
+        QString xmlPath = campos.value("nomearquivo");
+        QString xMotivo = campos.value("xmotivo");
+
+        if (cstat == "102") {
+            EventoFiscalDTO evento;
+            evento.tipoEvento    = "Inutilizacao";
+            evento.idLote        = 0;
+            evento.cstat         = cstat;
+            evento.justificativa = motivo;
+            evento.xmlPath       = xmlPath;
+            evento.nProt         = nProt;
+            evento.idNf          = -1;
+            evento.codigo        = "";
+            qDebug() << "debug evento inu" << evento.codigo;
+            auto r = eventoServ.inserir(evento);
+            if (!r.ok) {
+                return {true, FiscalEmitterErro::Nenhum,
+                        "Inutilização homologada, mas falha ao salvar no banco:\n" + r.msg};
+            }
+            return {true, FiscalEmitterErro::Nenhum,
+                    QString("Inutilização homologada.\nNProt: %1\n%2").arg(nProt, xMotivo)};
+        } else {
+            return {false, FiscalEmitterErro::Recusado,
+                    QString("Inutilização recusada.\nCStat: %1\n%2").arg(cstat, xMotivo)};
+        }
+
+    } catch (const std::exception &e) {
+        return {false, FiscalEmitterErro::ErroAoEnviar, QString("Erro ao enviar inutilização: %1").arg(e.what())};
+    }
+}

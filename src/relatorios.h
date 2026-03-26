@@ -13,6 +13,8 @@
 #include <QStandardItemModel>
 #include <QMenu>
 #include <QAction>
+#include <QDate>
+#include <QComboBox>
 #include "services/config_service.h"
 #include "services/relatorios_service.h"
 #include "util/graficohelper.h"
@@ -37,9 +39,6 @@ private slots:
 private:
     Ui::relatorios *ui;
     QLocale portugues;
-    QStringList meses = {"01 - Janeiro", "02 - Fevereiro", "03 - Março", "04 - Abril", "05 - Maio",
-                         "06 - Junho", "07 - Julho", "08 - Agosto", "09 - Setembro",
-                         "10 - Outubro", "11 - Novembro", "12 - Dezembro"};
     ConfigDTO configDTO;
     Relatorios_service relatoriosServ;
 
@@ -50,6 +49,12 @@ private:
     void configurarJanelaFormasPagamentoAno();
     void configurarJanelaNFValor();
     void configurarJanelaProdutoLucroValor();
+
+    static Agrupamento agrupFromCombo(QComboBox *cb, bool semDia = false);
+
+    QChartView *chartViewAtual();
+    void exportarPdfAtual();
+    void exportarCsvAtual();
 };
 
 #endif // RELATORIOS_H

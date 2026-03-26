@@ -6,8 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Qt Test
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Test Core Sql Gui Widgets Xml PrintSupport Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Sql Gui Widgets Xml PrintSupport Network)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Test Core Sql Gui Widgets Xml PrintSupport Network Charts)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Sql Gui Widgets Xml PrintSupport Network Charts)
 
 if(CMAKE_SYSTEM MATCHES "Windows")
     include(FetchContent)
@@ -121,6 +121,7 @@ add_executable(QEstoqueLojaTests
 
 
 
+
 )
 target_compile_definitions(QEstoqueLojaTests PRIVATE TEST_ENV)
 
@@ -151,6 +152,7 @@ target_link_libraries(QEstoqueLojaTests PRIVATE
     zint
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Xml
+    Qt${QT_VERSION_MAJOR}::Charts
 )
 
 if (CMAKE_SYSTEM MATCHES "Linux")

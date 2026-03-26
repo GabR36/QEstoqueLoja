@@ -100,6 +100,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/delegateprecof2.cpp src/delegateprecof2.h
         src/delegatepago.h src/delegatepago.cpp
         src/util/pdfexporter.h src/util/pdfexporter.cpp
+        src/util/csvexporter.h src/util/csvexporter.cpp
         src/subclass/customlineedit.h src/subclass/customlineedit.cpp
         src/delegateprecovalidate.h src/delegateprecovalidate.cpp
         src/delegatelockcol.h src/delegatelockcol.cpp

@@ -13,6 +13,11 @@
 #include <QTimer>
 #include "configuracao.h"
 #include <QStandardPaths>
+#include <QSet>
+#include <QComboBox>
+#include <QChartView>
+#include "util/pdfexporter.h"
+#include "util/csvexporter.h"
 
 relatorios::relatorios(QWidget *parent)
     : QWidget(parent)
@@ -34,6 +39,9 @@ relatorios::relatorios(QWidget *parent)
         configurarJanelaProdutoLucroValor();
     }
 
+    connect(ui->Btn_ExportCSV, &QPushButton::clicked, this, &relatorios::exportarCsvAtual);
+    connect(ui->Btn_ExportPDF, &QPushButton::clicked, this, &relatorios::exportarPdfAtual);
+
     ui->CBox_VendasMain->setCurrentIndex(0);
     ui->Stacked_Vendas->setCurrentIndex(0);
 }
@@ -48,335 +56,414 @@ bool relatorios::existeProdutoVendido()
     return relatoriosServ.existeProdutoVendido();
 }
 
+Agrupamento relatorios::agrupFromCombo(QComboBox *cb, bool semDia)
+{
+    QString t = cb->currentText();
+    if (!semDia && t == "Dia") return Agrupamento::Dia;
+    if (t == "Ano")            return Agrupamento::Ano;
+    return Agrupamento::Mes;
+}
+
+void relatorios::configurarJanelaQuantVendas()
+{
+    QDate inicio = QDate(QDate::currentDate().year(), 1, 1);
+    QDate fim    = QDate::currentDate();
+    ui->DE_InicioQuant->setDate(inicio);
+    ui->DE_FimQuant->setDate(fim);
+    ui->CBox_AgrupQuant->setCurrentIndex(1); // Mês por padrão
+
+    connect(ui->Btn_AplicarQuant, &QPushButton::clicked, this, [=]() {
+        QDate de  = ui->DE_InicioQuant->date();
+        QDate ate = ui->DE_FimQuant->date();
+        if (de > ate) {
+            QMessageBox::warning(this, "Período inválido", "A data inicial não pode ser posterior à data final.");
+            return;
+        }
+
+        Agrupamento agrup = agrupFromCombo(ui->CBox_AgrupQuant);
+        QMap<QString, int> dados = relatoriosServ.buscarQuantVendasPeriodo(de, ate, agrup);
+        if (dados.isEmpty()) {
+            QMessageBox::information(this, "Sem dados", "Não há vendas registradas para esse período.");
+            return;
+        }
+
+        QStringList categorias = dados.keys();
+        QBarSet *set = new QBarSet("Vendas");
+        for (const QString &k : categorias)
+            *set << dados[k];
+
+        connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
+            if (status)
+                QToolTip::showText(QCursor::pos(), QString("Vendas: %1").arg((*set)[index]));
+        });
+
+        double maxY = *std::max_element(dados.begin(), dados.end());
+        QString titulo = QString("Quantidade de Vendas por %1 (%2 – %3)")
+                         .arg(ui->CBox_AgrupQuant->currentText())
+                         .arg(de.toString("dd/MM/yyyy"))
+                         .arg(ate.toString("dd/MM/yyyy"));
+        QChartView *cv = GraficoHelper::criarBarChart(titulo, categorias, {set}, maxY);
+        GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(0), cv, 1);
+    });
+
+    emit ui->Btn_AplicarQuant->clicked();
+}
+
+void relatorios::configurarJanelaValorVendas()
+{
+    QDate inicio = QDate(QDate::currentDate().year(), 1, 1);
+    QDate fim    = QDate::currentDate();
+    ui->DE_InicioValor->setDate(inicio);
+    ui->DE_FimValor->setDate(fim);
+    ui->CBox_AgrupValor->setCurrentIndex(1); // Mês por padrão
+
+    connect(ui->Btn_AplicarValor, &QPushButton::clicked, this, [=]() {
+        QDate de  = ui->DE_InicioValor->date();
+        QDate ate = ui->DE_FimValor->date();
+        if (de > ate) {
+            QMessageBox::warning(this, "Período inválido", "A data inicial não pode ser posterior à data final.");
+            return;
+        }
+
+        Agrupamento agrup = agrupFromCombo(ui->CBox_AgrupValor);
+        QMap<QString, QPair<double,double>> dados = relatoriosServ.buscarValorVendasPeriodo(de, ate, agrup);
+        if (dados.isEmpty()) {
+            QMessageBox::information(this, "Sem dados", "Não há vendas registradas para esse período.");
+            return;
+        }
+
+        QStringList categorias = dados.keys();
+        QBarSet *setVendas   = new QBarSet("Vendas");
+        QBarSet *setEntradas = new QBarSet("Prazo");
+        double maxValor = 0;
+
+        for (const QString &k : categorias) {
+            double v = dados[k].first;
+            double e = dados[k].second;
+            *setVendas   << v;
+            *setEntradas << e;
+            maxValor = std::max({maxValor, v, e});
+        }
+
+        connect(setVendas, &QBarSet::hovered, this, [=](bool status, int index) {
+            if (status)
+                QToolTip::showText(QCursor::pos(), QString("R$: %1").arg((*setVendas)[index]));
+        });
+        connect(setEntradas, &QBarSet::hovered, this, [=](bool status, int index) {
+            if (status)
+                QToolTip::showText(QCursor::pos(), QString("R$: %1").arg((*setEntradas)[index]));
+        });
+
+        QString titulo = QString("Valor de Vendas por %1 (%2 – %3)")
+                         .arg(ui->CBox_AgrupValor->currentText())
+                         .arg(de.toString("dd/MM/yyyy"))
+                         .arg(ate.toString("dd/MM/yyyy"));
+        QChartView *cv = GraficoHelper::criarBarChart(titulo, categorias, {setVendas, setEntradas}, maxValor * 1.1);
+        GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(1), cv, 1);
+    });
+
+    emit ui->Btn_AplicarValor->clicked();
+}
+
+void relatorios::configurarJanelaTopProdutosVendas()
+{
+    QDate inicio = QDate(QDate::currentDate().year(), 1, 1);
+    QDate fim    = QDate::currentDate();
+    ui->DE_InicioTop->setDate(inicio);
+    ui->DE_FimTop->setDate(fim);
+
+    connect(ui->Btn_AplicarTop, &QPushButton::clicked, this, [=]() {
+        QDate de  = ui->DE_InicioTop->date();
+        QDate ate = ui->DE_FimTop->date();
+        if (de > ate) {
+            QMessageBox::warning(this, "Período inválido", "A data inicial não pode ser posterior à data final.");
+            return;
+        }
+
+        QMap<QString, int> dados = relatoriosServ.buscarTopProdutosVendidosPeriodo(de, ate);
+        if (dados.isEmpty()) {
+            QMessageBox::information(this, "Sem dados", "Não há produtos vendidos para esse período.");
+            return;
+        }
+
+        QStringList categorias = dados.keys();
+        QBarSet *set = new QBarSet("Vendas");
+        for (const QString &k : categorias)
+            *set << dados[k];
+
+        connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
+            if (status)
+                QToolTip::showText(QCursor::pos(),
+                    QString("%1\nQtd: %2").arg(categorias.at(index)).arg((*set)[index]));
+        });
+
+        double maxY = *std::max_element(dados.begin(), dados.end());
+        QString titulo = QString("Top 10 Produtos Mais Vendidos (%1 – %2)")
+                         .arg(de.toString("dd/MM/yyyy"))
+                         .arg(ate.toString("dd/MM/yyyy"));
+        QChartView *cv = GraficoHelper::criarBarChart(titulo, categorias, {set}, maxY);
+        GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(2), cv, 1);
+    });
+
+    emit ui->Btn_AplicarTop->clicked();
+}
+
 void relatorios::configurarJanelaFormasPagamentoAno()
 {
-    if (ui->CBox_AnoFormaPagamento->count() == 0) {
-        ui->CBox_AnoFormaPagamento->addItems(relatoriosServ.buscarAnosDisponiveis());
-    }
+    QDate inicio = QDate(QDate::currentDate().year(), 1, 1);
+    QDate fim    = QDate::currentDate();
+    ui->DE_InicioFormas->setDate(inicio);
+    ui->DE_FimFormas->setDate(fim);
+    ui->CBox_AgrupFormas->setCurrentIndex(0); // Mês por padrão
 
-    connect(ui->CBox_AnoFormaPagamento, &QComboBox::currentTextChanged, this, [=](const QString &ano){
-        QString anoSelecionado = ui->CBox_AnoFormaPagamento->currentText();
-        if (anoSelecionado.isEmpty()) return;
+    connect(ui->Btn_AplicarFormas, &QPushButton::clicked, this, [=]() {
+        QDate de  = ui->DE_InicioFormas->date();
+        QDate ate = ui->DE_FimFormas->date();
+        if (de > ate) {
+            QMessageBox::warning(this, "Período inválido", "A data inicial não pode ser posterior à data final.");
+            return;
+        }
 
-        QMap<QString, QVector<int>> dados = relatoriosServ.buscarFormasPagamentoPorAno(anoSelecionado);
-        QStringList mesesAbrev = {"Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"};
+        Agrupamento agrup = agrupFromCombo(ui->CBox_AgrupFormas, /*semDia=*/true);
+        QMap<QString, QMap<QString,int>> dados = relatoriosServ.buscarFormasPagamentoPeriodo(de, ate, agrup);
+        if (dados.isEmpty()) {
+            QMessageBox::information(this, "Sem dados", "Não há vendas registradas para esse período.");
+            return;
+        }
+
+        // Coletar todos os períodos únicos em ordem
+        QSet<QString> periodSet;
+        for (auto &inner : dados)
+            for (auto it = inner.cbegin(); it != inner.cend(); ++it)
+                periodSet.insert(it.key());
+        QStringList categorias = periodSet.values();
+        categorias.sort();
 
         int maxValor = 0;
         QList<QBarSet*> sets;
-
-        for (auto it = dados.begin(); it != dados.end(); ++it) {
+        for (auto it = dados.cbegin(); it != dados.cend(); ++it) {
             QBarSet *set = new QBarSet(it.key());
-            for (int val : it.value()) {
+            for (const QString &p : categorias) {
+                int val = it.value().value(p, 0);
                 *set << val;
                 maxValor = std::max(maxValor, val);
             }
             QString nomeForma = it.key();
             connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
-                if (status) {
-                    QToolTip::showText(QCursor::pos(), QString("%1: %2").arg(nomeForma).arg((*set)[index]));
-                }
+                if (status)
+                    QToolTip::showText(QCursor::pos(),
+                        QString("%1: %2").arg(nomeForma).arg((*set)[index]));
             });
             sets << set;
         }
 
-        QChartView *chartView = GraficoHelper::criarBarChart(
-            "Formas de Pagamento por Mês - Ano " + anoSelecionado,
-            mesesAbrev, sets, maxValor);
-        GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(3), chartView, 1);
+        QString titulo = QString("Formas de Pagamento por %1 (%2 – %3)")
+                         .arg(ui->CBox_AgrupFormas->currentText())
+                         .arg(de.toString("dd/MM/yyyy"))
+                         .arg(ate.toString("dd/MM/yyyy"));
+        QChartView *cv = GraficoHelper::criarBarChart(titulo, categorias, sets, maxValor);
+        GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(3), cv, 1);
     });
 
-    emit ui->CBox_AnoFormaPagamento->currentTextChanged(ui->CBox_AnoFormaPagamento->currentText());
-}
-
-void relatorios::configurarJanelaTopProdutosVendas()
-{
-    QMap<QString, int> topProdutos = relatoriosServ.buscarTopProdutosVendidos();
-
-    QBarSet *set = new QBarSet("Vendas");
-    QStringList categorias;
-
-    for (auto it = topProdutos.begin(); it != topProdutos.end(); ++it) {
-        categorias << it.key();
-        *set << it.value();
-    }
-
-    connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
-        if (status) {
-            QToolTip::showText(
-                QCursor::pos(),
-                QString("%1\nValor: %2")
-                    .arg(categorias.at(index))
-                    .arg((*set)[index], 0, 'f', 2)
-                );
-        }
-    });
-
-    double maxY = topProdutos.isEmpty() ? 1.0 : *std::max_element(topProdutos.begin(), topProdutos.end());
-    QChartView *chartView = GraficoHelper::criarBarChart("Top 10 Produtos Mais Vendidos", categorias, {set}, maxY);
-    GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(2), chartView, 2);
-}
-
-void relatorios::configurarJanelaValorVendas()
-{
-    ui->CBox_MesValor->setVisible(false);
-    ui->CBox_AnoValor->setVisible(false);
-
-    ui->CBox_MesValor->addItems(meses);
-
-    connect(ui->CBox_periodoValor, &QComboBox::currentTextChanged, this, [=](const QString &texto){
-        if (texto == "Ano") {
-            ui->CBox_AnoValor->setVisible(true);
-            ui->CBox_MesValor->setVisible(false);
-            ui->CBox_AnoValor->clear();
-            ui->CBox_AnoValor->addItems(relatoriosServ.buscarAnosDisponiveis());
-        } else if (texto == "Mes") {
-            ui->CBox_AnoValor->setVisible(true);
-            ui->CBox_MesValor->setVisible(true);
-            ui->CBox_AnoValor->clear();
-            ui->CBox_AnoValor->addItems(relatoriosServ.buscarAnosDisponiveis());
-            emit ui->CBox_MesValor->currentTextChanged(ui->CBox_MesValor->currentText());
-        } else {
-            ui->CBox_AnoValor->setVisible(false);
-            ui->CBox_MesValor->setVisible(false);
-        }
-    });
-
-    connect(ui->CBox_AnoValor, &QComboBox::currentTextChanged, this, [=](const QString &anoSelecionado) {
-        if (ui->CBox_periodoValor->currentText() == "Ano") {
-            QMap<QString, QPair<double, double>> vendasEEntradas = relatoriosServ.buscarValorVendasPorMesAno(anoSelecionado);
-
-            QBarSet *setVendas = new QBarSet("Vendas");
-            QBarSet *setEntradas = new QBarSet("Parcelas 'prazo'");
-            QStringList categorias;
-            double maxValor = 0;
-
-            for (int i = 1; i <= 12; ++i) {
-                QString mes = QString("%1").arg(i, 2, 10, QChar('0'));
-                categorias << mes;
-
-                double valorVendas = vendasEEntradas.value(mes, QPair<double, double>(0, 0)).first;
-                double valorEntradas = vendasEEntradas.value(mes, QPair<double, double>(0, 0)).second;
-
-                *setVendas << valorVendas;
-                *setEntradas << valorEntradas;
-
-                maxValor = std::max({maxValor, valorVendas, valorEntradas});
-            }
-
-            connect(setVendas, &QBarSet::hovered, this, [=](bool status, int index) {
-                if (status) {
-                    QToolTip::showText(QCursor::pos(), QString("R$: %1").arg((*setVendas)[index]));
-                }
-            });
-            connect(setEntradas, &QBarSet::hovered, this, [=](bool status, int index) {
-                if (status) {
-                    QToolTip::showText(QCursor::pos(), QString("R$: %1").arg((*setEntradas)[index]));
-                }
-            });
-
-            QChartView *chartView = GraficoHelper::criarBarChart(
-                "Valor Vendas e Parcelas por Mês - Ano " + anoSelecionado,
-                categorias, {setVendas, setEntradas}, maxValor * 1.1);
-            GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(1), chartView, 2);
-        }
-    });
-
-    connect(ui->CBox_MesValor, &QComboBox::currentTextChanged, this, [=](const QString &mesSelecionado) {
-        QString anoSelecionado = ui->CBox_AnoValor->currentText();
-        if (ui->CBox_periodoValor->currentText() == "Mes" && !anoSelecionado.isEmpty()) {
-            QString mesFormatado = mesSelecionado.left(2);
-
-            QMap<QString, double> vendas = relatoriosServ.buscarValorVendasPorDiaMesAno(anoSelecionado, mesFormatado);
-
-            QBarSet *set = new QBarSet("Valor Total Vendas");
-            QStringList categorias;
-
-            int diasNoMes = QDate(anoSelecionado.toInt(), mesFormatado.toInt(), 1).daysInMonth();
-            for (int dia = 1; dia <= diasNoMes; ++dia) {
-                QString diaStr = QString("%1").arg(dia, 2, 10, QChar('0'));
-                categorias << diaStr;
-                *set << vendas.value(diaStr, 0.0);
-            }
-
-            connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
-                if (status) {
-                    QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
-                }
-            });
-
-            double maxValor = vendas.isEmpty() ? 10.0 : *std::max_element(vendas.begin(), vendas.end());
-            QChartView *chartView = GraficoHelper::criarBarChart(
-                "Valor Vendas por Dia - " + mesSelecionado + " de " + anoSelecionado,
-                categorias, {set}, maxValor);
-            GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(1), chartView, 2);
-        }
-    });
-
-    ui->CBox_periodoValor->setCurrentIndex(1);
-}
-
-void relatorios::configurarJanelaQuantVendas()
-{
-    ui->CBox_Ano->setVisible(false);
-    ui->CBox_Mes->addItems(meses);
-    ui->CBox_Mes->setVisible(false);
-
-    connect(ui->CBox_Periodo, &QComboBox::currentTextChanged, this, [=](const QString &texto){
-        if (texto == "Ano") {
-            ui->CBox_Ano->setVisible(true);
-            ui->CBox_Mes->setVisible(false);
-            ui->CBox_Ano->clear();
-            ui->CBox_Ano->addItems(relatoriosServ.buscarAnosDisponiveis());
-        } else if (texto == "Mes") {
-            ui->CBox_Ano->setVisible(true);
-            ui->CBox_Mes->setVisible(true);
-            ui->CBox_Ano->clear();
-            ui->CBox_Ano->addItems(relatoriosServ.buscarAnosDisponiveis());
-        } else {
-            ui->CBox_Ano->setVisible(false);
-            ui->CBox_Mes->setVisible(false);
-        }
-    });
-
-    connect(ui->CBox_Ano, &QComboBox::currentTextChanged, this, [=](const QString &anoSelecionado){
-        if (ui->CBox_Periodo->currentText() == "Ano") {
-            QMap<QString, int> vendas = relatoriosServ.buscarVendasPorMesAno(anoSelecionado);
-            if (vendas.isEmpty()) {
-                QMessageBox::information(this, "Sem dados", "Não há vendas registradas para esse ano.");
-                return;
-            }
-
-            QBarSet *set = new QBarSet("Vendas");
-            QStringList categorias;
-
-            for (int i = 1; i <= 12; ++i) {
-                QString mes = QString("%1").arg(i, 2, 10, QChar('0'));
-                categorias << mes;
-                *set << vendas.value(mes, 0);
-            }
-
-            connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
-                if (status) {
-                    QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
-                }
-            });
-
-            double maxY = *std::max_element(vendas.begin(), vendas.end());
-            QChartView *chartView = GraficoHelper::criarBarChart(
-                "Quantidade de Vendas por Mês - Ano " + anoSelecionado,
-                categorias, {set}, maxY);
-            GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(0), chartView, 2);
-        }
-    });
-
-    ui->CBox_Periodo->setCurrentIndex(1);
-
-    connect(ui->CBox_Mes, &QComboBox::currentTextChanged, this, [=](const QString &mesSelecionado) {
-        QString anoSelecionado = ui->CBox_Ano->currentText();
-        if (ui->CBox_Periodo->currentText() == "Mes" && !anoSelecionado.isEmpty()) {
-            QString mesFormatado = mesSelecionado.left(2);
-
-            QMap<QString, int> vendas = relatoriosServ.buscarVendasPorDiaMesAno(anoSelecionado, mesFormatado);
-
-            QBarSet *set = new QBarSet("Vendas");
-            QStringList categorias;
-
-            int diasNoMes = QDate(anoSelecionado.toInt(), mesFormatado.toInt(), 1).daysInMonth();
-            for (int dia = 1; dia <= diasNoMes; ++dia) {
-                QString diaStr = QString("%1").arg(dia, 2, 10, QChar('0'));
-                categorias << diaStr;
-                *set << vendas.value(diaStr, 0);
-            }
-
-            connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
-                if (status) {
-                    QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
-                }
-            });
-
-            int maxVendas = vendas.isEmpty() ? 10 : *std::max_element(vendas.begin(), vendas.end());
-            QChartView *chartView = GraficoHelper::criarBarChart(
-                "Quantidade de Vendas por Dia - " + mesSelecionado + " de " + anoSelecionado,
-                categorias, {set}, maxVendas);
-            GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(0), chartView, 2);
-        }
-    });
-
-    ui->CBox_Periodo->setCurrentIndex(1);
+    emit ui->Btn_AplicarFormas->clicked();
 }
 
 void relatorios::configurarJanelaNFValor()
 {
-    ui->CBox_AnoNfValor->addItems(relatoriosServ.buscarAnosDisponiveis());
+    QDate inicio = QDate(QDate::currentDate().year(), 1, 1);
+    QDate fim    = QDate::currentDate();
+    ui->DE_InicioNF->setDate(inicio);
+    ui->DE_FimNF->setDate(fim);
+    ui->CBox_AgrupNF->setCurrentIndex(0); // Mês por padrão
 
-    connect(ui->CBox_AnoNfValor, &QComboBox::currentTextChanged, this, [=](const QString &anoSelecionado){
-        QMap<QString, float> valoresNf = relatoriosServ.buscarValoresNfAno(anoSelecionado, configDTO.tpAmbFiscal);
-        if (valoresNf.isEmpty()) {
-            QMessageBox::information(this, "Sem dados", "Não há Notas Fiscais registradas para esse ano.");
+    connect(ui->Btn_AplicarNF, &QPushButton::clicked, this, [=]() {
+        QDate de  = ui->DE_InicioNF->date();
+        QDate ate = ui->DE_FimNF->date();
+        if (de > ate) {
+            QMessageBox::warning(this, "Período inválido", "A data inicial não pode ser posterior à data final.");
             return;
         }
 
-        QBarSet *set = new QBarSet("Valor de Notas Fiscais emitidas");
-        QStringList categorias;
-
-        for (int i = 1; i <= 12; ++i) {
-            QString mes = QString("%1").arg(i, 2, 10, QChar('0'));
-            categorias << mes;
-            *set << valoresNf.value(mes, 0);
+        Agrupamento agrup = agrupFromCombo(ui->CBox_AgrupNF, /*semDia=*/true);
+        QMap<QString, float> dados = relatoriosServ.buscarValoresNfPeriodo(de, ate, agrup, configDTO.tpAmbFiscal);
+        if (dados.isEmpty()) {
+            QMessageBox::information(this, "Sem dados", "Não há Notas Fiscais registradas para esse período.");
+            return;
         }
 
+        QStringList categorias = dados.keys();
+        QBarSet *set = new QBarSet("Valor de Notas Fiscais emitidas");
+        for (const QString &k : categorias)
+            *set << dados[k];
+
         connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
-            if (status) {
+            if (status)
                 QToolTip::showText(QCursor::pos(), QString("Valor: %1").arg((*set)[index]));
-            }
         });
 
-        double maxY = *std::max_element(valoresNf.begin(), valoresNf.end());
-        QChartView *chartView = GraficoHelper::criarBarChart(
-            "Valor Emitididos em Nota Fiscal - Ano " + anoSelecionado,
-            categorias, {set}, maxY);
-        GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(4), chartView, 1);
+        double maxY = *std::max_element(dados.begin(), dados.end());
+        QString titulo = QString("Valor Emitido em Nota Fiscal por %1 (%2 – %3)")
+                         .arg(ui->CBox_AgrupNF->currentText())
+                         .arg(de.toString("dd/MM/yyyy"))
+                         .arg(ate.toString("dd/MM/yyyy"));
+        QChartView *cv = GraficoHelper::criarBarChart(titulo, categorias, {set}, maxY);
+        GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(4), cv, 1);
     });
 
-    emit ui->CBox_AnoNfValor->currentTextChanged(ui->CBox_AnoNfValor->currentText());
+    emit ui->Btn_AplicarNF->clicked();
 }
 
 void relatorios::configurarJanelaProdutoLucroValor()
 {
-    ui->CBox_AnoProdutoLucro->addItems(relatoriosServ.buscarAnosDisponiveis());
+    QDate inicio = QDate(QDate::currentDate().year(), 1, 1);
+    QDate fim    = QDate::currentDate();
+    ui->DE_InicioLucro->setDate(inicio);
+    ui->DE_FimLucro->setDate(fim);
 
-    connect(ui->CBox_AnoProdutoLucro, &QComboBox::currentTextChanged, this, [=](const QString &anoSelecionado){
-        QMap<QString, float> valoresProduto = relatoriosServ.produtosMaisLucrativosAno(anoSelecionado);
-        if (valoresProduto.isEmpty()) {
-            QMessageBox::information(this, "Sem dados", "Não há vendas registradas para esse ano.");
+    connect(ui->Btn_AplicarLucro, &QPushButton::clicked, this, [=]() {
+        QDate de  = ui->DE_InicioLucro->date();
+        QDate ate = ui->DE_FimLucro->date();
+        if (de > ate) {
+            QMessageBox::warning(this, "Período inválido", "A data inicial não pode ser posterior à data final.");
             return;
         }
 
-        QBarSet *set = new QBarSet("Lucro");
-        QStringList categorias;
+        QMap<QString, float> dados = relatoriosServ.produtosMaisLucrativosPeriodo(de, ate);
+        if (dados.isEmpty()) {
+            QMessageBox::information(this, "Sem dados", "Não há vendas registradas para esse período.");
+            return;
+        }
 
-        for (auto it = valoresProduto.constBegin(); it != valoresProduto.constEnd(); ++it) {
+        QStringList categorias;
+        QBarSet *set = new QBarSet("Lucro");
+        for (auto it = dados.cbegin(); it != dados.cend(); ++it) {
             categorias << it.key();
             *set << it.value();
         }
 
         connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
-            if (status) {
-                QToolTip::showText(
-                    QCursor::pos(),
+            if (status)
+                QToolTip::showText(QCursor::pos(),
                     QString("%1\nLucro: R$ %2")
                         .arg(categorias.at(index))
-                        .arg((*set)[index], 0, 'f', 2)
-                    );
-            }
+                        .arg((*set)[index], 0, 'f', 2));
         });
 
-        double maxY = *std::max_element(valoresProduto.begin(), valoresProduto.end());
-        QChartView *chartView = GraficoHelper::criarBarChart(
-            "TOP 10 produtos que mais geraram lucro - Ano " + anoSelecionado,
-            categorias, {set}, maxY);
-        GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(5), chartView, 1);
+        double maxY = *std::max_element(dados.begin(), dados.end());
+        QString titulo = QString("TOP 10 Produtos que mais geraram Lucro (%1 – %2)")
+                         .arg(de.toString("dd/MM/yyyy"))
+                         .arg(ate.toString("dd/MM/yyyy"));
+        QChartView *cv = GraficoHelper::criarBarChart(titulo, categorias, {set}, maxY);
+        GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(5), cv, 1);
     });
 
-    emit ui->CBox_AnoProdutoLucro->currentTextChanged(ui->CBox_AnoProdutoLucro->currentText());
+    emit ui->Btn_AplicarLucro->clicked();
+}
+
+// ── Helpers de exportação ──────────────────────────────────────────────────
+
+QChartView *relatorios::chartViewAtual()
+{
+    QWidget *page = ui->Stacked_Vendas->currentWidget();
+    if (!page || !page->layout() || page->layout()->count() < 2)
+        return nullptr;
+    return qobject_cast<QChartView*>(page->layout()->itemAt(1)->widget());
+}
+
+void relatorios::exportarPdfAtual()
+{
+    PDFexporter::exportarGraficoRelatorio(this, chartViewAtual());
+}
+
+void relatorios::exportarCsvAtual()
+{
+    int idx = ui->Stacked_Vendas->currentIndex();
+    QList<QStringList> linhas;
+    QString nomeArquivo = "relatorio.csv";
+
+    switch (idx) {
+    case 0: { // Quantidade de vendas
+        auto dados = relatoriosServ.buscarQuantVendasPeriodo(
+            ui->DE_InicioQuant->date(), ui->DE_FimQuant->date(),
+            agrupFromCombo(ui->CBox_AgrupQuant));
+        linhas << QStringList{"Período", "Quantidade de Vendas"};
+        for (auto it = dados.cbegin(); it != dados.cend(); ++it)
+            linhas << QStringList{it.key(), QString::number(it.value())};
+        nomeArquivo = "relatorio_quant_vendas.csv";
+        break;
+    }
+    case 1: { // Valor de vendas
+        auto dados = relatoriosServ.buscarValorVendasPeriodo(
+            ui->DE_InicioValor->date(), ui->DE_FimValor->date(),
+            agrupFromCombo(ui->CBox_AgrupValor));
+        linhas << QStringList{"Período", "Vendas (R$)", "Valor Prazo (R$)"};
+        for (auto it = dados.cbegin(); it != dados.cend(); ++it)
+            linhas << QStringList{it.key(),
+                                  QString::number(it.value().first,  'f', 2),
+                                  QString::number(it.value().second, 'f', 2)};
+        nomeArquivo = "relatorio_valor_vendas.csv";
+        break;
+    }
+    case 2: { // Top produtos
+        auto dados = relatoriosServ.buscarTopProdutosVendidosPeriodo(
+            ui->DE_InicioTop->date(), ui->DE_FimTop->date());
+        linhas << QStringList{"Produto", "Quantidade Vendida"};
+        for (auto it = dados.cbegin(); it != dados.cend(); ++it)
+            linhas << QStringList{it.key(), QString::number(it.value())};
+        nomeArquivo = "relatorio_top_produtos.csv";
+        break;
+    }
+    case 3: { // Formas de pagamento
+        auto dados = relatoriosServ.buscarFormasPagamentoPeriodo(
+            ui->DE_InicioFormas->date(), ui->DE_FimFormas->date(),
+            agrupFromCombo(ui->CBox_AgrupFormas, /*semDia=*/true));
+
+        QSet<QString> periodSet;
+        for (auto &inner : dados)
+            for (auto it = inner.cbegin(); it != inner.cend(); ++it)
+                periodSet.insert(it.key());
+        QStringList periodos = periodSet.values();
+        periodos.sort();
+        QStringList formas = dados.keys();
+
+        QStringList cabecalho = {"Período"};
+        cabecalho << formas;
+        linhas << cabecalho;
+
+        for (const QString &p : periodos) {
+            QStringList linha = {p};
+            for (const QString &f : formas)
+                linha << QString::number(dados.value(f).value(p, 0));
+            linhas << linha;
+        }
+        nomeArquivo = "relatorio_formas_pagamento.csv";
+        break;
+    }
+    case 4: { // NF valores
+        auto dados = relatoriosServ.buscarValoresNfPeriodo(
+            ui->DE_InicioNF->date(), ui->DE_FimNF->date(),
+            agrupFromCombo(ui->CBox_AgrupNF, /*semDia=*/true),
+            configDTO.tpAmbFiscal);
+        linhas << QStringList{"Período", "Valor Total (R$)"};
+        for (auto it = dados.cbegin(); it != dados.cend(); ++it)
+            linhas << QStringList{it.key(), QString::number(it.value(), 'f', 2)};
+        nomeArquivo = "relatorio_nf_valores.csv";
+        break;
+    }
+    case 5: { // Produtos mais lucrativos
+        auto dados = relatoriosServ.produtosMaisLucrativosPeriodo(
+            ui->DE_InicioLucro->date(), ui->DE_FimLucro->date());
+        linhas << QStringList{"Produto", "Lucro (R$)"};
+        for (auto it = dados.cbegin(); it != dados.cend(); ++it)
+            linhas << QStringList{it.key(), QString::number(it.value(), 'f', 2)};
+        nomeArquivo = "relatorio_lucro_produtos.csv";
+        break;
+    }
+    default:
+        QMessageBox::information(this, "Não disponível",
+            "Esta página não possui dados para exportar.");
+        return;
+    }
+
+    CsvExporter::exportar(this, nomeArquivo, linhas);
 }

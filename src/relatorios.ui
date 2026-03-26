@@ -138,6 +138,38 @@ QPushButton:pressed {
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QPushButton" name="Btn_ExportCSV">
+       <property name="text">
+        <string>Exportar CSV</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>110</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>Exportar dados do gráfico atual para CSV</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Btn_ExportPDF">
+       <property name="text">
+        <string>Exportar PDF</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>110</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>Exportar gráfico atual como PDF</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -145,106 +177,348 @@ QPushButton:pressed {
      <property name="currentIndex">
       <number>6</number>
      </property>
+
+     <!-- page 0: Quantidade de vendas -->
      <widget class="QWidget" name="page">
       <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_7">
+        <layout class="QHBoxLayout" name="filterBar_Quant">
+         <property name="spacing">
+          <number>6</number>
+         </property>
          <item>
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Período:</string>
-           </property>
+          <widget class="QLabel" name="lbl_deQuant">
+           <property name="text"><string>De:</string></property>
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="CBox_Periodo">
-           <item>
-            <property name="text">
-             <string>Mes</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Ano</string>
-            </property>
-           </item>
+          <widget class="QDateEdit" name="DE_InicioQuant">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
           </widget>
          </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QComboBox" name="CBox_Ano"/>
+          <widget class="QLabel" name="lbl_ateQuant">
+           <property name="text"><string>Até:</string></property>
+          </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="CBox_Mes"/>
+          <widget class="QDateEdit" name="DE_FimQuant">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_agrupQuant">
+           <property name="text"><string>Agrupar por:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="CBox_AgrupQuant">
+           <item><property name="text"><string>Dia</string></property></item>
+           <item><property name="text"><string>Mês</string></property></item>
+           <item><property name="text"><string>Ano</string></property></item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_AplicarQuant">
+           <property name="text"><string>Aplicar</string></property>
+           <property name="maximumSize"><size><width>80</width><height>30</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
          </item>
         </layout>
        </item>
       </layout>
      </widget>
+
+     <!-- page_2 (index 1): Valor de vendas -->
      <widget class="QWidget" name="page_2">
       <layout class="QVBoxLayout" name="verticalLayout_10">
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_9">
+        <layout class="QHBoxLayout" name="filterBar_Valor">
+         <property name="spacing">
+          <number>6</number>
+         </property>
          <item>
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Período:</string>
-           </property>
+          <widget class="QLabel" name="lbl_deValor">
+           <property name="text"><string>De:</string></property>
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="CBox_periodoValor">
-           <item>
-            <property name="text">
-             <string>Mes</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Ano</string>
-            </property>
-           </item>
+          <widget class="QDateEdit" name="DE_InicioValor">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
           </widget>
          </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <widget class="QComboBox" name="CBox_AnoValor"/>
+          <widget class="QLabel" name="lbl_ateValor">
+           <property name="text"><string>Até:</string></property>
+          </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="CBox_MesValor"/>
+          <widget class="QDateEdit" name="DE_FimValor">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_agrupValor">
+           <property name="text"><string>Agrupar por:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="CBox_AgrupValor">
+           <item><property name="text"><string>Dia</string></property></item>
+           <item><property name="text"><string>Mês</string></property></item>
+           <item><property name="text"><string>Ano</string></property></item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_AplicarValor">
+           <property name="text"><string>Aplicar</string></property>
+           <property name="maximumSize"><size><width>80</width><height>30</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
          </item>
         </layout>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="page_5"/>
+
+     <!-- page_5 (index 2): Top produtos mais vendidos -->
+     <widget class="QWidget" name="page_5">
+      <layout class="QVBoxLayout" name="verticalLayout_top">
+       <item>
+        <layout class="QHBoxLayout" name="filterBar_Top">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lbl_deTop">
+           <property name="text"><string>De:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_InicioTop">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_ateTop">
+           <property name="text"><string>Até:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_FimTop">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_AplicarTop">
+           <property name="text"><string>Aplicar</string></property>
+           <property name="maximumSize"><size><width>80</width><height>30</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+
+     <!-- page_6 (index 3): Formas de pagamento -->
      <widget class="QWidget" name="page_6">
       <layout class="QVBoxLayout" name="verticalLayout_11">
        <item>
-        <widget class="QComboBox" name="CBox_AnoFormaPagamento"/>
+        <layout class="QHBoxLayout" name="filterBar_Formas">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lbl_deFormas">
+           <property name="text"><string>De:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_InicioFormas">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_ateFormas">
+           <property name="text"><string>Até:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_FimFormas">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_agrupFormas">
+           <property name="text"><string>Agrupar por:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="CBox_AgrupFormas">
+           <item><property name="text"><string>Mês</string></property></item>
+           <item><property name="text"><string>Ano</string></property></item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_AplicarFormas">
+           <property name="text"><string>Aplicar</string></property>
+           <property name="maximumSize"><size><width>80</width><height>30</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
+
+     <!-- page_7 (index 4): Nota Fiscal valores -->
      <widget class="QWidget" name="page_7">
       <layout class="QVBoxLayout" name="verticalLayout_19">
        <item>
-        <widget class="QComboBox" name="CBox_AnoNfValor"/>
+        <layout class="QHBoxLayout" name="filterBar_NF">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lbl_deNF">
+           <property name="text"><string>De:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_InicioNF">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_ateNF">
+           <property name="text"><string>Até:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_FimNF">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_agrupNF">
+           <property name="text"><string>Agrupar por:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="CBox_AgrupNF">
+           <item><property name="text"><string>Mês</string></property></item>
+           <item><property name="text"><string>Ano</string></property></item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_AplicarNF">
+           <property name="text"><string>Aplicar</string></property>
+           <property name="maximumSize"><size><width>80</width><height>30</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
+
+     <!-- page_8 (index 5): Produtos que geram mais lucro -->
      <widget class="QWidget" name="page_8">
       <layout class="QVBoxLayout" name="verticalLayout_20">
        <item>
-        <widget class="QComboBox" name="CBox_AnoProdutoLucro"/>
+        <layout class="QHBoxLayout" name="filterBar_Lucro">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lbl_deLucro">
+           <property name="text"><string>De:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_InicioLucro">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_ateLucro">
+           <property name="text"><string>Até:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_FimLucro">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_AplicarLucro">
+           <property name="text"><string>Aplicar</string></property>
+           <property name="maximumSize"><size><width>80</width><height>30</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
+
+     <!-- page_estoque (index 6): unchanged -->
      <widget class="QWidget" name="page_estoque">
       <layout class="QVBoxLayout" name="verticalLayout_estoque">
        <item>
@@ -252,6 +526,7 @@ QPushButton:pressed {
        </item>
       </layout>
      </widget>
+
     </widget>
    </item>
   </layout>

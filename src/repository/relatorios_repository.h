@@ -7,6 +7,9 @@
 #include <QPair>
 #include <QVector>
 #include <QStringList>
+#include <QDate>
+
+enum class Agrupamento { Dia, Mes, Ano };
 
 class Relatorios_repository : public QObject
 {
@@ -14,21 +17,18 @@ class Relatorios_repository : public QObject
 public:
     explicit Relatorios_repository(QObject *parent = nullptr);
 
-    QStringList buscarAnosDisponiveis();
-    QMap<QString, int>              buscarVendasPorMes();
-    QMap<QString, int>              buscarVendasPorMesAno(const QString &ano);
-    QMap<QString, int>              buscarVendasPorDiaMesAno(const QString &ano, const QString &mes);
-    QMap<QString, double>           buscarValorVendasPorDiaMesAno(const QString &ano, const QString &mes);
-    QMap<QString, QPair<double,double>> buscarValorVendasPorMesAno(const QString &ano);
-    QMap<QString, int>              buscarTopProdutosVendidos();
-    QMap<QString, QVector<int>>     buscarFormasPagamentoPorAno(const QString &ano);
-    QMap<QString, float>            buscarValoresNfAno(const QString &ano, int tpAmb);
-    QMap<QString, float>            produtosMaisLucrativosAno(const QString &ano);
-    bool                            existeProdutoVendido();
-    QList<QStringList>              buscarTodosProdutosParaCsv();
+    QMap<QString, int>               buscarQuantVendasPeriodo(const QDate &inicio, const QDate &fim, Agrupamento agrup);
+    QMap<QString, QPair<double,double>> buscarValorVendasPeriodo(const QDate &inicio, const QDate &fim, Agrupamento agrup);
+    QMap<QString, int>               buscarTopProdutosVendidosPeriodo(const QDate &inicio, const QDate &fim);
+    QMap<QString, QMap<QString,int>> buscarFormasPagamentoPeriodo(const QDate &inicio, const QDate &fim, Agrupamento agrup);
+    QMap<QString, float>             buscarValoresNfPeriodo(const QDate &inicio, const QDate &fim, Agrupamento agrup, int tpAmb);
+    QMap<QString, float>             produtosMaisLucrativosPeriodo(const QDate &inicio, const QDate &fim);
+    bool                             existeProdutoVendido();
+    QList<QStringList>               buscarTodosProdutosParaCsv();
 
 private:
     QSqlDatabase db;
+    static QString strftimeFormato(Agrupamento agrup);
 
 signals:
 };

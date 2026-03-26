@@ -4,54 +4,34 @@ Relatorios_service::Relatorios_service(QObject *parent)
     : QObject{parent}
 {}
 
-QStringList Relatorios_service::buscarAnosDisponiveis()
+QMap<QString, int> Relatorios_service::buscarQuantVendasPeriodo(const QDate &inicio, const QDate &fim, Agrupamento agrup)
 {
-    return relatoriosRepo.buscarAnosDisponiveis();
+    return relatoriosRepo.buscarQuantVendasPeriodo(inicio, fim, agrup);
 }
 
-QMap<QString, int> Relatorios_service::buscarVendasPorMes()
+QMap<QString, QPair<double,double>> Relatorios_service::buscarValorVendasPeriodo(const QDate &inicio, const QDate &fim, Agrupamento agrup)
 {
-    return relatoriosRepo.buscarVendasPorMes();
+    return relatoriosRepo.buscarValorVendasPeriodo(inicio, fim, agrup);
 }
 
-QMap<QString, int> Relatorios_service::buscarVendasPorMesAno(const QString &ano)
+QMap<QString, int> Relatorios_service::buscarTopProdutosVendidosPeriodo(const QDate &inicio, const QDate &fim)
 {
-    return relatoriosRepo.buscarVendasPorMesAno(ano);
+    return relatoriosRepo.buscarTopProdutosVendidosPeriodo(inicio, fim);
 }
 
-QMap<QString, int> Relatorios_service::buscarVendasPorDiaMesAno(const QString &ano, const QString &mes)
+QMap<QString, QMap<QString,int>> Relatorios_service::buscarFormasPagamentoPeriodo(const QDate &inicio, const QDate &fim, Agrupamento agrup)
 {
-    return relatoriosRepo.buscarVendasPorDiaMesAno(ano, mes);
+    return relatoriosRepo.buscarFormasPagamentoPeriodo(inicio, fim, agrup);
 }
 
-QMap<QString, double> Relatorios_service::buscarValorVendasPorDiaMesAno(const QString &ano, const QString &mes)
+QMap<QString, float> Relatorios_service::buscarValoresNfPeriodo(const QDate &inicio, const QDate &fim, Agrupamento agrup, int tpAmb)
 {
-    return relatoriosRepo.buscarValorVendasPorDiaMesAno(ano, mes);
+    return relatoriosRepo.buscarValoresNfPeriodo(inicio, fim, agrup, tpAmb);
 }
 
-QMap<QString, QPair<double, double>> Relatorios_service::buscarValorVendasPorMesAno(const QString &ano)
+QMap<QString, float> Relatorios_service::produtosMaisLucrativosPeriodo(const QDate &inicio, const QDate &fim)
 {
-    return relatoriosRepo.buscarValorVendasPorMesAno(ano);
-}
-
-QMap<QString, int> Relatorios_service::buscarTopProdutosVendidos()
-{
-    return relatoriosRepo.buscarTopProdutosVendidos();
-}
-
-QMap<QString, QVector<int>> Relatorios_service::buscarFormasPagamentoPorAno(const QString &ano)
-{
-    return relatoriosRepo.buscarFormasPagamentoPorAno(ano);
-}
-
-QMap<QString, float> Relatorios_service::buscarValoresNfAno(const QString &ano, int tpAmb)
-{
-    return relatoriosRepo.buscarValoresNfAno(ano, tpAmb);
-}
-
-QMap<QString, float> Relatorios_service::produtosMaisLucrativosAno(const QString &ano)
-{
-    return relatoriosRepo.produtosMaisLucrativosAno(ano);
+    return relatoriosRepo.produtosMaisLucrativosPeriodo(inicio, fim);
 }
 
 bool Relatorios_service::existeProdutoVendido()

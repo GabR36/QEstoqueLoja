@@ -325,7 +325,7 @@ ProdutoDTO Produto_Repository::getProduto(qlonglong id){
 
     QSqlQuery query(db);
     query.prepare("SELECT quantidade, descricao, preco, codigo_barras, nf, un_comercial, "
-                  "preco_fornecedor, porcent_lucro, ncm, cest, aliquota_imposto, csosn, pis, local "
+                  "preco_fornecedor, porcent_lucro, ncm, cest, aliquota_imposto, csosn, pis, local, "
                   "adicionado_em, atualizado_em "
                   "FROM produtos WHERE id = :id");
     query.bindValue(":id", id);
@@ -349,6 +349,7 @@ ProdutoDTO Produto_Repository::getProduto(qlonglong id){
         prod.precoFornecedor = query.value("preco_fornecedor").toDouble();
         prod.quantidade = query.value("quantidade").toDouble();
         prod.uCom = query.value("un_comercial").toString();
+        prod.local = query.value("local").toString();
         prod.adicionadoEm = query.value("adicionado_em").toString();
         prod.atualizadoEm = query.value("atualizado_em").toString();
 

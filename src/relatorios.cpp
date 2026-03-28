@@ -38,6 +38,7 @@ relatorios::relatorios(QWidget *parent)
         configurarJanelaNFValor();
         configurarJanelaProdutoLucroValor();
     }
+    configurarJanelaInventario();
 
     connect(ui->Btn_ExportCSV, &QPushButton::clicked, this, &relatorios::exportarCsvAtual);
     connect(ui->Btn_ExportPDF, &QPushButton::clicked, this, &relatorios::exportarPdfAtual);
@@ -360,6 +361,35 @@ void relatorios::configurarJanelaProdutoLucroValor()
     emit ui->Btn_AplicarLucro->clicked();
 }
 
+void relatorios::configurarJanelaInventario()
+{
+    QDate inicio = QDate(QDate::currentDate().year(), 1, 1);
+    QDate fim    = QDate::currentDate();
+    ui->DE_InicioInv->setDate(inicio);
+    ui->DE_FimInv->setDate(fim);
+    ui->ChkBox_SomenteNfInv->setChecked(false);
+
+    connect(ui->Btn_AplicarInv, &QPushButton::clicked, this, [=]() {
+        QDate de  = ui->DE_InicioInv->date();
+        QDate ate = ui->DE_FimInv->date();
+        if (de > ate) {
+            QMessageBox::warning(this, "Período inválido", "A data inicial não pode ser posterior à data final.");
+            return;
+        }
+
+        bool somenteNf = ui->ChkBox_SomenteNfInv->isChecked();
+        auto dados = relatoriosServ.buscarInventario(de, ate, somenteNf);
+
+        if (dados.isEmpty()) {
+            ui->Lbl_InvStatus->setText("Nenhum produto encontrado para o período selecionado.");
+        } else {
+            ui->Lbl_InvStatus->setText(
+                QString("%1 produto(s) encontrado(s). Clique em \"Exportar CSV\" para baixar.")
+                    .arg(dados.size()));
+        }
+    });
+}
+
 // ── Helpers de exportação ──────────────────────────────────────────────────
 
 QChartView *relatorios::chartViewAtual()
@@ -372,7 +402,27 @@ QChartView *relatorios::chartViewAtual()
 
 void relatorios::exportarPdfAtual()
 {
-    PDFexporter::exportarGraficoRelatorio(this, chartViewAtual());
+    int idx = ui->Stacked_Vendas->currentIndex();
+    if (idx == 6) {
+        QDate de  = ui->DE_InicioInv->date();
+        QDate ate = ui->DE_FimInv->date();
+        bool somenteNf = ui->ChkBox_SomenteNfInv->isChecked();
+        auto dados = relatoriosServ.buscarInventario(de, ate, somenteNf);
+        if (dados.isEmpty()) {
+            QMessageBox::information(this, "Sem dados",
+                "Nenhum produto encontrado para o período selecionado.");
+            return;
+        }
+        QList<QStringList> linhas;
+        linhas << QStringList{"ID", "Quantidade", "Descrição", "Un. Comercial", "Preço Fornecedor (R$)"};
+        linhas << dados;
+        QString titulo = QString("Inventário — %1 a %2")
+                         .arg(de.toString("dd/MM/yyyy"))
+                         .arg(ate.toString("dd/MM/yyyy"));
+        PDFexporter::exportarTabelaRelatorio(this, titulo, linhas);
+    } else {
+        PDFexporter::exportarGraficoRelatorio(this, chartViewAtual());
+    }
 }
 
 void relatorios::exportarCsvAtual()
@@ -457,6 +507,21 @@ void relatorios::exportarCsvAtual()
         for (auto it = dados.cbegin(); it != dados.cend(); ++it)
             linhas << QStringList{it.key(), QString::number(it.value(), 'f', 2)};
         nomeArquivo = "relatorio_lucro_produtos.csv";
+        break;
+    }
+    case 6: { // Inventário por período
+        QDate de  = ui->DE_InicioInv->date();
+        QDate ate = ui->DE_FimInv->date();
+        bool somenteNf = ui->ChkBox_SomenteNfInv->isChecked();
+        auto dados = relatoriosServ.buscarInventario(de, ate, somenteNf);
+        if (dados.isEmpty()) {
+            QMessageBox::information(this, "Sem dados",
+                "Nenhum produto encontrado para o período selecionado.");
+            return;
+        }
+        linhas << QStringList{"ID", "Quantidade", "Descrição", "Un. Comercial", "Preço Fornecedor (R$)"};
+        linhas << dados;
+        nomeArquivo = "relatorio_inventario.csv";
         break;
     }
     default:

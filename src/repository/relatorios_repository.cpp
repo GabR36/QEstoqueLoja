@@ -261,6 +261,52 @@ bool Relatorios_repository::existeProdutoVendido()
     return false;
 }
 
+QList<QStringList> Relatorios_repository::buscarInventario(const QDate &inicio, const QDate &fim, bool somenteNf)
+{
+    QList<QStringList> resultado;
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco. buscarInventario";
+        return resultado;
+    }
+
+    QSqlQuery query(db);
+    query.prepare(R"(
+        SELECT id, quantidade, descricao, un_comercial,
+               CASE
+                   WHEN preco_fornecedor IS NOT NULL AND preco_fornecedor > 0
+                       THEN preco_fornecedor
+                   ELSE preco / (1.0 + porcent_lucro / 100.0)
+               END AS preco_custo
+        FROM produtos
+        WHERE (:somente_nf = 0 OR nf = 1)
+          AND quantidade > 0
+          AND date(adicionado_em) BETWEEN :inicio AND :fim
+        ORDER BY descricao
+    )");
+    query.bindValue(":somente_nf", somenteNf ? 1 : 0);
+    query.bindValue(":inicio",     inicio.toString(Qt::ISODate));
+    query.bindValue(":fim",        fim.toString(Qt::ISODate));
+
+    if (!query.exec()) {
+        qDebug() << "Erro buscarInventario:" << query.lastError().text();
+        db.close();
+        return resultado;
+    }
+
+    while (query.next()) {
+        resultado << QStringList{
+            query.value("id").toString(),
+            query.value("quantidade").toString(),
+            query.value("descricao").toString(),
+            query.value("un_comercial").toString(),
+            QString::number(query.value("preco_custo").toDouble(), 'f', 2)
+        };
+    }
+
+    db.close();
+    return resultado;
+}
+
 QList<QStringList> Relatorios_repository::buscarTodosProdutosParaCsv()
 {
     QList<QStringList> resultado;

@@ -123,6 +123,11 @@ QPushButton:pressed {
          <string>Produtos que geram mais Lucro</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>Inventário por Período</string>
+        </property>
+       </item>
       </widget>
      </item>
      <item>
@@ -518,11 +523,69 @@ QPushButton:pressed {
       </layout>
      </widget>
 
-     <!-- page_estoque (index 6): unchanged -->
+     <!-- page_estoque (index 6): Inventário por período -->
      <widget class="QWidget" name="page_estoque">
       <layout class="QVBoxLayout" name="verticalLayout_estoque">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3"/>
+        <layout class="QHBoxLayout" name="filterBar_Inv">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lbl_deInv">
+           <property name="text"><string>De:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_InicioInv">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_ateInv">
+           <property name="text"><string>Até:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_FimInv">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="ChkBox_SomenteNfInv">
+           <property name="text"><string>Somente produtos com NF</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_AplicarInv">
+           <property name="text"><string>Aplicar</string></property>
+           <property name="maximumSize"><size><width>80</width><height>30</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="Lbl_InvStatus">
+         <property name="text"><string>Selecione o período e clique em Aplicar.</string></property>
+         <property name="alignment"><set>Qt::AlignmentFlag::AlignCenter</set></property>
+         <property name="styleSheet"><string notr="true">font: 10pt &quot;Segoe UI&quot;; color: rgb(80,80,80);</string></property>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation"><enum>Qt::Orientation::Vertical</enum></property>
+         <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+        </spacer>
        </item>
       </layout>
      </widget>

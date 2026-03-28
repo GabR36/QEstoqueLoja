@@ -34,8 +34,18 @@ bool CsvExporter::exportar(QWidget *parent,
     QTextStream out(&file);
     out.setEncoding(QStringConverter::Utf8);
 
-    for (const QStringList &linha : linhas)
-        out << linha.join(';') << "\n";
+    auto quotarCampo = [](const QString &campo) -> QString {
+        QString c = campo;
+        c.replace('"', "\"\"");
+        return '"' + c + '"';
+    };
+
+    for (const QStringList &linha : linhas) {
+        QStringList campos;
+        for (const QString &campo : linha)
+            campos << quotarCampo(campo);
+        out << campos.join(';') << "\n";
+    }
 
     file.close();
     QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));

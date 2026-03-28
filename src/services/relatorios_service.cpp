@@ -43,3 +43,8 @@ QList<QStringList> Relatorios_service::buscarTodosProdutosParaCsv()
 {
     return relatoriosRepo.buscarTodosProdutosParaCsv();
 }
+
+QList<QStringList> Relatorios_service::buscarInventario(const QDate &inicio, const QDate &fim, bool somenteNf)
+{
+    return relatoriosRepo.buscarInventario(inicio, fim, somenteNf);
+}

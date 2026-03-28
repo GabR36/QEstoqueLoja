@@ -179,3 +179,102 @@ void PDFexporter::exportarGraficoRelatorio(QWidget *parent, QChartView *chartVie
     QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
 }
 
+void PDFexporter::exportarTabelaRelatorio(QWidget *parent,
+                                          const QString &titulo,
+                                          const QList<QStringList> &linhas)
+{
+    if (linhas.size() < 2) {
+        QMessageBox::information(parent, "Sem dados", "Nenhum dado para exportar.");
+        return;
+    }
+
+    QString filePath = QFileDialog::getSaveFileName(
+        parent,
+        "Salvar PDF",
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/relatorio_inventario.pdf",
+        "PDF (*.pdf)");
+    if (filePath.isEmpty()) return;
+
+    QPdfWriter pdf(filePath);
+    pdf.setPageLayout(QPageLayout(
+        QPageSize(QPageSize::A4),
+        QPageLayout::Portrait,
+        QMarginsF(12, 15, 12, 15),
+        QPageLayout::Millimeter));
+    pdf.setResolution(150);
+
+    QPainter painter(&pdf);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    const int W          = pdf.width();
+    const int alturaLinha = 55;
+    const int margemTop  = 100;
+    const int margemLat  = 30;
+    const int conteudoW  = W - 2 * margemLat;
+
+    // Cabeçalho
+    const QStringList &cabecalho = linhas.first();
+    const int nCols = cabecalho.size();
+
+    // Distribuição proporcional das colunas: ID pequeno, Qtd pequeno, Descrição grande, Un médio, Preço médio
+    QVector<int> pesos(nCols, 10);
+    if (nCols == 5) { pesos = {5, 6, 35, 10, 14}; }
+    int pesoTotal = 0;
+    for (int p : pesos) pesoTotal += p;
+
+    QVector<int> larguras(nCols);
+    for (int i = 0; i < nCols; i++)
+        larguras[i] = conteudoW * pesos[i] / pesoTotal;
+
+    int y = margemTop;
+
+    auto desenharCabecalho = [&]() {
+        // Título
+        painter.setFont(QFont("Arial", 14, QFont::Bold));
+        painter.drawText(margemLat, y + 20, titulo);
+        y += 50;
+
+        // Linha de cabeçalho da tabela
+        painter.setFont(QFont("Arial", 9, QFont::Bold));
+        painter.fillRect(margemLat, y, conteudoW, alturaLinha, QColor(220, 220, 220));
+        int x = margemLat;
+        for (int i = 0; i < nCols; i++) {
+            painter.drawText(QRect(x + 5, y, larguras[i] - 10, alturaLinha),
+                             Qt::AlignVCenter | Qt::AlignLeft,
+                             cabecalho[i]);
+            x += larguras[i];
+        }
+        painter.drawRect(margemLat, y, conteudoW, alturaLinha);
+        y += alturaLinha;
+    };
+
+    desenharCabecalho();
+
+    painter.setFont(QFont("Arial", 8));
+    const int maxY = pdf.height() - 80;
+
+    for (int row = 1; row < linhas.size(); row++) {
+        if (y + alturaLinha > maxY) {
+            pdf.newPage();
+            y = margemTop;
+            desenharCabecalho();
+        }
+
+        const QStringList &linha = linhas[row];
+        if (row % 2 == 0)
+            painter.fillRect(margemLat, y, conteudoW, alturaLinha, QColor(245, 245, 245));
+
+        int x = margemLat;
+        for (int i = 0; i < nCols && i < linha.size(); i++) {
+            painter.drawText(QRect(x + 5, y, larguras[i] - 10, alturaLinha),
+                             Qt::AlignVCenter | Qt::AlignLeft | Qt::TextWordWrap,
+                             linha[i]);
+            x += larguras[i];
+        }
+        painter.drawLine(margemLat, y + alturaLinha, margemLat + conteudoW, y + alturaLinha);
+        y += alturaLinha;
+    }
+
+    painter.end();
+    QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+}

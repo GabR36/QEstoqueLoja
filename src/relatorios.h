@@ -49,6 +49,7 @@ private:
     void configurarJanelaFormasPagamentoAno();
     void configurarJanelaNFValor();
     void configurarJanelaProdutoLucroValor();
+    void configurarJanelaInventario();
 
     static Agrupamento agrupFromCombo(QComboBox *cb, bool semDia = false);
 

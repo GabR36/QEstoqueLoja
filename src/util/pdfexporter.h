@@ -23,6 +23,11 @@ public:
     // Exibe QFileDialog, mostra valores nas barras e abre o arquivo após salvar.
     static void exportarGraficoRelatorio(QWidget *parent, QChartView *chartView);
 
+    // Exporta uma tabela de dados para PDF (A4 retrato) com paginação automática.
+    static void exportarTabelaRelatorio(QWidget *parent,
+                                        const QString &titulo,
+                                        const QList<QStringList> &linhas);
+
 private:
    // QSqlDatabase db = QSqlDatabase::database();
 

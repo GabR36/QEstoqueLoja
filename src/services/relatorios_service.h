@@ -22,6 +22,7 @@ public:
     QMap<QString, float>             produtosMaisLucrativosPeriodo(const QDate &inicio, const QDate &fim);
     bool                             existeProdutoVendido();
     QList<QStringList>               buscarTodosProdutosParaCsv();
+    QList<QStringList>               buscarInventario(const QDate &inicio, const QDate &fim, bool somenteNf);
 
 private:
     Relatorios_repository relatoriosRepo;

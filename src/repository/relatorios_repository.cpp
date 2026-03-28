@@ -175,11 +175,12 @@ QMap<QString, float> Relatorios_repository::buscarValoresNfPeriodo(const QDate &
     QString fmt = strftimeFormato(agrup);
     QSqlQuery query(db);
     query.prepare(QString(
-        "SELECT strftime('%1', dhemi) AS periodo, SUM(valor_total) "
+        "SELECT strftime('%1', dhemi) AS periodo, "
+        "SUM(CASE WHEN finalidade = 'DEVOLUCAO' THEN -valor_total ELSE valor_total END) "
         "FROM notas_fiscais "
         "WHERE date(dhemi) BETWEEN :inicio AND :fim "
         "  AND (cstat = '100' OR cstat = '150') AND tp_amb = :tpamb "
-        "  AND finalidade = 'NORMAL' "
+        "  AND finalidade IN ('NORMAL', 'DEVOLUCAO') "
         "GROUP BY periodo "
         "ORDER BY periodo"
     ).arg(fmt));

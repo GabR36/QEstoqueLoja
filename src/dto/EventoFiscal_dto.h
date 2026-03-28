@@ -14,6 +14,7 @@ struct EventoFiscalDTO {
     qlonglong idNf;
     QString atualizadoEm;
     QString codigo;
+    QString adicionadoEm;
 };
 
 #endif

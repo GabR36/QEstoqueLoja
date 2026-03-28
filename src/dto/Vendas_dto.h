@@ -15,6 +15,8 @@ struct VendasDTO {
     double desconto = 0;
     bool estaPago;
     qlonglong idCliente;
+    QString adicionadoEm;
+    QString atualizadoEm;
 };
 
 #endif // VENDAS_DTO_H

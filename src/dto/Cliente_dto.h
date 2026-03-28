@@ -20,6 +20,8 @@ struct ClienteDTO {
     QString cep;
     int indIeDest;
     QString ie;
+    QString adicionadoEm;
+    QString atualizadoEm;
 
 };
 

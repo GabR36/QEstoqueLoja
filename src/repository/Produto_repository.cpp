@@ -5,11 +5,13 @@
 #include "../services/Produto_service.h"
 #include "../infra/databaseconnection_service.h"
 #include "../util/dbutil.h"
+#include "../util/datautil.h"
 
 Produto_Repository::Produto_Repository(QObject *parent)
 : QObject{parent}
 {
     db = DatabaseConnection_service::db();
+    dataAgoraUs = DataUtil::getDataAgoraUS();
 }
 
 bool Produto_Repository::codigoBarrasExiste(const QString &codigo)
@@ -40,15 +42,17 @@ bool Produto_Repository::inserir(const ProdutoDTO &p, QString &erroSQL)
         qDebug() << "db nao aberto ao salvar resumo nota";
         return false;
     }
-
+    QString dataAgora = DataUtil::getDataAgoraUS();
     QSqlQuery query(db);
     query.prepare(
         "INSERT INTO produtos "
         "(quantidade, descricao, preco, codigo_barras, nf, un_comercial, "
-        "preco_fornecedor, porcent_lucro, ncm, cest, aliquota_imposto, csosn, pis) "
+        "preco_fornecedor, porcent_lucro, ncm, cest, aliquota_imposto, csosn, pis, "
+        "adicionado_em, atualizado_em) "
         "VALUES "
         "(:quantidade, :descricao, :preco, :codigo_barras, :nf, :un_comercial, "
-        ":preco_fornecedor, :porcent_lucro, :ncm, :cest, :aliquota_imposto, :csosn, :pis)"
+        ":preco_fornecedor, :porcent_lucro, :ncm, :cest, :aliquota_imposto, :csosn, :pis, "
+        ":adicionadoem, :atualizadoem)"
         );
 
     query.bindValue(":quantidade", p.quantidade);
@@ -64,6 +68,9 @@ bool Produto_Repository::inserir(const ProdutoDTO &p, QString &erroSQL)
     query.bindValue(":aliquota_imposto", p.aliquotaIcms);
     query.bindValue(":csosn", p.csosn);
     query.bindValue(":pis", p.pis);
+    query.bindValue(":adicionadoem", dataAgora);
+    query.bindValue(":atualizadoem", dataAgora);
+
 
     if (!query.exec()) {
         erroSQL = query.lastError().text();
@@ -194,6 +201,7 @@ bool Produto_Repository::alterar(
         qDebug() << "db nao aberto ao salvar resumo nota";
         return false;
     }
+    QString dataAgora = DataUtil::getDataAgoraUS();
     QSqlQuery query(db);
 
     query.prepare(R"(
@@ -210,7 +218,8 @@ bool Produto_Repository::alterar(
             cest = :cest,
             aliquota_imposto = :aliquotaimp,
             csosn = :csosn,
-            pis = :pis
+            pis = :pis,
+            atualizado_em = :atualizadoem
         WHERE id = :id
     )");
 
@@ -228,6 +237,8 @@ bool Produto_Repository::alterar(
     query.bindValue(":aliquotaimp", p.aliquotaIcms);
     query.bindValue(":csosn", p.csosn);
     query.bindValue(":pis", p.pis);
+    query.bindValue(":atualizadoem", dataAgora);
+
 
     if (!query.exec()) {
         erro = query.lastError().text();
@@ -267,8 +278,10 @@ bool Produto_Repository::atualizarLocal(int id, const QString &local, QString &e
     }
 
     QSqlQuery query(db);
-    query.prepare("UPDATE produtos SET local = :local WHERE id = :id");
+    query.prepare("UPDATE produtos SET local = :local, atualizado_em = :atualizado WHERE id = :id");
     query.bindValue(":local", local);
+    query.bindValue(":atualizado", dataAgoraUs);
+
     query.bindValue(":id", id);
 
     if (!query.exec()) {
@@ -286,8 +299,11 @@ bool Produto_Repository::updateAumentarQuantidadeProduto(qlonglong idprod, doubl
         return false;
     }
     QSqlQuery query(db);
-    query.prepare("UPDATE produtos SET quantidade = quantidade + :quant WHERE id = :id");
+    query.prepare("UPDATE produtos SET quantidade = quantidade + :quant, atualizado_em = :atualizadoem "
+                  "WHERE id = :id");
     query.bindValue(":quant", quantia);
+    query.bindValue(":atualizadoem", dataAgoraUs);
+
     query.bindValue(":id", idprod);
 
     if(!query.exec()){
@@ -310,6 +326,7 @@ ProdutoDTO Produto_Repository::getProduto(qlonglong id){
     QSqlQuery query(db);
     query.prepare("SELECT quantidade, descricao, preco, codigo_barras, nf, un_comercial, "
                   "preco_fornecedor, porcent_lucro, ncm, cest, aliquota_imposto, csosn, pis, local "
+                  "adicionado_em, atualizado_em "
                   "FROM produtos WHERE id = :id");
     query.bindValue(":id", id);
     if(!query.exec()){
@@ -332,6 +349,9 @@ ProdutoDTO Produto_Repository::getProduto(qlonglong id){
         prod.precoFornecedor = query.value("preco_fornecedor").toDouble();
         prod.quantidade = query.value("quantidade").toDouble();
         prod.uCom = query.value("un_comercial").toString();
+        prod.adicionadoEm = query.value("adicionado_em").toString();
+        prod.atualizadoEm = query.value("atualizado_em").toString();
+
     }
 
     db.close();
@@ -370,6 +390,9 @@ ProdutoDTO Produto_Repository::getProdutoPeloCodBarras(const QString &codigo){
         prod.csosn = query.value("csosn").toString();
         prod.pis = query.value("pis").toString();
         prod.local = query.value("local").toString();
+        prod.adicionadoEm = query.value("adicionado_em").toString();
+        prod.atualizadoEm = query.value("atualizado_em").toString();
+
     }
 
     db.close();
@@ -382,8 +405,11 @@ bool Produto_Repository::updateDiminuirQuantidadeProduto(qlonglong idprod, doubl
         return false;
     }
     QSqlQuery query(db);
-    query.prepare("UPDATE produtos SET quantidade = quantidade - :quant WHERE id = :id");
+    query.prepare("UPDATE produtos SET quantidade = quantidade - :quant , atualizado_em = :atualizadoem "
+                  "WHERE id = :id");
     query.bindValue(":quant", quantia);
+    query.bindValue(":atualizadoem", DataUtil::getDataAgoraUS());
+
     query.bindValue(":id", idprod);
 
     if(!query.exec()){
@@ -419,12 +445,15 @@ bool Produto_Repository::atualizarCamposMap(qlonglong id, const QVariantMap &cam
     }
 
     QSqlQuery query(db);
-    query.prepare("UPDATE produtos SET " + sets.join(", ") + " WHERE id = ?");
+    query.prepare("UPDATE produtos SET " + sets.join(", ") + ", atualizado_em = :atualizadoem " +
+                  " WHERE id = ?");
 
     for(const QVariant &v : binds)
         query.addBindValue(v);
 
     query.addBindValue(id);
+    query.bindValue(":atualizadoem", DataUtil::getDataAgoraUS());
+
 
     if(!query.exec()){
         qDebug() << "atualizarCamposMap: query falhou" << query.lastError().text();

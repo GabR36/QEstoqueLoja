@@ -21,6 +21,7 @@ struct NotaFiscalDTO {
     qlonglong idNfRef;
     QString dhEmi;
     qlonglong idEmissorCliente;
+    QString adicionadoEm;
 };
 
 #endif // NOTAFISCAL_DTO_H

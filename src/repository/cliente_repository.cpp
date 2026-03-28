@@ -54,9 +54,9 @@ bool Cliente_repository::inserir(ClienteDTO cliente){
     }
     query.prepare("INSERT INTO clientes (nome, email, telefone, endereco, cpf, "
                   "data_nascimento, data_cadastro, eh_pf, numero_end, bairro, "
-                  "xMun, cMun, uf, cep, indIEDest, ie) VALUES (:nome, :email, :telefone, :endereco, :cpf, "
+                  "xMun, cMun, uf, cep, indIEDest, ie, adicionado_em, atualizado_em) VALUES (:nome, :email, :telefone, :endereco, :cpf, "
                   ":data_nascimento, :data_cadastro, :eh_pf, :numero_end, :bairro, "
-                  ":xMun, :cMun, :uf, :cep, :indIEDest, :ie)");
+                  ":xMun, :cMun, :uf, :cep, :indIEDest, :ie, :adicionadoem, :atualizadoem)");
     query.bindValue(":nome", cliente.nome);
     query.bindValue(":email", cliente.email);
     query.bindValue(":telefone", cliente.telefone);
@@ -73,6 +73,9 @@ bool Cliente_repository::inserir(ClienteDTO cliente){
     query.bindValue(":cep", cliente.cep);
     query.bindValue(":indIEDest", cliente.indIeDest);
     query.bindValue(":ie", cliente.ie);
+    query.bindValue(":adicionadoem", dataFormatada);
+    query.bindValue(":atualizadoem", dataFormatada);
+
 
     if(!query.exec()){
         qDebug() << "Query insert Cliente nao funcionou!";
@@ -191,7 +194,8 @@ ClienteDTO Cliente_repository::getClienteByID(qlonglong id){
 
     QSqlQuery query(db);
     query.prepare("SELECT nome, email, telefone, endereco, cpf, data_nascimento, "
-                  "eh_pf, numero_end, bairro, xMun, cMun, uf, cep, indIEDest, ie "
+                  "eh_pf, numero_end, bairro, xMun, cMun, uf, cep, indIEDest, ie, "
+                  "adicionado_em, atualizado_em "
                   "FROM clientes "
                   "WHERE id = :valor1");
     query.bindValue(":valor1", id);
@@ -218,6 +222,8 @@ ClienteDTO Cliente_repository::getClienteByID(qlonglong id){
     cli.cep = query.value(12).toString();
     cli.indIeDest = query.value(13).toInt();
     cli.ie = query.value(14).toString();
+    cli.adicionadoEm = query.value(15).toString();
+    cli.atualizadoEm = query.value(16).toString();
     db.close();
     return cli;
 
@@ -228,12 +234,15 @@ bool Cliente_repository::updateCliente(qlonglong id, ClienteDTO cliente){
         qDebug() << "Banco nao abriu em getclientebyid()";
         return false;
     }
+    QString dataFormatada = DataUtil::getDataAgoraUS();
+
     QSqlQuery query(db);
     query.prepare("UPDATE clientes SET nome = :valor1, email = :valor2, "
                   "telefone = :valor3, endereco = :valor4, cpf = :valor5, "
                   "data_nascimento = :valor6, eh_pf = :valor7, numero_end = :numero, "
                   "bairro = :bairro, xMun = :xmun, cMun = :cmun, uf = :uf, cep = :cep, "
-                  "indIEDest = :indiedest, ie = :ie WHERE id = :valor8");
+                  "indIEDest = :indiedest, ie = :ie, atualizado_em = :atualizadoem "
+                  "WHERE id = :valor8");
     query.bindValue(":valor1", cliente.nome);
     query.bindValue(":valor2", cliente.email);
     query.bindValue(":valor3", cliente.telefone);
@@ -250,6 +259,8 @@ bool Cliente_repository::updateCliente(qlonglong id, ClienteDTO cliente){
     query.bindValue(":cep", cliente.cep);
     query.bindValue(":indiedest", cliente.indIeDest);
     query.bindValue(":ie", cliente.ie);
+    query.bindValue(":atualizadoem", dataFormatada);
+
     if(!query.exec()){
         qDebug() << "erro query, update clientes";
         db.close();
@@ -294,6 +305,8 @@ QList<ClienteDTO> Cliente_repository::getListAllClientes(){
         cli.cep = query.value("cep").toString();
         cli.indIeDest = query.value("indIEDest").toInt();
         cli.ie = query.value("ie").toString();
+        cli.adicionadoEm = query.value("adicionado_em").toString();
+        cli.atualizadoEm = query.value("atualizado_em").toString();
 
         lista.append(cli);
     }

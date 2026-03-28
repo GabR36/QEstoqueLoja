@@ -24,9 +24,9 @@ bool notafiscal_repository::salvarResNFe(NotaFiscalDTO resumoNota){
     QString dhemiFormatada = dt.toString("yyyy-MM-dd HH:mm:ss");
 
     query.prepare("INSERT INTO notas_fiscais (cstat, modelo, tp_amb, xml_path, valor_total, atualizado_em,"
-                  "cnpjemit, chnfe, nprot, cuf, finalidade, saida, nnf, serie, dhemi) VALUES (:cstat, :modelo,"
+                  "cnpjemit, chnfe, nprot, cuf, finalidade, saida, nnf, serie, dhemi, adicionado_em) VALUES (:cstat, :modelo,"
                   " :tpamb, :xmlpath, :vnf, :atualizadoem, :cnpjemit, :chnf, :nprot, :cuf, :finalidade, "
-                  ":saida, :nnf, :serie, :dhemi)");
+                  ":saida, :nnf, :serie, :dhemi, :adicionadoem)");
     query.bindValue(":cstat", resumoNota.cstat);
     query.bindValue(":modelo", "55");
     query.bindValue(":tpamb", resumoNota.tpAmb);
@@ -42,6 +42,7 @@ bool notafiscal_repository::salvarResNFe(NotaFiscalDTO resumoNota){
     query.bindValue(":nnf", "0");
     query.bindValue(":serie", "");
     query.bindValue(":dhemi", dhemiFormatada);
+    query.bindValue(":adicionadoem", dataFormatada);
 
     if(!query.exec()){
         qDebug() << "ERRO INSERT notas_fiscais:" << query.lastError().text();
@@ -263,7 +264,7 @@ NotaFiscalDTO notafiscal_repository::getNotaNormalFromIdVenda(qlonglong idvenda)
     QSqlQuery query(db);
     query.prepare("SELECT cstat, nnf, serie, modelo, tp_amb, xml_path, valor_total, atualizado_em, "
                   "id_venda, cnpjemit, chnfe, nprot, cuf, finalidade, saida, id_nf_ref, dhemi, "
-                  "id_emissorcliente FROM notas_fiscais WHERE "
+                  "id_emissorcliente, adicionado_em FROM notas_fiscais WHERE "
                   "id_venda = :idvenda AND finalidade = 'NORMAL'");
     query.bindValue(":idvenda", idvenda);
 
@@ -292,6 +293,7 @@ NotaFiscalDTO notafiscal_repository::getNotaNormalFromIdVenda(qlonglong idvenda)
         nota.tpAmb = query.value("tpamb").toInt();
         nota.valorTotal = query.value("valor_total").toDouble();
         nota.xmlPath = query.value("xml_path").toString();
+        nota.adicionadoEm = query.value("adicionado_em").toString();
     }
     db.close();
     return nota;
@@ -306,15 +308,16 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
     QSqlQuery query(db);
 
     // QString dhemi = nota.dhEmi;
-    // QDateTime dt = QDateTime::fromString(dhemi, "dd/MM/yyyy HH:mm:ss");
     // QString dhemiFormatada = dt.toString("yyyy-MM-dd HH:mm:ss");
     // qDebug() << "dhemi formatada:" << dhemiFormatada;
 
     query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, tp_amb, xml_path, valor_total, "
                   "atualizado_em, id_venda, "
-                  "cnpjemit, chnfe, nprot, cuf, finalidade, saida, id_nf_ref, dhemi, id_emissorcliente) "
+                  "cnpjemit, chnfe, nprot, cuf, finalidade, saida, id_nf_ref, dhemi, "
+                  "id_emissorcliente, adicioando_em) "
                   "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xmlpath, :vnf, :atualizadoem, :idvenda, "
-                  ":cnpjemit, :chnf, :nprot, :cuf, :finalidade, :saida, :idnfref, :dhemi, :idemissor)");
+                  ":cnpjemit, :chnf, :nprot, :cuf, :finalidade, :saida, :idnfref, :dhemi, :idemissor, "
+                  ":adicionadoem)");
     query.bindValue(":cstat", nota.cstat);
     query.bindValue(":nnf", nota.nnf);
     query.bindValue(":serie", nota.serie);
@@ -333,6 +336,8 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
     query.bindValue(":idnfref", nota.idNfRef);
     query.bindValue(":dhemi", nota.dhEmi);
     query.bindValue(":idemissor", nota.idEmissorCliente);
+    query.bindValue(":adicionadoem", dataFormatada);
+
 
     if(!query.exec()){
         qDebug() << "ERRO INSERT notas_fiscais:" << query.lastError().text();
@@ -416,7 +421,7 @@ NotaFiscalDTO notafiscal_repository::getNotaById(qlonglong id){
     QSqlQuery query(db);
     query.prepare("SELECT cstat, nnf, serie, modelo, tp_amb, xml_path, valor_total, atualizado_em, "
                   "id_venda, cnpjemit, chnfe, nprot, cuf, finalidade, saida, id_nf_ref, dhemi, "
-                  "id_emissorcliente FROM notas_fiscais WHERE id = :id");
+                  "id_emissorcliente, adicionado_em FROM notas_fiscais WHERE id = :id");
     query.bindValue(":id", id);
 
     if(!query.exec()){
@@ -444,6 +449,8 @@ NotaFiscalDTO notafiscal_repository::getNotaById(qlonglong id){
         nota.tpAmb             = query.value("tp_amb").toInt();
         nota.valorTotal        = query.value("valor_total").toDouble();
         nota.xmlPath           = query.value("xml_path").toString();
+        nota.adicionadoEm           = query.value("adicionado_em").toString();
+
     }
 
     db.close();

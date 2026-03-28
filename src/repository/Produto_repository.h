@@ -29,6 +29,7 @@ public:
     bool atualizarCamposMap(qlonglong id, const QVariantMap &campos, bool marcarNf);
 private:
     QSqlDatabase db;
+    QString dataAgoraUs;
 };
 
 #endif // PRODUTO_REPOSITORY_H

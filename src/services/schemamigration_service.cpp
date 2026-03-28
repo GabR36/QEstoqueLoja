@@ -146,7 +146,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             query.exec("INSERT INTO config (key, value) VALUES ('porcent_lucro', '40')");
             query.exec("INSERT INTO config (key, value) VALUES ('taxa_debito', '2')");
             query.exec("INSERT INTO config (key, value) VALUES ('taxa_credito', '3')");
-
+            configDTO = confServ.carregarTudo();
             // normalizar dados existentes
             if (!query.exec("SELECT id, descricao FROM produtos")) {
                 qDebug() << "Erro ao executar a consulta SQL:" << query.lastError().text();
@@ -696,6 +696,84 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
 
             break;
 
+        }
+        case 7:
+        {
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+                break;
+            }
+
+            qDebug() << "Atualizando para versao 8";
+
+            QSqlQuery query(db);
+
+            auto execQuery = [&](const QString &sql) -> bool {
+                if (!query.exec(sql)) {
+                    qDebug() << "ERRO SQL:" << sql;
+                    qDebug() << "Detalhes:" << query.lastError().text();
+                    return false;
+                }
+                return true;
+            };
+
+            bool ok = true;
+
+            // clientes
+            ok &= execQuery("ALTER TABLE clientes ADD COLUMN adicionado_em DATETIME");
+            ok &= execQuery("ALTER TABLE clientes ADD COLUMN atualizado_em DATETIME");
+            ok &= execQuery("UPDATE clientes SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+
+            // entradas_vendas
+            ok &= execQuery("ALTER TABLE entradas_vendas ADD COLUMN adicionado_em DATETIME");
+            ok &= execQuery("ALTER TABLE entradas_vendas ADD COLUMN atualizado_em DATETIME");
+            ok &= execQuery("UPDATE entradas_vendas SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+
+            // eventos_fiscais
+            ok &= execQuery("ALTER TABLE eventos_fiscais ADD COLUMN adicionado_em DATETIME");
+            ok &= execQuery("UPDATE eventos_fiscais SET adicionado_em = atualizado_em");
+
+            // notas_fiscais
+            ok &= execQuery("ALTER TABLE notas_fiscais ADD COLUMN adicionado_em DATETIME");
+            ok &= execQuery("UPDATE notas_fiscais SET adicionado_em = atualizado_em");
+
+            // produtos
+            ok &= execQuery("ALTER TABLE produtos ADD COLUMN adicionado_em DATETIME");
+            ok &= execQuery("ALTER TABLE produtos ADD COLUMN atualizado_em DATETIME");
+            ok &= execQuery("UPDATE produtos SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+
+            // produtos_nota
+            ok &= execQuery("ALTER TABLE produtos_nota ADD COLUMN adicionado_em DATETIME");
+            ok &= execQuery("ALTER TABLE produtos_nota ADD COLUMN atualizado_em DATETIME");
+            ok &= execQuery("UPDATE produtos_nota SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+
+            // produtos_vendidos
+            ok &= execQuery("ALTER TABLE produtos_vendidos ADD COLUMN adicionado_em DATETIME");
+            ok &= execQuery("ALTER TABLE produtos_vendidos ADD COLUMN atualizado_em DATETIME");
+            ok &= execQuery("ALTER TABLE produtos_vendidos ADD COLUMN emitido_nf INTEGER DEFAULT 0");
+            ok &= execQuery("UPDATE produtos_vendidos SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+
+            // vendas2
+            ok &= execQuery("ALTER TABLE vendas2 ADD COLUMN adicionado_em DATETIME");
+            ok &= execQuery("ALTER TABLE vendas2 ADD COLUMN atualizado_em DATETIME");
+            ok &= execQuery("UPDATE vendas2 SET adicionado_em = data_hora, atualizado_em = data_hora");
+
+            if (ok) {
+                ok &= execQuery("PRAGMA user_version = 8");
+            }
+
+            if (!ok) {
+                qDebug() << "Erro durante migracao. Fazendo rollback.";
+                db.rollback();
+            } else if (!db.commit()) {
+                qDebug() << "Erro ao dar commit:" << db.lastError().text();
+                db.rollback();
+            } else {
+                dbSchemaVersion = 8;
+                qDebug() << "Migracao para versao 8 concluida com sucesso.";
+            }
+
+            break;
         }
 
         }

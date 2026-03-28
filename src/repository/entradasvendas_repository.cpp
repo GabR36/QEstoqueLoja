@@ -110,7 +110,7 @@ QList<EntradaVendaDTO> EntradasVendas_repository::getEntradasFromVenda(qlonglong
 
     QSqlQuery query(db);
     query.prepare("SELECT total, data_hora, forma_pagamento, valor_recebido, troco, "
-                  "taxa, valor_final, desconto FROM entradas_vendas WHERE "
+                  "taxa, valor_final, desconto, adicionado_em, atualizado_em FROM entradas_vendas WHERE "
                   "id_venda = :idvenda");
     query.bindValue(":idvenda", idvenda);
 
@@ -131,6 +131,8 @@ QList<EntradaVendaDTO> EntradasVendas_repository::getEntradasFromVenda(qlonglong
         dto.valorFinal = query.value("valor_final").toDouble();
         dto.valorRecebido = query.value("valor_recebido").toDouble();
         dto.idVenda = idvenda;
+        dto.adicionadoEm = query.value("adicionado_em").toString();
+        dto.atualizadoEm = query.value("atualizado_em").toString();
         lista.append(dto);
     }
     db.close();
@@ -144,7 +146,8 @@ void EntradasVendas_repository::listarEntradasVenda(QSqlQueryModel *model, qlong
         return;
     }
     QSqlQuery query(db);
-    query.prepare("SELECT total, data_hora, forma_pagamento, valor_final, troco, taxa, valor_recebido, desconto, id "
+    query.prepare("SELECT total, data_hora, forma_pagamento, valor_final, troco, taxa, valor_recebido, "
+                  "desconto, id, adicionado_em, atualizado_em "
                   "FROM entradas_vendas WHERE id_venda = :idvenda");
     query.bindValue(":idvenda", idvenda);
     query.exec();

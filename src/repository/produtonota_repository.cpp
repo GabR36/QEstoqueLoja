@@ -3,6 +3,7 @@
 #include "../infra/databaseconnection_service.h"
 #include <QSqlError>
 #include "../util/dbutil.h"
+#include "../util/datautil.h"
 
 ProdutoNota_repository::ProdutoNota_repository(QObject *parent)
     : QObject{parent}
@@ -50,14 +51,17 @@ bool ProdutoNota_repository::inserir(ProdutoNotaDTO produtoNota){
         qDebug() << "erro ao abrir banco de dados inserir produto nota";
         return false;
     }
+    QString data = DataUtil::getDataAgoraUS();
     QSqlQuery q(db);
     q.prepare(
         "INSERT INTO produtos_nota "
         "(id_nf, nitem, quantidade, descricao, preco, codigo_barras, un_comercial, "
-        " ncm, csosn, pis, cfop, aliquota_imposto, cst_icms, tem_st, status, adicionado) "
+        " ncm, csosn, pis, cfop, aliquota_imposto, cst_icms, tem_st, status, adicionado, "
+        "adicionado_em, atualizado_em ) "
         "VALUES "
         "(:id_nf, :nitem, :quant, :desc, :preco, :cod_barras, :un_comercial, "
-        " :ncm, :csosn, :pis, :cfop, :aliquota, :cst_icms, :tem_st, :status, :adicionado)"
+        " :ncm, :csosn, :pis, :cfop, :aliquota, :cst_icms, :tem_st, :status, :adicionado, "
+        ":adicionadoem, :atualizadoem)"
         );
 
     q.bindValue(":id_nf",        produtoNota.idNf);
@@ -76,6 +80,9 @@ bool ProdutoNota_repository::inserir(ProdutoNotaDTO produtoNota){
     q.bindValue(":tem_st",       produtoNota.temSt ? 1 : 0);
     q.bindValue(":status",       "OK");
     q.bindValue(":adicionado", 0);
+    q.bindValue(":adicionado_em", data);
+    q.bindValue(":atualizado_em", data);
+
 
     if (!q.exec()) {
         qDebug() << "Erro ao inserir produto:" << q.lastError().text();
@@ -97,7 +104,8 @@ ProdutoNotaDTO ProdutoNota_repository::getProdutoNota(qlonglong id){
     QSqlQuery query(db);
     query.prepare("SELECT id, quantidade, descricao, preco, codigo_barras, un_comercial, "
                   "ncm, csosn, pis, cfop, aliquota_imposto, nitem, id_nf, status, cst_icms, "
-                  "tem_st, id_nfDevol, adicionado FROM produtos_nota WHERE id = :id");
+                  "tem_st, id_nfDevol, adicionado, adicionado_em, atualizado_em "
+                  "FROM produtos_nota WHERE id = :id");
     query.bindValue(":id", id);
 
     if(!query.exec()){
@@ -125,6 +133,9 @@ ProdutoNotaDTO ProdutoNota_repository::getProdutoNota(qlonglong id){
         prod.cstIcms = query.value("cst_icms").toString();
         prod.idNfDevol = query.value("id_nfDevol").toLongLong();
         prod.adicionado = query.value("adicionado").toBool();
+        prod.adicionadoEm = query.value("adicionado_em").toString();
+        prod.atualizadoEm = query.value("atualizado_em").toString();
+
     }
 
     db.close();
@@ -162,7 +173,9 @@ bool ProdutoNota_repository::marcarComoAdicionado(qlonglong id){
     }
 
     QSqlQuery query(db);
-    query.prepare("UPDATE produtos_nota SET adicionado = 1 WHERE id = :id");
+    query.prepare("UPDATE produtos_nota SET adicionado = 1, atualizado_em = :atualizadoem "
+                  "WHERE id = :id");
+    query.bindValue(":atualizadoem", DataUtil::getDataAgoraUS());
     query.bindValue(":id", id);
 
     if(!query.exec()){
@@ -182,8 +195,10 @@ bool ProdutoNota_repository::marcarComoDevolvido(qlonglong id, qlonglong idNfDev
     }
 
     QSqlQuery query(db);
-    query.prepare("UPDATE produtos_nota SET status = 'DEVOLVIDO', id_nfDevol = :idnfdevol WHERE id = :id");
+    query.prepare("UPDATE produtos_nota SET status = 'DEVOLVIDO', id_nfDevol = :idnfdevol, "
+                  "atualizado_em = :atualizadoem WHERE id = :id");
     query.bindValue(":idnfdevol", idNfDevol);
+    query.bindValue(":atualizadoem", DataUtil::getDataAgoraUS());
     query.bindValue(":id", id);
 
     if(!query.exec()){

@@ -19,6 +19,8 @@ struct ProdutoDTO {
     QString csosn;
     QString pis;
     QString local;
+    QString adicionadoEm;
+    QString atualizadoEm;
 };
 
 #endif

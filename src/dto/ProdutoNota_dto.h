@@ -22,6 +22,8 @@ struct ProdutoNotaDTO {
     double aliquotaIcms = 0;
     QString csosn;
     QString pis;
+    QString adicionadoEm;
+    QString atualizadoEm;
 };
 
 #endif // PRODUTONOTA_DTO_H

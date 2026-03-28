@@ -2,6 +2,7 @@
 #include "../infra/databaseconnection_service.h"
 #include <QSqlQuery>
 #include <QDebug>
+#include "../util/datautil.h"
 
 ProdutoVenda_repository::ProdutoVenda_repository(QObject *parent)
     : QObject{parent}
@@ -40,7 +41,8 @@ QList<ProdutoVendidoDTO> ProdutoVenda_repository::getProdutosVendidos(qlonglong 
 
     QSqlQuery query(db);
     query.prepare(
-        "SELECT pv.id_produto, pv.id_venda, p.descricao, pv.quantidade, pv.preco_vendido "
+        "SELECT pv.id_produto, pv.id_venda, p.descricao, pv.quantidade, pv.preco_vendido, "
+        "pv.adicionado_em, pv.atualizado_em, pv.emitido_nf "
         "FROM produtos_vendidos pv "
         "JOIN produtos p ON pv.id_produto = p.id "
         "WHERE pv.id_venda = :id_venda"
@@ -61,6 +63,9 @@ QList<ProdutoVendidoDTO> ProdutoVenda_repository::getProdutosVendidos(qlonglong 
         dto.descricao = query.value(2).toString();
         dto.quantidade = query.value(3).toDouble();
         dto.precoVendido = query.value(4).toDouble();
+        dto.adicionadoEm = query.value(5).toString();
+        dto.atualizadoEm  = query.value(6).toString();
+        dto.emitidoNf = query.value(7).toBool();
 
         lista.append(dto);
     }
@@ -187,7 +192,8 @@ ProdutoVendidoDTO ProdutoVenda_repository::getProdutoVendido(qlonglong id){
     }
 
     QSqlQuery query(db);
-    query.prepare("SELECT id_produto, id_venda, quantidade, preco_vendido FROM produtos_vendidos "
+    query.prepare("SELECT id_produto, id_venda, quantidade, preco_vendido, adicionado_em, "
+                  "atualizado_em, emitido_nf FROM produtos_vendidos "
                   "WHERE id = :id");
     query.bindValue(":id", id);
     if(!query.exec()){
@@ -201,6 +207,10 @@ ProdutoVendidoDTO ProdutoVenda_repository::getProdutoVendido(qlonglong id){
         prod.idVenda = query.value("id_venda").toLongLong();
         prod.quantidade = query.value("quantidade").toDouble();
         prod.precoVendido = query.value("preco_vendido").toDouble();
+        prod.adicionadoEm = query.value("adicionado_em").toString();
+        prod.atualizadoEm = query.value("atualizado_em").toString();
+        prod.emitidoNf = query.value("emitido_nf").toBool();
+
     }
     return prod;
 
@@ -211,15 +221,23 @@ bool ProdutoVenda_repository::inserir(ProdutoVendidoDTO prod){
         qDebug() << "Erro ao abrir banco (inserir)";
         return false;
     }
+    QString data = DataUtil::getDataAgoraUS();
 
     QSqlQuery query(db);
-    query.prepare("INSERT INTO produtos_vendidos (id_produto, id_venda, quantidade, preco_vendido) VALUES "
-                  "(:idprod, :idvenda, :quantidade, :precovendido)");
+    query.prepare("INSERT INTO produtos_vendidos (id_produto, id_venda, quantidade, "
+                  "preco_vendido, adicionado_em, atualizado_em, emitido_nf) VALUES "
+                  "(:idprod, :idvenda, :quantidade, :precovendido, :adicionadoem, "
+                  ":atualizadoem, :emitidonf)");
 
     query.bindValue(":idprod", prod.idProduto);
     query.bindValue(":idvenda", prod.idVenda);
     query.bindValue(":quantidade", prod.quantidade);
     query.bindValue(":precovendido", prod.precoVendido);
+    query.bindValue(":adicionadoem", data);
+    query.bindValue(":atualizadoem", data);
+    query.bindValue(":emitidonf", prod.emitidoNf);
+
+
 
     if(!query.exec()){
         qDebug() << "Query não executou  inserir produto vendido.";

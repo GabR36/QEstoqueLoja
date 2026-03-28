@@ -21,9 +21,9 @@ bool EventoFiscal_repository::inserir(EventoFiscalDTO evento){
 
     q.prepare(R"(
         INSERT INTO eventos_fiscais
-        (tipo_evento, id_lote, cstat, justificativa, codigo, xml_path, nprot, id_nf, atualizado_em)
+        (tipo_evento, id_lote, cstat, justificativa, codigo, xml_path, nprot, id_nf, atualizado_em, adicionado_em)
         VALUES
-        (:tipo, :lote, :cstat, :just, :codigo, :xml, :nprot, :idnf, :atualizado)
+        (:tipo, :lote, :cstat, :just, :codigo, :xml, :nprot, :idnf, :atualizado, :adicionadoem)
     )");
 
     q.bindValue(":tipo", evento.tipoEvento);
@@ -35,6 +35,7 @@ bool EventoFiscal_repository::inserir(EventoFiscalDTO evento){
     q.bindValue(":nprot", evento.nProt);
     q.bindValue(":idnf", evento.idNf > 0 ? QVariant(evento.idNf) : QVariant(QMetaType(QMetaType::LongLong)));
     q.bindValue(":atualizado", evento.atualizadoEm);
+    q.bindValue(":adicionadoem", evento.adicionadoEm);
 
     if(!q.exec()){
         qDebug() << "Query inserção evento não rodou:" << q.lastError().text();
@@ -86,7 +87,7 @@ QList<QPair<QString, QString>> EventoFiscal_repository::buscarXmlsPorPeriodo(QDa
     q.prepare(R"(
         SELECT tipo_evento, xml_path
         FROM eventos_fiscais
-        WHERE atualizado_em BETWEEN :ini AND :fim
+        WHERE adicionado_em BETWEEN :ini AND :fim
     )");
     q.bindValue(":ini", dtIni.toString("yyyy-MM-dd HH:mm:ss"));
     q.bindValue(":fim", dtFim.toString("yyyy-MM-dd HH:mm:ss"));
@@ -118,7 +119,8 @@ void EventoFiscal_repository::listarTodos(QSqlQueryModel *model)
             cstat,
             codigo,
             atualizado_em,
-            xml_path
+            xml_path,
+            adicionado_em
         FROM eventos_fiscais
         ORDER BY atualizado_em DESC
     )", db);

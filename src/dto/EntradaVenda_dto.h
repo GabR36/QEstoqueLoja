@@ -12,6 +12,8 @@ struct EntradaVendaDTO {
     double taxa;
     double valorFinal;
     double desconto;
+    QString adicionadoEm;
+    QString atualizadoEm;
 };
 
 #endif // ENTRADAVENDA_DTO_H

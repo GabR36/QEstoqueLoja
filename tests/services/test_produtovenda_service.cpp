@@ -6,6 +6,7 @@
 #include "../db/test_db_factory.h"
 #include <QSqlQuery>
 #include "infra/databaseconnection_service.h"
+#include "dto/Produto_dto.h"
 
 namespace {
 
@@ -101,11 +102,15 @@ void TestProdutoVendaService::inserir_produto_vendido_ok()
     // verifica no banco
     DatabaseConnection_service::open();
     QSqlQuery q(db);
-    q.exec("SELECT id_produto, quantidade, preco_vendido FROM produtos_vendidos WHERE id_venda = 999");
+    q.exec("SELECT id_produto, quantidade, preco_vendido, adicionado_em, atualizado_em, emitido_nf "
+           "FROM produtos_vendidos WHERE id_venda = 999");
     QVERIFY(q.next());
     QCOMPARE(q.value("id_produto").toLongLong(), idProd);
     QCOMPARE(q.value("quantidade").toDouble(), 3.0);
     QCOMPARE(q.value("preco_vendido").toDouble(), 15.00);
+    QVERIFY(!q.value("adicionado_em").toString().isEmpty());
+    QVERIFY(!q.value("atualizado_em").toString().isEmpty());
+    QCOMPARE(q.value("emitido_nf").toInt(), 0);
     db.close();
 }
 
@@ -202,6 +207,173 @@ void TestProdutoVendaService::tem_apenas_um_produto_true()
 
     ProdutoVenda_service service;
     QVERIFY(service.temApenasUmProduto(idVenda));
+}
+
+void TestProdutoVendaService::marcar_emitido_nf_emitir_todos()
+{
+    // produto nf=false
+    qlonglong idProdSemNf = inserirProdutoTeste(db, "NF_EMIT_ALL_A");
+    // produto nf=true
+    Produto_Service ps;
+    ProdutoDTO pNf;
+    pNf.quantidade      = 10;
+    pNf.descricao       = "Produto NF True";
+    pNf.preco           = 20.00;
+    pNf.codigoBarras    = "NF_EMIT_ALL_B";
+    pNf.nf              = true;
+    pNf.uCom            = "UN";
+    pNf.precoFornecedor = 10.00;
+    pNf.percentLucro    = 20.00;
+    pNf.ncm             = "12345678";
+    pNf.cest            = "";
+    pNf.aliquotaIcms    = 18;
+    pNf.csosn           = "102";
+    pNf.pis             = "49";
+    ps.inserir(pNf);
+
+    DatabaseConnection_service::open();
+    QSqlQuery qId(db);
+    qId.prepare("SELECT id FROM produtos WHERE codigo_barras = :cod");
+    qId.bindValue(":cod", "NF_EMIT_ALL_B");
+    qId.exec();
+    qId.next();
+    qlonglong idProdComNf = qId.value(0).toLongLong();
+    db.close();
+
+    QVERIFY(idProdSemNf > 0);
+    QVERIFY(idProdComNf > 0);
+
+    VendasDTO v;
+    v.clienteNome    = "Consumidor";
+    v.dataHora       = "2026-03-16 10:00:00";
+    v.total          = 35.00;
+    v.formaPagamento = "Dinheiro";
+    v.valorRecebido  = 35.00;
+    v.troco          = 0;
+    v.taxa           = 0;
+    v.valorFinal     = 35.00;
+    v.desconto       = 0;
+    v.estaPago       = true;
+    v.idCliente      = 1;
+
+    ProdutoVendidoDTO pv1;
+    pv1.idProduto    = idProdSemNf;
+    pv1.idVenda      = 0;
+    pv1.quantidade   = 1;
+    pv1.precoVendido = 15.00;
+
+    ProdutoVendidoDTO pv2;
+    pv2.idProduto    = idProdComNf;
+    pv2.idVenda      = 0;
+    pv2.quantidade   = 1;
+    pv2.precoVendido = 20.00;
+
+    Vendas_service vendaService;
+    auto ri = vendaService.inserirVendaRegraDeNegocio(v, {pv1, pv2});
+    QVERIFY(ri.ok);
+
+    ProdutoVenda_service service;
+    auto r = service.marcarComoEmitidoNF(ri.idVendaInserida, true);
+    QVERIFY(r.ok);
+
+    // ambos devem estar marcados como emitido_nf = 1
+    DatabaseConnection_service::open();
+    QSqlQuery q(db);
+    q.exec(QString("SELECT emitido_nf FROM produtos_vendidos WHERE id_venda = %1 AND id_produto = %2")
+               .arg(ri.idVendaInserida).arg(idProdSemNf));
+    QVERIFY(q.next());
+    QCOMPARE(q.value(0).toInt(), 1);
+
+    QSqlQuery q2(db);
+    q2.exec(QString("SELECT emitido_nf FROM produtos_vendidos WHERE id_venda = %1 AND id_produto = %2")
+                .arg(ri.idVendaInserida).arg(idProdComNf));
+    QVERIFY(q2.next());
+    QCOMPARE(q2.value(0).toInt(), 1);
+    db.close();
+}
+
+void TestProdutoVendaService::marcar_emitido_nf_apenas_produtos_nf()
+{
+    // produto nf=false
+    qlonglong idProdSemNf = inserirProdutoTeste(db, "NF_ONLY_A");
+    // produto nf=true
+    Produto_Service ps;
+    ProdutoDTO pNf;
+    pNf.quantidade      = 10;
+    pNf.descricao       = "Produto NF True B";
+    pNf.preco           = 20.00;
+    pNf.codigoBarras    = "NF_ONLY_B";
+    pNf.nf              = true;
+    pNf.uCom            = "UN";
+    pNf.precoFornecedor = 10.00;
+    pNf.percentLucro    = 20.00;
+    pNf.ncm             = "12345678";
+    pNf.cest            = "";
+    pNf.aliquotaIcms    = 18;
+    pNf.csosn           = "102";
+    pNf.pis             = "49";
+    ps.inserir(pNf);
+
+    DatabaseConnection_service::open();
+    QSqlQuery qId(db);
+    qId.prepare("SELECT id FROM produtos WHERE codigo_barras = :cod");
+    qId.bindValue(":cod", "NF_ONLY_B");
+    qId.exec();
+    qId.next();
+    qlonglong idProdComNf = qId.value(0).toLongLong();
+    db.close();
+
+    QVERIFY(idProdSemNf > 0);
+    QVERIFY(idProdComNf > 0);
+
+    VendasDTO v;
+    v.clienteNome    = "Consumidor";
+    v.dataHora       = "2026-03-16 10:00:00";
+    v.total          = 35.00;
+    v.formaPagamento = "Dinheiro";
+    v.valorRecebido  = 35.00;
+    v.troco          = 0;
+    v.taxa           = 0;
+    v.valorFinal     = 35.00;
+    v.desconto       = 0;
+    v.estaPago       = true;
+    v.idCliente      = 1;
+
+    ProdutoVendidoDTO pv1;
+    pv1.idProduto    = idProdSemNf;
+    pv1.idVenda      = 0;
+    pv1.quantidade   = 1;
+    pv1.precoVendido = 15.00;
+
+    ProdutoVendidoDTO pv2;
+    pv2.idProduto    = idProdComNf;
+    pv2.idVenda      = 0;
+    pv2.quantidade   = 1;
+    pv2.precoVendido = 20.00;
+
+    Vendas_service vendaService;
+    auto ri = vendaService.inserirVendaRegraDeNegocio(v, {pv1, pv2});
+    QVERIFY(ri.ok);
+
+    ProdutoVenda_service service;
+    auto r = service.marcarComoEmitidoNF(ri.idVendaInserida, false);
+    QVERIFY(r.ok);
+
+    // produto sem nf deve permanecer emitido_nf = 0
+    DatabaseConnection_service::open();
+    QSqlQuery q(db);
+    q.exec(QString("SELECT emitido_nf FROM produtos_vendidos WHERE id_venda = %1 AND id_produto = %2")
+               .arg(ri.idVendaInserida).arg(idProdSemNf));
+    QVERIFY(q.next());
+    QCOMPARE(q.value(0).toInt(), 0);
+
+    // produto com nf deve estar emitido_nf = 1
+    QSqlQuery q2(db);
+    q2.exec(QString("SELECT emitido_nf FROM produtos_vendidos WHERE id_venda = %1 AND id_produto = %2")
+                .arg(ri.idVendaInserida).arg(idProdComNf));
+    QVERIFY(q2.next());
+    QCOMPARE(q2.value(0).toInt(), 1);
+    db.close();
 }
 
 void TestProdutoVendaService::tem_apenas_um_produto_false()

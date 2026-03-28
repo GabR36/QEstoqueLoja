@@ -314,7 +314,7 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
     query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, tp_amb, xml_path, valor_total, "
                   "atualizado_em, id_venda, "
                   "cnpjemit, chnfe, nprot, cuf, finalidade, saida, id_nf_ref, dhemi, "
-                  "id_emissorcliente, adicioando_em) "
+                  "id_emissorcliente, adicionado_em) "
                   "VALUES (:cstat, :nnf, :serie, :modelo, :tpamb, :xmlpath, :vnf, :atualizadoem, :idvenda, "
                   ":cnpjemit, :chnf, :nprot, :cuf, :finalidade, :saida, :idnfref, :dhemi, :idemissor, "
                   ":adicionadoem)");

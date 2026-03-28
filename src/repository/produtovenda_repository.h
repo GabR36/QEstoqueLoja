@@ -18,6 +18,7 @@ public:
     int contarProdutosVendidosFromVenda(qlonglong idvenda);
     ProdutoVendidoDTO getProdutoVendido(qlonglong id);
     bool inserir(ProdutoVendidoDTO prod);
+    bool marcarComoEmitidoNf(qlonglong idVenda, bool emitirTodos);
 private:
     QSqlDatabase db;
 

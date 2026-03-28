@@ -56,3 +56,12 @@ ProdutoVenda_service::Resultado ProdutoVenda_service::inserir(ProdutoVendidoDTO 
 }
 
 
+ProdutoVenda_service::Resultado ProdutoVenda_service::marcarComoEmitidoNF(qlonglong idvenda,
+                                                                          bool emitirTodos){
+    if(!prodVendaRepo.marcarComoEmitidoNf(idvenda, emitirTodos)){
+        return {false, ProdutoVendaErro::Update, "Erro ao atualizar emitidos nf." };
+    }else{
+        return{true, ProdutoVendaErro::Nenhum, ""};
+    }
+}
+

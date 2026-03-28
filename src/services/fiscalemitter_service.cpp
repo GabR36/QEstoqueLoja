@@ -281,6 +281,7 @@ FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNfcePadrao(VendasD
     if(!result.ok){
         return {false, FiscalEmitterErro::Salvar, "Erro ao salvar nota fiscal."};
     }else{
+        prodVendaServ.marcarComoEmitidoNF(venda.id, emitirTodos);
         QString msg = "Nota enviada e salva com sucesso.\ncStat:" + nota.cstat;
         return{true, FiscalEmitterErro::Nenhum, msg};
     }
@@ -408,6 +409,7 @@ FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNFePadrao(VendasDT
     if(!result.ok){
         return {false, FiscalEmitterErro::Salvar, "Erro ao salvar nota fiscal."};
     }else{
+        prodVendaServ.marcarComoEmitidoNF(venda.id, emitirTodos);
         QDateTime datavenda = QDateTime::fromString(nota.atualizadoEm, "yyyy-MM-dd HH:mm:ss");
         auto r = emailServ.enviarEmailNFe(cliente.nome, cliente.email, nota.xmlPath,
                                           nfe->getPdfDanfe(), datavenda, confDTO.nomeEmpresa);

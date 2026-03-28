@@ -18,6 +18,8 @@ private slots:
     void deletar_por_idvenda();
     void tem_apenas_um_produto_true();
     void tem_apenas_um_produto_false();
+    void marcar_emitido_nf_emitir_todos();
+    void marcar_emitido_nf_apenas_produtos_nf();
 };
 
 #endif // TEST_PRODUTOVENDA_SERVICE_H

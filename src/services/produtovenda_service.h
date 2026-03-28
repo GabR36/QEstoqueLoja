@@ -32,6 +32,7 @@ public:
     bool temApenasUmProduto(qlonglong idvenda);
     ProdutoVendidoDTO getProdutoVendido(qlonglong id);
     ProdutoVenda_service::Resultado inserir(ProdutoVendidoDTO prod);
+    ProdutoVenda_service::Resultado marcarComoEmitidoNF(qlonglong idvenda, bool emitirTodos);
 private:
     ProdutoVenda_repository prodVendaRepo;
 

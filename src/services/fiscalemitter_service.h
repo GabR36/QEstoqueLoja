@@ -14,6 +14,7 @@
 #include "produtonota_service.h"
 #include "../dto/ProdutoNota_dto.h"
 #include "eventofiscal_service.h"
+#include "produtovenda_service.h"
 
 enum class FiscalEmitterErro{
     Nenhum,
@@ -70,6 +71,7 @@ private:
     Config_service confServ;
     ConfigDTO confDTO;
     EventoFiscal_service eventoServ;
+    ProdutoVenda_service prodVendaServ;
 
 
 signals:

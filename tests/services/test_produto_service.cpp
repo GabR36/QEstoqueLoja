@@ -34,7 +34,7 @@ void TestProdutoService::inserir_produto_ok()
     }
     QSqlQuery query(db);
     query.exec("SELECT * FROM produtos ORDER BY id DESC");
-    QString desc, codbarras, nf, ucom, ncm, cest, csosn, pis;
+    QString desc, codbarras, nf, ucom, ncm, cest, csosn, pis, adicionadoEm, atualizadoEm;
     double preco, precoforn, quant, aliquota, percentlucro;
 
     while(query.next()){
@@ -51,6 +51,8 @@ void TestProdutoService::inserir_produto_ok()
         aliquota = query.value("aliquota_imposto").toFloat();
         csosn = query.value("csosn").toString();
         pis = query.value("pis").toString();
+        adicionadoEm = query.value("adicionado_em").toString();
+        atualizadoEm = query.value("atualizado_em").toString();
     }
     db.close();
     QCOMPARE(quant, 10);
@@ -66,6 +68,8 @@ void TestProdutoService::inserir_produto_ok()
     QCOMPARE(aliquota, 32.5);
     QCOMPARE(csosn, "102");
     QCOMPARE(pis, "49");
+    QVERIFY(!adicionadoEm.isEmpty());
+    QVERIFY(!atualizadoEm.isEmpty());
 
 }
 

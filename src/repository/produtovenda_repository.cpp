@@ -216,6 +216,40 @@ ProdutoVendidoDTO ProdutoVenda_repository::getProdutoVendido(qlonglong id){
 
 }
 
+bool ProdutoVenda_repository::marcarComoEmitidoNf(qlonglong idVenda, bool emitirTodos)
+{
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco (marcarComoEmitidoNf)";
+        return false;
+    }
+
+    QString data = DataUtil::getDataAgoraUS();
+    QString sql;
+
+    if (emitirTodos) {
+        sql = "UPDATE produtos_vendidos SET emitido_nf = 1, atualizado_em = :data "
+              "WHERE id_venda = :idvenda";
+    } else {
+        sql = "UPDATE produtos_vendidos SET emitido_nf = 1, atualizado_em = :data "
+              "WHERE id_venda = :idvenda "
+              "AND id_produto IN (SELECT id FROM produtos WHERE nf = 1)";
+    }
+
+    QSqlQuery query(db);
+    query.prepare(sql);
+    query.bindValue(":data", data);
+    query.bindValue(":idvenda", idVenda);
+
+    if (!query.exec()) {
+        qDebug() << "Erro marcarComoEmitidoNf:" << query.lastError().text();
+        db.close();
+        return false;
+    }
+
+    db.close();
+    return true;
+}
+
 bool ProdutoVenda_repository::inserir(ProdutoVendidoDTO prod){
     if (!DatabaseConnection_service::open()) {
         qDebug() << "Erro ao abrir banco (inserir)";
@@ -236,8 +270,6 @@ bool ProdutoVenda_repository::inserir(ProdutoVendidoDTO prod){
     query.bindValue(":adicionadoem", data);
     query.bindValue(":atualizadoem", data);
     query.bindValue(":emitidonf", prod.emitidoNf);
-
-
 
     if(!query.exec()){
         qDebug() << "Query não executou  inserir produto vendido.";

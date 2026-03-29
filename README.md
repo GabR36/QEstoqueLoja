@@ -41,14 +41,14 @@ O **QEstoqueLoja** busca resolver esse problema com:
 
 ---
 
-## ⚙️ Tecnologias
+## ecnologias
 
 - **Qt Framework**
 - **SQLite** (banco de dados local)
 
 ---
 
-## 📦 Instalação
+## Instalação
 
 Instaladores para **Windows** e **Linux (Debian)** estão disponíveis na página de releases:
 
@@ -58,7 +58,7 @@ Basta baixar e executar — não é necessário configurar servidor ou dependên
 
 ---
 
-## 🛠️ Compilação
+## ompilação
 
 ### Dependências
 
@@ -78,7 +78,7 @@ Basta baixar e executar — não é necessário configurar servidor ou dependên
 
 ---
 
-### 🔧 Build com CMake
+### Build com CMake
 
 ```bash
 mkdir build

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(QEstoqueLoja VERSION 0.1 LANGUAGES CXX)
 
-
+enable_testing()
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -36,7 +36,7 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libxml2-v2.11.5/include/libxml2
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/QtRPT
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/include
-        # ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-headers
 
     )
 endif()
@@ -45,13 +45,7 @@ endif()
 set(TS_FILES QEstoqueLoja_pt_BR.ts)
 if(CMAKE_SYSTEM MATCHES "Windows")
 
-    include(FetchContent)
-    FetchContent_Declare(
-    zint
-    GIT_REPOSITORY https://github.com/zint/zint.git
-    GIT_TAG master # Você pode substituir por uma versão específica, se desejar
-    )
-    FetchContent_MakeAvailable(zint)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/zint)
 elseif(CMAKE_SYSTEM MATCHES "Linux")
     find_package(PNG)
     find_library(ZINT_LIBRARIES NAMES zint)
@@ -64,6 +58,8 @@ set(PROJECT_SOURCES
         src/mainwindow.ui
         ${TS_FILES}
 )
+
+add_subdirectory(tests)
 
 if(WIN32)
     set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Imagens/QEstoqueLOja/AppIcon.rc")
@@ -84,6 +80,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/venda.h src/venda.cpp src/venda.ui
         Imagens/recursosImg.qrc
         src/relatorios.h src/relatorios.cpp src/relatorios.ui
+        src/janelaorcamento.h src/janelaorcamento.cpp src/janelaorcamento.ui
         src/pagamento.h src/pagamento.cpp src/pagamento.ui
 
         src/configuracao.h src/configuracao.cpp src/configuracao.ui
@@ -97,6 +94,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/delegateprecof2.cpp src/delegateprecof2.h
         src/delegatepago.h src/delegatepago.cpp
         src/util/pdfexporter.h src/util/pdfexporter.cpp
+        src/util/csvexporter.h src/util/csvexporter.cpp
         src/subclass/customlineedit.h src/subclass/customlineedit.cpp
         src/delegateprecovalidate.h src/delegateprecovalidate.cpp
         src/delegatelockcol.h src/delegatelockcol.cpp
@@ -113,7 +111,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/nota/DanfeUtil.h src/nota/DanfeUtil.cpp
         src/util/NFUtilidades.cpp
         src/subclass/leditdialog.h src/subclass/leditdialog.cpp
-        src/infojanelaprod.h src/infojanelaprod.cpp src/infojanelaprod.ui
+        src/infojanelaprod.h src/infojanelaprod.cpp
 
         src/util/helppage.h src/util/helppage.cpp src/util/helppage.ui
         src/nota/acbrmanager.h src/nota/acbrmanager.cpp
@@ -121,7 +119,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/nota/ACBrNFeImport.h
         src/nota/nfceacbr.h src/nota/nfceacbr.cpp
         src/nota/nfeacbr.h src/nota/nfeacbr.cpp
-        src/schemamanager.h src/schemamanager.cpp
         src/nota/cancelnf.h src/nota/cancelnf.cpp
         src/util/ACBrConsultaCNPJ.cpp src/util/ACBrConsultaCNPJ.h
         src/util/consultacnpjmanager.h src/util/consultacnpjmanager.cpp
@@ -145,8 +142,65 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/delegateambiente.h src/delegateambiente.cpp
         Imagens/recursosImg.qrc
 
-    )
+        src/services/Produto_service.h src/services/Produto_service.cpp
+        src/dto/Produto_dto.h
+        src/repository/Produto_repository.h
+        src/repository/Produto_repository.cpp
+        src/util/printutil.h src/util/printutil.cpp
+        src/services/barcode_service.h src/services/barcode_service.cpp
+        src/util/codigobarrasutil.h src/util/codigobarrasutil.cpp
+        src/services/acbr_service.h src/services/acbr_service.cpp
+        src/services/schemamigration_service.h src/services/schemamigration_service.cpp
+        src/infra/apppath_service.h src/infra/apppath_service.cpp
+        src/infra/databaseconnection_service.h src/infra/databaseconnection_service.cpp
+        src/services/schemamigration_service.cpp src/services/schemamigration_service.h
+        src/dto/Config_dto.h
+        src/repository/config_repository.h src/repository/config_repository.cpp
+        src/services/config_service.h src/services/config_service.cpp
+        src/services/imagestorage_service.h src/services/imagestorage_service.cpp
+        src/repository/dfeinfo_repository.h src/repository/dfeinfo_repository.cpp
+        src/services/dfe_service.h src/services/dfe_service.cpp
+        src/dto/NotaFiscal_dto.h
+        src/repository/notafiscal_repository.h src/repository/notafiscal_repository.cpp
+        src/util/datautil.h src/util/datautil.cpp
+        src/services/notafiscal_service.h src/services/notafiscal_service.cpp
+        src/dto/ProdutoNota_dto.h
+        src/repository/produtonota_repository.h src/repository/produtonota_repository.cpp
+        src/services/produtonota_service.h src/services/produtonota_service.cpp
+        src/dto/Cliente_dto.h
+        src/repository/cliente_repository.h src/repository/cliente_repository.cpp
+        src/services/cliente_service.h src/services/cliente_service.cpp
+        src/dto/EventoFiscal_dto.h
+        src/repository/eventofiscal_repository.h src/repository/eventofiscal_repository.cpp
+        src/services/eventofiscal_service.h src/services/eventofiscal_service.cpp
+        src/repository/vendas_repository.h src/repository/vendas_repository.cpp
+        src/services/vendas_service.h src/services/vendas_service.cpp
+        src/repository/entradasvendas_repository.h src/repository/entradasvendas_repository.cpp
+        src/services/entradasvendas_service.h src/services/entradasvendas_service.cpp
+        src/services/financeiro_service.h src/services/financeiro_service.cpp
+        src/services/consultacnpj_service.h src/services/consultacnpj_service.cpp
+        src/dto/Vendas_dto.h
+        src/dto/ProdutoVendido_dto.h
+        src/repository/produtovenda_repository.h src/repository/produtovenda_repository.cpp
+        src/services/produtovenda_service.h src/services/produtovenda_service.cpp
+        src/services/recibo_service.h src/services/recibo_service.cpp
+        src/dto/EntradaVenda_dto.h
+        src/dto/ResumoVendas_dto.h
+        src/util/vendasutil.h src/util/vendasutil.cpp
+        src/services/fiscalemitter_service.h src/services/fiscalemitter_service.cpp
+        src/services/email_service.h src/services/email_service.cpp
+        src/dto/ProdutoParaNFe_dto.h
+        src/dto/NFRetorno_dto.h
+        Imagens/QEstoqueLOja/logo-completo-claro.png
+        src/repository/relatorios_repository.h src/repository/relatorios_repository.cpp
+        src/services/relatorios_service.h src/services/relatorios_service.cpp
+        src/inutilizacaodialog.h src/inutilizacaodialog.cpp src/inutilizacaodialog.ui
 
+
+
+
+
+    )
 
 
 # Define target properties for Android with Qt 6 as:
@@ -176,6 +230,7 @@ else()
 endif()
 
 if (WIN32)
+    add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
     add_library(quazip1-qt6 UNKNOWN IMPORTED)
 
     set_target_properties(quazip1-qt6 PROPERTIES
@@ -201,10 +256,13 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libiconv-for-Windows/lib64/Release
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libxml2-v2.11.5/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/bin/release/lib
-        # ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/lib
     )
     target_link_libraries(QEstoqueLoja  PRIVATE QtRPT quazip1-qt6 Qt6::Core5Compat zdll)
+    target_include_directories(QEstoqueLoja PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-headers
+    )
 
 endif()
 
@@ -273,9 +331,4 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(QEstoqueLoja)
 endif()
 
-
-
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(QEstoqueLoja)
-endif()
 

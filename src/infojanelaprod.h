@@ -1,31 +1,18 @@
 #ifndef INFOJANELAPROD_H
 #define INFOJANELAPROD_H
 
-#include <QDialog>
-#include <QSqlDatabase>
-#include <QLocale>
+#include "alterarproduto.h"
+#include "../services/Produto_service.h"
 
-namespace Ui {
-class InfoJanelaProd;
-}
-
-class InfoJanelaProd : public QDialog
+class InfoJanelaProd : public AlterarProduto
 {
     Q_OBJECT
 
 public:
-    explicit InfoJanelaProd(QWidget *parent = nullptr, int id = 1);
-    ~InfoJanelaProd();
+    explicit InfoJanelaProd(QWidget *parent = nullptr, QString id = "1");
 
 private:
-    Ui::InfoJanelaProd *ui;
-    QSqlDatabase db = QSqlDatabase::database();
-    QLocale portugues;
-    QString quant,desc,precoFinal,codigoBarras,ucom,precoForn,porcentLucro,
-        ncm,cest,aliquotaIcms,csosn,pis,local;
-    bool nf;
-
-
+    Produto_Service infoService;
 };
 
 #endif // INFOJANELAPROD_H

@@ -9,6 +9,12 @@
 #include <QVector>
 #include <QLocale>
 #include <sstream>
+#include "../services/config_service.h"
+#include "../dto/NFRetorno_dto.h"
+#include "../dto/ProdutoVendido_dto.h"
+#include "../services/Produto_service.h"
+#include "../dto/ProdutoParaNFe_dto.h"
+#include "../services/notafiscal_service.h"
 
 class NfceACBR : public QObject
 {
@@ -20,22 +26,25 @@ public:
     void setNNF(int nNF);
     void setCliente(QString cpf, bool ehPf);
     void setProdutosVendidos(QList<QList<QVariant> > produtosVendidos, bool emitirTodos);
-    void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco,
-                             float taxa);
-    int getNNF();
+    void setPagamentoValores(QString formaPag, double desconto, double recebido, double troco,
+                             double taxa);
+    qlonglong getNNF();
     int getSerie();
     QString gerarEnviar();
     QString getXmlPath();
     double getVNF();
     QString getChaveNf();
     QString getDhEmiConvertida();
+    NFRetornoDTO gerarEnviarRetorno();
+    void setProdutosVendidosNew(QList<ProdutoVendidoDTO> listaProds, bool emitirTodos);
+    void setRetornoForcado(const QString &retorno);
 private:
     ACBrNFe *nfce;
     QSqlDatabase db;
     QLocale portugues;
     std::stringstream ini;
-    QMap<QString, QString> fiscalValues;
-    QMap<QString, QString> empresaValues;
+    ConfigDTO configDTO;
+
 
     QString caminhoXml;
     std::string tpAmb, cuf, cnf, cnpjEmit;
@@ -48,13 +57,16 @@ private:
     int quantProds;
     QVector<float> vTotTribProduto;
     QVector<float> descontoProd;
-    QList<QList<QVariant>>listaProdutos;
+    QList<ProdutoParaNFeDTO> listaProdutosNFCe;
     double descontoNf,trocoNf,vPagNf, vNf;
     QString indPagNf,tPagNf;
     float taxaPercentual;
     double totalGeral;
     bool usarIBS;
     std::string dataHora;
+    QString retornoForcado = "";
+    Produto_Service prodServ;
+
 
     void carregarConfig();
     void ide();
@@ -69,10 +81,12 @@ private:
 
 
     bool isValidGTIN(const QString &gtin);
-    void aplicarDescontoTotal(float descontoTotal);
+    void aplicarDescontoTotal(double descontoTotal);
     float corrigirTaxa(float taxaAntiga, float desconto);
     void aplicarAcrescimoProporcional(float taxaPercentual);
 
+    double getSomaValorTotalProdutos();
+    NotaFiscal_service notaServ;
 signals:
 };
 

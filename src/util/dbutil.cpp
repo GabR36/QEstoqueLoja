@@ -33,3 +33,7 @@ QVector<QVariantMap> DBUtil::extrairResultados(QSqlQuery &query)
 
     return resultados;
 }
+
+bool DBUtil::isValido(){
+    return true;
+}

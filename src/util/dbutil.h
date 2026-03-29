@@ -11,6 +11,7 @@ public:
     explicit DBUtil(QObject *parent = nullptr);
 
     static QVector<QVariantMap> extrairResultados(QSqlQuery &query);
+    bool isValido();
 signals:
 };
 

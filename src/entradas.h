@@ -3,10 +3,15 @@
 
 #include <QWidget>
 #include <QSqlDatabase>
-#include "nota/ACBrNFe.h"
 #include <QLocale>
-#include "nota/nfeacbr.h"
 #include <QSqlQueryModel>
+#include "services/dfe_service.h"
+#include "services/config_service.h"
+#include "services/notafiscal_service.h"
+#include "services/produtonota_service.h"
+#include "services/Produto_service.h"
+#include "services/fiscalemitter_service.h"
+#include "services/cliente_service.h"
 
 struct Cliente{
     QString nome;
@@ -57,28 +62,27 @@ private:
     QMap<QString, QString> financeiroValues;
     QMap<QString, QString> produtoValues;
     QLocale portugues;
-    NfeACBR *nfe;
     qlonglong id_nf_selec;
-    QString lastInsertedIDNfDevol;
-    QString cstatRetornado;
     QSqlQueryModel *modelEntradas;
+    QSqlQueryModel *modelProdutosNota;
+    ConfigDTO configDTO;
+    Dfe_service dfeServ;
+    NotaFiscal_service notaServ;
+    ProdutoNota_service prodNotaServ;
+    Produto_Service prodServ;
+    FiscalEmitter_service fiscalEmitterServ;
+    Cliente_service clienteServ;
 
 
-    void salvarRegistroDFe(const QString &nome_emitente, const QString &data_emissao, const QString &vnf, const QString &nsu, const QString &tipo, const QString &chave, const QString &cnpj, const QString &situacao, const QString &xml, const QString &data_recebimento);
     void carregarTabela();
-    QString converterDataSefaz(const QString &data);
     void carregarProdutosDaNota(qlonglong id_nf);
-    bool existeCodBarras(QString codigo);
     void addProdSemCodBarras(QString idProd, QString codBarras);
-    void devolverProdutos(QList<qlonglong> &idsProduto);
-    QString salvarDevolucaoNf(QString retornoEnvio, QString idnf, NfeACBR *devolNfe,
-                              QList<qlonglong> &idsProduto);
-    void atualizarProdutoNotaAoDevolver(QString idNfDevol, QList<qlonglong> &idsProduto);
+    void devolverProdutos(QList<ProdutoNotaDTO> &produtosNota);
     double calcularPrecoItemSN(const QString &xmlPath, int nItem);
     void addProdComCodBarras(QString idProd, QString codBarras);
     void atualizarProdutoNotaAdicionado(QString idProd);
     void enviarEmailNFe(QString nomeCliente, QString emailCliente, QString xmlPath, std::string pdfDanfe, QString cnpj);
-    void atualizarTabela(QString whereSql = "");
+    void atualizarTabela(const QString &de = "", const QString &ate = "");
 
 signals:
     void produtoAdicionado();

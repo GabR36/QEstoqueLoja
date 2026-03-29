@@ -1,25 +1,43 @@
-#ifndef SCHEMAMANAGER_H
-#define SCHEMAMANAGER_H
+// #ifndef SCHEMAMANAGER_H
+// #define SCHEMAMANAGER_H
 
-#include <QObject>
-#include <QSqlDatabase>
+// #include <QObject>
+// #include <QSqlDatabase>
 
-class SchemaManager : public QObject
-{
-    Q_OBJECT
-public:
-    explicit SchemaManager(QObject *parent = nullptr, int dbLastVersion = 0);
+// enum class SchemaErro {
+//     Nenhum,
+//     CampoVazio,
+//     FalhaConexao,
+//     ErroSQL,
+//     ErroMigracao
+// };
 
-    void update();
+// class SchemaManager : public QObject
+// {
+//     Q_OBJECT
 
-    int dbSchemaLastVersion;
+// public:
 
-    int dbSchemaVersion;
+//     struct Resultado {
+//         bool ok;
+//         SchemaErro status;
+//         QString message;
+//         int lastVersion;
+//     };
+//     explicit SchemaManager(QObject *parent = nullptr, int dbLastVersion = 0);
 
-    QSqlDatabase db;
-signals:
-    void dbVersao6();
-    void dbVersao7();
-};
+//     int dbSchemaLastVersion;
 
-#endif // SCHEMAMANAGER_H
+//     int dbSchemaVersion;
+
+//     QSqlDatabase db;
+//     // void update();
+
+//     SchemaManager::Resultado update();
+
+// signals:
+//     void dbVersao6();
+//     void dbVersao7();
+// };
+
+// #endif // SCHEMAMANAGER_H

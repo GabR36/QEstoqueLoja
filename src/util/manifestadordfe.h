@@ -6,77 +6,17 @@
 #include <QMap>
 #include <QSqlDatabase>
 #include "../nota/eventocienciaop.h"
+#include "../services/config_service.h"
+#include "../services/dfe_service.h"
+#include "../infra/databaseconnection_service.h"
+#include "../services/notafiscal_service.h"
+#include "../dto/NotaFiscal_dto.h"
+#include <qlocale.h>
+#include "../services/produtonota_service.h"
+#include "../util/nfxmlutil.h"
+#include "../services/cliente_service.h"
+#include "../services/eventofiscal_service.h"
 
-struct ResumoNFe {
-    QString chave;
-    QString nome;
-    QString cnpjEmit;
-    QString schema;
-    QString vnf;
-    QString cstat;
-    QString xml_path;
-    QString nProt;
-    QString dhEmi;
-};
-
-struct ProcNfe {
-    QString chave;
-    QString nsu;
-    QString cnpjEmit;
-    QString schema;
-    QString vnf;
-    QString cstat;
-    QString xml_path;
-    QString nProt;
-    QString dhEmi;
-    QString nome;
-    QString cSitNfe;
-};
-
-
-struct Emitente {
-    QString cnpj;
-    QString nome;
-    QString xLgr;
-    QString nro;
-    QString xBairro;
-    QString xMun;
-    QString cMun;
-    QString uf;
-    QString cep;
-    QString ie;
-};
-
-struct NotaFiscal {
-    QString cstat;
-    qlonglong nnf = 0;
-    QString serie;
-    QString modelo;
-    bool tp_amb = false;
-    QString xml_path;
-    double valor_total = 0.0;
-    QString cnpjemit;
-    QString chnfe;
-    QString nprot;
-    QString cuf;
-};
-
-struct ProdutoNota {
-    float quant;
-    QString desc;
-    double preco;
-    QString cod_barras;
-    QString un_comercial;
-    QString ncm;
-    QString csosn;
-    QString pis;
-    QString cfop;
-    float aliquota_imposto;
-    QString nitem;
-    qlonglong id_nf;
-    QString cst_icms;
-    bool tem_st;
-};
 
 class ManifestadorDFe : public QObject
 {
@@ -86,35 +26,38 @@ public:
     bool enviarCienciaOperacao(const QString &chNFe, const QString &cnpjEmit);
     void consultarEManifestar();
     void consultarEBaixarXML();
-    QString getUltNsu();
-    QString getUltNsuXml();
-    bool possoConsultar();
     void consultaAlternada();
+    void consultarSePossivel();
+    void setRetornoForcado(const QString &retorno);
 private:
     QSqlDatabase db;
-    QMap<QString, QString> fiscalValues;
-    QMap<QString, QString> empresaValues;
+    ConfigDTO configDTO;
     QString cuf,cnpj;
     QString ultimo_nsu;
     QString ultNsuXml;
     QString novoUltNsuXml;
+    Dfe_service dfeServ;
+    NotaFiscal_service nfServ;
+    QLocale portugues;
+    ProdutoNota_service prodNotaServ;
+    NfXmlUtil xmlUtil;
+    Cliente_service cliServ;
+    EventoFiscal_service eveServ;
+    QString retornoForcado = "";
 
-    void salvarEventoNoBanco(const QString &tipo, const EventoRetornoInfo &info, const QString &chaveNFe);
+
+
+    void salvarEventoNoBanco(EventoFiscalDTO info, const QString &chaveNFe);
     void carregarConfigs();
     void processarHeaderDfe(const QString &bloco);
     void salvarNovoUltNsu(const QString &ultNsu);
     bool existeCienciaOperacao(const QString &chNFe);
-    void salvarResumoNota(ResumoNFe resumo);
+    void salvarResumoNota(NotaFiscalDTO resumo);
     void processarResumo(const QString &bloco);
     void processarNota(const QString &bloco);
-    bool salvarEmitenteCliente(ProcNfe notaInfo);
-    Emitente lerEmitenteDoXML(const QString &xmlPath);
-    NotaFiscal lerNotaFiscalDoXML(const QString &xmlPath);
-    bool atualizarNotaBanco(ProcNfe notaInfo);
-    void salvarNovoUltNsuXml(const QString &ultnsuxml);
-    void atualizarDataNsu(int option);
+    bool salvarEmitenteCliente(NotaFiscalDTO notaInfo);
+    bool atualizarNotaBanco(NotaFiscalDTO notaInfo);
     void processarHeaderDfeXML(const QString &bloco);
-    QList<ProdutoNota> carregarProdutosDaNFe(const QString &xml_path, qlonglong id_nf);
     bool salvarProdutosNota(const QString &xml_path, const QString &chnfe);
 signals:
 };

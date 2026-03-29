@@ -122,7 +122,7 @@ void pagamentoAPrazo::terminarPagamento()
     // inserir os produtos da venda
 
     if(ui->CheckImprimirCNF->isChecked()){
-        Vendas::imprimirReciboVenda(idVenda);
+        Vendas::imprimirReciboVenda(idVenda.toLongLong());
 
 
     }

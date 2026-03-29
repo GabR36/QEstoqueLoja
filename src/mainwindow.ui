@@ -39,36 +39,32 @@
   </property>
   <property name="styleSheet">
    <string notr="true">
-
-#MainWindow{
-background-color: rgb(199, 199, 199);
-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(199, 199, 199, 255), stop:1 rgba(170, 170, 170, 255));
-
+#MainWindow {
+  background-color: rgb(199, 199, 199);
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
+    stop:0 rgba(199, 199, 199, 255), stop:1 rgba(170, 170, 170, 255));
 }
-QPushButton{
-background-color: rgb(43, 132, 191);
-color: rgb(255, 255, 255);
-font-size: 15px;
-border-radius: 13px;
-
+QPushButton {
+  background-color: rgb(43, 132, 191);
+  color: rgb(255, 255, 255);
+  font-size: 13px;
+  border-radius: 10px;
 }
-
-QPushButton:hover{
-	background-color: rgb(13, 92, 161);
+QPushButton:hover {
+  background-color: rgb(13, 92, 161);
 }
-QPushButton:pressed{
-	
-color: rgb(255, 255, 255);
-	background-color: rgb(153, 193, 241);
-font-size: 15px;
-border-radius: 13px;
+QPushButton:pressed {
+  color: rgb(255, 255, 255);
+  background-color: rgb(153, 193, 241);
+  font-size: 13px;
+  border-radius: 10px;
 }
-QGroupBox{
-background-color:rgb(170, 170, 170);
-	font: 700 9pt &quot;Segoe UI&quot;;
-	font-size: 15px;
+QGroupBox {
+  background-color: rgb(170, 170, 170);
+  font: 700 9pt &quot;Segoe UI&quot;;
+  font-size: 15px;
 }
-</string>
+   </string>
   </property>
   <property name="dockNestingEnabled">
    <bool>true</bool>
@@ -89,41 +85,39 @@ background-color:rgb(170, 170, 170);
       <property name="minimumSize">
        <size>
         <width>1500</width>
-        <height>70</height>
+        <height>62</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>70</height>
+        <height>62</height>
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">QFrame{
-/*background-color:rgb(148, 148, 148);*/
-background-color: rgb(199, 199, 199);
-
+       <string notr="true">
+QFrame {
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+    stop:0 rgb(38, 62, 92), stop:1 rgb(24, 42, 66));
+  border-bottom: 2px solid rgb(43, 132, 191);
 }
-
-QPushButton{
-background-color:transparent;
-	font: 700 10pt &quot;Segoe UI&quot;;
-color: black;
-border-bottom: 1px solid black;
-border-radius: 13px;
-
+QPushButton {
+  background-color: transparent;
+  font: 600 10pt &quot;Segoe UI&quot;;
+  color: rgb(195, 215, 235);
+  border: none;
+  border-radius: 7px;
+  padding: 4px 6px;
 }
-QPushButton:hover{
-	background-color: rgb(13, 92, 161);
+QPushButton:hover {
+  background-color: rgba(43, 132, 191, 150);
+  color: white;
 }
-QPushButton:pressed{
-	
-color: rgb(255, 255, 255);
-	background-color: rgb(153, 193, 241);
-
+QPushButton:pressed {
+  background-color: rgba(153, 193, 241, 100);
+  color: white;
 }
-
-</string>
+       </string>
       </property>
       <property name="frameShape">
        <enum>QFrame::Shape::StyledPanel</enum>
@@ -137,7 +131,7 @@ color: rgb(255, 255, 255);
          <x>0</x>
          <y>0</y>
          <width>1201</width>
-         <height>71</height>
+         <height>62</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -155,24 +149,24 @@ color: rgb(255, 255, 255);
              <widget class="QLabel" name="label_6">
               <property name="minimumSize">
                <size>
-                <width>160</width>
-                <height>40</height>
+                <width>150</width>
+                <height>38</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
-                <width>170</width>
-                <height>50</height>
+                <width>160</width>
+                <height>48</height>
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">border-right: 2px solid black;</string>
+               <string notr="true">border-right: 2px solid rgba(43, 132, 191, 180);</string>
               </property>
               <property name="text">
                <string/>
               </property>
               <property name="pixmap">
-               <pixmap resource="../Imagens/recursosImg.qrc">:/QEstoqueLOja/mkaoyvblContraste.png</pixmap>
+               <pixmap resource="../Imagens/recursosImg.qrc">:/QEstoqueLOja/logo-completo-claro.png</pixmap>
               </property>
               <property name="scaledContents">
                <bool>true</bool>
@@ -196,21 +190,18 @@ color: rgb(255, 255, 255);
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>140</width>
-                    <height>60</height>
+                    <width>115</width>
+                    <height>43</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>140</width>
-                    <height>60</height>
+                    <width>95</width>
+                    <height>43</height>
                    </size>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true"/>
-                  </property>
                   <property name="text">
-                   <string>Cadastrar 
+                   <string>Cadastrar
 Produto</string>
                   </property>
                   <property name="icon">
@@ -218,8 +209,8 @@ Produto</string>
                   </property>
                   <property name="iconSize">
                    <size>
-                    <width>40</width>
-                    <height>40</height>
+                    <width>26</width>
+                    <height>26</height>
                    </size>
                   </property>
                  </widget>
@@ -234,26 +225,23 @@ Produto</string>
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>100</width>
-                    <height>60</height>
+                    <width>88</width>
+                    <height>43</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>100</width>
-                    <height>60</height>
+                    <width>88</width>
+                    <height>43</height>
                    </size>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>Alterar</string>
                   </property>
                   <property name="iconSize">
                    <size>
-                    <width>40</width>
-                    <height>40</height>
+                    <width>26</width>
+                    <height>26</height>
                    </size>
                   </property>
                  </widget>
@@ -268,32 +256,33 @@ Produto</string>
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>100</width>
-                    <height>60</height>
+                    <width>88</width>
+                    <height>43</height>
                    </size>
                   </property>
                   <property name="maximumSize">
                    <size>
-                    <width>100</width>
-                    <height>60</height>
+                    <width>88</width>
+                    <height>43</height>
                    </size>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">#Btn_Delete:hover{
-background-color:rgb(191, 61, 64);
+                   <string notr="true">
+#Btn_Delete:hover {
+  background-color: rgb(191, 61, 64);
 }
-#Btn_Delete:pressed{
-background-color:rgb(255, 96, 99)
-
-}</string>
+#Btn_Delete:pressed {
+  background-color: rgb(255, 96, 99);
+}
+                   </string>
                   </property>
                   <property name="text">
                    <string>Deletar</string>
                   </property>
                   <property name="iconSize">
                    <size>
-                    <width>40</width>
-                    <height>40</height>
+                    <width>26</width>
+                    <height>26</height>
                    </size>
                   </property>
                  </widget>
@@ -310,34 +299,33 @@ background-color:rgb(255, 96, 99)
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>140</width>
-                  <height>60</height>
+                  <width>115</width>
+                  <height>43</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>140</width>
-                  <height>60</height>
+                  <width>115</width>
+                  <height>43</height>
                  </size>
                 </property>
                 <property name="styleSheet">
                  <string notr="true">
-
-#Btn_Venda:hover{
-	background-color:rgb(03,75,119);
-
+#Btn_Venda:hover {
+  background-color: rgb(03, 75, 119);
 }
-#Btn_Venda:pressed{
-background-color: rgb(153, 193, 241);
-}</string>
+#Btn_Venda:pressed {
+  background-color: rgb(153, 193, 241);
+}
+                 </string>
                 </property>
                 <property name="text">
                  <string>Vendas</string>
                 </property>
                 <property name="iconSize">
                  <size>
-                  <width>40</width>
-                  <height>40</height>
+                  <width>26</width>
+                  <height>26</height>
                  </size>
                 </property>
                </widget>
@@ -352,35 +340,74 @@ background-color: rgb(153, 193, 241);
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>140</width>
-                  <height>60</height>
+                  <width>115</width>
+                  <height>43</height>
                  </size>
                 </property>
                 <property name="maximumSize">
                  <size>
-                  <width>140</width>
-                  <height>60</height>
+                  <width>120</width>
+                  <height>43</height>
                  </size>
                 </property>
                 <property name="styleSheet">
                  <string notr="true">
-#Btn_Relatorios:hover{
-background-color:rgb(03,75,119);
+#Btn_Relatorios:hover {
+  background-color: rgb(03, 75, 119);
 }
-#Btn_Relatorios:pressed{
-
-	background-color: rgb(153, 193, 241);
-
+#Btn_Relatorios:pressed {
+  background-color: rgb(153, 193, 241);
 }
-</string>
+                 </string>
                 </property>
                 <property name="text">
                  <string>Relatórios</string>
                 </property>
                 <property name="iconSize">
                  <size>
-                  <width>40</width>
-                  <height>40</height>
+                  <width>26</width>
+                  <height>26</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="Btn_Orcamento">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>115</width>
+                  <height>43</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>115</width>
+                  <height>43</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">
+#Btn_Orcamento:hover {
+  background-color: rgb(03, 75, 119);
+}
+#Btn_Orcamento:pressed {
+  background-color: rgb(153, 193, 241);
+}
+                 </string>
+                </property>
+                <property name="text">
+                 <string>Orçamento</string>
+                </property>
+                <property name="iconSize">
+                 <size>
+                  <width>26</width>
+                  <height>26</height>
                  </size>
                 </property>
                </widget>
@@ -389,8 +416,8 @@ background-color:rgb(03,75,119);
                <widget class="QPushButton" name="Btn_Clientes">
                 <property name="minimumSize">
                  <size>
-                  <width>140</width>
-                  <height>60</height>
+                  <width>115</width>
+                  <height>43</height>
                  </size>
                 </property>
                 <property name="text">
@@ -398,8 +425,8 @@ background-color:rgb(03,75,119);
                 </property>
                 <property name="iconSize">
                  <size>
-                  <width>40</width>
-                  <height>40</height>
+                  <width>26</width>
+                  <height>26</height>
                  </size>
                 </property>
                </widget>
@@ -408,8 +435,8 @@ background-color:rgb(03,75,119);
                <widget class="QPushButton" name="Btn_Entradas">
                 <property name="minimumSize">
                  <size>
-                  <width>140</width>
-                  <height>60</height>
+                  <width>115</width>
+                  <height>43</height>
                  </size>
                 </property>
                 <property name="text">
@@ -421,8 +448,8 @@ background-color:rgb(03,75,119);
                 </property>
                 <property name="iconSize">
                  <size>
-                  <width>40</width>
-                  <height>40</height>
+                  <width>26</width>
+                  <height>26</height>
                  </size>
                 </property>
                </widget>
@@ -454,13 +481,42 @@ background-color:rgb(03,75,119);
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <widget class="CustomLineEdit" name="Ledit_Pesquisa">
           <property name="minimumSize">
            <size>
             <width>200</width>
-            <height>30</height>
+            <height>32</height>
            </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">
+QLineEdit {
+  background-color: white;
+  border: 1px solid rgb(175, 185, 205);
+  border-right: none;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+  padding: 2px 10px;
+  font-size: 12px;
+  color: rgb(45, 55, 75);
+}
+QLineEdit:focus {
+  border-color: rgb(43, 132, 191);
+  border-right: none;
+}
+           </string>
           </property>
           <property name="placeholderText">
            <string>  Pesquisar por descrição ou código de barras</string>
@@ -477,34 +533,65 @@ background-color:rgb(03,75,119);
           </property>
           <property name="minimumSize">
            <size>
-            <width>40</width>
-            <height>30</height>
+            <width>38</width>
+            <height>32</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>30</width>
-            <height>30</height>
+            <width>38</width>
+            <height>32</height>
            </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">
+QPushButton {
+  background-color: rgb(43, 132, 191);
+  border: 1px solid rgb(43, 132, 191);
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+QPushButton:hover {
+  background-color: rgb(13, 92, 161);
+  border-color: rgb(13, 92, 161);
+}
+QPushButton:pressed {
+  background-color: rgb(153, 193, 241);
+}
+           </string>
           </property>
           <property name="text">
            <string/>
           </property>
           <property name="iconSize">
            <size>
-            <width>20</width>
-            <height>20</height>
+            <width>18</width>
+            <height>18</height>
            </size>
           </property>
          </widget>
+        </item>
+        <item>
+         <spacer name="searchSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>
       <item>
        <widget class="QLabel" name="label">
         <property name="styleSheet">
-         <string notr="true">font: 700 9pt &quot;Segoe UI&quot;;
-font-size: 15px;</string>
+         <string notr="true">font: 700 9pt &quot;Segoe UI&quot;; font-size: 15px;</string>
         </property>
         <property name="text">
          <string>Produtos:</string>
@@ -536,9 +623,6 @@ font-size: 15px;</string>
         </property>
         <property name="autoFillBackground">
          <bool>false</bool>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
         </property>
         <property name="alternatingRowColors">
          <bool>true</bool>
@@ -580,20 +664,6 @@ font-size: 15px;</string>
      <height>20</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuGerarrelat_rios">
-    <property name="title">
-     <string>Relatórios</string>
-    </property>
-    <widget class="QMenu" name="menuGerar_lista_Produtos_PDF">
-     <property name="title">
-      <string>Gerar lista Produtos PDF</string>
-     </property>
-     <addaction name="actionTodos_Produtos"/>
-     <addaction name="actionApenas_NF"/>
-    </widget>
-    <addaction name="menuGerar_lista_Produtos_PDF"/>
-    <addaction name="actionGerar_Relat_rio_CSV"/>
-   </widget>
    <widget class="QMenu" name="menuVendas">
     <property name="title">
      <string>Vendas</string>
@@ -613,22 +683,16 @@ font-size: 15px;</string>
     <addaction name="actionDocumenta_o"/>
     <addaction name="actionSobre"/>
    </widget>
-   <widget class="QMenu" name="menuEmail">
-    <property name="title">
-     <string>Email</string>
-    </property>
-    <addaction name="actionEnviar"/>
-   </widget>
    <widget class="QMenu" name="menuFiscal">
     <property name="title">
      <string>Fiscal</string>
     </property>
     <addaction name="actionMonitor_Fiscal"/>
+    <addaction name="actionEnviar_Notas_Contador"/>
+    <addaction name="actionInutilizar_Numera_o_NF"/>
    </widget>
    <addaction name="menuEditar"/>
    <addaction name="menuVendas"/>
-   <addaction name="menuGerarrelat_rios"/>
-   <addaction name="menuEmail"/>
    <addaction name="menuFiscal"/>
    <addaction name="menuAjuda"/>
   </widget>
@@ -694,6 +758,16 @@ font-size: 15px;</string>
   <action name="actionMonitor_Fiscal">
    <property name="text">
     <string>Monitor Fiscal</string>
+   </property>
+  </action>
+  <action name="actionEnviar_Notas_Contador">
+   <property name="text">
+    <string>Enviar Notas ao Contador</string>
+   </property>
+  </action>
+  <action name="actionInutilizar_Numera_o_NF">
+   <property name="text">
+    <string>Inutilizar Numeração NF</string>
    </property>
   </action>
  </widget>

@@ -7,10 +7,10 @@
 DanfeUtil::DanfeUtil(QObject *parent)
     : QObject{parent}
 {
-    QStringList dataLocations = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
+    QStringList dataLocations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
     for (const QString &basePath : dataLocations) {
-        QString candidateNfe = basePath + "/QEstoqueLoja/reports/DANFE-NFe.xml";
-        QString candidateNFCe = basePath + "/QEstoqueLoja/reports/DANFE-NFCe.xml";
+        QString candidateNfe = basePath + "/reports/DANFE-NFe.xml";
+        QString candidateNFCe = basePath + "/reports/DANFE-NFCe.xml";
         if (QFileInfo::exists(candidateNfe)) {
             caminhoReportNFe = candidateNfe;
             caminhoReportNFCe = candidateNFCe;
@@ -18,11 +18,11 @@ DanfeUtil::DanfeUtil(QObject *parent)
         }
     }
 
-    //caminhoReportNFe = QStandardPaths::AppConfigLocation(QStandardPaths::GenericDataLocation) + "/reports/DANFE-NFe.xml";
-    //caminhoReportNFCe = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/reports/DANFE-NFCe.xml";
-    empresaValues = Configuracao::get_All_Empresa_Values();
+
+    Config_service *confServ = new Config_service(this);
+    configDTO = confServ->carregarTudo();
     QString caminhoCompletoLogo = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
-                              "/imagens/" + QFileInfo(empresaValues.value("caminho_logo_empresa")).fileName();
+                              "/imagens/" + QFileInfo(configDTO.logoPathEmpresa).fileName();
     caminhoLogo = caminhoCompletoLogo;
 }
 bool DanfeUtil::abrirDanfe(int idVenda){

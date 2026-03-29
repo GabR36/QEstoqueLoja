@@ -21,7 +21,7 @@ private:
     QSqlDatabase db;
 
     void configurar();
-    int getIdProdSelected();
+    QString getIdProdSelected();
     void verProd();
 };
 

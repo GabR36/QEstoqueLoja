@@ -17,17 +17,16 @@
 #include <QStringListModel>
 #include "inserircliente.h"
 #include "infojanelaprod.h"
-
+#include "../services/Produto_service.h"
+#include "services/config_service.h"
 
 venda::venda(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::venda)
 {
     ui->setupUi(this);
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. construtor venda.";
-    }
-    modeloProdutos->setQuery("SELECT * FROM produtos");
+
+    prodServ.listarProdutos(modeloProdutos);
     ui->Tview_Produtos->setModel(modeloProdutos);
     modeloProdutos->setHeaderData(0, Qt::Horizontal, tr("ID"));
     modeloProdutos->setHeaderData(1, Qt::Horizontal, tr("Quantidade"));
@@ -54,7 +53,6 @@ venda::venda(QWidget *parent) :
 
 
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
-    db.close();
 
     modeloSelecionados->setHorizontalHeaderItem(0, new QStandardItem("ID Produto"));
     modeloSelecionados->setHorizontalHeaderItem(1, new QStandardItem("Quantidade Vendida"));
@@ -88,20 +86,10 @@ venda::venda(QWidget *parent) :
     ui->Tview_ProdutosSelecionados->setColumnWidth(3, 160);
     ui->Tview_ProdutosSelecionados->setColumnWidth(4, 200);
 
-
-
-   // ui->Tview_ProdutosSelecionados->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
-
-    //ui->Tview_Produtos->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
     // colocar a data atual no dateEdit
     ui->DateEdt_Venda->setDateTime(QDateTime::currentDateTime());
 
     // setar o foco no codigo de barras
-
-
-
 
     //actionMenu contextMenu
     actionMenuDeletarProd = new QAction(this);
@@ -110,14 +98,8 @@ venda::venda(QWidget *parent) :
     actionMenuDeletarProd->setIcon(deletar);
     connect(actionMenuDeletarProd,SIGNAL(triggered(bool)),this,SLOT(deletarProd()));
 
-
     //torna a tabela editavel
     ui->Tview_ProdutosSelecionados->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked);
-
-
-
-
-
 
     ui->Btn_SelecionarProduto->setEnabled(false);
 
@@ -126,13 +108,9 @@ venda::venda(QWidget *parent) :
         atualizarTotalProduto();
     });
 
-
     QCompleter *completer = new QCompleter(this);
     completer->setCaseSensitivity(Qt::CaseInsensitive); // Ignorar maiúsculas e minúsculas
     completer->setFilterMode(Qt::MatchContains); // Sugestões que contêm o texto digitado
-
-
-
 
     atualizarListaCliente();
 
@@ -140,7 +118,6 @@ venda::venda(QWidget *parent) :
         // Define o primeiro item da lista como texto do QLineEdit
         ui->Ledit_Cliente->setText(clientesComId.first());
 
-        // Isso depende do formato que você está usando ("Nome (ID: 123)")
         QString primeiroCliente = clientesComId.first();
         int posInicioNome = 0;
         int posFinalNome = primeiroCliente.indexOf(" (ID:"); // Encontra onde começa o ID
@@ -167,21 +144,25 @@ venda::venda(QWidget *parent) :
         validarCliente(true); // Mostra mensagens para o usuário
     });
 
-    fiscalValues = Configuracao::get_All_Fiscal_Values();
-    QString tipoAmb = fiscalValues.value("tp_amb");
-    QString emitirNf = fiscalValues.value("emit_nf");
 
-    if (tipoAmb == "1" && emitirNf == "1") {
-        ui->Lbl_TpAmb->setText("🟢 Amb: Produção");
+    Config_service *confServ = new Config_service(this);
+
+    configDTO = confServ->carregarTudo();
+    bool tipoAmb = configDTO.tpAmbFiscal;
+    bool emitirNf = configDTO.emitNfFiscal;
+
+    if (tipoAmb == 1 && emitirNf == 1) {
+        ui->Lbl_TpAmb->setText("Ambiente: Produção");
         ui->Lbl_TpAmb->setStyleSheet("color: white; background-color: green; font-weight: bold; padding: 4px; border-radius: 5px;");
-    } else if(emitirNf == "1"){
-        ui->Lbl_TpAmb->setText("🟠 Amb: Homologação");
+    } else if(emitirNf == 1){
+        ui->Lbl_TpAmb->setText("Ambiente: Homologação");
         ui->Lbl_TpAmb->setStyleSheet("color: white; background-color: orange; font-weight: bold; padding: 4px; border-radius: 5px;");
     }
     connect(ui->Tview_Produtos, &QTableView::doubleClicked,
             this, &venda::verProd);
     ui->Ledit_Pesquisa->setFocus();
 }
+
 void venda::atualizarTotalProduto() {
     for (int row = 0; row < modeloSelecionados->rowCount(); ++row) {
         double totalproduto = 0.0;
@@ -203,28 +184,17 @@ void venda::atualizarTotalProduto() {
             );
     }
 }
-void venda::atualizarListaCliente(){
-    clientesComId.clear(); // Limpa a lista antes de recarregar
 
-    if (!db.open()) {
-        qDebug() << "Erro ao conectar ao banco de dados para autocompletar nomes.";
-    } else {
-        // Consultar nomes e IDs da tabela "clientes"
-        QSqlQuery query("SELECT id, nome FROM clientes");
+void venda::atualizarListaCliente()
+{
+    clientesComId = cliServ.listarClientesParaCompleter();
 
-        while (query.next()) {
-            int id = query.value(0).toInt();
-            QString nome = query.value(1).toString();
-            // Formatar como "Nome (ID: 123)"
-            clientesComId << QString("%1 (ID: %2)").arg(nome).arg(id);
-        }
-        db.close();
-    }
-
-    // Atualizar o completer
     QCompleter *completer = ui->Ledit_Cliente->completer();
+
     if (completer) {
-        QStringListModel *model = qobject_cast<QStringListModel*>(completer->model());
+        QStringListModel *model =
+            qobject_cast<QStringListModel*>(completer->model());
+
         if (model) {
             model->setStringList(clientesComId);
         }
@@ -236,71 +206,51 @@ venda::~venda()
 {
     delete ui;
 }
-int venda::validarCliente(bool mostrarMensagens) {
-    QString texto = ui->Ledit_Cliente->text().trimmed();
+qlonglong venda::validarCliente(bool mostrarMensagens)
+{
+    auto resultado =
+        cliServ.validarClienteTexto(ui->Ledit_Cliente->text());
 
-   // Se o campo estiver vazio
-    if (texto.isEmpty()) {
-        if (mostrarMensagens) {
-            QMessageBox::warning(this, "Cliente não informado", "Por favor, informe o cliente!");
-            ui->Ledit_Cliente->setFocus();
-        }
-        return -1; // Código de erro para campo vazio
-    }
+    if(!resultado.ok)
+    {
+        if(mostrarMensagens)
+        {
+            switch(resultado.erro)
+            {
+            case ClienteErro::CampoVazio:
+                QMessageBox::warning(this,"Cliente",
+                                     "Por favor informe o cliente.");
+                ui->Ledit_Cliente->setFocus();
+                break;
 
-    // Extrai nome e ID do texto digitado
-    auto [nome, id] = extrairNomeId(texto);
-
-    // Verifica formato válido
-    if (id == -1) {
-        // Tenta encontrar o cliente mais próximo no banco de dados
-        if (!db.open()) {
-            if (mostrarMensagens) {
-                qDebug() << "Erro ao abrir banco de dados";
-                QMessageBox::warning(this, "Erro", "Não foi possível validar o cliente!");
-            }
-            return -2; // Código de erro para falha no banco de dados
-        }
-
-        QSqlQuery query;
-        query.prepare("SELECT id, nome FROM clientes WHERE nome LIKE :nome ORDER BY LENGTH(nome) ASC LIMIT 1");
-        query.bindValue(":nome", "%" + texto + "%");
-
-        if (query.exec() && query.next()) {
-            int foundId = query.value(0).toInt();
-            QString foundName = query.value(1).toString();
-            ui->Ledit_Cliente->setText(QString("%1 (ID: %2)").arg(foundName).arg(foundId));
-            db.close();
-            return foundId; // Retorna o ID encontrado
-        } else {
-            db.close();
-            if (mostrarMensagens) {
-                QMessageBox::warning(this, "Cliente não encontrado",
-                                     "Nenhum cliente correspondente foi encontrado.\n"
-                                     "Digite no formato: Nome (ID: 123) ou selecione uma sugestão.");
+            case ClienteErro::InsercaoInvalida:
+                QMessageBox::warning(this,"Cliente",
+                                     "Cliente não encontrado.");
                 ui->Ledit_Cliente->clear();
                 ui->Ledit_Cliente->setFocus();
+                break;
+
+            case ClienteErro::QuebraDeRegra:
+                QMessageBox::warning(this,"Cliente",
+                                     "Nome não corresponde ao ID.");
+                ui->Ledit_Cliente->selectAll();
+                ui->Ledit_Cliente->setFocus();
+                break;
+
+            default:
+                QMessageBox::warning(this,"Erro",
+                                     resultado.msg);
             }
-            return -3; // Código de erro para cliente não encontrado
         }
+
+        return -1;
     }
 
-    // Verifica correspondência entre nome e ID
-    if (!verificarNomeIdCliente(nome, id)) {
-        if (mostrarMensagens) {
-            QMessageBox::warning(this, "Dados inválidos",
-                                 "O nome não corresponde ao ID informado!\n"
-                                 "Por favor, corrija ou selecione uma sugestão válida.");
-            ui->Ledit_Cliente->selectAll();
-            ui->Ledit_Cliente->setFocus();
-        }
-        return -4; // Código de erro para nome e ID não correspondentes
-    }
+    if(!resultado.nomeCorrigido.isEmpty())
+        ui->Ledit_Cliente->setText(resultado.nomeCorrigido);
 
-    return id; // Retorna o ID válido
+    return resultado.clienteId;
 }
-
-
 
 void venda::on_Btn_SelecionarProduto_clicked()
 {
@@ -330,13 +280,11 @@ void venda::on_Btn_SelecionarProduto_clicked()
     ui->Lbl_Total->setText(Total());
 }
 
-
 void venda::handleSelectionChange(const QItemSelection &selected, const QItemSelection &deselected) {
     // Este slot é chamado sempre que a seleção na tabela muda
     Q_UNUSED(deselected);
-
-
 }
+
 void venda::handleSelectionChangeProdutos(const QItemSelection &selected, const QItemSelection &deselected){
     if (selected.indexes().isEmpty()) {
         qDebug() << "Nenhum registro selecionado.";
@@ -381,149 +329,87 @@ void venda::focusInEvent(QFocusEvent *event)
     ui->Ledit_Cliente->setReadOnly(false); // Permite edição ao focar
 }
 
-
-
 void venda::on_Btn_Pesquisa_clicked()
 {
-
     QString inputText = ui->Ledit_Pesquisa->text();
-    QString normalizadoPesquisa = MainWindow::normalizeText(inputText);
 
-    // Dividir a string em palavras usando split por espaços em branco
-    QStringList palavras = normalizadoPesquisa.split(" ", Qt::SkipEmptyParts);
+    prodServ.pesquisar(inputText, modeloProdutos);
 
-    // Exibir as palavras separadas no console (opcional)
-    // qDebug() << "Palavras separadas:";
-    // for (const QString& palavra : palavras) {
-    //     qDebug() << palavra;
-    // }
-
-    if (!db.open()) {
-        qDebug() << "Erro ao abrir banco de dados. Botão Pesquisar.";
+    if (!modeloProdutos) {
+        QMessageBox::warning(this, "Erro", "Erro ao realizar a pesquisa.");
         return;
     }
-
-
-
-    // Construir consulta SQL dinâmica
-    QString sql = "SELECT * FROM produtos WHERE ";
-    QStringList conditions;
-    if (palavras.length() > 1){
-        for (const QString &palavra : palavras) {
-            conditions << QString("descricao LIKE '%%1%'").arg(palavra);
-
-        }
-
-        sql += conditions.join(" AND ");
-
-    }else{
-        sql += "descricao LIKE '%" + normalizadoPesquisa + "%'  OR codigo_barras LIKE '%" + normalizadoPesquisa + "%'";
-    }
-    sql += " ORDER BY id DESC";
-
-    // Executar a consulta
-    modeloProdutos->setQuery(sql, db);
-
-
-    // Mostrar na tableview a consulta
-    // CustomDelegate *delegate = new CustomDelegate(this);
-    // ui->Tview_Produtos->setItemDelegate(delegate);
-    ui->Tview_Produtos->setModel(modeloProdutos);
-
-    db.close();
 }
 
+QList<ProdutoVendidoDTO> venda::obterProdutosSelecionados()
+{
+    QList<ProdutoVendidoDTO> lista;
 
-bool venda::verificarNomeIdCliente(const QString &nome, int id) {
-    if (!db.open()) {
-        qDebug() << "Erro ao conectar ao banco de dados";
-        return false;
+    QLocale brasil(QLocale::Portuguese, QLocale::Brazil);
+
+    for (int row = 0; row < modeloSelecionados->rowCount(); ++row)
+    {
+        ProdutoVendidoDTO prod;
+
+        prod.idProduto =
+            modeloSelecionados->data(modeloSelecionados->index(row,0)).toLongLong();
+
+        QString quantTexto =
+            modeloSelecionados->data(modeloSelecionados->index(row,1)).toString();
+
+        QString descricao =
+            modeloSelecionados->data(modeloSelecionados->index(row,2)).toString();
+
+        QString precoTexto =
+            modeloSelecionados->data(modeloSelecionados->index(row,3)).toString();
+
+        prod.quantidade = brasil.toDouble(quantTexto);
+        prod.precoVendido = brasil.toDouble(precoTexto);
+
+        prod.descricao = descricao;
+        // prod.total = prod.quantidade * prod.precoUnitario;
+
+        lista.append(prod);
     }
 
-    QSqlQuery query;
-    query.prepare("SELECT nome FROM clientes WHERE id = :id");
-    query.bindValue(":id", id);
-
-    if (!query.exec()) {
-        qDebug() << "Erro na consulta:";
-        db.close();
-        return false;
-    }
-
-    if (query.next()) {
-        QString nomeNoBanco = query.value(0).toString();
-        db.close();
-        return nomeNoBanco.compare(nome, Qt::CaseInsensitive) == 0;
-    }
-
-    db.close();
-    return false;
+    return lista;
 }
-
-QPair<QString, int> venda::extrairNomeId(const QString &texto) {
-        QRegularExpression regex("^(.*?)\\s*\\(ID:\\s*(\\d+)\\)$");
-        QRegularExpressionMatch match = regex.match(texto);
-
-        if (match.hasMatch()) {
-            return qMakePair(match.captured(1).trimmed(), match.captured(2).toInt());
-        }
-        return qMakePair(QString(), -1); // Retorno inválido
-}
-
-
-
 
 void venda::on_Btn_Aceitar_clicked()
 {
-    int idCliente = validarCliente(true);
-    if (idCliente < 0) { // Se retornou algum código de erro
+    qlonglong idCliente = validarCliente(true);
+
+    if (idCliente < 0)
         return;
-    }
 
-    auto [nome, id] = extrairNomeId(ui->Ledit_Cliente->text());
+    auto [nome, id] =
+        cliServ.extrairNomeId(ui->Ledit_Cliente->text());
 
+    QList<ProdutoVendidoDTO> produtos =
+        obterProdutosSelecionados();
 
-    // pegar os valores da tabela dos produtos selecionados
-    QList<QList<QVariant>> rowDataList;
-    QLocale brasil(QLocale::Portuguese, QLocale::Brazil);        // Usa vírgula
-    QLocale americano(QLocale::English, QLocale::UnitedStates);  // Usa ponto
+    QString data =
+        portugues.toString(ui->DateEdt_Venda->dateTime(),
+                           "dd-MM-yyyy hh:mm:ss");
 
-    for (int row = 0; row < modeloSelecionados->rowCount(); ++row) {
-        QList<QVariant> rowData;
-        for (int col = 0; col < modeloSelecionados->columnCount() - 1; col++) {
+    pagamentoVenda *pagamento =
+        new pagamentoVenda(produtos,
+                           Total(),
+                           nome,
+                           data,
+                           idCliente);
 
-            QModelIndex index = modeloSelecionados->index(row, col);
-            QVariant valor = modeloSelecionados->data(index);
-
-            // Coluna 1 = quantidade
-            // Coluna 3 = preço
-            if (col == 1 || col == 3) {
-                QString texto = valor.toString();
-
-                // Converte string BR ("12,50") → double
-                double numero = brasil.toDouble(texto);
-
-                // Converte double → string US ("12.50")
-                texto = americano.toString(numero, 'f', 2);
-
-                rowData.append(texto);
-            } else {
-                rowData.append(valor);
-            }
-        }
-        rowDataList.append(rowData);
-    }
-
-    qDebug() << rowDataList;
-    //QString cliente = ui->Ledit_Cliente->text();
-    QString data =  portugues.toString(ui->DateEdt_Venda->dateTime(), "dd-MM-yyyy hh:mm:ss");
-    pagamentoVenda *pagamento = new pagamentoVenda(rowDataList, Total(), nome, data, idCliente);
     pagamento->setWindowModality(Qt::ApplicationModal);
-    connect(pagamento, &pagamento::pagamentoConcluido, this, &venda::vendaConcluida);
-    connect(pagamento, &pagamento::pagamentoConcluido, this, &venda::close);
 
+    connect(pagamento,
+            &pagamentoVenda::pagamentoConcluido,
+            this,
+            &venda::vendaConcluida);
 
-
+    connect(pagamento,
+            &pagamentoVenda::pagamentoConcluido,
+            this,
+            &venda::close);
 
     pagamento->show();
 }
@@ -554,48 +440,28 @@ void venda::on_Tview_ProdutosSelecionados_customContextMenuRequested(const QPoin
 
     menu.addAction(actionMenuDeletarProd);
 
-
-
     menu.exec(ui->Tview_ProdutosSelecionados->viewport()->mapToGlobal(pos));
 }
+
 void venda::deletarProd(){
     modeloSelecionados->removeRow(ui->Tview_ProdutosSelecionados->currentIndex().row());
     ui->Lbl_Total->setText(Total());
 }
-
 
 void venda::on_Ledit_Pesquisa_returnPressed()
 {
     // código de barras inserido
     // verificar se o codigo de barras ja existe
     QString barrasProduto = ui->Ledit_Pesquisa->text();
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. botao enviar.";
-    }
-    QSqlQuery query;
+    bool barrasExiste = prodServ.codigoBarrasExiste(barrasProduto);
 
-    query.prepare("SELECT COUNT(*) FROM produtos WHERE codigo_barras = :codigoBarras");
-    query.bindValue(":codigoBarras", barrasProduto);
-    if (!query.exec()) {
-        qDebug() << "Erro na consulta: contagem codigo barras";
-    }
-    query.next();
-    bool barrasExiste = query.value(0).toInt() > 0 && barrasProduto != "";
-    qDebug() << barrasProduto;
     if(barrasExiste){
         // o código existe
-        QSqlQuery query;
-
-        query.prepare("SELECT * FROM produtos WHERE codigo_barras = :codigoBarras");
-        query.bindValue(":codigoBarras", barrasProduto);
-        if (!query.exec()) {
-            qDebug() << "Erro na consulta: contagem codigo barras";
-        }
-        query.next();
-        QString idBarras = query.value(0).toString();
-        QString descBarras = query.value(2).toString();
+        ProdutoDTO prodBarras = prodServ.getProdutoPeloCodBarras(barrasProduto);
+        QString idBarras = QString::number(prodBarras.id);
+        QString descBarras = prodBarras.descricao;
         // preco na notacao br
-        QString precoBarras = portugues.toString(query.value(3).toFloat());
+        QString precoBarras = portugues.toString(prodBarras.preco);
         qDebug() << idBarras;
 
         // mostrar na tabela Selecionados
@@ -613,8 +479,6 @@ void venda::on_Ledit_Pesquisa_returnPressed()
     }
 }
 
-
-
 void venda::on_Btn_CancelarVenda_clicked()
 {
     this->close();
@@ -626,8 +490,6 @@ void venda::selecionarClienteNovo(){
 
         ui->Ledit_Cliente->setText(clientesComId.last());
 
-        // Opcional: selecionar apenas o nome (se quiser destacar parte do texto)
-        // Isso depende do formato que você está usando ("Nome (ID: 123)")
         QString ultimoCliente = clientesComId.last();
         int posInicioNome = 0;
         int posFinalNome = ultimoCliente.indexOf(" (ID:"); // Encontra onde começa o ID
@@ -648,7 +510,7 @@ void venda::on_Btn_NovoCliente_clicked()
     connect(inserirCliente, &InserirCliente::clienteInserido, this, &venda::selecionarClienteNovo);
     inserirCliente->show();
 }
-int venda::getIdProdSelected(){
+QString venda::getIdProdSelected(){
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
 
@@ -656,13 +518,13 @@ int venda::getIdProdSelected(){
         int selectedRow = selectedIndexes.first().row();
         QModelIndex idIndex = ui->Tview_Produtos->model()->index(selectedRow, 0);
 
-        int id = ui->Tview_Produtos->model()->data(idIndex).toInt();
+        QString id = ui->Tview_Produtos->model()->data(idIndex).toString();
         return id;
     }
 }
 
 void venda::verProd(){
-    int id = getIdProdSelected();
+    QString id = getIdProdSelected();
     InfoJanelaProd *janelaProd = new InfoJanelaProd(this, id);
     janelaProd->show();
 }

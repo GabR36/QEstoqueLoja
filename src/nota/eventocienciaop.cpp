@@ -4,14 +4,16 @@
 #include <QFile>
 #include <QDomDocument>
 #include <QDir>
+#include "../util/NfUtilidades.h"
+
 
 #define ID_LOTE 1
 
 EventoCienciaOP::EventoCienciaOP(QObject *parent, QString chnfe)
     : QObject{parent}
 {
-    empresaValues = Configuracao::get_All_Empresa_Values();
-    fiscalValues = Configuracao::get_All_Fiscal_Values();
+    Config_service *confServ = new Config_service(this);
+    configDTO = confServ->carregarTudo();
     chnfe_global = chnfe;
 
     acbr = AcbrManager::instance()->nfe();
@@ -19,7 +21,7 @@ EventoCienciaOP::EventoCienciaOP(QObject *parent, QString chnfe)
 
 void EventoCienciaOP::preencherEvento(){
     std::string dataHora = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm").toStdString();
-    QString cnpjemit = empresaValues.value("cnpj_empresa");
+    QString cnpjemit = configDTO.cnpjEmpresa;
 
     ini << "[EVENTO]\n";
     ini << "idLote=" << ID_LOTE << "\n";
@@ -74,10 +76,13 @@ QString EventoCienciaOP::gerarEnviar(){
 
 }
 
-EventoRetornoInfo EventoCienciaOP::gerarEnviarRetorno()
+EventoFiscalDTO EventoCienciaOP::gerarEnviarRetorno()
 {
     preencherEvento();
-    EventoRetornoInfo info;
+    EventoFiscalDTO evento;
+    evento.codigo = EVENTO_CIENCIA_OPERACAO;
+    evento.idLote = ID_LOTE;
+    evento.tipoEvento = "Ciencia de Operacao";
 
     try {
         acbr->LimparListaEventos();
@@ -109,7 +114,7 @@ EventoRetornoInfo EventoCienciaOP::gerarEnviarRetorno()
 
         // Remove duplicações tipo //
         eventoPath = QDir::cleanPath(eventoPath);
-        info.xmlPath = eventoPath;
+        evento.xmlPath = eventoPath;
 
 
         // 2. lê e parseia o XML completo
@@ -123,17 +128,17 @@ EventoRetornoInfo EventoCienciaOP::gerarEnviarRetorno()
                           .firstChildElement("retEvento")
                           .firstChildElement("infEvento");
 
-            info.cStat   = ev.firstChildElement("cStat").text();
-            info.xMotivo = ev.firstChildElement("xMotivo").text();
-            info.nProt   = ev.firstChildElement("nProt").text();
+            evento.cstat   = ev.firstChildElement("cStat").text();
+            evento.justificativa = ev.firstChildElement("xMotivo").text();
+            evento.nProt   = ev.firstChildElement("nProt").text();
 
         }
 
-        return info;
+        return evento;
     }
     catch (...) {
-        info.cStat = "-1";
-        info.xMotivo = "ERRO DESCONHECIDO";
-        return info;
+        evento.cstat = "-1";
+        evento.justificativa = "ERRO DESCONHECIDO";
+        return evento;
     }
 }

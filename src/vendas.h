@@ -10,7 +10,13 @@
 #include "entradasvendasprazo.h"
 #include "nota/DanfeUtil.h"
 #include "nota/nfeacbr.h"
-
+#include "services/vendas_service.h"
+#include "services/produtovenda_service.h"
+#include "services/notafiscal_service.h"
+#include "services/eventofiscal_service.h"
+#include "services/Produto_service.h"
+#include "services/fiscalemitter_service.h"
+#include "services/cliente_service.h"
 
 namespace Ui {
 class Vendas;
@@ -29,13 +35,11 @@ public:
     void atualizarTabelas();
     QLocale portugues;
     QList<QList<QVariant>> rowDataList;
-    static bool imprimirReciboVenda( QString idVenda);
-    static QStringList getProdutosVendidos( QString idVenda);
+    static bool imprimirReciboVenda(qlonglong idvenda);
     void actionAbrirPagamentosVenda(QString id_venda);
 
 
     void AtualizarTabelasSinal();
-    int getNfId(int id_venda);
     void deletarVenda(bool cancelarNf);
 public slots:
     void imprimirReciboVendaSelec(QString id); //precisa ser slot :(
@@ -54,17 +58,17 @@ private slots:
 
     void on_Tview_Vendas2_customContextMenuRequested(const QPoint &pos);
 
-    void on_testebutton_clicked();
-
     void on_cb_BuscaVendasPrazo_stateChanged(int arg1);
 
     void on_Btn_AbrirPag_clicked();
 
     void on_Tview_ProdutosVendidos_customContextMenuRequested(const QPoint &pos);
 
+    void on_cb_BuscaVendasPrazo_checkStateChanged(const Qt::CheckState &arg1);
+
 private:
     // void LabelLucro();
-    void LabelLucro(QString whereQueryData, QString whereQueryPrazo, QString whereQueryCliente);
+    void LabelLucro(QString de, QString ate);
     QSqlQueryModel *modeloProdVendidos = new QSqlQueryModel;
     QSqlQueryModel *modeloVendas2 = new QSqlQueryModel;
     Ui::Vendas *ui;
@@ -78,13 +82,18 @@ private:
     void Teste();
     QString idVendaSelec;
     void devolverProdutoVenda(QString id_venda, QString id_prod_vend);
-    void devolverProduto(QString id_prod_vend, QString id_produto, QString qntd);
-    void mostrarVendasCliente(int idCliente);
+    void mostrarVendasCliente(qlonglong idCliente);
     int IDCLIENTE = 0;
     void abrirDanfeXml(QString id_Venda);
     QString dataGlobal;
-    QString salvarEvento(QString retorno, int id_nf);
-    QString salvarDevolucaoNf(QString retornoEnvio, int idnf, NfeACBR *devolNfe);
+    Vendas_service vendaServ;
+    ProdutoVenda_service prodVendaServ;
+    NotaFiscal_service notaServ;
+    EventoFiscal_service eventoServ;
+    Produto_Service prodServ;
+    FiscalEmitter_service fiscalServ;
+    Cliente_service cliServ;
+
 signals:
     void vendaConcluidaVendas();
     void pagamentosConcluidos();

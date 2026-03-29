@@ -18,7 +18,9 @@ Clientes::Clientes(QWidget *parent)
 {
     ui->setupUi(this);
 
-    model->setQuery("SELECT * FROM clientes");
+
+    model = new QSqlQueryModel(this);
+    cliServ.listarClientes(model);
     ui->Tview_Clientes->setModel(model);
 
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
@@ -51,7 +53,6 @@ Clientes::~Clientes()
 
 void Clientes::on_Btn_Alterar_clicked()
 {
-    qDebug() << "Teste";
     if(ui->Tview_Clientes->selectionModel()->isSelected(ui->Tview_Clientes->currentIndex())){
         // obter id selecionado
         QItemSelectionModel *selectionModel = ui->Tview_Clientes->selectionModel();
@@ -74,6 +75,11 @@ void Clientes::on_Btn_Alterar_clicked()
     }
 }
 
+void Clientes::atualizarTabelaClientes(){
+    cliServ.listarClientes(model);
+}
+
+
 
 void Clientes::on_Btn_Deletar_clicked()
 {
@@ -93,22 +99,13 @@ void Clientes::on_Btn_Deletar_clicked()
             QItemSelectionModel *selectionModel = ui->Tview_Clientes->selectionModel();
             QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
             QVariant idVariant = ui->Tview_Clientes->model()->data(ui->Tview_Clientes->model()->index(selectedIndex.row(), 0));
-            QString clienteId = idVariant.toString();
+            qlonglong clienteId = idVariant.toLongLong();
 
-            if(clienteId.toInt() > 1){
-                // query para deletar a partir do id
-                db.open();
-                QSqlQuery query;
-                query.prepare("DELETE FROM clientes WHERE id = :valor1");
-                query.bindValue(":valor1", clienteId);
-                query.exec();
-
-                // atualizar
-                model->setQuery("SELECT * FROM clientes");
+            auto result = cliServ.deletarCliente(clienteId);
+            if(!result.ok){
+                QMessageBox::warning(this,"Erro",result.msg);
             }else{
-                QMessageBox::warning(this,"Erro","Não é possivel deletar o cliente 1!");
-                return;
-
+                atualizarTabelaClientes();
             }
         }
     }
@@ -127,152 +124,23 @@ void Clientes::on_Btn_Novo_clicked()
     inserircliente->show();
 }
 void Clientes::atualizarTableview(){
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. atualizarTableView";
-    }
-    model->setQuery("SELECT * FROM clientes");
-
-    db.close();
-}
-int Clientes::getQuantCompras(int idCliente){
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. geQuantVendas";
-    }
-
-    QSqlQuery query;
-    query.prepare("SELECT * FROM vendas2 where id_cliente = :id");
-    query.bindValue(":id", idCliente);
-    int index = 0;
-
-    query.exec();
-    while(query.next()){
-        index += 1;
-    }
-    return index;
-
-}
-QString Clientes::getDataUltimoPagamento(int idCliente){
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. getUltimoPagamento";
-    }
-    QSqlQuery query;
-
-    query.prepare("SELECT ev.data_hora "
-        "FROM entradas_vendas ev "
-        "JOIN vendas2 v ON ev.id_venda = v.id "
-        "WHERE v.id_cliente = :id "
-        "ORDER BY ev.data_hora DESC "
-        "LIMIT 1;");
-    query.bindValue(":id", idCliente);
-
-    if(!query.exec()) {
-        qDebug() << "Erro na query:" << query.lastError().text();
-        db.close();
-        return QString();
-    }
-
-    QDateTime data;
-    if(query.next()) {
-        data = query.value(0).toDateTime();
-    } else {
-        db.close();
-        return QString("Nenhum pagamento encontrado");
-    }
-    db.close();
-
-    QString resultado = portugues.toString(data, "dddd, dd/MM/yyyy");
-
-    return resultado;
-
-
-}
-
-double Clientes::getValorUltimoPagamento(int idCliente){
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. getValorUltimoPagamento";
-    }
-    QSqlQuery query;
-
-        query.prepare("SELECT ev.valor_final "
-            "FROM entradas_vendas ev "
-            "JOIN vendas2 v ON ev.id_venda = v.id "
-            "WHERE v.id_cliente = :id "
-            "ORDER BY ev.data_hora DESC "
-            "LIMIT 1;");
-    query.bindValue(":id", idCliente);
-
-    if(!query.exec()) {
-        qDebug() << "Erro na query:" << query.lastError().text();
-        db.close();
-        return 0;
-    }
-    double valor;
-    if(query.next()) {
-        valor = query.value(0).toDouble();
-    } else {
-        db.close();
-        return 0;
-    }
-    db.close();
-
-    return valor;
-}
-double Clientes::getValorDevido(int idCliente) {
-    if (!db.open()) {
-        qDebug() << "Erro ao abrir banco de dados";
-        return 0.0;
-    }
-
-    // 1. Soma o valor_final de todas as vendas do cliente
-    QSqlQuery queryVendas;
-    queryVendas.prepare(
-        "SELECT SUM(valor_final) FROM vendas2 "
-        "WHERE id_cliente = :id_cliente AND "
-        "forma_pagamento = 'Prazo'"
-        );
-    queryVendas.bindValue(":id_cliente", idCliente);
-
-    double totalVendas = 0.0;
-    if (queryVendas.exec() && queryVendas.next()) {
-        totalVendas = queryVendas.value(0).toDouble();
-    } else {
-        qDebug() << "Erro ao calcular total de vendas:" << queryVendas.lastError().text();
-        db.close();
-        return 0.0;
-    }
-
-    // 2. Soma o valor de todas as entradas relacionadas às vendas do cliente
-    QSqlQuery queryEntradas;
-    queryEntradas.prepare(
-        "SELECT SUM(ev.valor_final) FROM entradas_vendas ev "
-        "JOIN vendas2 v ON ev.id_venda = v.id "
-        "WHERE v.id_cliente = :id_cliente"
-        );
-    queryEntradas.bindValue(":id_cliente", idCliente);
-
-    double totalEntradas = 0.0;
-    if (queryEntradas.exec() && queryEntradas.next()) {
-        totalEntradas = queryEntradas.value(0).toDouble();
-    } else {
-        qDebug() << "Erro ao calcular total de entradas:" << queryEntradas.lastError().text();
-        db.close();
-        return 0.0;
-    }
-
-    db.close();
-
-    // 3. Calcula o valor devido
-    double valorDevido = totalVendas - totalEntradas;
-    qDebug() << "Valor devido para cliente" << idCliente << ":" << valorDevido;
-
-    return valorDevido;
+    atualizarTabelaClientes();
 }
 
 void Clientes::atualizarInfosSinal(){
-    ui->Lbl_QuantCompras->setText(QString::number(getQuantCompras(IDCLIENTE)));
-    ui->Lbl_DataUltimoPag->setText(getDataUltimoPagamento(IDCLIENTE));
-    ui->Lbl_ValorUltimoPag->setText("R$ " + portugues.toString(getValorUltimoPagamento(IDCLIENTE)));
-    ui->Lbl_valorTotalDevido->setText("R$ " + portugues.toString(getValorDevido(IDCLIENTE)));
+
+
+    qlonglong idCliente = IDCLIENTE;
+    QDateTime dataUltimoPag = entradaServ.getDataUltimoPagamentoFromCliente(idCliente);
+    QString dataFormatada = portugues.toString(dataUltimoPag, "dddd, dd/MM/yyyy");
+    QString ValorTotalDevidoFormatado = portugues.toString(financeiroServ.getValorTotalDevidoFromCliente(idCliente));
+    QString valorUltimoPagFormatado = portugues.toString(entradaServ.getValorUltimoPagamentoFromCliente(idCliente));
+    QString quantCompras = QString::number(vendaServ.getQuantidadeComprasCliente(idCliente));
+
+    ui->Lbl_QuantCompras->setText(quantCompras);
+    ui->Lbl_DataUltimoPag->setText(dataFormatada);
+    ui->Lbl_ValorUltimoPag->setText("R$ " + valorUltimoPagFormatado);
+    ui->Lbl_valorTotalDevido->setText("R$ " + ValorTotalDevidoFormatado);
 }
 void Clientes::on_Btn_abrirCompras_clicked()
 {
@@ -299,36 +167,25 @@ void Clientes::on_Btn_abrirCompras_clicked()
 void Clientes::atualizarInfos(const QItemSelection &selected, const QItemSelection &)
 {
     if (!selected.indexes().isEmpty()) {
-        QModelIndex index = selected.indexes().first();  // Pega a primeira célula selecionada
-        int idCliente = model->data(model->index(index.row(), 0)).toInt(); // Coluna 0 = id
-        IDCLIENTE = idCliente;
-        ui->Lbl_QuantCompras->setText(QString::number(getQuantCompras(idCliente)));
-        ui->Lbl_DataUltimoPag->setText(getDataUltimoPagamento(idCliente));
-        ui->Lbl_ValorUltimoPag->setText("R$ " + portugues.toString(getValorUltimoPagamento(idCliente)));
-        ui->Lbl_valorTotalDevido->setText("R$ " + portugues.toString(getValorDevido(idCliente)));
 
+        QModelIndex index = selected.indexes().first();  // Pega a primeira célula selecionada
+        qlonglong idCliente = model->data(model->index(index.row(), 0)).toLongLong(); // Coluna 0 = id
+        QDateTime dataUltimoPag = entradaServ.getDataUltimoPagamentoFromCliente(idCliente);
+        QString dataFormatada = portugues.toString(dataUltimoPag, "dddd, dd/MM/yyyy");
+        QString ValorTotalDevidoFormatado = portugues.toString(financeiroServ.getValorTotalDevidoFromCliente(idCliente));
+        QString valorUltimoPagFormatado = portugues.toString(entradaServ.getValorUltimoPagamentoFromCliente(idCliente));
+        QString quantCompras = QString::number(vendaServ.getQuantidadeComprasCliente(idCliente));
+        IDCLIENTE = idCliente;
+        ui->Lbl_QuantCompras->setText(quantCompras);
+        ui->Lbl_DataUltimoPag->setText(dataFormatada);
+        ui->Lbl_ValorUltimoPag->setText("R$ " + valorUltimoPagFormatado);
+        ui->Lbl_valorTotalDevido->setText("R$ " + ValorTotalDevidoFormatado);
     }
 }
 
 void Clientes::on_Ledit_Pesquisa_textChanged(const QString &arg1)
 {
     QString inputText = ui->Ledit_Pesquisa->text();
-   // QString normalizadoPesquisa = MainWindow::normalizeText(inputText);
-
-    if (!db.open()) {
-        qDebug() << "Erro ao abrir banco de dados. Botão Pesquisar.";
-        return;
-    }
-
-    QString sql = "SELECT * FROM clientes WHERE nome LIKE '%" + inputText + "%' ORDER BY id DESC";
-
-    // Executar a consulta
-    model->setQuery(sql, db);
-    if (model->lastError().isValid()) {
-        qDebug() << "Erro ao executar consulta:" << model->lastError().text();
-    }
-
-
-    db.close();
+    cliServ.pesquisar(model, inputText);
 }
 

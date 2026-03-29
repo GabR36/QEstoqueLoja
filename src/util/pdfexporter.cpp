@@ -1,215 +1,280 @@
 #include "pdfexporter.h"
+#include <QChartView>
 #include <QPdfWriter>
 #include <QPainter>
+#include <QPageSize>
+#include <QPageLayout>
 #include <QSqlQuery>
 #include <QDesktopServices>
 #include <QLocale>
 #include <QUrl>
+#include <QFont>
+#include <QDate>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QMessageBox>
+#include <QGraphicsScene>
+#include <QAbstractBarSeries>
+#include <QBarSet>
+#include <QAbstractAxis>
+#include <QValueAxis>
+#include <QColor>
 
 PDFexporter::PDFexporter() {
 
 
 }
 
-void PDFexporter::exportarTodosProdutosParaPDF(const QString &fileName)
+void PDFexporter::exportarResumoContadorPdf(const QString &filePath,
+                                             QDateTime dtIni, QDateTime dtFim,
+                                             const QList<NotaFiscalDTO> &notas)
 {
-    QLocale portugues2;
+    QPdfWriter pdf(filePath);
+    pdf.setPageSize(QPageSize(QPageSize::A4));
+    pdf.setResolution(300);
 
-    QSqlDatabase db = QSqlDatabase::database();
+    QPainter painter(&pdf);
 
-    if (fileName.isEmpty())
-        return;
+    const int margemEsquerda   = 20;
+    const int margemTopo       = 120;
+    const int espacamentoLinha = 60;
+    int y = margemTopo;
 
-    if (!db.open()) {
-        qDebug() << "nao abriu bd";
-        return;
-    }
+    painter.setFont(QFont("Arial", 16, QFont::Bold));
+    painter.drawText(margemEsquerda, y,
+                     QString("NF Autorizadas no período de %1 até %2")
+                         .arg(dtIni.date().toString("dd/MM/yyyy"))
+                         .arg(dtFim.date().toString("dd/MM/yyyy")));
+    y += 80;
 
-    QPdfWriter writer(fileName);
-    writer.setPageSize(QPageSize(QPageSize::A4));
-    QPainter painter(&writer);
-    painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-    painter.setFont(QFont("Arial", 10, QFont::Bold));
+    painter.setFont(QFont("Arial", 11, QFont::Bold));
+    painter.drawText(margemEsquerda,        y, "Número");
+    painter.drawText(margemEsquerda + 250,  y, "Emissão");
+    painter.drawText(margemEsquerda + 500,  y, "Chave");
+    painter.drawText(margemEsquerda + 1700, y, "Valor Total");
+    painter.drawText(margemEsquerda + 2000, y, "Situação");
+    y += espacamentoLinha;
 
-    // Altura de linha e layout inicial
-    int lineHeight = 300;
-    int availableHeight = writer.height();
-    int startY = 1500;
+    painter.setFont(QFont("Arial", 11));
 
-    // Desenho do cabeçalho
-    QImage logo(":/QEstoqueLOja/mkaoyvbl.png");
-    painter.drawImage(QRect(100, 100, 2000, 400), logo);
-    painter.drawText(500, 1000, "Dados da Tabela Produtos:");
-    painter.drawText(1000, 1500, "ID");
-    painter.drawText(1600, 1500, "Quantidade");
-    painter.drawText(3000, 1500, "Descrição");
-    painter.drawText(8500, 1500, "Preço R$");
+    int    totalRegistros = 0;
+    double totalGeral     = 0.0;
+    QLocale ptBR(QLocale::Portuguese, QLocale::Brazil);
 
-    QSqlQuery query("SELECT * FROM produtos");
-    int row2 = 0;
-    double sumData4 = 0.0;
-
-    while (query.next()) {
-        QString data2 = query.value(1).toString();
-        QString data4 = query.value(3).toString();
-
-        float soma = (data2.toFloat() < 0) ? 0 : data4.toDouble() * data2.toFloat();
-        sumData4 += soma;
-        ++row2;
-    }
-
-    painter.drawText(5000, 1000, "total R$:" + portugues2.toString(sumData4, 'f', 2));
-    painter.drawText(8000, 1000, "total itens:" + QString::number(row2));
-
-    QSqlQuery query2("SELECT * FROM produtos");
-    int row = 1;
-    QFontMetrics metrics(painter.font());
-
-    while (query2.next()) {
-        QString data1 = query2.value(0).toString();
-        QString data2 = query2.value(1).toString();
-        QString data3 = query2.value(2).toString();
-        QString data4 = query2.value(3).toString();
-
-        QRect rect = metrics.boundingRect(QRect(0, 0, 4000, lineHeight), Qt::TextWordWrap, data3);
-        int textHeight = rect.height();
-
-        if (startY + lineHeight * row > availableHeight) {
-            writer.newPage();
-            startY = 100;
-            row = 1;
+    for (const NotaFiscalDTO &nota : notas) {
+        if (y + espacamentoLinha > pdf.height() - margemTopo) {
+            pdf.newPage();
+            y = margemTopo;
         }
 
-        painter.drawText(QRect(1000, startY + lineHeight * row, 4000, textHeight), data1);
-        painter.drawText(QRect(1600, startY + lineHeight * row, 4000, textHeight), portugues2.toString(data2.toDouble()));
-        painter.drawText(QRect(3000, startY + lineHeight * row, 4000, textHeight), Qt::TextWordWrap, data3);
-        painter.drawText(QRect(8500, startY + lineHeight * row, 4000, textHeight), portugues2.toString(data4.toDouble()));
+        int    cstat          = nota.cstat.toInt();
+        double valorParaTotal = nota.valorTotal;
+        QString situacao;
 
-        startY += textHeight;
-        ++row;
+        if (cstat == 135) {
+            situacao       = "CANCELADO";
+            valorParaTotal = 0;
+        } else if (nota.finalidade == "DEVOLUCAO") {
+            situacao       = "DEVOLUÇÃO";
+            valorParaTotal = -nota.valorTotal;
+        } else {
+            situacao = "AUTORIZADA";
+        }
+
+        QDate dataEmissao = QDateTime::fromString(nota.dhEmi, "yyyy-MM-dd HH:mm:ss").date();
+
+        painter.drawText(margemEsquerda,        y, QString::number(nota.nnf));
+        painter.drawText(margemEsquerda + 250,  y, dataEmissao.toString("dd/MM/yyyy"));
+        painter.drawText(margemEsquerda + 500,  y, nota.chNfe);
+        painter.drawText(margemEsquerda + 1700, y, ptBR.toCurrencyString(valorParaTotal));
+        painter.drawText(margemEsquerda + 2000, y, situacao);
+        painter.drawLine(margemEsquerda, y + 15, pdf.width() - margemEsquerda, y + 15);
+
+        totalRegistros++;
+        totalGeral += valorParaTotal;
+        y += espacamentoLinha;
     }
+
+    y += 60;
+    painter.setFont(QFont("Arial", 12, QFont::Bold));
+    painter.drawText(margemEsquerda, y,
+                     QString("Total de Registros: %1").arg(totalRegistros));
+    y += 40;
+    painter.drawText(margemEsquerda, y,
+                     QString("Valor Total Geral: %1").arg(ptBR.toCurrencyString(totalGeral)));
 
     painter.end();
-    db.close();
-
-    QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
 }
-void PDFexporter::exportarNfProdutosParaPDF(const QString &fileName){
 
-
-    QSqlDatabase db = QSqlDatabase::database();
-    QLocale portugues;
-
-    if (fileName.isEmpty())
-        return;
-
-    if (!db.open()) {
-        qDebug() << "nao abriu bd";
+void PDFexporter::exportarGraficoRelatorio(QWidget *parent, QChartView *chartView)
+{
+    if (!chartView) {
+        QMessageBox::information(parent, "Nada para exportar",
+            "Aplique o filtro antes de exportar.");
         return;
     }
 
-    QPdfWriter writer(fileName);
-    writer.setPageSize(QPageSize(QPageSize::A4));
-    QPainter painter(&writer);
-    painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing);
-    painter.setFont(QFont("Arial", 10, QFont::Bold));
+    QString filePath = QFileDialog::getSaveFileName(
+        parent,
+        "Salvar PDF",
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/relatorio.pdf",
+        "PDF (*.pdf)");
+    if (filePath.isEmpty()) return;
 
-    // Determinar a altura de uma linha e o espaço disponível na página
-    int lineHeight = 300; // Altura de uma linha
-    int availableHeight = writer.height(); // Altura disponível na página
-    int startY = 1500; // Define a coordenada Y inicial
+    QChart *chart = chartView->chart();
 
-    // Desenha os dados da tabela no PDF
-    QImage logo(":/QEstoqueLOja/mkaoyvbl.png");
-    painter.drawImage(QRect(100, 100, 2000, 400), logo);
-    painter.drawText(500, 1000,       "Dados da Tabela Produtos:");
-    painter.drawText(1000, 1500,       "ID");
-    painter.drawText(1600, 1500, "Quantidade");
-    painter.drawText(3000, 1500, "Descrição");
-    painter.drawText(8500, 1500, "Preço R$");
+    // Habilitar rótulos nas barras com cor escura legível
+    for (QAbstractSeries *series : chart->series()) {
+        auto *barSeries = qobject_cast<QAbstractBarSeries*>(series);
+        if (!barSeries) continue;
+        barSeries->setLabelsVisible(true);
+        barSeries->setLabelsPosition(QAbstractBarSeries::LabelsOutsideEnd);
+        barSeries->setLabelsFormat("@value");
+        for (QBarSet *barSet : barSeries->barSets())
+            barSet->setLabelColor(QColor(30, 30, 30));
+    }
 
-    QSqlQuery query("SELECT * FROM produtos");
-
-    int row2 = 1;
-    int rowNF = 1;
-    float sumData4 = 0.0;
-    while(query.next()){
-        QString data2 = query.value(1).toString(); // quant
-        QString data4 = query.value(3).toString(); // preco
-        int variantNf = query.value(5).toInt();
-
-        if(variantNf == 1){
-
-
-
-            // double preco = portugues.toDouble(data4.toString());
-            float soma;
-            if(data2.toFloat() < 0){
-                soma = data4.toDouble() * 0;
-            }else{
-                soma = data4.toDouble() * data2.toFloat(); // Converte o valor para double
-            }
-            sumData4 += soma; // Adiciona o valor à soma total
-            ++rowNF;
-
+    // Ampliar eixo Y 15% para acomodar rótulos acima das barras
+    double originalMaxY = -1;
+    for (QAbstractAxis *axis : chart->axes(Qt::Vertical)) {
+        auto *vAxis = qobject_cast<QValueAxis*>(axis);
+        if (vAxis) {
+            originalMaxY = vAxis->max();
+            vAxis->setMax(originalMaxY * 1.15);
+            break;
         }
+    }
 
-        ++row2;
+    // Renderizar
+    QPdfWriter pdf(filePath);
+    pdf.setPageLayout(QPageLayout(
+        QPageSize(QPageSize::A4),
+        QPageLayout::Landscape,
+        QMarginsF(10, 10, 10, 10),
+        QPageLayout::Millimeter));
+    pdf.setResolution(150);
+
+    QPainter painter(&pdf);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.fillRect(QRect(0, 0, pdf.width(), pdf.height()), Qt::white);
+
+    QGraphicsScene *scene = chartView->scene();
+    scene->render(&painter,
+                  QRectF(0, 0, pdf.width(), pdf.height()),
+                  scene->sceneRect());
+    painter.end();
+
+    // Restaurar estado original do gráfico na tela
+    for (QAbstractSeries *series : chart->series()) {
+        auto *barSeries = qobject_cast<QAbstractBarSeries*>(series);
+        if (barSeries) barSeries->setLabelsVisible(false);
+    }
+    if (originalMaxY > 0) {
+        for (QAbstractAxis *axis : chart->axes(Qt::Vertical)) {
+            auto *vAxis = qobject_cast<QValueAxis*>(axis);
+            if (vAxis) { vAxis->setMax(originalMaxY); break; }
+        }
+    }
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+}
+
+void PDFexporter::exportarTabelaRelatorio(QWidget *parent,
+                                          const QString &titulo,
+                                          const QList<QStringList> &linhas)
+{
+    if (linhas.size() < 2) {
+        QMessageBox::information(parent, "Sem dados", "Nenhum dado para exportar.");
+        return;
+    }
+
+    QString filePath = QFileDialog::getSaveFileName(
+        parent,
+        "Salvar PDF",
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/relatorio_inventario.pdf",
+        "PDF (*.pdf)");
+    if (filePath.isEmpty()) return;
+
+    QPdfWriter pdf(filePath);
+    pdf.setPageLayout(QPageLayout(
+        QPageSize(QPageSize::A4),
+        QPageLayout::Portrait,
+        QMarginsF(12, 15, 12, 15),
+        QPageLayout::Millimeter));
+    pdf.setResolution(150);
+
+    QPainter painter(&pdf);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    const int W          = pdf.width();
+    const int alturaLinha = 55;
+    const int margemTop  = 100;
+    const int margemLat  = 30;
+    const int conteudoW  = W - 2 * margemLat;
+
+    // Cabeçalho
+    const QStringList &cabecalho = linhas.first();
+    const int nCols = cabecalho.size();
+
+    // Distribuição proporcional das colunas: ID pequeno, Qtd pequeno, Descrição grande, Un médio, Preço médio
+    QVector<int> pesos(nCols, 10);
+    if (nCols == 5) { pesos = {5, 6, 35, 10, 14}; }
+    int pesoTotal = 0;
+    for (int p : pesos) pesoTotal += p;
+
+    QVector<int> larguras(nCols);
+    for (int i = 0; i < nCols; i++)
+        larguras[i] = conteudoW * pesos[i] / pesoTotal;
+
+    int y = margemTop;
+
+    auto desenharCabecalho = [&]() {
+        // Título
+        painter.setFont(QFont("Arial", 14, QFont::Bold));
+        painter.drawText(margemLat, y + 20, titulo);
+        y += 50;
+
+        // Linha de cabeçalho da tabela
+        painter.setFont(QFont("Arial", 9, QFont::Bold));
+        painter.fillRect(margemLat, y, conteudoW, alturaLinha, QColor(220, 220, 220));
+        int x = margemLat;
+        for (int i = 0; i < nCols; i++) {
+            painter.drawText(QRect(x + 5, y, larguras[i] - 10, alturaLinha),
+                             Qt::AlignVCenter | Qt::AlignLeft,
+                             cabecalho[i]);
+            x += larguras[i];
+        }
+        painter.drawRect(margemLat, y, conteudoW, alturaLinha);
+        y += alturaLinha;
     };
 
-    painter.drawText(5000, 1000,"total R$:" + portugues.toString(sumData4,'f',2));
-    painter.drawText(8000, 1000,"total itens:" + QString::number( rowNF));
+    desenharCabecalho();
 
-    QSqlQuery query2("SELECT * FROM produtos");
+    painter.setFont(QFont("Arial", 8));
+    const int maxY = pdf.height() - 80;
 
-
-
-
-    int row = 1;
-    //  double sumData4 = 0.0;
-
-    QFontMetrics metrics(painter.font());
-    while (query2.next()) {
-        QString data1 = query2.value(0).toString(); // id
-        QString data2 = query2.value(1).toString(); // quant
-        QString data3 = query2.value(2).toString(); // desc
-        QString data4 = query2.value(3).toString(); // preco
-        QString nf = query2.value(5).toString();
-
-
-
-        QRect rect = metrics.boundingRect(QRect(0, 0, 4000, lineHeight), Qt::TextWordWrap, data3);
-        int textHeight = rect.height();
-
-        // Verifica se há espaço suficiente na página atual para desenhar outra linha
-        if (startY + lineHeight * row > availableHeight) {
-            // Se não houver, inicie uma nova página
-            writer.newPage();
-            startY = 100; // Reinicie a coordenada Y inicial
-            row = 1; // Reinicie o contador de linha
+    for (int row = 1; row < linhas.size(); row++) {
+        if (y + alturaLinha > maxY) {
+            pdf.newPage();
+            y = margemTop;
+            desenharCabecalho();
         }
 
-        if(nf == "1"){
+        const QStringList &linha = linhas[row];
+        if (row % 2 == 0)
+            painter.fillRect(margemLat, y, conteudoW, alturaLinha, QColor(245, 245, 245));
 
-            // Desenhe os dados na página atual
-            painter.drawText(QRect(1000, startY + lineHeight * row, 4000, textHeight), data1); //stary = 1500
-            painter.drawText(QRect(1600, startY + lineHeight * row, 4000, textHeight), portugues.toString(data2.toDouble()));
-            painter.drawText(QRect(3000, startY + lineHeight * row, 4000, textHeight), Qt::TextWordWrap, data3); // data3 com quebra de linha
-            painter.drawText(QRect(8500, startY + lineHeight * row, 4000, textHeight), portugues.toString(data4.toDouble()));
-
-            startY += textHeight;
-
-            ++row;
+        int x = margemLat;
+        for (int i = 0; i < nCols && i < linha.size(); i++) {
+            painter.drawText(QRect(x + 5, y, larguras[i] - 10, alturaLinha),
+                             Qt::AlignVCenter | Qt::AlignLeft | Qt::TextWordWrap,
+                             linha[i]);
+            x += larguras[i];
         }
-
+        painter.drawLine(margemLat, y + alturaLinha, margemLat + conteudoW, y + alturaLinha);
+        y += alturaLinha;
     }
-    qDebug() << "row = " + row;
 
     painter.end();
-
-    db.close();
-
-    // Abre o PDF após a criação
-    QDesktopServices::openUrl(QUrl::fromLocalFile(fileName));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
 }
-

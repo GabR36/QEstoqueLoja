@@ -6,6 +6,8 @@
 #include <QLocale>
 #include <QSet>
 #include "util/ibptutil.h"
+#include "../services/Produto_service.h"
+#include "dto/Produto_dto.h"
 
 
 namespace Ui {
@@ -30,7 +32,7 @@ public:
     ~AlterarProduto();
     QLocale portugues;
 
-    void TrazerInfo(QString desc, QString quant, QString preco, QString barras, bool nf, QString ucom, QString precoforn, QString porcentlucro, QString ncm, QString cest, QString aliquotaimp, QString csosn, QString pis);
+    void TrazerInfo(const ProdutoDTO &produto);
 private slots:
     void on_Btn_AltAceitar_accepted();
 
@@ -44,11 +46,16 @@ private slots:
 
     void on_Ledit_AltPreco_textChanged(const QString &arg1);
 
-private:
+protected:
     Ui::AlterarProduto *ui;
+
+private:
     QSet<QString> generatedNumbers;
     bool atualizando = false;
     IbptUtil *util = new IbptUtil();
+    Produto_Service *produtoService;
+    QSqlDatabase db;
+
 signals:
     void produtoAlterado();
 };

@@ -12,14 +12,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>1200</width>
-    <height>600</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>16777215</width>
-    <height>16777215</height>
+    <width>900</width>
+    <height>500</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -27,702 +21,579 @@
   </property>
   <property name="styleSheet">
    <string notr="true">
-
-#relatorios{
-background-color: rgb(199, 199, 199);
-
+#relatorios {
+  background-color: rgb(199, 199, 199);
 }
-QPushButton{
-background-color: rgb(43, 132, 191);
-color: rgb(255, 255, 255);
-font-size: 15px;
-border-radius: 13px;
-
+QPushButton {
+  background-color: rgb(43, 132, 191);
+  color: rgb(255, 255, 255);
+  font-size: 13px;
+  border-radius: 10px;
 }
-QPushButton#Btn_CsvGerar{
-font: 700 9pt &quot;Segoe UI&quot;;
-background-color: rgb(43, 132, 191);
-color: rgb(255, 255, 255);
-font-size: 15px;
-border-radius: 13px;
-
-
+QPushButton:hover {
+  background-color: rgb(13, 92, 161);
 }
-
-QPushButton:hover{
-	background-color: rgb(13, 92, 161);
+QPushButton:pressed {
+  color: rgb(255, 255, 255);
+  background-color: rgb(153, 193, 241);
 }
-QPushButton:pressed{
-	
-color: rgb(255, 255, 255);
-	background-color: rgb(153, 193, 241);
-font-size: 15px;
-border-radius: 13px;
-}
-QTabWidget{
-background-color:rgb(222, 221, 218)
-}
-QGroupBox{
-background-color:rgb(170, 170, 170);
-	font: 700 9pt &quot;Segoe UI&quot;;
-	font-size: 15px;
-}
-</string>
+   </string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>8</number>
+   </property>
+   <property name="leftMargin">
+    <number>12</number>
+   </property>
+   <property name="topMargin">
+    <number>12</number>
+   </property>
+   <property name="rightMargin">
+    <number>12</number>
+   </property>
+   <property name="bottomMargin">
+    <number>12</number>
+   </property>
+   <item>
+    <layout class="QHBoxLayout" name="topBarLayout">
      <property name="spacing">
-      <number>0</number>
+      <number>10</number>
      </property>
      <item>
-      <widget class="QTabWidget" name="tabWidget">
+      <widget class="QLabel" name="label_2">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="styleSheet">
-        <string notr="true"/>
+        <string notr="true">font: 700 10pt &quot;Segoe UI&quot;;</string>
        </property>
-       <property name="currentIndex">
-        <number>1</number>
+       <property name="text">
+        <string>Tipo de Relatório:</string>
        </property>
-       <widget class="QWidget" name="tab_3">
-        <attribute name="title">
-         <string>Vendas</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
-         <item>
-          <widget class="QLabel" name="label_2">
-           <property name="styleSheet">
-            <string notr="true">font: 700 10pt &quot;Ubuntu&quot;;</string>
-           </property>
-           <property name="text">
-            <string>Tipo de Relatório:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-           <item>
-            <widget class="QComboBox" name="CBox_VendasMain">
-             <property name="styleSheet">
-              <string notr="true">font: 700 10pt &quot;Ubuntu&quot;;</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>Quantidade de vendas por período</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Valor de vendas por período</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Produtos mais vendidos</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Forma de Pagamento</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Nota Fiscal Valores</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Produtos que geram mais Lucro</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item>
-            <widget class="QStackedWidget" name="Stacked_Vendas">
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-             <property name="currentIndex">
-              <number>5</number>
-             </property>
-             <widget class="QWidget" name="page">
-              <layout class="QVBoxLayout" name="verticalLayout_8">
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_7">
-                 <item>
-                  <widget class="QLabel" name="label_4">
-                   <property name="text">
-                    <string>Período:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QComboBox" name="CBox_Periodo">
-                   <item>
-                    <property name="text">
-                     <string>Mes</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Ano</string>
-                    </property>
-                   </item>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout">
-                 <item>
-                  <widget class="QComboBox" name="CBox_Ano"/>
-                 </item>
-                 <item>
-                  <widget class="QComboBox" name="CBox_Mes"/>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QWidget" name="page_2">
-              <layout class="QVBoxLayout" name="verticalLayout_10">
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_9">
-                 <item>
-                  <widget class="QLabel" name="label_5">
-                   <property name="text">
-                    <string>Período:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QComboBox" name="CBox_periodoValor">
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <item>
-                    <property name="text">
-                     <string>Mes</string>
-                    </property>
-                   </item>
-                   <item>
-                    <property name="text">
-                     <string>Ano</string>
-                    </property>
-                   </item>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_2">
-                 <item>
-                  <widget class="QComboBox" name="CBox_AnoValor"/>
-                 </item>
-                 <item>
-                  <widget class="QComboBox" name="CBox_MesValor"/>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QWidget" name="page_5"/>
-             <widget class="QWidget" name="page_6">
-              <layout class="QVBoxLayout" name="verticalLayout_11">
-               <item>
-                <widget class="QComboBox" name="CBox_AnoFormaPagamento"/>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QWidget" name="page_7">
-              <layout class="QVBoxLayout" name="verticalLayout_19">
-               <item>
-                <widget class="QComboBox" name="CBox_AnoNfValor"/>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QWidget" name="page_8">
-              <layout class="QVBoxLayout" name="verticalLayout_20">
-               <item>
-                <widget class="QComboBox" name="CBox_AnoProdutoLucro"/>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
-       </widget>
-       <widget class="QWidget" name="tab_4">
-        <attribute name="title">
-         <string>Estoque</string>
-        </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_6">
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <item>
-            <widget class="QLabel" name="label_3">
-             <property name="styleSheet">
-              <string notr="true">font: 700 10pt &quot;Ubuntu&quot;;</string>
-             </property>
-             <property name="text">
-              <string>Tipo de Relatório:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="CBox_EstoqueMain">
-             <property name="styleSheet">
-              <string notr="true">font: 700 10pt &quot;Ubuntu&quot;;</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>Orçamento Produtos</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Lista Todos Produtos</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="QStackedWidget" name="Stacked_Estoque">
-           <property name="midLineWidth">
-            <number>0</number>
-           </property>
-           <property name="currentIndex">
-            <number>0</number>
-           </property>
-           <widget class="QWidget" name="page_3">
-            <layout class="QGridLayout" name="gridLayout_2">
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_11">
-               <property name="styleSheet">
-                <string notr="true">font: 700 15pt &quot;Ubuntu&quot;;</string>
-               </property>
-               <property name="text">
-                <string>Criar Orçamento para Cliente:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QGroupBox" name="groupBox">
-               <property name="maximumSize">
-                <size>
-                 <width>400</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="title">
-                <string/>
-               </property>
-               <layout class="QVBoxLayout" name="verticalLayout_18">
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_14">
-                  <item>
-                   <widget class="QLabel" name="label_7">
-                    <property name="styleSheet">
-                     <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
-                    </property>
-                    <property name="text">
-                     <string>Pesquisar:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="CustomLineEdit" name="Ledit_PesquisaProduto">
-                    <property name="maximumSize">
-                     <size>
-                      <width>1231231</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="Btn_AddProd">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>25</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>25</height>
-                     </size>
-                    </property>
-                    <property name="text">
-                     <string>Adicionar Produto</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_2">
-                  <property name="orientation">
-                   <enum>Qt::Orientation::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>20</width>
-                    <height>40</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_13">
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_4">
-                    <item>
-                     <widget class="QLabel" name="label_6">
-                      <property name="styleSheet">
-                       <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
-                      </property>
-                      <property name="text">
-                       <string>Cliente:</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="Btn_NovoCliente">
-                      <property name="text">
-                       <string>Novo Cliente</string>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </item>
-                  <item>
-                   <widget class="CustomLineEdit" name="Ledit_Cliente">
-                    <property name="minimumSize">
-                     <size>
-                      <width>0</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_15">
-                  <property name="spacing">
-                   <number>5</number>
-                  </property>
-                  <item>
-                   <spacer name="verticalSpacer">
-                    <property name="orientation">
-                     <enum>Qt::Orientation::Vertical</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>20</width>
-                      <height>40</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_9">
-                    <property name="styleSheet">
-                     <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
-                    </property>
-                    <property name="text">
-                     <string>Observação:</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QTextEdit" name="Tedit_Obs">
-                    <property name="maximumSize">
-                     <size>
-                      <width>16777215</width>
-                      <height>150</height>
-                     </size>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
-                </item>
-               </layout>
-              </widget>
-             </item>
-             <item row="1" column="1" colspan="2">
-              <layout class="QVBoxLayout" name="verticalLayout_21">
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_17">
-                 <item>
-                  <widget class="QLabel" name="label_10">
-                   <property name="styleSheet">
-                    <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
-                   </property>
-                   <property name="text">
-                    <string>Produtos:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="ProdutoTableView" name="Tview_ProdutosOrcamento">
-                   <property name="autoFillBackground">
-                    <bool>true</bool>
-                   </property>
-                   <property name="alternatingRowColors">
-                    <bool>true</bool>
-                   </property>
-                   <property name="selectionMode">
-                    <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
-                   </property>
-                   <property name="selectionBehavior">
-                    <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <spacer name="verticalSpacer_3">
-                 <property name="orientation">
-                  <enum>Qt::Orientation::Vertical</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>40</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <layout class="QVBoxLayout" name="verticalLayout_16">
-                 <item>
-                  <widget class="QLabel" name="label_8">
-                   <property name="styleSheet">
-                    <string notr="true">font: 500 10pt &quot;Ubuntu&quot;;</string>
-                   </property>
-                   <property name="text">
-                    <string>Produtos Selecionados:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QTableView" name="Tview_ProdutosSelec">
-                   <property name="maximumSize">
-                    <size>
-                     <width>16777215</width>
-                     <height>150</height>
-                    </size>
-                   </property>
-                   <property name="contextMenuPolicy">
-                    <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
-                   </property>
-                   <property name="autoFillBackground">
-                    <bool>true</bool>
-                   </property>
-                   <property name="alternatingRowColors">
-                    <bool>true</bool>
-                   </property>
-                   <property name="selectionMode">
-                    <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
-                   </property>
-                   <property name="selectionBehavior">
-                    <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-                   </property>
-                   <attribute name="verticalHeaderVisible">
-                    <bool>false</bool>
-                   </attribute>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </item>
-             <item row="2" column="1">
-              <widget class="QLabel" name="Lbl_TotalGeral">
-               <property name="styleSheet">
-                <string notr="true">font: 700 12pt &quot;Ubuntu&quot;;</string>
-               </property>
-               <property name="text">
-                <string>Total Geral:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="2">
-              <widget class="QPushButton" name="Btn_Terminar">
-               <property name="minimumSize">
-                <size>
-                 <width>150</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>150</width>
-                 <height>40</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>Visualizar/Exportar 
- Orçamento</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QWidget" name="page_4">
-            <layout class="QVBoxLayout" name="verticalLayout_12">
-             <item>
-              <layout class="QVBoxLayout" name="verticalLayout_5">
-               <item>
-                <widget class="QLabel" name="label">
-                 <property name="enabled">
-                  <bool>true</bool>
-                 </property>
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>250</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="toolTip">
-                  <string>Exporte o estoque!</string>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">font: 700 12pt &quot;Segoe UI&quot;;
-</string>
-                 </property>
-                 <property name="text">
-                  <string>Exportar estoque</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignmentFlag::AlignCenter</set>
-                 </property>
-                 <property name="margin">
-                  <number>-1</number>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_3">
-                 <item>
-                  <widget class="QPushButton" name="Btn_CsvGen">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>250</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>250</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="autoFillBackground">
-                    <bool>false</bool>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <property name="text">
-                    <string>Gerar CSV produtos estoque</string>
-                   </property>
-                   <property name="checkable">
-                    <bool>true</bool>
-                   </property>
-                   <property name="checked">
-                    <bool>false</bool>
-                   </property>
-                   <property name="default">
-                    <bool>false</bool>
-                   </property>
-                   <property name="flat">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="Btn_PdfGen">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="minimumSize">
-                    <size>
-                     <width>250</width>
-                     <height>32</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>250</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true"/>
-                   </property>
-                   <property name="text">
-                    <string>Gerar PDF produtos estoque</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-              </layout>
-             </item>
-            </layout>
-           </widget>
-          </widget>
-         </item>
-        </layout>
-       </widget>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="CBox_VendasMain">
+       <property name="minimumSize">
+        <size>
+         <width>320</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>500</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 700 10pt &quot;Segoe UI&quot;;</string>
+       </property>
+       <item>
+        <property name="text">
+         <string>Quantidade de vendas por período</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Valor de vendas por período</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Produtos mais vendidos</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Forma de Pagamento</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Nota Fiscal Valores</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Produtos que geram mais Lucro</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Inventário por Período</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="topBarSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Btn_ExportCSV">
+       <property name="text">
+        <string>Exportar CSV</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>110</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>Exportar dados do gráfico atual para CSV</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Btn_ExportPDF">
+       <property name="text">
+        <string>Exportar PDF</string>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>110</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="toolTip">
+        <string>Exportar gráfico atual como PDF</string>
+       </property>
       </widget>
      </item>
     </layout>
    </item>
+   <item>
+    <widget class="QStackedWidget" name="Stacked_Vendas">
+     <property name="currentIndex">
+      <number>6</number>
+     </property>
+
+     <!-- page 0: Quantidade de vendas -->
+     <widget class="QWidget" name="page">
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <item>
+        <layout class="QHBoxLayout" name="filterBar_Quant">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lbl_deQuant">
+           <property name="text"><string>De:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_InicioQuant">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_ateQuant">
+           <property name="text"><string>Até:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_FimQuant">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_agrupQuant">
+           <property name="text"><string>Agrupar por:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="CBox_AgrupQuant">
+           <item><property name="text"><string>Dia</string></property></item>
+           <item><property name="text"><string>Mês</string></property></item>
+           <item><property name="text"><string>Ano</string></property></item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_AplicarQuant">
+           <property name="text"><string>Aplicar</string></property>
+           <property name="maximumSize"><size><width>80</width><height>30</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+
+     <!-- page_2 (index 1): Valor de vendas -->
+     <widget class="QWidget" name="page_2">
+      <layout class="QVBoxLayout" name="verticalLayout_10">
+       <item>
+        <layout class="QHBoxLayout" name="filterBar_Valor">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lbl_deValor">
+           <property name="text"><string>De:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_InicioValor">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_ateValor">
+           <property name="text"><string>Até:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_FimValor">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_agrupValor">
+           <property name="text"><string>Agrupar por:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="CBox_AgrupValor">
+           <item><property name="text"><string>Dia</string></property></item>
+           <item><property name="text"><string>Mês</string></property></item>
+           <item><property name="text"><string>Ano</string></property></item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_AplicarValor">
+           <property name="text"><string>Aplicar</string></property>
+           <property name="maximumSize"><size><width>80</width><height>30</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+
+     <!-- page_5 (index 2): Top produtos mais vendidos -->
+     <widget class="QWidget" name="page_5">
+      <layout class="QVBoxLayout" name="verticalLayout_top">
+       <item>
+        <layout class="QHBoxLayout" name="filterBar_Top">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lbl_deTop">
+           <property name="text"><string>De:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_InicioTop">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_ateTop">
+           <property name="text"><string>Até:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_FimTop">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_AplicarTop">
+           <property name="text"><string>Aplicar</string></property>
+           <property name="maximumSize"><size><width>80</width><height>30</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+
+     <!-- page_6 (index 3): Formas de pagamento -->
+     <widget class="QWidget" name="page_6">
+      <layout class="QVBoxLayout" name="verticalLayout_11">
+       <item>
+        <layout class="QHBoxLayout" name="filterBar_Formas">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lbl_deFormas">
+           <property name="text"><string>De:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_InicioFormas">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_ateFormas">
+           <property name="text"><string>Até:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_FimFormas">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_agrupFormas">
+           <property name="text"><string>Agrupar por:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="CBox_AgrupFormas">
+           <item><property name="text"><string>Mês</string></property></item>
+           <item><property name="text"><string>Ano</string></property></item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_AplicarFormas">
+           <property name="text"><string>Aplicar</string></property>
+           <property name="maximumSize"><size><width>80</width><height>30</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+
+     <!-- page_7 (index 4): Nota Fiscal valores -->
+     <widget class="QWidget" name="page_7">
+      <layout class="QVBoxLayout" name="verticalLayout_19">
+       <item>
+        <layout class="QHBoxLayout" name="filterBar_NF">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lbl_deNF">
+           <property name="text"><string>De:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_InicioNF">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_ateNF">
+           <property name="text"><string>Até:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_FimNF">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_agrupNF">
+           <property name="text"><string>Agrupar por:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="CBox_AgrupNF">
+           <item><property name="text"><string>Mês</string></property></item>
+           <item><property name="text"><string>Ano</string></property></item>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_AplicarNF">
+           <property name="text"><string>Aplicar</string></property>
+           <property name="maximumSize"><size><width>80</width><height>30</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+
+     <!-- page_8 (index 5): Produtos que geram mais lucro -->
+     <widget class="QWidget" name="page_8">
+      <layout class="QVBoxLayout" name="verticalLayout_20">
+       <item>
+        <layout class="QHBoxLayout" name="filterBar_Lucro">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lbl_deLucro">
+           <property name="text"><string>De:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_InicioLucro">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_ateLucro">
+           <property name="text"><string>Até:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_FimLucro">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_AplicarLucro">
+           <property name="text"><string>Aplicar</string></property>
+           <property name="maximumSize"><size><width>80</width><height>30</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+
+     <!-- page_estoque (index 6): Inventário por período -->
+     <widget class="QWidget" name="page_estoque">
+      <layout class="QVBoxLayout" name="verticalLayout_estoque">
+       <item>
+        <layout class="QHBoxLayout" name="filterBar_Inv">
+         <property name="spacing">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lbl_deInv">
+           <property name="text"><string>De:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_InicioInv">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_ateInv">
+           <property name="text"><string>Até:</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="DE_FimInv">
+           <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           <property name="calendarPopup"><bool>true</bool></property>
+           <property name="minimumSize"><size><width>110</width><height>26</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="ChkBox_SomenteNfInv">
+           <property name="text"><string>Somente produtos com NF</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="Btn_AplicarInv">
+           <property name="text"><string>Aplicar</string></property>
+           <property name="maximumSize"><size><width>80</width><height>30</height></size></property>
+          </widget>
+         </item>
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Orientation::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="Lbl_InvStatus">
+         <property name="text"><string>Selecione o período e clique em Aplicar.</string></property>
+         <property name="alignment"><set>Qt::AlignmentFlag::AlignCenter</set></property>
+         <property name="styleSheet"><string notr="true">font: 10pt &quot;Segoe UI&quot;; color: rgb(80,80,80);</string></property>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation"><enum>Qt::Orientation::Vertical</enum></property>
+         <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+
+    </widget>
+   </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>CustomLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>customlineedit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>ProdutoTableView</class>
-   <extends>QTableView</extends>
-   <header>produtotableview.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

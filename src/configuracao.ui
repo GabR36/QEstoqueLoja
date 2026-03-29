@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>5</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -357,9 +357,9 @@
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
+            <y>-347</y>
             <width>492</width>
-            <height>831</height>
+            <height>829</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -799,7 +799,7 @@ border-radius: 0px;</string>
                 <item>
                  <widget class="QLineEdit" name="Ledt_IdCsrtRespTec">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="maxLength">
                    <number>20</number>
@@ -813,17 +813,17 @@ border-radius: 0px;</string>
                 <item>
                  <widget class="QLabel" name="label_27">
                   <property name="text">
-                   <string>HASH CSRT:</string>
+                   <string>CSRT:</string>
                   </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLineEdit" name="Ledt_HashCsrtRespTec">
                   <property name="enabled">
-                   <bool>false</bool>
+                   <bool>true</bool>
                   </property>
                   <property name="maxLength">
-                   <number>20</number>
+                   <number>60</number>
                   </property>
                  </widget>
                 </item>

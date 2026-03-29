@@ -2,8 +2,8 @@
 #define JANELAEMAILCONTADOR_H
 
 #include <QDialog>
-#include <QSqlDatabase>
 #include <QDateTime>
+#include "services/email_service.h"
 
 namespace Ui {
 class JanelaEmailContador;
@@ -19,21 +19,13 @@ public:
 
 private slots:
     void on_Dedit_Inicio_dateChanged(const QDate &date);
-
     void on_Dedit_Fim_dateChanged(const QDate &date);
-
     void on_pushButton_clicked();
 
 private:
     Ui::JanelaEmailContador *ui;
-    QSqlDatabase db;
+    Email_service emailServ;
     void atualizarContadores();
-    QMap<QString, QStringList> xmlsPorPasta;
-    QMap<QString, QString> contadorValues;
-    QMap<QString, QString> empresaValues;
-    QMap<QString, QString> fiscalValues;
-    void enviarEmailContador(QString zip, QDate dtIni, QDate dtFim, QString pdfPath);
-    void gerarResumoPdf(const QString &filePath, QDateTime dtIni, QDateTime dtFim);
 };
 
 #endif // JANELAEMAILCONTADOR_H

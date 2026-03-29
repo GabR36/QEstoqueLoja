@@ -5,6 +5,7 @@
 #include <QLocale>
 #include <QMap>
 #include "../nota/acbrmanager.h"
+#include "../services/config_service.h"
 
 
 class DanfeUtil : public QObject
@@ -23,6 +24,7 @@ private:
     QLocale portugues;
     QString caminhoReportNFe,caminhoReportNFCe,caminhoLogo;
     QMap<QString,QString> empresaValues;
+    ConfigDTO configDTO;
 signals:
 };
 

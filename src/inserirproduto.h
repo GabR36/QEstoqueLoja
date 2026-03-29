@@ -5,6 +5,9 @@
 #include <QSqlDatabase>
 #include <QLocale>
 #include "util/ibptutil.h"
+#include "services/Produto_service.h"
+#include "services/config_service.h"
+#include "dto/Produto_dto.h"
 
 
 namespace Ui {
@@ -18,7 +21,7 @@ class InserirProduto : public QWidget
 public:
     explicit InserirProduto(QWidget *parent = nullptr);
     ~InserirProduto();
-    void preencherCamposProduto(const QString &quantidade, const QString &descricao, const QString &preco, const QString &codigoBarras, bool nf, const QString &uCom, const QString &precoFornecedor, const QString &percentLucro, const QString &ncm, const QString &aliquota, const QString &csosn, const QString &pis);
+    void preencherCamposProduto(const ProdutoDTO &prod);
 private slots:
     void on_Btn_GerarCBarras_clicked();
 
@@ -38,19 +41,18 @@ private slots:
 private:
 
     Ui::InserirProduto *ui;
-    QMap<QString, QString> financeiroValues;
-     QMap<QString, QString> produtoValues;
     QSet<QString> generatedNumbers;
     QLocale portugues;
-    QString gerarNumero();
-    bool verificarCodigoBarras();
     QSqlDatabase db = QSqlDatabase::database();
     bool atualizando = false; // Flag para evitar loops recursivos
     //bool eventFilter(QObject *watched, QEvent *event) override;
     IbptUtil *util;
+    Produto_Service service;
+    ConfigDTO configDTO;
 
+    void carregarConfiguracoes();
 signals:
-    void codigoBarrasExistenteSignal(QString &query);
+    void codigoBarrasExistenteSignal(QString &codigo);
     void produtoInserido();
 };
 

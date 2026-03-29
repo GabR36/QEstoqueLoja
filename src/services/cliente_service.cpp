@@ -34,8 +34,8 @@ qlonglong Cliente_service::getIdFromCpfCnpj(const QString &cpfcnpj){
 }
 
 
-QSqlQueryModel* Cliente_service::listarClientes(){
-    return cliRepo.listarClientes();
+void Cliente_service::listarClientes(QSqlQueryModel *model){
+    return cliRepo.listarClientes(model);
 }
 
 Cliente_service::Resultado Cliente_service::deletarCliente(qlonglong id){
@@ -51,8 +51,8 @@ Cliente_service::Resultado Cliente_service::deletarCliente(qlonglong id){
 
 }
 
-QSqlQueryModel* Cliente_service::pesquisar(const QString &nome){
-    return cliRepo.pesquisar(nome);
+void Cliente_service::pesquisar(QSqlQueryModel* model, const QString &nome){
+    return cliRepo.pesquisar(model, nome);
 }
 
 
@@ -247,4 +247,70 @@ Cliente_service::Resultado Cliente_service::updateCliente(qlonglong id, ClienteD
     }else{
         return {true, ClienteErro::Nenhum, ""};
     }
+}
+
+QStringList Cliente_service::listarClientesParaCompleter()
+{
+    QStringList lista;
+
+    QList<ClienteDTO> clientes = cliRepo.getListAllClientes();
+
+    for(const ClienteDTO &cli : clientes){
+        lista << QString("%1 (ID: %2)").arg(cli.nome).arg(cli.id);
+    }
+
+    return lista;
+}
+
+QPair<QString, int> Cliente_service::extrairNomeId(const QString &texto) {
+    QRegularExpression regex("^(.*?)\\s*\\(ID:\\s*(\\d+)\\)$");
+    QRegularExpressionMatch match = regex.match(texto);
+
+    if (match.hasMatch()) {
+        return qMakePair(match.captured(1).trimmed(), match.captured(2).toInt());
+    }
+    return qMakePair(QString(), -1); // Retorno inválido
+}
+
+Cliente_service::ResultadoValidacaoClienteCompleter
+Cliente_service::validarClienteTexto(const QString &texto)
+{
+    ResultadoValidacaoClienteCompleter res;
+
+    QString txt = texto.trimmed();
+
+    if(txt.isEmpty()){
+        res.erro = ClienteErro::CampoVazio;
+        res.msg = "Cliente não informado.";
+        return res;
+    }
+
+    auto [nome,id] = extrairNomeId(txt);
+
+    if(id == -1)
+    {
+        ClienteDTO cli = cliRepo.buscarClientePorNomeAproximado(txt);
+
+        if(cli.id == 0){
+            res.erro = ClienteErro::InsercaoInvalida;
+            res.msg = "Cliente não encontrado.";
+            return res;
+        }
+
+        res.ok = true;
+        res.clienteId = cli.id;
+        res.nomeCorrigido = QString("%1 (ID: %2)").arg(cli.nome).arg(cli.id);
+        return res;
+    }
+
+    if(!cliRepo.verificarNomeId(nome,id)){
+        res.erro = ClienteErro::QuebraDeRegra;
+        res.msg = "Nome não corresponde ao ID.";
+        return res;
+    }
+
+    res.ok = true;
+    res.clienteId = id;
+
+    return res;
 }

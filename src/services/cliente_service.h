@@ -23,16 +23,26 @@ public:
         ClienteErro erro = ClienteErro::Nenhum;
         QString msg;
     };
+    struct ResultadoValidacaoClienteCompleter {
+        bool ok = false;
+        ClienteErro erro = ClienteErro::Nenhum;
+        QString msg;
+        qlonglong clienteId = -1;
+        QString nomeCorrigido;
+    };
     explicit Cliente_service(QObject *parent = nullptr);
     qlonglong contarQuantosRegistrosPorCPFCNPJ(const QString &cpfcnpj);
     Cliente_service::Resultado inserirClienteEmitente(ClienteDTO emissor);
     qlonglong getIdFromCpfCnpj(const QString &cpfcnpj);
-    QSqlQueryModel *listarClientes();
+    void listarClientes(QSqlQueryModel *model);
     Cliente_service::Resultado deletarCliente(qlonglong id);
-    QSqlQueryModel *pesquisar(const QString &nome);
+    void pesquisar(QSqlQueryModel* model, const QString &nome);
     Cliente_service::Resultado inserirCliente(ClienteDTO cliente);
     ClienteDTO getClienteByID(qlonglong id);
     Cliente_service::Resultado updateCliente(qlonglong id, ClienteDTO cliente);
+    QStringList listarClientesParaCompleter();
+    Cliente_service::ResultadoValidacaoClienteCompleter validarClienteTexto(const QString &texto);
+    QPair<QString, int> extrairNomeId(const QString &texto);
 private:
     Cliente_repository cliRepo;
 

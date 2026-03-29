@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSqlDatabase>
+#include <QSqlQueryModel>
 #include "../dto/EntradaVenda_dto.h"
 #include <QList>
 
@@ -17,6 +18,8 @@ public:
     double getValorTotalEntradasFromClientes(qlonglong idcliente);
     QList<EntradaVendaDTO> getEntradasFromVenda(qlonglong idvenda);
     bool deletarPorIdVenda(qlonglong idvenda);
+    void listarEntradasVenda(QSqlQueryModel *model, qlonglong idvenda);
+    bool deletarEntradaPorId(qlonglong id);
 private:
     QSqlDatabase db;
 

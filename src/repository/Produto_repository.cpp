@@ -4,11 +4,14 @@
 #include <QDebug>
 #include "../services/Produto_service.h"
 #include "../infra/databaseconnection_service.h"
+#include "../util/dbutil.h"
+#include "../util/datautil.h"
 
 Produto_Repository::Produto_Repository(QObject *parent)
 : QObject{parent}
 {
     db = DatabaseConnection_service::db();
+    dataAgoraUs = DataUtil::getDataAgoraUS();
 }
 
 bool Produto_Repository::codigoBarrasExiste(const QString &codigo)
@@ -39,15 +42,17 @@ bool Produto_Repository::inserir(const ProdutoDTO &p, QString &erroSQL)
         qDebug() << "db nao aberto ao salvar resumo nota";
         return false;
     }
-
+    QString dataAgora = DataUtil::getDataAgoraUS();
     QSqlQuery query(db);
     query.prepare(
         "INSERT INTO produtos "
         "(quantidade, descricao, preco, codigo_barras, nf, un_comercial, "
-        "preco_fornecedor, porcent_lucro, ncm, cest, aliquota_imposto, csosn, pis) "
+        "preco_fornecedor, porcent_lucro, ncm, cest, aliquota_imposto, csosn, pis, "
+        "adicionado_em, atualizado_em) "
         "VALUES "
         "(:quantidade, :descricao, :preco, :codigo_barras, :nf, :un_comercial, "
-        ":preco_fornecedor, :porcent_lucro, :ncm, :cest, :aliquota_imposto, :csosn, :pis)"
+        ":preco_fornecedor, :porcent_lucro, :ncm, :cest, :aliquota_imposto, :csosn, :pis, "
+        ":adicionadoem, :atualizadoem)"
         );
 
     query.bindValue(":quantidade", p.quantidade);
@@ -63,6 +68,9 @@ bool Produto_Repository::inserir(const ProdutoDTO &p, QString &erroSQL)
     query.bindValue(":aliquota_imposto", p.aliquotaIcms);
     query.bindValue(":csosn", p.csosn);
     query.bindValue(":pis", p.pis);
+    query.bindValue(":adicionadoem", dataAgora);
+    query.bindValue(":atualizadoem", dataAgora);
+
 
     if (!query.exec()) {
         erroSQL = query.lastError().text();
@@ -75,21 +83,19 @@ bool Produto_Repository::inserir(const ProdutoDTO &p, QString &erroSQL)
     return true;
 }
 
-QSqlQueryModel* Produto_Repository::listarProdutos()
+void Produto_Repository::listarProdutos(QSqlQueryModel* model)
 {
+    if (!model) {
+        qDebug() << "Model inválido em listarProdutos";
+        return;
+    }
     if(!DatabaseConnection_service::open()){
         qDebug() << "db nao aberto ao salvar resumo nota";
-        return nullptr;
+        return;
     }
-
-    auto *model = new QSqlQueryModel();
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC", db);
 
-    if (model->lastError().isValid()) {
-        qDebug() << "Erro SQL:" << model->lastError().text();
-    }
     db.close();
-    return model;
 }
 
 QSqlQueryModel* Produto_Repository::getProdutoPeloCodigo(const QString &codigoBarras){
@@ -138,12 +144,17 @@ bool Produto_Repository::deletar(const QString &id, QString &erroSQL)
     return true;
 }
 
-QSqlQueryModel* Produto_Repository::pesquisar(const QStringList &palavras,
-                                              const QString &textoNormalizado)
+void Produto_Repository::pesquisar(const QStringList &palavras,
+                                              const QString &textoNormalizado, QSqlQueryModel* model)
 {
+    if (!model) {
+        qDebug() << "Model inválido em pesquisar";
+        return;
+    }
+
     if(!DatabaseConnection_service::open()){
         qDebug() << "db nao aberto ao salvar resumo nota";
-        return nullptr;
+        return;
     }
 
     QString sql = "SELECT * FROM produtos WHERE ";
@@ -174,13 +185,11 @@ QSqlQueryModel* Produto_Repository::pesquisar(const QStringList &palavras,
     if (!query.exec()) {
         qDebug() << "[SQL ERROR]" << query.lastError().text();
         db.close();
-        return nullptr;
+        return;
     }
 
-    auto *model = new QSqlQueryModel();
     model->setQuery(query);
     db.close();
-    return model;
 }
 
 bool Produto_Repository::alterar(
@@ -192,6 +201,7 @@ bool Produto_Repository::alterar(
         qDebug() << "db nao aberto ao salvar resumo nota";
         return false;
     }
+    QString dataAgora = DataUtil::getDataAgoraUS();
     QSqlQuery query(db);
 
     query.prepare(R"(
@@ -208,7 +218,8 @@ bool Produto_Repository::alterar(
             cest = :cest,
             aliquota_imposto = :aliquotaimp,
             csosn = :csosn,
-            pis = :pis
+            pis = :pis,
+            atualizado_em = :atualizadoem
         WHERE id = :id
     )");
 
@@ -226,6 +237,8 @@ bool Produto_Repository::alterar(
     query.bindValue(":aliquotaimp", p.aliquotaIcms);
     query.bindValue(":csosn", p.csosn);
     query.bindValue(":pis", p.pis);
+    query.bindValue(":atualizadoem", dataAgora);
+
 
     if (!query.exec()) {
         erro = query.lastError().text();
@@ -265,8 +278,10 @@ bool Produto_Repository::atualizarLocal(int id, const QString &local, QString &e
     }
 
     QSqlQuery query(db);
-    query.prepare("UPDATE produtos SET local = :local WHERE id = :id");
+    query.prepare("UPDATE produtos SET local = :local, atualizado_em = :atualizado WHERE id = :id");
     query.bindValue(":local", local);
+    query.bindValue(":atualizado", dataAgoraUs);
+
     query.bindValue(":id", id);
 
     if (!query.exec()) {
@@ -279,15 +294,16 @@ bool Produto_Repository::atualizarLocal(int id, const QString &local, QString &e
 }
 
 bool Produto_Repository::updateAumentarQuantidadeProduto(qlonglong idprod, double quantia){
-    if (!db.isOpen()) {
-        if (!db.open()) {
-            qDebug() << "Erro ao abrir banco";
-            return false;
-        }
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao updateAumentarQuantidadeProduto";
+        return false;
     }
     QSqlQuery query(db);
-    query.prepare("UPDATE produtos SET quantidade = quantidade + :quant WHERE id = :id");
+    query.prepare("UPDATE produtos SET quantidade = quantidade + :quant, atualizado_em = :atualizadoem "
+                  "WHERE id = :id");
     query.bindValue(":quant", quantia);
+    query.bindValue(":atualizadoem", dataAgoraUs);
+
     query.bindValue(":id", idprod);
 
     if(!query.exec()){
@@ -298,4 +314,175 @@ bool Produto_Repository::updateAumentarQuantidadeProduto(qlonglong idprod, doubl
         db.close();
         return true;
     }
+}
+
+ProdutoDTO Produto_Repository::getProduto(qlonglong id){
+    ProdutoDTO prod;
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao updateAumentarQuantidadeProduto";
+        return prod;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("SELECT quantidade, descricao, preco, codigo_barras, nf, un_comercial, "
+                  "preco_fornecedor, porcent_lucro, ncm, cest, aliquota_imposto, csosn, pis, local, "
+                  "adicionado_em, atualizado_em "
+                  "FROM produtos WHERE id = :id");
+    query.bindValue(":id", id);
+    if(!query.exec()){
+        qDebug() << "Query nao rodou getProduto()";
+        db.close();
+        return prod;
+    }
+
+    while(query.next()){
+        prod.aliquotaIcms = query.value("aliquota_imposto").toDouble();
+        prod.cest = query.value("cest").toString();
+        prod.codigoBarras = query.value("codigo_barras").toString();
+        prod.csosn = query.value("csosn").toString();
+        prod.descricao = query.value("descricao").toString();
+        prod.ncm = query.value("ncm").toString();
+        prod.nf = query.value("nf").toBool();
+        prod.percentLucro = query.value("porcent_lucro").toDouble();
+        prod.pis = query.value("pis").toString();
+        prod.preco = query.value("preco").toDouble();
+        prod.precoFornecedor = query.value("preco_fornecedor").toDouble();
+        prod.quantidade = query.value("quantidade").toDouble();
+        prod.uCom = query.value("un_comercial").toString();
+        prod.local = query.value("local").toString();
+        prod.adicionadoEm = query.value("adicionado_em").toString();
+        prod.atualizadoEm = query.value("atualizado_em").toString();
+
+    }
+
+    db.close();
+    return prod;
+}
+
+ProdutoDTO Produto_Repository::getProdutoPeloCodBarras(const QString &codigo){
+    ProdutoDTO prod;
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao getProdutoPeloCodBarras";
+        return prod;
+    }
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM produtos WHERE codigo_barras = :cod");
+    query.bindValue(":cod", codigo);
+
+    if(!query.exec()){
+        qDebug() << " Query não executou getProdutoPeloCodBarras";
+        db.close();
+        return prod;
+    }
+
+    while(query.next()){
+        prod.id = query.value("id").toLongLong();
+        prod.quantidade = query.value("quantidade").toDouble();
+        prod.descricao = query.value("descricao").toString();
+        prod.preco =query.value("preco").toDouble();
+        prod.codigoBarras = query.value("codigo_barras").toString();
+        prod.nf = query.value("nf").toBool();
+        prod.uCom = query.value("un_comercial").toString();
+        prod.precoFornecedor = query.value("preco_fornecedor").toDouble();
+        prod.percentLucro = query.value("porcent_lucro").toDouble();
+        prod.ncm = query.value("ncm").toString();
+        prod.cest = query.value("cest").toString();
+        prod.aliquotaIcms = query.value("aliquota_imposto").toDouble();
+        prod.csosn = query.value("csosn").toString();
+        prod.pis = query.value("pis").toString();
+        prod.local = query.value("local").toString();
+        prod.adicionadoEm = query.value("adicionado_em").toString();
+        prod.atualizadoEm = query.value("atualizado_em").toString();
+
+    }
+
+    db.close();
+    return prod;
+}
+
+bool Produto_Repository::updateDiminuirQuantidadeProduto(qlonglong idprod, double quantia){
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "db nao aberto ao updateDiminuirQuantidadeProduto";
+        return false;
+    }
+    QSqlQuery query(db);
+    query.prepare("UPDATE produtos SET quantidade = quantidade - :quant , atualizado_em = :atualizadoem "
+                  "WHERE id = :id");
+    query.bindValue(":quant", quantia);
+    query.bindValue(":atualizadoem", DataUtil::getDataAgoraUS());
+
+    query.bindValue(":id", idprod);
+
+    if(!query.exec()){
+        qDebug() << "Query updateAumentarQuantidadeProduto nao rodou.";
+        db.close();
+        return false;
+    }else{
+        db.close();
+        return true;
+    }
+}
+
+bool Produto_Repository::atualizarCamposMap(qlonglong id, const QVariantMap &campos, bool marcarNf){
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "erro ao abrir banco atualizarCamposMap";
+        return false;
+    }
+
+    QStringList sets;
+    QVariantList binds;
+
+    for(auto it = campos.constBegin(); it != campos.constEnd(); ++it){
+        sets << QString("%1 = ?").arg(it.key());
+        binds << it.value();
+    }
+
+    if(marcarNf)
+        sets << "nf = 1";
+
+    if(sets.isEmpty()){
+        db.close();
+        return true;
+    }
+
+    QSqlQuery query(db);
+    query.prepare("UPDATE produtos SET " + sets.join(", ") + ", atualizado_em = :atualizadoem " +
+                  " WHERE id = ?");
+
+    for(const QVariant &v : binds)
+        query.addBindValue(v);
+
+    query.addBindValue(id);
+    query.bindValue(":atualizadoem", DataUtil::getDataAgoraUS());
+
+
+    if(!query.exec()){
+        qDebug() << "atualizarCamposMap: query falhou" << query.lastError().text();
+        db.close();
+        return false;
+    }
+
+    db.close();
+    return true;
+}
+
+QVariantMap Produto_Repository::getProdutoPorCodBarrasMap(const QString &codigo){
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "erro ao abrir banco getProdutoPorCodBarrasMap";
+        return {};
+    }
+
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM produtos WHERE codigo_barras = :codigo");
+    query.bindValue(":codigo", codigo);
+
+    if(!query.exec()){
+        qDebug() << "getProdutoPorCodBarrasMap: query falhou" << query.lastError().text();
+        db.close();
+        return {};
+    }
+
+    QVector<QVariantMap> registros = DBUtil::extrairResultados(query);
+    db.close();
+    return registros.isEmpty() ? QVariantMap{} : registros.first();
 }

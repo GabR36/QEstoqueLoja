@@ -15,6 +15,8 @@
 #include "services/notafiscal_service.h"
 #include "services/eventofiscal_service.h"
 #include "services/Produto_service.h"
+#include "services/fiscalemitter_service.h"
+#include "services/cliente_service.h"
 
 namespace Ui {
 class Vendas;
@@ -80,16 +82,17 @@ private:
     void Teste();
     QString idVendaSelec;
     void devolverProdutoVenda(QString id_venda, QString id_prod_vend);
-    void mostrarVendasCliente(int idCliente);
+    void mostrarVendasCliente(qlonglong idCliente);
     int IDCLIENTE = 0;
     void abrirDanfeXml(QString id_Venda);
     QString dataGlobal;
-    QString salvarDevolucaoNf(QString retornoEnvio, qlonglong idnf, NfeACBR *devolNfe);
     Vendas_service vendaServ;
     ProdutoVenda_service prodVendaServ;
     NotaFiscal_service notaServ;
     EventoFiscal_service eventoServ;
     Produto_Service prodServ;
+    FiscalEmitter_service fiscalServ;
+    Cliente_service cliServ;
 
 signals:
     void vendaConcluidaVendas();

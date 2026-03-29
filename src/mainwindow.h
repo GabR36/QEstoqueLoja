@@ -24,7 +24,7 @@
 #include "dto/Config_dto.h"
 
 
-#define VERSAO_QE "2.4.0"
+#define VERSAO_QE "2.5.0"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -61,6 +61,8 @@ private slots:
 
     void on_Btn_Relatorios_clicked();
 
+    void on_Btn_Orcamento_clicked();
+
     void on_actionRealizar_Venda_triggered();
 
     void on_Btn_AddProd_clicked();
@@ -90,7 +92,11 @@ private slots:
 
     void on_actionSobre_triggered();
 
+    void on_actionEnviar_Notas_Contador_triggered();
+
     void on_actionMonitor_Fiscal_triggered();
+
+    void on_actionInutilizar_Numera_o_NF_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -110,7 +116,7 @@ private:
     void setarIconesJanela();
     //QModelIndex selected_index;
 
-    const int ultimaVersaoSchema = 7;
+    const int ultimaVersaoSchema = 8;
 
 
     void mostrarProdutoPorCodigoBarras(const QString &codigo);

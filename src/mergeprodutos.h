@@ -3,8 +3,8 @@
 
 #include <QWidget>
 #include <QStandardItemModel>
-#include <QSqlDatabase>
 #include "util/ibptutil.h"
+#include "services/Produto_service.h"
 namespace Ui {
 class MergeProdutos;
 }
@@ -26,10 +26,10 @@ private slots:
 private:
     Ui::MergeProdutos *ui;
     QStandardItemModel *modeloComparacaoProd;
-    QSqlDatabase db;
     QString idProduto;
     bool nfProduto;
     IbptUtil *ibpt;
+    Produto_Service prodServ;
     void atualizarAliquotaPeloNcm();
 signals:
     void produtoAtualizado();

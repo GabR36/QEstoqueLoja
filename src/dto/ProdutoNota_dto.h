@@ -4,9 +4,10 @@
 #include <qstring.h>
 
 struct ProdutoNotaDTO {
+    qlonglong id;
     double quantidade;
     QString descricao;
-    double preco;
+    double preco = 0;
     QString codigoBarras;
     QString uCom;
     QString cfop;
@@ -18,9 +19,11 @@ struct ProdutoNotaDTO {
     qlonglong idNfDevol;
     bool adicionado;
     QString ncm;
-    double aliquotaIcms;
+    double aliquotaIcms = 0;
     QString csosn;
     QString pis;
+    QString adicionadoEm;
+    QString atualizadoEm;
 };
 
 #endif // PRODUTONOTA_DTO_H

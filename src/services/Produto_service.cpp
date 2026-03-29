@@ -122,9 +122,9 @@ Produto_Service::Resultado Produto_Service::deletar(const QString &id){
 
 }
 
-QSqlQueryModel* Produto_Service::listarProdutos()
+void Produto_Service::listarProdutos(QSqlQueryModel *model)
 {
-    return repo.listarProdutos();
+    return repo.listarProdutos(model);
 }
 
 QSqlQueryModel* Produto_Service::getProdutoPeloCodigo(const QString &codigoBarras){
@@ -163,17 +163,17 @@ QString Produto_Service::normalizeText(const QString &text) {
 
 }
 
-QSqlQueryModel* Produto_Service::pesquisar(const QString &texto)
+void Produto_Service::pesquisar(const QString &texto, QSqlQueryModel* model)
 {
     QString normalizado = normalizeText(texto);
 
     if (normalizado.trimmed().isEmpty()) {
-        return repo.listarProdutos(); // fallback padrão
+        return repo.listarProdutos(model); // fallback padrão
     }
 
     QStringList palavras = normalizado.split(" ", Qt::SkipEmptyParts);
 
-    return repo.pesquisar(palavras, normalizado);
+    return repo.pesquisar(palavras, normalizado, model);
 }
 
 Produto_Service::Resultado Produto_Service::alterarVerificarCodigoBarras(const ProdutoDTO &p,
@@ -250,6 +250,34 @@ Produto_Service::Resultado Produto_Service::atualizarLocalProduto(qlonglong id, 
 Produto_Service::Resultado Produto_Service::updateAumentarQuantidadeProduto(qlonglong idprod,
                                                                             double quantia ){
     if(!repo.updateAumentarQuantidadeProduto(idprod, quantia)){
+        return {false, ProdutoErro::Update, "Erro ao atualizar quantia produto."};
+    }else{
+        return {true, ProdutoErro::Nenhum, "Quantia atualizada com sucesso"};
+    }
+}
+
+ProdutoDTO Produto_Service::getProduto(qlonglong id){
+    return repo.getProduto(id);
+}
+
+ProdutoDTO Produto_Service::getProdutoPeloCodBarras(const QString &codigo){
+    return repo.getProdutoPeloCodBarras(codigo);
+}
+
+QVariantMap Produto_Service::getProdutoPorCodBarrasMap(const QString &codigo){
+    return repo.getProdutoPorCodBarrasMap(codigo);
+}
+
+Produto_Service::Resultado Produto_Service::atualizarCamposMap(qlonglong id, const QVariantMap &campos, bool marcarNf){
+    if(!repo.atualizarCamposMap(id, campos, marcarNf)){
+        return {false, ProdutoErro::Update, "Erro ao atualizar produto."};
+    }
+    return {true, ProdutoErro::Nenhum, ""};
+}
+
+Produto_Service::Resultado Produto_Service::updateDiminuirQuantidadeProduto(qlonglong idprod,
+                                                                            double quantia ){
+    if(!repo.updateDiminuirQuantidadeProduto(idprod, quantia)){
         return {false, ProdutoErro::Update, "Erro ao atualizar quantia produto."};
     }else{
         return {true, ProdutoErro::Nenhum, "Quantia atualizada com sucesso"};

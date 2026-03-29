@@ -14,11 +14,14 @@ public:
     qlonglong contarQuantosRegistrosPorCPFCNPJ(const QString &cpfcnpj);
     bool inserir(ClienteDTO cliente);
     qlonglong getIdFromCPFCNPJ(const QString &cpfcnpj);
-    QSqlQueryModel *listarClientes();
+    void listarClientes(QSqlQueryModel *model);
     bool deletarCliente(qlonglong id);
-    QSqlQueryModel *pesquisar(const QString &nome);
+    void pesquisar(QSqlQueryModel *model, const QString &nome);
     ClienteDTO getClienteByID(qlonglong id);
     bool updateCliente(qlonglong id, ClienteDTO cliente);
+    QList<ClienteDTO> getListAllClientes();
+    bool verificarNomeId(const QString &nome, qlonglong id);
+    ClienteDTO buscarClientePorNomeAproximado(const QString &nome);
 private:
     QSqlDatabase db;
 

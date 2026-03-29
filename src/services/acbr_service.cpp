@@ -18,10 +18,10 @@ Acbr_service::Acbr_service(QObject *parent)
 Acbr_service::Resultado Acbr_service::configurar(const QString &versaoApp)
 {
 
-    Config_service *confServ = new Config_service(this);
-    configDTO = confServ->carregarTudo();
+    Config_service confServ;
+    configDTO = confServ.carregarTudo();
 
-    if(configDTO.tpAmbFiscal != true){
+    if(configDTO.emitNfFiscal != true){
         return{false, AcbrErro::NaoEmitindoNf, "Não atualizou pois emitir NF não está marcado"};
     }
 
@@ -53,11 +53,15 @@ Acbr_service::Resultado Acbr_service::configurar(const QString &versaoApp)
     std::string tpAmb = (configDTO.tpAmbFiscal == 0 ? "1" : "0");
     QString caminhoCompletoLogo = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
                                   "/imagens/" + QFileInfo(configDTO.logoPathEmpresa).fileName();
+    std::string idCsrt = configDTO.idCSRTFiscal.toStdString();
+    std::string csrt = configDTO.hashCSRTFiscal.toStdString();
 
+    std::string tlsEmail = (configDTO.tlsEmail == 0 ? "0" : "1");
+    std::string sslEmail = (configDTO.sslEmail == 0 ? "0" : "1");
+    qDebug() << "CSRT:" << csrt;
 
     if(certificadoPath == "")
         return {false, AcbrErro::CampoVazio, "Caminho do certificado não configurado"};
-
     if(schemaPath == "")
         return {false, AcbrErro::CampoVazio, "Schema não configurado"};
 
@@ -98,7 +102,8 @@ Acbr_service::Resultado Acbr_service::configurar(const QString &versaoApp)
 
     nfe->ConfigGravarValor("NFe", "SalvarGer", "0");
 
-
+    nfe->ConfigGravarValor("NFe", "IdCSRT", idCsrt);
+    nfe->ConfigGravarValor("NFe", "CSRT", csrt);
 
     //sistema
     nfe->ConfigGravarValor("Sistema", "Nome", "QEstoqueLoja");
@@ -128,8 +133,8 @@ Acbr_service::Resultado Acbr_service::configurar(const QString &versaoApp)
     mail->ConfigGravarValor("Email", "Usuario", configDTO.usuarioEmail.toStdString());
     mail->ConfigGravarValor("Email", "Senha", configDTO.senhaEmail.toStdString());
     mail->ConfigGravarValor("Email", "Porta", configDTO.portaEmail.toStdString());
-    mail->ConfigGravarValor("Email", "SSL", QVariant(configDTO.sslEmail).toString().toStdString());
-    mail->ConfigGravarValor("Email", "TLS", QVariant(configDTO.tlsEmail).toString().toStdString());
+    mail->ConfigGravarValor("Email", "SSL", sslEmail);
+    mail->ConfigGravarValor("Email", "TLS", tlsEmail);
     mail->ConfigGravar("");
 
     return {true, AcbrErro::Nenhum, ""};

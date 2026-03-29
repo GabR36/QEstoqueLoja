@@ -1,0 +1,12 @@
+[Inutilizacao]
+CStat=102
+CUF=41
+DhRecbto=24/03/2026 00:00:00
+Msg=Inutilizacao de numero homologado
+NProt=141260000000000
+NomeArquivo=/tmp/xml_inutilizacao_test.xml
+VerAplic=PR-v4_5_30
+Versao=4.00
+XMotivo=Inutilizacao de numero homologado
+Xml=<?xml version="1.0" encoding="UTF-8"?><ProcInutNFe versao="4.00" xmlns="http://www.portalfiscal.inf.br/nfe"><inutNFe xmlns="http://www.portalfiscal.inf.br/nfe" versao="4.00"><infInut Id="ID41260000000000000000650010000000588000000588"><tpAmb>2</tpAmb><xServ>INUTILIZAR</xServ><cUF>41</cUF><ano>26</ano><CNPJ>99999900000191</CNPJ><mod>65</mod><serie>1</serie><nNFIni>588</nNFIni><nNFFin>588</nNFFin><xJust>Erro de sequencia numerica no sistema</xJust></infInut></inutNFe><retInutNFe versao="4.00" xmlns="http://www.portalfiscal.inf.br/nfe"><infInut><tpAmb>2</tpAmb><verAplic>PR-v4_5_30</verAplic><cStat>102</cStat><xMotivo>Inutilizacao de numero homologado</xMotivo><cUF>41</cUF><ano>26</ano><CNPJ>99999900000191</CNPJ><mod>65</mod><serie>1</serie><nNFIni>588</nNFIni><nNFFin>588</nNFFin><dhRecbto>2026-03-24T00:00:00-03:00</dhRecbto><nProt>141260000000000</nProt></infInut></retInutNFe></ProcInutNFe>
+tpAmb=2

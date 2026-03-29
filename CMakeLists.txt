@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.5)
 project(QEstoqueLoja VERSION 0.1 LANGUAGES CXX)
 
 enable_testing()
-add_subdirectory(tests)
-
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -38,7 +36,7 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libxml2-v2.11.5/include/libxml2
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/QtRPT
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/include
-        # ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-headers
 
     )
 endif()
@@ -47,13 +45,7 @@ endif()
 set(TS_FILES QEstoqueLoja_pt_BR.ts)
 if(CMAKE_SYSTEM MATCHES "Windows")
 
-    include(FetchContent)
-    FetchContent_Declare(
-    zint
-    GIT_REPOSITORY https://github.com/zint/zint.git
-    GIT_TAG master # Você pode substituir por uma versão específica, se desejar
-    )
-    FetchContent_MakeAvailable(zint)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/zint)
 elseif(CMAKE_SYSTEM MATCHES "Linux")
     find_package(PNG)
     find_library(ZINT_LIBRARIES NAMES zint)
@@ -66,6 +58,8 @@ set(PROJECT_SOURCES
         src/mainwindow.ui
         ${TS_FILES}
 )
+
+add_subdirectory(tests)
 
 if(WIN32)
     set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Imagens/QEstoqueLOja/AppIcon.rc")
@@ -86,6 +80,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/venda.h src/venda.cpp src/venda.ui
         Imagens/recursosImg.qrc
         src/relatorios.h src/relatorios.cpp src/relatorios.ui
+        src/janelaorcamento.h src/janelaorcamento.cpp src/janelaorcamento.ui
         src/pagamento.h src/pagamento.cpp src/pagamento.ui
 
         src/configuracao.h src/configuracao.cpp src/configuracao.ui
@@ -99,6 +94,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/delegateprecof2.cpp src/delegateprecof2.h
         src/delegatepago.h src/delegatepago.cpp
         src/util/pdfexporter.h src/util/pdfexporter.cpp
+        src/util/csvexporter.h src/util/csvexporter.cpp
         src/subclass/customlineedit.h src/subclass/customlineedit.cpp
         src/delegateprecovalidate.h src/delegateprecovalidate.cpp
         src/delegatelockcol.h src/delegatelockcol.cpp
@@ -115,7 +111,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/nota/DanfeUtil.h src/nota/DanfeUtil.cpp
         src/util/NFUtilidades.cpp
         src/subclass/leditdialog.h src/subclass/leditdialog.cpp
-        src/infojanelaprod.h src/infojanelaprod.cpp src/infojanelaprod.ui
+        src/infojanelaprod.h src/infojanelaprod.cpp
 
         src/util/helppage.h src/util/helppage.cpp src/util/helppage.ui
         src/nota/acbrmanager.h src/nota/acbrmanager.cpp
@@ -191,6 +187,15 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/dto/EntradaVenda_dto.h
         src/dto/ResumoVendas_dto.h
         src/util/vendasutil.h src/util/vendasutil.cpp
+        src/services/fiscalemitter_service.h src/services/fiscalemitter_service.cpp
+        src/services/email_service.h src/services/email_service.cpp
+        src/dto/ProdutoParaNFe_dto.h
+        src/dto/NFRetorno_dto.h
+        Imagens/QEstoqueLOja/logo-completo-claro.png
+        src/repository/relatorios_repository.h src/repository/relatorios_repository.cpp
+        src/services/relatorios_service.h src/services/relatorios_service.cpp
+        src/inutilizacaodialog.h src/inutilizacaodialog.cpp src/inutilizacaodialog.ui
+
 
 
 
@@ -225,6 +230,7 @@ else()
 endif()
 
 if (WIN32)
+    add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
     add_library(quazip1-qt6 UNKNOWN IMPORTED)
 
     set_target_properties(quazip1-qt6 PROPERTIES
@@ -250,10 +256,13 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libiconv-for-Windows/lib64/Release
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libxml2-v2.11.5/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/bin/release/lib
-        # ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/lib
     )
     target_link_libraries(QEstoqueLoja  PRIVATE QtRPT quazip1-qt6 Qt6::Core5Compat zdll)
+    target_include_directories(QEstoqueLoja PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-headers
+    )
 
 endif()
 
@@ -318,12 +327,6 @@ add_custom_command(TARGET QEstoqueLoja POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_SOURCE_DIR}/recursos" "${APPDATA_DIR}/recursos"
     COMMENT "Copiando reports e recursos para ${APPDATA_DIR}"
 )
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(QEstoqueLoja)
-endif()
-
-
-
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(QEstoqueLoja)
 endif()

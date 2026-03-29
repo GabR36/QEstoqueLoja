@@ -54,9 +54,9 @@ bool Cliente_repository::inserir(ClienteDTO cliente){
     }
     query.prepare("INSERT INTO clientes (nome, email, telefone, endereco, cpf, "
                   "data_nascimento, data_cadastro, eh_pf, numero_end, bairro, "
-                  "xMun, cMun, uf, cep, indIEDest, ie) VALUES (:nome, :email, :telefone, :endereco, :cpf, "
+                  "xMun, cMun, uf, cep, indIEDest, ie, adicionado_em, atualizado_em) VALUES (:nome, :email, :telefone, :endereco, :cpf, "
                   ":data_nascimento, :data_cadastro, :eh_pf, :numero_end, :bairro, "
-                  ":xMun, :cMun, :uf, :cep, :indIEDest, :ie)");
+                  ":xMun, :cMun, :uf, :cep, :indIEDest, :ie, :adicionadoem, :atualizadoem)");
     query.bindValue(":nome", cliente.nome);
     query.bindValue(":email", cliente.email);
     query.bindValue(":telefone", cliente.telefone);
@@ -73,6 +73,9 @@ bool Cliente_repository::inserir(ClienteDTO cliente){
     query.bindValue(":cep", cliente.cep);
     query.bindValue(":indIEDest", cliente.indIeDest);
     query.bindValue(":ie", cliente.ie);
+    query.bindValue(":adicionadoem", dataFormatada);
+    query.bindValue(":atualizadoem", dataFormatada);
+
 
     if(!query.exec()){
         qDebug() << "Query insert Cliente nao funcionou!";
@@ -109,20 +112,21 @@ qlonglong Cliente_repository::getIdFromCPFCNPJ(const QString &cpfcnpj){
     }
 }
 
-QSqlQueryModel* Cliente_repository::listarClientes(){
-    if (!DatabaseConnection_service::open()) {
-            qDebug() << "Erro ao abrir banco (listarClientes)";
-            return nullptr;
+void Cliente_repository::listarClientes(QSqlQueryModel *model)
+{
+    if (!model) {
+        qDebug() << "Model inválido em listarVendasDeAteFormaPagamento";
+        return;
     }
 
-    auto *model = new QSqlQueryModel();
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco";
+        return;
+    }
+
     model->setQuery("SELECT * FROM clientes", db);
 
-    if (model->lastError().isValid()) {
-        qDebug() << "Erro SQL:" << model->lastError().text();
-    }
     db.close();
-    return model;
 }
 
 bool Cliente_repository::deletarCliente(qlonglong id){
@@ -146,10 +150,16 @@ bool Cliente_repository::deletarCliente(qlonglong id){
 
 }
 
-QSqlQueryModel* Cliente_repository::pesquisar(const QString &nome)
+void Cliente_repository::pesquisar(QSqlQueryModel *model, const QString &nome)
 {
+    if (!model) {
+        qDebug() << "Model inválido em Cliente_repository::pesquisar";
+        return;
+    }
+
     if (!DatabaseConnection_service::open()) {
-        return nullptr;
+        qDebug() << "Erro ao abrir banco";
+        return;
     }
 
     QSqlQuery query(db);
@@ -163,20 +173,15 @@ QSqlQueryModel* Cliente_repository::pesquisar(const QString &nome)
 
     if (!query.exec()) {
         qDebug() << "Erro ao executar consulta:" << query.lastError().text();
-        db.close();
-        return nullptr;
+        return;
     }
 
-    auto *model = new QSqlQueryModel();
-    model->setQuery(std::move(query));
+    model->setQuery(query);
 
     if (model->lastError().isValid()) {
         qDebug() << "Erro no model:" << model->lastError().text();
-        db.close();
-        return nullptr;
+        return;
     }
-    db.close();
-    return model;
 }
 
 ClienteDTO Cliente_repository::getClienteByID(qlonglong id){
@@ -189,7 +194,8 @@ ClienteDTO Cliente_repository::getClienteByID(qlonglong id){
 
     QSqlQuery query(db);
     query.prepare("SELECT nome, email, telefone, endereco, cpf, data_nascimento, "
-                  "eh_pf, numero_end, bairro, xMun, cMun, uf, cep, indIEDest, ie "
+                  "eh_pf, numero_end, bairro, xMun, cMun, uf, cep, indIEDest, ie, "
+                  "adicionado_em, atualizado_em "
                   "FROM clientes "
                   "WHERE id = :valor1");
     query.bindValue(":valor1", id);
@@ -200,6 +206,7 @@ ClienteDTO Cliente_repository::getClienteByID(qlonglong id){
     }
 
     query.next();
+    cli.id = id;
     cli.nome = query.value(0).toString();
     cli.email = query.value(1).toString();
     cli.telefone = query.value(2).toString();
@@ -215,6 +222,8 @@ ClienteDTO Cliente_repository::getClienteByID(qlonglong id){
     cli.cep = query.value(12).toString();
     cli.indIeDest = query.value(13).toInt();
     cli.ie = query.value(14).toString();
+    cli.adicionadoEm = query.value(15).toString();
+    cli.atualizadoEm = query.value(16).toString();
     db.close();
     return cli;
 
@@ -225,12 +234,15 @@ bool Cliente_repository::updateCliente(qlonglong id, ClienteDTO cliente){
         qDebug() << "Banco nao abriu em getclientebyid()";
         return false;
     }
+    QString dataFormatada = DataUtil::getDataAgoraUS();
+
     QSqlQuery query(db);
     query.prepare("UPDATE clientes SET nome = :valor1, email = :valor2, "
                   "telefone = :valor3, endereco = :valor4, cpf = :valor5, "
                   "data_nascimento = :valor6, eh_pf = :valor7, numero_end = :numero, "
                   "bairro = :bairro, xMun = :xmun, cMun = :cmun, uf = :uf, cep = :cep, "
-                  "indIEDest = :indiedest, ie = :ie WHERE id = :valor8");
+                  "indIEDest = :indiedest, ie = :ie, atualizado_em = :atualizadoem "
+                  "WHERE id = :valor8");
     query.bindValue(":valor1", cliente.nome);
     query.bindValue(":valor2", cliente.email);
     query.bindValue(":valor3", cliente.telefone);
@@ -247,6 +259,8 @@ bool Cliente_repository::updateCliente(qlonglong id, ClienteDTO cliente){
     query.bindValue(":cep", cliente.cep);
     query.bindValue(":indiedest", cliente.indIeDest);
     query.bindValue(":ie", cliente.ie);
+    query.bindValue(":atualizadoem", dataFormatada);
+
     if(!query.exec()){
         qDebug() << "erro query, update clientes";
         db.close();
@@ -255,4 +269,106 @@ bool Cliente_repository::updateCliente(qlonglong id, ClienteDTO cliente){
         db.close();
         return true;
     }
+}
+
+QList<ClienteDTO> Cliente_repository::getListAllClientes(){
+
+    QList<ClienteDTO> lista;
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "Banco nao abriu em getclientebyid()";
+        return lista;
+    }
+
+    QSqlQuery query(db);
+    if(!query.exec("SELECT * FROM clientes")){
+        qDebug() << "Não executou query getListAllClientes";
+        db.close();
+        return lista;
+    }
+
+    while(query.next()){
+        ClienteDTO cli;
+        cli.id = query.value("id").toLongLong();
+        cli.nome = query.value("nome").toString();
+        cli.email = query.value("email").toString();
+        cli.telefone = query.value("telefone").toString();
+        cli.endereco = query.value("telefone").toString();
+        cli.cpf = query.value("cpf").toString();
+        cli.dataNasc = query.value("data_nascimento").toString();
+        cli.dataCadastro = query.value("data_cadastro").toString();
+        cli.ehPf = query.value("eh_pf").toBool();
+        cli.numeroEnd = query.value("numero_end").toLongLong();
+        cli.bairro = query.value("bairro").toString();
+        cli.xMun = query.value("xMun").toString();
+        cli.cMun = query.value("cMun").toString();
+        cli.uf = query.value("uf").toString();
+        cli.cep = query.value("cep").toString();
+        cli.indIeDest = query.value("indIEDest").toInt();
+        cli.ie = query.value("ie").toString();
+        cli.adicionadoEm = query.value("adicionado_em").toString();
+        cli.atualizadoEm = query.value("atualizado_em").toString();
+
+        lista.append(cli);
+    }
+    db.close();
+    return lista;
+}
+
+
+bool Cliente_repository::verificarNomeId(const QString &nome, qlonglong id)
+{
+    if(!DatabaseConnection_service::open())
+        return false;
+
+    QSqlQuery query(db);
+
+    query.prepare(
+        "SELECT COUNT(*) "
+        "FROM clientes "
+        "WHERE id = :id AND nome = :nome"
+        );
+
+    query.bindValue(":id", id);
+    query.bindValue(":nome", nome);
+
+    if(!query.exec()){
+        db.close();
+        return false;
+    }
+
+    query.next();
+    bool existe = query.value(0).toInt() > 0;
+
+    db.close();
+    return existe;
+}
+
+ClienteDTO Cliente_repository::buscarClientePorNomeAproximado(const QString &nome)
+{
+    ClienteDTO cli;
+
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "Erro ao abrir banco buscarClientePorNomeAproximado";
+        return cli;
+    }
+
+    QSqlQuery query(db);
+
+    query.prepare(
+        "SELECT id, nome "
+        "FROM clientes "
+        "WHERE nome LIKE :nome "
+        "ORDER BY LENGTH(nome) ASC "
+        "LIMIT 1"
+        );
+
+    query.bindValue(":nome", "%" + nome + "%");
+
+    if(query.exec() && query.next()){
+        cli.id = query.value("id").toLongLong();
+        cli.nome = query.value("nome").toString();
+    }
+
+    db.close();
+    return cli;
 }

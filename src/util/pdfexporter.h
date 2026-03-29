@@ -2,14 +2,31 @@
 #define PDFEXPORTER_H
 
 #include <QString>
+#include <QDateTime>
+#include <QList>
 #include <QSqlDatabase>
+#include <QWidget>
+#include "../dto/NotaFiscal_dto.h"
+
+class QChartView;
 
 class PDFexporter
 {
 public:
     PDFexporter();
-    static void exportarTodosProdutosParaPDF(const QString &fileName);
-    static void exportarNfProdutosParaPDF(const QString &fileName);
+
+    static void exportarResumoContadorPdf(const QString &filePath,
+                                          QDateTime dtIni, QDateTime dtFim,
+                                          const QList<NotaFiscalDTO> &notas);
+
+    // Exporta o gráfico atual para PDF (A4 landscape).
+    // Exibe QFileDialog, mostra valores nas barras e abre o arquivo após salvar.
+    static void exportarGraficoRelatorio(QWidget *parent, QChartView *chartView);
+
+    // Exporta uma tabela de dados para PDF (A4 retrato) com paginação automática.
+    static void exportarTabelaRelatorio(QWidget *parent,
+                                        const QString &titulo,
+                                        const QList<QStringList> &linhas);
 
 private:
    // QSqlDatabase db = QSqlDatabase::database();

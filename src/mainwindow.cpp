@@ -15,6 +15,7 @@
 #include "vendas.h"
 #include <QDoubleValidator>
 #include "relatorios.h"
+#include "janelaorcamento.h"
 #include "venda.h"
 #include <QModelIndex>
 #include <QMenu>
@@ -46,6 +47,7 @@
 #include "services/schemamigration_service.h"
 #include "services/config_service.h"
 #include "services/dfe_service.h"
+#include "inutilizacaodialog.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -65,13 +67,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // configuracao do modelo e view produtos
     ui->Tview_Produtos->setModel(model);
-    model->setHeaderData(0, Qt::Horizontal, tr("ID"));
-    model->setHeaderData(1, Qt::Horizontal, tr("Quantidade"));
-    model->setHeaderData(2, Qt::Horizontal, tr("Descrição"));
-    model->setHeaderData(3, Qt::Horizontal, tr("Preço"));
-    model->setHeaderData(4, Qt::Horizontal, tr("Código de Barras"));
-    model->setHeaderData(5, Qt::Horizontal, tr("NF"));
-
 
     //carrega as configurações no DTO
     Config_service *confServ = new Config_service(this);
@@ -81,6 +76,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
     ui->Ledit_Pesquisa->installEventFilter(this);
     atualizarTableview();
+    model->setHeaderData(0, Qt::Horizontal, tr("ID"));
+    model->setHeaderData(1, Qt::Horizontal, tr("Quantidade"));
+    model->setHeaderData(2, Qt::Horizontal, tr("Descrição"));
+    model->setHeaderData(3, Qt::Horizontal, tr("Preço"));
+    model->setHeaderData(4, Qt::Horizontal, tr("Código de Barras"));
+    model->setHeaderData(5, Qt::Horizontal, tr("NF"));
     //
     // Selecionar a primeira linha da tabela
     QModelIndex firstIndex = model->index(0, 0);
@@ -166,15 +167,18 @@ void MainWindow::mostrarProdutoPorCodigoBarras(const QString &codigo)
 }
 
 void MainWindow::setarIconesJanela(){
-    iconAlterarProduto.addFile(":/QEstoqueLOja/story-editor.svg");
-    iconAddProduto.addFile(":/QEstoqueLOja/add-product.svg");
-    iconBtnVenda.addFile(":/QEstoqueLOja/amarok-cart-view.svg");
-    iconDelete.addFile(":/QEstoqueLOja/amarok-cart-remove.svg");
+    iconAlterarProduto.addFile(":/QEstoqueLOja/light-icons/story-editor.svg");
+    iconAddProduto.addFile(":/QEstoqueLOja/light-icons/amarok_cart_add.svg");
+    iconBtnVenda.addFile(":/QEstoqueLOja/light-icons/amarok_cart_view.svg");
+    iconDelete.addFile(":/QEstoqueLOja/light-icons/amarok_cart_remove.svg");
     iconPesquisa.addFile(":/QEstoqueLOja/edit-find.svg");
-    iconBtnRelatorios.addFile(":/QEstoqueLOja/view-financial-account-investment-security.svg");
+    iconBtnRelatorios.addFile(":/QEstoqueLOja/light-icons/view-financial-account-investment-security.svg");
     iconImpressora.addFile(":/QEstoqueLOja/document-print.svg");
-    iconClientes.addFile(":/QEstoqueLOja/user-others.svg");
-
+    iconClientes.addFile(":/QEstoqueLOja/light-icons/user-others.svg");
+    QIcon orcamentoIcon;
+    orcamentoIcon.addFile(":/QEstoqueLOja/light-icons/view-task.svg");
+    QIcon comprasIcon;
+    comprasIcon.addFile(":/QEstoqueLOja/light-icons/view-financial-list.svg");
 
     ui->Btn_AddProd->setIcon(iconAddProduto);
     ui->Btn_Venda->setIcon(iconBtnVenda);
@@ -183,12 +187,13 @@ void MainWindow::setarIconesJanela(){
     ui->Btn_Pesquisa->setIcon(iconPesquisa);
     ui->Btn_Relatorios->setIcon(iconBtnRelatorios);
     ui->Btn_Clientes->setIcon(iconClientes);
+    ui->Btn_Orcamento->setIcon(orcamentoIcon);
+    ui->Btn_Entradas->setIcon(comprasIcon);
 }
 
 void MainWindow::atualizarTableview()
 {
-    model = produtoService->listarProdutos();
-    ui->Tview_Produtos->setModel(model);
+    produtoService->listarProdutos(model);
 }
 
 
@@ -235,14 +240,13 @@ void MainWindow::on_Btn_Pesquisa_clicked()
 {
     QString inputText = ui->Ledit_Pesquisa->text();
 
-    auto model = produtoService->pesquisar(inputText);
+    produtoService->pesquisar(inputText, model);
 
     if (!model) {
         QMessageBox::warning(this, "Erro", "Erro ao realizar a pesquisa.");
         return;
     }
 
-    ui->Tview_Produtos->setModel(model);
 }
 
 void MainWindow::on_Btn_Alterar_clicked()
@@ -250,53 +254,34 @@ void MainWindow::on_Btn_Alterar_clicked()
 
 
     if(ui->Tview_Produtos->selectionModel()->isSelected(ui->Tview_Produtos->currentIndex())){
-    // obter id selecionado
     QItemSelectionModel *selectionModel = ui->Tview_Produtos->selectionModel();
     QModelIndex selectedIndex = selectionModel->selectedIndexes().first();
-    QVariant idVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 0));
-    QVariant quantVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 1));
-    QVariant descVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 2));
-    QVariant precoVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 3));
-    QVariant barrasVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 4));
-    QVariant nfVariant = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 5));
-    QVariant uCom = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 6));
-    QVariant precoForn = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 7));
-    QVariant porcentLucro = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 8));
-    QVariant ncm = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 9));
-    QVariant cest = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 10));
-    QVariant aliquotaImp = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 11));
-    QVariant csosn = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 12));
-    QVariant pis = ui->Tview_Produtos->model()->data(ui->Tview_Produtos->model()->index(selectedIndex.row(), 13));
+    auto cell = [&](int col) {
+        return ui->Tview_Produtos->model()->data(
+            ui->Tview_Produtos->model()->index(selectedIndex.row(), col));
+    };
 
+    ProdutoDTO produto;
+    produto.id           = cell(0).toLongLong();
+    produto.quantidade   = cell(1).toDouble();
+    produto.descricao    = cell(2).toString();
+    produto.preco        = cell(3).toDouble();
+    produto.codigoBarras = cell(4).toString();
+    produto.nf           = cell(5).toBool();
+    produto.uCom         = cell(6).toString();
+    produto.precoFornecedor = cell(7).toString().trimmed().isEmpty() ? 0.0 : cell(7).toDouble();
+    produto.percentLucro = cell(8).toDouble();
+    produto.ncm          = cell(9).toString();
+    produto.cest         = cell(10).toString();
+    produto.aliquotaIcms = cell(11).toDouble();
+    produto.csosn        = cell(12).toString();
+    produto.pis          = cell(13).toString();
 
-    QString productId = idVariant.toString();
-    QString productQuant = portugues.toString(quantVariant.toFloat());
-    QString productDesc = descVariant.toString();
-    QString productPreco = portugues.toString(precoVariant.toFloat());
-    QString productBarras = barrasVariant.toString();
-    bool productNf = nfVariant.toBool();
-    QString productUCom = uCom.toString();
-    QString produtoPrecoForn;
-    if(precoForn.toString().trimmed().isEmpty()){
-        produtoPrecoForn = "";
-    }else{
-        produtoPrecoForn = portugues.toString(precoForn.toFloat());
-    }
-    QString productPorcentLucro = portugues.toString(porcentLucro.toFloat());
-    QString productNCM = ncm.toString();
-    QString productCEST = cest.toString();
-    QString productAliquotaImp = portugues.toString(aliquotaImp.toFloat());
-    QString productPis = pis.toString();
-    QString productCsosn = csosn.toString();
-
-    qDebug() << productId;
-    qDebug() << productPreco;
     // criar janela
     AlterarProduto *alterar = new AlterarProduto;
     alterar->janelaPrincipal = this;
-    alterar->idAlt = productId;
-    alterar->TrazerInfo(productDesc, productQuant, productPreco, productBarras, productNf, productUCom,
-    produtoPrecoForn, productPorcentLucro, productNCM, productCEST, productAliquotaImp, productCsosn, productPis);
+    alterar->idAlt = QString::number(produto.id);
+    alterar->TrazerInfo(produto);
     // alterar->setWindowModality(Qt::ApplicationModal);
     alterar->show();
     connect(alterar, &AlterarProduto::produtoAlterado, this,
@@ -322,6 +307,13 @@ void MainWindow::on_Btn_Relatorios_clicked()
     relatorios *relatorios1 = new relatorios;
     relatorios1->setWindowModality(Qt::ApplicationModal);
     relatorios1->show();
+}
+
+void MainWindow::on_Btn_Orcamento_clicked()
+{
+    JanelaOrcamento *janelaOrcamento = new JanelaOrcamento;
+    janelaOrcamento->setWindowModality(Qt::ApplicationModal);
+    janelaOrcamento->show();
 }
 
 void MainWindow::imprimirEtiqueta1(){
@@ -519,9 +511,8 @@ void MainWindow::on_actionDocumenta_o_triggered()
 
 void MainWindow::atualizarConfigAcbr(){
     qDebug() << " tentou atualizar acbr config";
-        auto *acbrService = new Acbr_service(this);
-        auto res = acbrService->configurar(VERSAO_QE);
-        acbrService->configurar(VERSAO_QE);
+        Acbr_service acbrService;
+        auto res = acbrService.configurar(VERSAO_QE);
         if(!res.ok){
             if(res.erro != AcbrErro::NaoEmitindoNf){
                 QMessageBox::critical(this, "Erro", res.msg);
@@ -552,8 +543,7 @@ void MainWindow::on_Btn_Entradas_clicked()
 
 void MainWindow::on_actionEnviar_triggered()
 {
-    JanelaEmailContador *janelaEmail = new JanelaEmailContador();
-    janelaEmail->show();
+
 }
 
 
@@ -563,10 +553,23 @@ void MainWindow::on_actionSobre_triggered()
     sobre->show();
 }
 
+void MainWindow::on_actionEnviar_Notas_Contador_triggered()
+{
+    JanelaEmailContador *janelaEmail = new JanelaEmailContador();
+    janelaEmail->show();
+}
+
 
 void MainWindow::on_actionMonitor_Fiscal_triggered()
 {
     MonitorFiscal *monitor = new MonitorFiscal();
     monitor->show();
+}
+
+
+void MainWindow::on_actionInutilizar_Numera_o_NF_triggered()
+{
+    InutilizacaoDialog *inu = new InutilizacaoDialog();
+    inu->show();
 }
 

@@ -1,6 +1,6 @@
 #include "ziputil.h"
-#include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
+#include <quazip/JlCompress.h>
 #include <qfile.h>
 #include <qfileinfo.h>
 
@@ -25,4 +25,9 @@ bool ZipUtil::adicionarArquivoZip(QuaZip &zip, QString caminhoArquivo) {
     zipFile.write(file.readAll());
     zipFile.close();
     return true;
+}
+
+bool ZipUtil::comprimirDiretorio(const QString &dirPath, const QString &zipPath)
+{
+    return JlCompress::compressDir(zipPath, dirPath);
 }

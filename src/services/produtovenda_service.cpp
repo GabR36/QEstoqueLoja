@@ -34,7 +34,9 @@ ProdutoVenda_service::Resultado ProdutoVenda_service::deletarProdutosVendidosPor
 
 bool ProdutoVenda_service::temApenasUmProduto(qlonglong idvenda){
     int quantidadeProds = prodVendaRepo.contarProdutosVendidosFromVenda(idvenda);
+    qDebug() << "Quantidade de produto da venda: " << quantidadeProds;
     if(quantidadeProds == 1){
+
         return true;
     }else{
         return false;
@@ -45,5 +47,21 @@ ProdutoVendidoDTO ProdutoVenda_service::getProdutoVendido(qlonglong id){
     return prodVendaRepo.getProdutoVendido(id);
 }
 
+ProdutoVenda_service::Resultado ProdutoVenda_service::inserir(ProdutoVendidoDTO prod){
+    if(!prodVendaRepo.inserir(prod)){
+        return {false, ProdutoVendaErro::Salvar, "Erro ao inserir Produto Vendido."};
+    }else{
+        return {true, ProdutoVendaErro::Nenhum, "Produto Vendido salvo com sucesso."};
+    }
+}
 
+
+ProdutoVenda_service::Resultado ProdutoVenda_service::marcarComoEmitidoNF(qlonglong idvenda,
+                                                                          bool emitirTodos){
+    if(!prodVendaRepo.marcarComoEmitidoNf(idvenda, emitirTodos)){
+        return {false, ProdutoVendaErro::Update, "Erro ao atualizar emitidos nf." };
+    }else{
+        return{true, ProdutoVendaErro::Nenhum, ""};
+    }
+}
 

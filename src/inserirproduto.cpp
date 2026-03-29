@@ -70,37 +70,24 @@ void InserirProduto::carregarConfiguracoes(){
     configDTO = confServ->carregarTudo();
 }
 
-void InserirProduto::preencherCamposProduto(
-    const QString &quantidade,
-    const QString &descricao,
-    const QString &preco,
-    const QString &codigoBarras,
-    bool nf,
-    const QString &uCom,
-    const QString &precoFornecedor,
-    const QString &percentLucro,
-    const QString &ncm,
-    const QString &aliquota,
-    const QString &csosn,
-    const QString &pis)
+void InserirProduto::preencherCamposProduto(const ProdutoDTO &prod)
 {
-    ui->Ledit_Quant->setText(quantidade);
-    ui->Ledit_Desc->setText(descricao);
-    ui->Ledit_PrecoFinal->setText(preco);
-    ui->Ledit_CBarras->setText(codigoBarras);
-    ui->Check_Nf->setChecked(nf);
-    ui->Ledit_PrecoFornecedor->setText(precoFornecedor);
-    ui->Ledit_PercentualLucro->setText(percentLucro);
-    ui->Ledit_NCM->setText(ncm);
-    ui->Ledit_Aliquota->setText(aliquota);
-    ui->Ledit_CSOSN->setText(csosn);
-    ui->Ledit_PIS->setText(pis);
-    int index = ui->CBox_UCom->findText(uCom, Qt::MatchFixedString | Qt::MatchCaseSensitive);
+    ui->Ledit_Quant->setText(portugues.toString(prod.quantidade));
+    ui->Ledit_Desc->setText(prod.descricao);
+    ui->Ledit_PrecoFinal->setText(prod.preco > 0 ? portugues.toString(prod.preco, 'f', 2) : "");
+    ui->Ledit_CBarras->setText(prod.codigoBarras);
+    ui->Check_Nf->setChecked(prod.nf);
+    ui->Ledit_PrecoFornecedor->setText(prod.precoFornecedor > 0 ? portugues.toString(prod.precoFornecedor, 'f', 2) : "");
+    ui->Ledit_PercentualLucro->setText(portugues.toString(prod.percentLucro));
+    ui->Ledit_NCM->setText(prod.ncm);
+    ui->Ledit_Aliquota->setText(prod.aliquotaIcms > 0 ? portugues.toString(prod.aliquotaIcms) : "");
+    ui->Ledit_CSOSN->setText(prod.csosn);
+    ui->Ledit_PIS->setText(prod.pis);
+    int index = ui->CBox_UCom->findText(prod.uCom, Qt::MatchFixedString | Qt::MatchCaseSensitive);
     ui->CBox_UCom->setCurrentIndex(index >= 0 ? index : 0);
-    ui->CBox_UCom->setCurrentText(uCom);
+    ui->CBox_UCom->setCurrentText(prod.uCom);
 
     on_Ledit_NCM_editingFinished();
-
 }
 
 void InserirProduto::on_Btn_GerarCBarras_clicked()

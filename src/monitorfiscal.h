@@ -3,10 +3,11 @@
 
 #include <QWidget>
 #include "menuitem.h"
-#include <QSqlDatabase>
 #include <QSqlQueryModel>
 #include "delegateambiente.h"
 #include "delegatehora.h"
+#include "services/notafiscal_service.h"
+#include "services/eventofiscal_service.h"
 
 enum class TipoVisualizacao {
     NotaFiscal,
@@ -33,19 +34,20 @@ private:
     Ui::MonitorFiscal *ui;
     QVector<MenuItem*> m_items;
     void selectItem(MenuItem *item);
-    QSqlDatabase db;
     QSqlQueryModel *modelSaida;
     QSqlQueryModel *modelEventos;
     TipoVisualizacao m_tipoAtual;
     DelegateAmbiente *delegateAmb;
     DelegateHora *delegateHora;
+    NotaFiscal_service notaServ;
+    EventoFiscal_service eventoServ;
 
     void abrirSaida();
     void abrirDevolucao();
     void carregarTabelaDevolucao();
-    void AtualizarTabelaNotas(QString whereSql);
+    void AtualizarTabelaNotas(const QStringList &finalidades);
     void abrirEntrada();
-    void AtualizarTabelaEventos(QString whereSql);
+    void AtualizarTabelaEventos();
     void abrirEventos();
 };
 

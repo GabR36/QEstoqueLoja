@@ -4,6 +4,7 @@
 #include <QObject>
 #include "../repository/entradasvendas_repository.h"
 #include <QLocale>
+#include <QSqlQueryModel>
 #include "../dto/EntradaVenda_dto.h"
 #include <QList>
 
@@ -31,6 +32,8 @@ public:
     QDateTime getDataUltimoPagamentoFromCliente(qlonglong idcliente);
     QList<EntradaVendaDTO> getEntradasFromVenda(qlonglong idvenda);
     EntradasVendas_service::Resultado deletarPorIdVenda(qlonglong idvenda);
+    void listarEntradasVenda(QSqlQueryModel *model, qlonglong idvenda);
+    EntradasVendas_service::Resultado deletarEntradaPorId(qlonglong id);
 private:
     EntradasVendas_repository entradaRepo;
     QLocale locale;

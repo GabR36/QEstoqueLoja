@@ -1,0 +1,25 @@
+[Envio]
+CStat=100
+CUF=41
+DhRecbto=16/03/2026 16:20:09
+Msg=Autorizado o uso da NF-e
+NProt=141260000000001
+NRec=
+TMed=0
+VerAplic=PR-v4_5_28
+Versao=4.00
+XMotivo=Autorizado o uso da NF-e
+tpAmb=2
+
+[NFe582]
+Id=ID141260000000001
+NomeArq=/home/usuario/.local/share/QEstoqueLoja/xmlNf/99999999000191/NFCe/202603/NFCe/41260399999999000191650010000005821000000090-nfe.xml
+XML=<protNFe versao=\"4.00\"><infProt Id=\"ID141260000000001\"><tpAmb>2</tpAmb><verAplic>PR-v4_5_28</verAplic><chNFe>41260399999999000191650010000005821000000090</chNFe><dhRecbto>2026-03-16T16:20:09-03:00</dhRecbto><nProt>141260000000001</nProt><digVal>hkfu/jQ5u2S7zLramJqQzISRTaY=</digVal><cStat>100</cStat><xMotivo>Autorizado o uso da NF-e</xMotivo></infProt></protNFe>
+cStat=100
+chDFe=41260399999999000191650010000005821000000090
+dhRecbto=16/03/2026 16:20:09
+digVal=hkfu/jQ5u2S7zLramJqQzISRTaY=
+nProt=141260000000001
+tpAmb=2
+verAplic=PR-v4_5_28
+xMotivo=Autorizado o uso da NF-e

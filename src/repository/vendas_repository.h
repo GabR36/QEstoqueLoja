@@ -21,9 +21,12 @@ public:
     QPair<QDate, QDate> getMinMaxData();
     VendasDTO getVenda(qlonglong id);
     ResumoVendasDTO calcularResumo(const QString &dataDe, const QString &dataAte, bool somentePrazo, qlonglong idCliente);
-    void listarVendasDeAteFormaPagamento(QSqlQueryModel *model, const QString &de, const QString &ate, VendasUtil::VendasFormaPagamento formaPag);
     bool deletarVenda(qlonglong id);
     bool updateNewTotalTrocoValorFinal(double total, double troco, double valorFinal, qlonglong id);
+    void listarVendasCliente(QSqlQueryModel *model, qlonglong idcliente);
+    void listarVendasDeAteFormaPagamento(QSqlQueryModel *model, const QString &de, const QString &ate, VendasUtil::VendasFormaPagamento formaPag, qlonglong idCliente);
+    qlonglong inserir(VendasDTO venda);
+    bool atualizarEstaPago(qlonglong idVenda, int estaPago);
 private:
     QSqlDatabase db;
 

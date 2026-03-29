@@ -2,5 +2,10 @@
     <qresource prefix="/">
         <file>recursos/consultaDFE_sanitizada.txt</file>
         <file>recursos/xml_procnfe.xml</file>
+        <file>recursos/nfce_sanitizada_ok.txt</file>
+        <file>recursos/nfe_sanitizada_ok.txt</file>
+        <file>recursos/inu_sanitizada_ok.txt</file>
+        <file>recursos/inu_sanitizada_recusado.txt</file>
+        <file>recursos/nfce_sanitizada_windows.txt</file>
     </qresource>
 </RCC>

@@ -12,6 +12,7 @@ pagamento::pagamento(QString total, QString cliente, QString data, QWidget *pare
 {
     ui->setupUi(this);
 
+    configDTO = confServ.carregarTudo();
     totalGlobal = total;
     ui->Lbl_ResumoTotal->setText(total);
     clienteGlobal = cliente;
@@ -73,25 +74,8 @@ void pagamento::on_CBox_FormaPagamento_activated(int index)
     // mostrar ou esconder campos relacionados ao troco
     // a depender da forma dinheiro ser selecionada
 
-    // pegar os valores de taxas padrao das configuracoes
-    if(!db.open()){
-        qDebug() << "erro ao abrir banco de dados. pagamento combobox";
-    }
-    QSqlQuery query;
-
-    QString taxaDebito  = "3";
-    QString taxaCredito = "4";
-    if (query.exec("SELECT value FROM config WHERE key = 'taxa_debito'")){
-        while (query.next()) {
-            taxaDebito = portugues.toString(query.value(0).toFloat());
-        }
-    }
-    if (query.exec("SELECT value FROM config WHERE key = 'taxa_credito'")){
-        while (query.next()) {
-            taxaCredito = portugues.toString(query.value(0).toFloat());
-        }
-    }
-    //
+    QString taxaDebito  = QString::number(configDTO.taxaDebitoFinanceiro);
+    QString taxaCredito = QString::number(configDTO.taxaCreditoFinanceiro);
 
     switch (index) {
     case 0:
@@ -203,7 +187,6 @@ void pagamento::terminarPagamento()
 {
 
 }
-
 
 void pagamento::on_CheckPorcentagem_stateChanged(int arg1)
 {

@@ -2,6 +2,8 @@
 #define PRODUTONOTA_SERVICE_H
 
 #include <QObject>
+#include <QSqlQueryModel>
+#include <QVariantMap>
 #include "../dto/ProdutoNota_dto.h"
 #include "../repository/produtonota_repository.h"
 
@@ -22,6 +24,12 @@ public:
     };
     explicit ProdutoNota_service(QObject *parent = nullptr);
     ProdutoNota_service::Resultado inserirListaProdutos(QList<ProdutoNotaDTO> lista);
+    void listarPorNota(QSqlQueryModel *model, qlonglong idNf);
+    ProdutoNotaDTO getProdutoNota(qlonglong id);
+    QString getXmlPathPorId(qlonglong id);
+    bool marcarComoAdicionado(qlonglong id);
+    QVariantMap getProdutoNotaComXmlPath(qlonglong id);
+    bool marcarComoDevolvido(qlonglong id, qlonglong idNfDevol);
 private:
     ProdutoNota_repository prodNotaRepo;
 

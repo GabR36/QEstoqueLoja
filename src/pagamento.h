@@ -9,6 +9,7 @@
 #include <QSqlDatabase>
 #include <QMessageBox>
 #include <QDateTime>
+#include "services/config_service.h"
 
 namespace Ui {
 class pagamento;
@@ -27,6 +28,7 @@ public:
     QString totalGlobal;
     QLocale portugues;
     QSqlDatabase db = QSqlDatabase::database();
+    ConfigDTO configDTO;
 
 private slots:
     void on_buttonBox_accepted();
@@ -50,6 +52,8 @@ protected:
     void descontoTaxa();
     Ui::pagamento *ui;
     virtual void terminarPagamento();
+    Config_service confServ;
+
 signals:
     void pagamentoConcluido();
 };

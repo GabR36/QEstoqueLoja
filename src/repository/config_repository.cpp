@@ -1,6 +1,7 @@
 #include "config_repository.h"
 #include "../infra/databaseconnection_service.h"
 #include <QSqlQuery>
+#include <QSqlError>
 
 Config_repository::Config_repository(QObject *parent)
     : QObject{parent}
@@ -24,8 +25,6 @@ ConfigDTO Config_repository::loadAll()
     while(q.next()){
         map[q.value(0).toString()] = q.value(1).toString();
     }
-
-    m_db.close();
 
     dto.nomeEmpresa = map["nome_empresa"];
     dto.nomeFantasiaEmpresa = map["nfant_empresa"];
@@ -172,6 +171,5 @@ bool Config_repository::saveAll(const ConfigDTO &dto)
         }
     }
 
-    m_db.close();
     return true;
 }

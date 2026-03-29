@@ -4,7 +4,7 @@
 #include <QString>
 
 struct ProdutoDTO {
-    QString id;
+    qlonglong id;
     double quantidade;
     QString descricao;
     double preco;
@@ -18,6 +18,9 @@ struct ProdutoDTO {
     double aliquotaIcms;
     QString csosn;
     QString pis;
+    QString local;
+    QString adicionadoEm;
+    QString atualizadoEm;
 };
 
 #endif

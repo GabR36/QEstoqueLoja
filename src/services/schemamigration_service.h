@@ -30,6 +30,7 @@ public:
     int dbSchemaLastVersion;
 
     int dbSchemaVersion;
+    Config_service confServ;
     ConfigDTO configDTO;
 
     QSqlDatabase db;

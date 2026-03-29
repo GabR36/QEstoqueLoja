@@ -3,6 +3,11 @@
 
 #include <QObject>
 #include <QSqlDatabase>
+#include <QSqlQueryModel>
+#include <QMap>
+#include <QList>
+#include <QPair>
+#include <QDateTime>
 #include <../dto/NotaFiscal_dto.h>
 
 class notafiscal_repository : public QObject
@@ -14,6 +19,17 @@ public:
     qlonglong getIdFromChave(QString chnfe);
     bool updateWhereChave(NotaFiscalDTO dto, QString chave);
     qlonglong getIdFromIdVenda(qlonglong idvenda);
+    qlonglong getProximoNNF55(QString serie, bool tpAmb, qlonglong nnfConfigurado);
+    NotaFiscalDTO getNotaNormalFromIdVenda(qlonglong idvenda);
+    NotaFiscalDTO getNotaById(qlonglong id);
+    bool inserir(NotaFiscalDTO nota);
+    qlonglong getIdNotaNormalFromIdVenda(qlonglong idvenda);
+    qlonglong getProximoNNF65(QString serie, bool tpAmb, qlonglong nnfConfigurado);
+    void listarEntradas(QSqlQueryModel *model, const QString &de = "", const QString &ate = "");
+    void listarMonitor(QSqlQueryModel *model, const QStringList &finalidades);
+    QMap<QString, int>             contarPorFinalidade(QDateTime dtIni, QDateTime dtFim, int tpAmb);
+    QList<QPair<QString, QString>> buscarXmlsPorPeriodo(QDateTime dtIni, QDateTime dtFim, int tpAmb);
+    QList<NotaFiscalDTO>           buscarPorPeriodo(QDateTime dtIni, QDateTime dtFim, int tpAmb);
 private:
     QSqlDatabase db;
 

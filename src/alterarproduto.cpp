@@ -55,40 +55,26 @@ AlterarProduto::~AlterarProduto()
     delete util;
 }
 
- void AlterarProduto::TrazerInfo(QString desc, QString quant, QString preco, QString barras, bool nf,
-                                QString ucom, QString precoforn, QString porcentlucro, QString ncm,
-                                QString cest, QString aliquotaimp, QString csosn, QString pis){
+void AlterarProduto::TrazerInfo(const ProdutoDTO &produto)
+{
+    barrasAlt = produto.codigoBarras;
 
-
-    descAlt = desc;
-    quantAlt = quant;
-    precoAlt = preco;
-    barrasAlt = barras;
-    nfAlt = nf;
-    ucomAlt = ucom;
-    precoFornAlt = precoforn;
-    porcentLucroAlt = porcentlucro;
-    ncmAlt = ncm;
-    cestAlt = cest;
-    aliquotaImpAlt = aliquotaimp;
-    csosnAlt = csosn;
-    pisAlt = pis;
-
-    ui->Ledit_AltDesc->setText(desc);
-    ui->Ledit_AltQuant->setText(quant);
-    ui->Ledit_AltPreco->setText(preco);
-    ui->Ledit_AltBarras->setText(barras);
-    ui->Check_AltNf->setChecked(nf);
-    ui->Ledit_AltPrecoFornecedor->setText(precoforn);
-    ui->Ledit_AltPercentualLucro->setText(porcentlucro);
-    ui->CBox_AltUCom->setCurrentText(ucom);
-    ui->Ledit_AltNCM->setText(ncm);
-    ui->Ledit_AltCEST->setText(cest);
-    ui->Ledit_AltAliquota->setText(aliquotaimp);
-    ui->Ledit_AltCSOSN->setText(csosn);
-    ui->Ledit_AltPIS->setText(pis);
-
-    ui->Lbl_AltNCMDesc->setText(util->get_Descricao_NCM(ncm));
+    ui->Ledit_AltDesc->setText(produto.descricao);
+    ui->Ledit_AltQuant->setText(portugues.toString(produto.quantidade, 'f', 2));
+    ui->Ledit_AltPreco->setText(portugues.toString(produto.preco, 'f', 2));
+    ui->Ledit_AltBarras->setText(produto.codigoBarras);
+    ui->Check_AltNf->setChecked(produto.nf);
+    ui->Ledit_AltPrecoFornecedor->setText(produto.precoFornecedor != 0.0
+                                              ? portugues.toString(produto.precoFornecedor, 'f', 2)
+                                              : QString());
+    ui->Ledit_AltPercentualLucro->setText(portugues.toString(produto.percentLucro, 'f', 2));
+    ui->CBox_AltUCom->setCurrentText(produto.uCom);
+    ui->Ledit_AltNCM->setText(produto.ncm);
+    ui->Ledit_AltCEST->setText(produto.cest);
+    ui->Ledit_AltAliquota->setText(portugues.toString(produto.aliquotaIcms, 'f', 2));
+    ui->Ledit_AltCSOSN->setText(produto.csosn);
+    ui->Ledit_AltPIS->setText(produto.pis);
+    ui->Lbl_AltNCMDesc->setText(util->get_Descricao_NCM(produto.ncm));
 }
 
  void AlterarProduto::on_Btn_AltAceitar_accepted()

@@ -2,64 +2,85 @@
 
 ## Descrição
 
-Software simples ERP para controlar o estoque de lojas pequenas.
+O **QEstoqueLoja** é um ERP simples e eficiente para controle de estoque e vendas em pequenas lojas.
 
-Funções:
-- **emissão, cancelamento e devolução de nota fiscal eletrônica (NF-e)
-e NFC-e para regime simples nacional**
-- Pesquisa de preço, registro de vendas
+Foi desenvolvido com foco em **facilidade de uso**, **instalação rápida** e **automatização de tarefas do dia a dia**, evitando a complexidade excessiva presente em sistemas ERP tradicionais.
+
+Atualmente, o sistema funciona de forma **local (offline)**, em um único computador, sem necessidade de servidores ou configurações complexas.
+
+---
+
+## Funcionalidades
+
+- Emissão, cancelamento e devolução de **NF-e** e **NFC-e** (Simples Nacional)
+- Registro de vendas e pesquisa de preços
 - Cadastro de produtos
-- Relatório de lucro e valor vendido
-- PDV
-- Código de barras
+- Controle de estoque
+- Relatórios de lucro e faturamento
+- PDV (Ponto de Venda)
+- Suporte a código de barras
 - Vendas a prazo
-- Gráficos e relatórios
+- Gráficos e relatórios gerenciais
 - Impressão de etiquetas
-- Orçamento
-- Importação de produtos através de notas fiscais
-- Envio de e-mail de notas fiscais
-- E mais.
+- Orçamentos
+- Importação de produtos via notas fiscais
+- Envio de notas fiscais por e-mail
+- E mais
 
-É feito para ser fácil de instalar e usar, sem necessidade de
-servidores ou dependencias, atualmente, funciona em apenas um
-computador, sem sincronização de dados. Apenas instale um executável e
-está pronto.
+---
 
-Nós entendemos que os programas atuais de ERP são muito complexos
-tentando cobrir todas as milhões de situações fiscais e financeiras de
-todos os comerciantes ao mesmo tempo, o que faz com que os comercios
-pequenos tenham dificuldade de integrar o sistema as suas necessidades
-e acabam não usando 99% do que os programas oferecem. O QEstoqueLoja
-tenta mudar essa situação com foco na automatização de tarefas e
-simplicidade.
+## Objetivo
 
-Feito em Qt framework e SQLite para o banco de dados.
+Muitos sistemas ERP tentam atender todos os tipos de negócios e cenários fiscais, tornando-se complexos e difíceis de usar.
 
-## Instalação
+O **QEstoqueLoja** busca resolver esse problema com:
+- Simplicidade
+- Foco em pequenas lojas
+- Automação de tarefas essenciais
+- Interface direta e prática
 
-Disponibilizamos instaladores para Windows e Linux (Debian) na página
-de [releases do
-repositório](https://github.com/GabR36/QEstoqueLoja/releases).
+---
 
-## Compilação
+## ⚙️ Tecnologias
+
+- **Qt Framework**
+- **SQLite** (banco de dados local)
+
+---
+
+## 📦 Instalação
+
+Instaladores para **Windows** e **Linux (Debian)** estão disponíveis na página de releases:
+
+👉 https://github.com/GabR36/QEstoqueLoja/releases
+
+Basta baixar e executar — não é necessário configurar servidor ou dependências adicionais.
+
+---
+
+## 🛠️ Compilação
 
 ### Dependências
 
-- cmake,
-- qt6-declarative-dev,
-- qt6-charts-dev,
-- qt6-base-dev,
-- qt6-tools-dev,
-- libzint-dev,
-- libquazip1-qt6-dev
-- [QtRpt](https://qtrpt.sourceforge.io/) *versão biblioteca e sem  barcode
-- [ACBrNFe](https://svn.code.sf.net/p/acbr/code/trunk2/) *compilada com Qt
-- [ACBrConsultaCNPJConsoleMT](https://svn.code.sf.net/p/acbr/code/trunk2/)
-- [ACBrMailConsoleMT](https://svn.code.sf.net/p/acbr/code/trunk2/)
+- cmake  
+- qt6-base-dev  
+- qt6-declarative-dev  
+- qt6-charts-dev  
+- qt6-tools-dev  
+- libzint-dev  
+- libquazip1-qt6-dev  
+- QtRpt *(versão biblioteca, sem suporte a barcode)*  
+  https://qtrpt.sourceforge.io/  
+- ACBrNFe *(compilada com Qt)*  
+- ACBrConsultaCNPJConsoleMT  
+- ACBrMailConsoleMT  
+  https://svn.code.sf.net/p/acbr/code/trunk2/
 
-### Cmake
+---
 
-```
+### 🔧 Build com CMake
+
+```bash
 mkdir build
 cmake -S . -B build
 cmake --build build
@@ -67,18 +88,25 @@ cmake --build build
 
 ## Motivações e Futuro
 
-O objetivo desse programa é atender as necessidades que vejo no dia a
-dia como funcionario de uma pequena loja de produtos
-diversos. Primeiro quero substituir as funções existentes em outros
-programas ja usados, para, em seguida, colocar funções adicionais que
-realmente possam tornar o trabalho mais eficiente.  Contribuiçoes
-serão adicionadas se não interferirem nos objetivos ou irem de acordo
-com os objetivos propostos.
+O projeto nasceu da necessidade real do dia a dia em uma pequena loja.
 
-O "Paradigma de programação" usado é o de "fazer as coisas
-funcionarem", se algo estiver funcionando ele será aceito. A ideia é
-que, se é algo bom, é adicionado, o código pode ser melhorado com o
-tempo. Seguindo os ideiais da metodologia Ágil.
+A ideia é:
+
+- Substituir ferramentas já utilizadas
+- Evoluir com funcionalidades que realmente aumentem a eficiência
+- Evitar complexidade desnecessária
+
+Contribuições são bem-vindas, desde que estejam alinhadas com o foco do projeto.
+
+## Filosofia de Desenvolvimento
+
+O projeto segue uma abordagem prática:
+
+“Fazer funcionar primeiro, melhorar depois.”
+
+- Código funcional tem prioridade
+- Melhorias são feitas de forma incremental
+- Influência de práticas ágeis
 
 ## Capturas de Tela
 
@@ -91,3 +119,5 @@ tempo. Seguindo os ideiais da metodologia Ágil.
 ![Tela Venda](/Imagens/capturaPagamento.png)
 
 ![Tela Relatórios](/Imagens/capturaGrafico.png)
+
+![Tela Monitor Fiscal](/Imagens/capturaMonitor.png)

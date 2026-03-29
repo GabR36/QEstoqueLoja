@@ -22,6 +22,7 @@ private slots:
     void enviarInutilizacao_motivo_curto();
     void enviarInutilizacao_numeros_invalidos();
     void enviarInutilizacao_retornoForcado_recusado();
+    void enviarNfcePadrao_retornoForcado_windows_ok();
 };
 
 #endif // TEST_FISCALEMITTER_SERVICE_H

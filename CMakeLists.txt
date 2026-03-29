@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.5)
 project(QEstoqueLoja VERSION 0.1 LANGUAGES CXX)
 
 enable_testing()
-add_subdirectory(tests)
-
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -38,7 +36,7 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libxml2-v2.11.5/include/libxml2
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/QtRPT
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/include
-        # ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-headers
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-headers
 
     )
 endif()
@@ -47,13 +45,7 @@ endif()
 set(TS_FILES QEstoqueLoja_pt_BR.ts)
 if(CMAKE_SYSTEM MATCHES "Windows")
 
-    include(FetchContent)
-    FetchContent_Declare(
-    zint
-    GIT_REPOSITORY https://github.com/zint/zint.git
-    GIT_TAG master # Você pode substituir por uma versão específica, se desejar
-    )
-    FetchContent_MakeAvailable(zint)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/zint)
 elseif(CMAKE_SYSTEM MATCHES "Linux")
     find_package(PNG)
     find_library(ZINT_LIBRARIES NAMES zint)
@@ -66,6 +58,8 @@ set(PROJECT_SOURCES
         src/mainwindow.ui
         ${TS_FILES}
 )
+
+add_subdirectory(tests)
 
 if(WIN32)
     set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Imagens/QEstoqueLOja/AppIcon.rc")
@@ -236,6 +230,7 @@ else()
 endif()
 
 if (WIN32)
+    add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
     add_library(quazip1-qt6 UNKNOWN IMPORTED)
 
     set_target_properties(quazip1-qt6 PROPERTIES
@@ -261,10 +256,13 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libiconv-for-Windows/lib64/Release
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/libxml2-v2.11.5/lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/bin/release/lib
-        # ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-lib
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-lib
         ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/lib
     )
     target_link_libraries(QEstoqueLoja  PRIVATE QtRPT quazip1-qt6 Qt6::Core5Compat zdll)
+    target_include_directories(QEstoqueLoja PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/quazip/quazip-headers
+    )
 
 endif()
 

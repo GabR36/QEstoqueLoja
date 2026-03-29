@@ -268,7 +268,7 @@ float NfceACBR::corrigirTaxa(float taxaAntiga, float desconto){
 }
 
 double NfceACBR::getSomaValorTotalProdutos(){
-    double valorTotalProdutos;
+    double valorTotalProdutos = 0.0;
     for (int i = 0; i < listaProdutosNFCe.size(); ++i) {
         valorTotalProdutos += listaProdutosNFCe[i].valorTotal;
     }

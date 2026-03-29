@@ -3,6 +3,7 @@
 #include <QSqlQuery>
 #include <QDebug>
 #include "../util/datautil.h"
+#include <QSqlError>
 
 ProdutoVenda_repository::ProdutoVenda_repository(QObject *parent)
     : QObject{parent}

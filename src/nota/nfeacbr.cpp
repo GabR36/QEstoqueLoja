@@ -460,7 +460,7 @@ double NfeACBR::corrigirTaxa(double taxaAntiga, double desconto){
 }
 
 double NfeACBR::getSomaValorTotalProdutos(){
-    double valorTotalProdutos;
+    double valorTotalProdutos = 0.0;
     for (int i = 0; i < listaProdutosNFe.size(); ++i) {
         valorTotalProdutos += listaProdutosNFe[i].valorTotal;
     }

@@ -222,8 +222,8 @@ void JanelaOrcamento::on_Btn_Terminar_clicked()
     ClienteDTO cliente = clienteService.getClienteByID(idCliente);
 
     QString reportPath;
-    for (const QString &basePath : QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation)) {
-        QString candidate = basePath + "/QEstoqueLoja/reports/orcamentoReport.xml";
+    for (const QString &basePath : QStandardPaths::standardLocations(QStandardPaths::AppDataLocation)) {
+        QString candidate = basePath + "/reports/orcamentoReport.xml";
         if (QFileInfo::exists(candidate)) {
             reportPath = candidate;
             break;

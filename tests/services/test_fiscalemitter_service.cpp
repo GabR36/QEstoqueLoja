@@ -286,6 +286,53 @@ void TestFiscalEmitterService::enviarInutilizacao_retornoForcado_ok()
     db.close();
 }
 
+void TestFiscalEmitterService::enviarNfcePadrao_retornoForcado_windows_ok()
+{
+    // retorno capturado no Windows: path com barras invertidas, nNF=593
+    QFile file(":/recursos/nfce_sanitizada_windows.txt");
+    QVERIFY2(file.open(QIODevice::ReadOnly | QIODevice::Text),
+             "Erro ao abrir nfce_sanitizada_windows.txt");
+    QString retornoFake = QString::fromUtf8(file.readAll());
+    file.close();
+    QVERIFY(!retornoFake.isEmpty());
+
+    qlonglong idProd = inserirProdutoNf(db);
+    QVERIFY(idProd > 0);
+
+    VendasDTO venda;
+    venda.id             = 1;
+    venda.total          = 50.00;
+    venda.formaPagamento = "Dinheiro";
+    venda.valorRecebido  = 50.00;
+    venda.troco          = 0;
+    venda.taxa           = 0;
+    venda.desconto       = 0;
+
+    ProdutoVendidoDTO pv;
+    pv.idProduto    = idProd;
+    pv.idVenda      = 1;
+    pv.quantidade   = 1;
+    pv.precoVendido = 50.00;
+
+    ClienteDTO cliente;
+
+    FiscalEmitter_service service;
+    service.setRetornoForcado(retornoFake);
+
+    auto r = service.enviarNfcePadrao(venda, {pv}, 593, cliente, true, false);
+
+    QVERIFY2(r.ok, qPrintable(r.msg));
+
+    DatabaseConnection_service::open();
+    QSqlQuery q(db);
+    q.exec("SELECT cstat, chnfe FROM notas_fiscais ORDER BY id DESC LIMIT 1");
+    QVERIFY(q.next());
+    QCOMPARE(q.value("cstat").toString(), QString("100"));
+    QCOMPARE(q.value("chnfe").toString(),
+             QString("41260399999999000191650010000005931000000090"));
+    db.close();
+}
+
 void TestFiscalEmitterService::enviarInutilizacao_motivo_curto()
 {
     FiscalEmitter_service service;

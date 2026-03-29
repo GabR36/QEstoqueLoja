@@ -6,21 +6,12 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Qt Test
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Test Core Sql Gui Widgets Xml PrintSupport Network Charts)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Sql Gui Widgets Xml PrintSupport Network Charts)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Test Core Sql Gui Widgets Xml PrintSupport Network Charts Core5Compat)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test Core Sql Gui Widgets Xml PrintSupport Network Charts Core5Compat)
 
-if(CMAKE_SYSTEM MATCHES "Windows")
-    include(FetchContent)
-    FetchContent_Declare(
-    zint
-    GIT_REPOSITORY https://github.com/zint/zint.git
-    GIT_TAG master # Você pode substituir por uma versão específica, se desejar
-    )
-    FetchContent_MakeAvailable(zint)
-elseif(CMAKE_SYSTEM MATCHES "Linux")
+if(CMAKE_SYSTEM MATCHES "Linux")
     find_package(PNG)
     find_library(ZINT_LIBRARIES NAMES zint)
-
 endif()
 
 
@@ -139,6 +130,14 @@ target_include_directories(QEstoqueLojaTests PRIVATE
     ${CMAKE_SOURCE_DIR}/tests
 )
 
+if (WIN32)
+    target_include_directories(QEstoqueLojaTests PRIVATE
+        ${CMAKE_SOURCE_DIR}/libs-externas/quazip/quazip-headers
+        ${CMAKE_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/include
+    )
+    target_compile_definitions(QEstoqueLojaTests PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+endif()
+
 # ==============================
 # Linkagem
 # ==============================
@@ -153,12 +152,15 @@ target_link_libraries(QEstoqueLojaTests PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Xml
     Qt${QT_VERSION_MAJOR}::Charts
+    Qt${QT_VERSION_MAJOR}::Core5Compat
 )
 
 if (CMAKE_SYSTEM MATCHES "Linux")
     target_link_libraries(QEstoqueLojaTests PRIVATE QuaZip::QuaZip)
 elseif (CMAKE_SYSTEM MATCHES "Windows")
-    target_link_libraries(QEstoqueLojaTests PRIVATE quazip1-qt6)
+    target_link_libraries(QEstoqueLojaTests PRIVATE
+        ${CMAKE_SOURCE_DIR}/libs-externas/quazip/quazip-lib/quazip1-qt6.lib
+    )
 endif()
 
 

@@ -1,6 +1,7 @@
 #include "config_repository.h"
 #include "../infra/databaseconnection_service.h"
 #include <QSqlQuery>
+#include <QSqlError>
 
 Config_repository::Config_repository(QObject *parent)
     : QObject{parent}

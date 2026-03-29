@@ -3,6 +3,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDebug>
+#include <QSqlRecord>
 
 Relatorios_repository::Relatorios_repository(QObject *parent)
     : QObject{parent}

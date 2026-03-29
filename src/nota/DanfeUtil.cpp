@@ -7,10 +7,10 @@
 DanfeUtil::DanfeUtil(QObject *parent)
     : QObject{parent}
 {
-    QStringList dataLocations = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
+    QStringList dataLocations = QStandardPaths::standardLocations(QStandardPaths::AppDataLocation);
     for (const QString &basePath : dataLocations) {
-        QString candidateNfe = basePath + "/QEstoqueLoja/reports/DANFE-NFe.xml";
-        QString candidateNFCe = basePath + "/QEstoqueLoja/reports/DANFE-NFCe.xml";
+        QString candidateNfe = basePath + "/reports/DANFE-NFe.xml";
+        QString candidateNFCe = basePath + "/reports/DANFE-NFCe.xml";
         if (QFileInfo::exists(candidateNfe)) {
             caminhoReportNFe = candidateNfe;
             caminhoReportNFCe = candidateNFCe;

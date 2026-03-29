@@ -2,6 +2,7 @@
 #include <QSqlQuery>
 #include "../infra/databaseconnection_service.h"
 #include <QDateTime>
+#include <QSqlError>
 
 DfeInfo_repository::DfeInfo_repository(QObject *parent)
     : QObject{parent}

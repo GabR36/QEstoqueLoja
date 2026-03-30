@@ -156,7 +156,7 @@ background-color:rgb(255, 96, 99)
         <string>Deletar venda</string>
        </property>
        <property name="icon">
-        <iconset resource="Imagens/recursosImg.qrc">
+        <iconset resource="../Imagens/recursosImg.qrc">
          <normaloff>:/QEstoqueLOja/amarok-cart-remove.svg</normaloff>:/QEstoqueLOja/amarok-cart-remove.svg</iconset>
        </property>
        <property name="iconSize">
@@ -204,7 +204,7 @@ background-color:rgb(03,75,119);
         <string>Inserir Venda</string>
        </property>
        <property name="icon">
-        <iconset resource="Imagens/recursosImg.qrc">
+        <iconset resource="../Imagens/recursosImg.qrc">
          <normaloff>:/QEstoqueLOja/add-product.svg</normaloff>:/QEstoqueLOja/add-product.svg</iconset>
        </property>
        <property name="iconSize">
@@ -391,7 +391,7 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
        <item>
         <widget class="QLabel" name="Lbl_Lucro">
          <property name="text">
-          <string>TextLabel</string>
+          <string/>
          </property>
         </widget>
        </item>
@@ -412,7 +412,7 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
        <item>
         <widget class="QLabel" name="Lbl_Total">
          <property name="text">
-          <string>TextLabel</string>
+          <string/>
          </property>
         </widget>
        </item>
@@ -433,7 +433,7 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
        <item>
         <widget class="QLabel" name="Lbl_Quantidade">
          <property name="text">
-          <string>TextLabel</string>
+          <string/>
          </property>
         </widget>
        </item>
@@ -471,7 +471,7 @@ font: 700 9pt &quot;Segoe UI&quot;;</string>
   </layout>
  </widget>
  <resources>
-  <include location="Imagens/recursosImg.qrc"/>
+  <include location="../Imagens/recursosImg.qrc"/>
  </resources>
  <connections/>
 </ui>

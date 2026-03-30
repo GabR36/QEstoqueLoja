@@ -192,7 +192,7 @@ FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNfcePadrao(VendasD
         if(produto.nf){
             algumProdTemNota = true;
             // se nao esta emitindo todos procurar ncm invalido apenas em produtos nf
-            if(!emitirTodos){
+            if(!emitirTodos && (produto.ncm == "00000000" || produto.ncm.isEmpty())){
                 algumProdTemNCMErrado = true;
                 produtosNcmInvalido.append(produto.descricao);
             }
@@ -320,7 +320,7 @@ FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNFePadrao(VendasDT
         if(produto.nf){
             algumProdTemNota = true;
             // se nao esta emitindo todos procurar ncm invalido apenas em produtos nf
-            if(!emitirTodos){
+            if(!emitirTodos && (produto.ncm == "00000000" || produto.ncm.isEmpty())){
                 algumProdTemNCMErrado = true;
                 produtosNcmInvalido.append(produto.descricao);
             }

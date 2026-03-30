@@ -61,7 +61,7 @@ Produto_Service::Resultado Produto_Service::validarConversao(const ProdutoDTO &p
                 "Por favor, insira um preço válido."};
     }
 
-    if (p.quantidade <= 0) {
+    if (p.quantidade < 0) {
         return {false, ProdutoErro::QuantidadeInvalida,
                 "Por favor, insira uma quantidade válida."};
     }

@@ -41,7 +41,7 @@ O **QEstoqueLoja** busca resolver esse problema com:
 
 ---
 
-## ecnologias
+## Tecnologias
 
 - **Qt Framework**
 - **SQLite** (banco de dados local)
@@ -52,13 +52,13 @@ O **QEstoqueLoja** busca resolver esse problema com:
 
 Instaladores para **Windows** e **Linux (Debian)** estão disponíveis na página de releases:
 
-👉 https://github.com/GabR36/QEstoqueLoja/releases
+https://github.com/GabR36/QEstoqueLoja/releases
 
 Basta baixar e executar — não é necessário configurar servidor ou dependências adicionais.
 
 ---
 
-## ompilação
+## Compilação
 
 ### Dependências
 

@@ -39,43 +39,38 @@
   </property>
   <property name="styleSheet">
    <string notr="true">
-
-#AlterarProduto{
-background-color: rgb(199, 199, 199);
-
+#AlterarProduto {
+  background-color: rgb(199, 199, 199);
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
+    stop:0 rgba(199, 199, 199, 255), stop:1 rgba(170, 170, 170, 255));
 }
-QPushButton{
-background-color: rgb(43, 132, 191);
-color: rgb(255, 255, 255);
-font-size: 15px;
-border-radius: 13px;
-
+QPushButton {
+  background-color: rgb(43, 132, 191);
+  color: rgb(255, 255, 255);
+  font-size: 13px;
+  border-radius: 10px;
 }
-QPushButton:disabled{
-	
-	
-	background-color: rgb(154, 153, 150);
+QPushButton:disabled {
+  background-color: rgb(154, 153, 150);
 }
-
-QPushButton:hover{
-	background-color: rgb(13, 92, 161);
+QPushButton:hover {
+  background-color: rgb(13, 92, 161);
 }
-QPushButton:pressed{
-	
-color: rgb(255, 255, 255);
-	background-color: rgb(153, 193, 241);
-font-size: 15px;
-border-radius: 13px;
+QPushButton:pressed {
+  color: rgb(255, 255, 255);
+  background-color: rgb(153, 193, 241);
+  font-size: 13px;
+  border-radius: 10px;
 }
-QTabWidget{
-background-color:rgb(222, 221, 218)
+QTabWidget {
+  background-color: rgb(222, 221, 218);
 }
-QGroupBox{
-background-color:rgb(170, 170, 170);
-	font: 700 9pt &quot;Segoe UI&quot;;
-	font-size: 15px;
+QGroupBox {
+  background-color: rgb(170, 170, 170);
+  font: 700 9pt &quot;Segoe UI&quot;;
+  font-size: 15px;
 }
-</string>
+   </string>
   </property>
   <property name="sizeGripEnabled">
    <bool>false</bool>

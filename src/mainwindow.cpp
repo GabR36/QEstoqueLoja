@@ -73,7 +73,7 @@ MainWindow::MainWindow(QWidget *parent)
     configDTO = confServ->carregarTudo();
 
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
-    ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
+    // header estilizado via stylesheet global
     ui->Ledit_Pesquisa->installEventFilter(this);
     atualizarTableview();
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));

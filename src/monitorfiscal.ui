@@ -63,13 +63,13 @@
 
 QTableView {
     background-color: #ffffff;
-    alternate-background-color: #f8fafc;
+    alternate-background-color: #dce9f5;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
     gridline-color: #e2e8f0;
     font: 10pt &quot;Ubuntu&quot;;
-    selection-background-color: #dbeafe;
-    selection-color: #1e3a5f;
+    selection-background-color: rgb(43, 132, 191);
+    selection-color: #ffffff;
     outline: none;
 }
 

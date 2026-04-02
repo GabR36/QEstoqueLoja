@@ -195,6 +195,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/repository/relatorios_repository.h src/repository/relatorios_repository.cpp
         src/services/relatorios_service.h src/services/relatorios_service.cpp
         src/inutilizacaodialog.h src/inutilizacaodialog.cpp src/inutilizacaodialog.ui
+        Imagens/QEstoqueLOja/light-icons/QeLogo-claro.png
 
 
 

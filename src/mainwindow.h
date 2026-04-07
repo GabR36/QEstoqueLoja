@@ -22,6 +22,7 @@
 #include "nota/acbrmanager.h"
 #include "../services/Produto_service.h"
 #include "dto/Config_dto.h"
+#include "services/contingencia_service.h"
 
 
 #define VERSAO_QE "2.5.0"
@@ -111,6 +112,7 @@ private:
     QAction* actionVerProduto;
     Produto_Service *produtoService;
     ConfigDTO configDTO;
+    ContingenciaService *contingenciaService = nullptr;
 
 
     void setarIconesJanela();

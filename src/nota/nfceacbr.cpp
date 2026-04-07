@@ -374,7 +374,7 @@ void NfceACBR::carregarConfig(){
     nfce->ConfigGravarValor("NFe", "ModeloDF", "1");  // NFe = 0
     nfce->ConfigGravarValor("NFe", "VersaoDF", "3");
     nfce->ConfigGravarValor("NFe", "VersaoQRCode", "3");
-    nfce->ConfigGravarValor("NFe", "FormaEmissao", "0");
+    nfce->ConfigGravarValor("NFe", "FormaEmissao", tpEmis == 9 ? "8" : "0");
     nfce->ConfigGravarValor("NFe", "Ambiente", tpAmb);
 }
 
@@ -417,6 +417,10 @@ void NfceACBR::ide()
     ini << "nNF=" << nnf << "\n";
     ini << "cNF=" << std::to_string(numeroAleatorio8dig) << "\n";
     ini << "dhEmi=" << dataHora << "\n";
+    if (tpEmis != 1) {
+        ini << "dhCont=" << dataHora << "\n";
+        ini << "xJust=Falha de conexao com a internet ou com o servico da SEFAZ\n";
+    }
     ini << "natOp=VENDA AO CONSUMIDOR\n";
     ini << "tpNF=1\n";
     ini << "finNFe=1\n";
@@ -722,30 +726,58 @@ QString NfceACBR::gerarEnviar(){
     if(usarIBS){
         ibscbsTotais();
     }
+    // Erros de preparação (dados inválidos, certificado, etc.) retornam erro normal — sem contingência
     try {
         nfce->CarregarINI(ini.str());
         nfce->Assinar();
-         // nfce->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
-
         nfce->Validar();
+    } catch (std::exception &e) {
+        qDebug() << "Erro ao preparar NFC-e:" << e.what();
+        return QString("Erro ao preparar nota %1:\n%2").arg(QString::fromStdString(nnf), e.what());
+    }
 
+    // Apenas falha no envio (sem internet) aciona contingência
+    try {
         std::string retorno = nfce->Enviar(1, false, true, false);
         QString ret = QString::fromUtf8(retorno.c_str());
         qDebug() << "nfce getpath: " << nfce->GetPath(0);
         qDebug() << "nfce chave: " << cnf;
-
         qDebug() << "Retorno SEFAZ:" << ret;
         return ret;
-        //nfce->Imprimir("", 1, "", true, std::nullopt, std::nullopt, std::nullopt);
+    } catch (std::exception &e) {
+        qDebug() << "Erro ao enviar NFC-e, tentando contingência offline:" << e.what();
+        try {
+            nfce->LimparLista();
+            tpEmis = 9;
+            ini.str("");
+            ini.clear();
+            ini << "[infNFe]\n";
+            ini << "versao=4.00\n\n";
+            carregarConfig();
+            ide();
+            emite();
+            dest();
+            carregarProds();
+            total();
+            transp();
+            pag();
+            infRespTec();
+            if(usarIBS) ibscbsTotais();
 
-    }
-    catch (std::exception &e) {
-        qDebug() << "Erro std::exception:" << e.what();
-        return QString("Erro ao enviar nota %1:\n%2").arg(QString::fromStdString(nnf), e.what());
-    }
-    catch (...) {
-        qDebug() << "Erro desconhecido!";
-        return QString("Erro desconhecido ao enviar nota %1.").arg(QString::fromStdString(nnf));
+            nfce->CarregarINI(ini.str());
+            nfce->Assinar();
+            std::string rawCnf = cnf;
+            rawCnf.erase(std::find(rawCnf.begin(), rawCnf.end(), '\0'), rawCnf.end());
+            QString chaveContingencia = QString::fromStdString(rawCnf).trimmed();
+            QString nomeArq = chaveContingencia + "-cont-nfe.xml";
+            nfce->GravarXml(0, nomeArq.toStdString(), caminhoXml.toStdString());
+            QString xmlPathContingencia = caminhoXml + "/" + nomeArq;
+            qDebug() << "NFC-e salva em contingência:" << xmlPathContingencia;
+            return QString("CONTINGENCIA=1\nchDFe=%1\nNomeArq=%2\n").arg(chaveContingencia, xmlPathContingencia);
+        } catch (std::exception &e2) {
+            qDebug() << "Contingência NFC-e também falhou:" << e2.what();
+            return QString("Erro ao enviar nota %1:\n%2").arg(QString::fromStdString(nnf), e.what());
+        }
     }
 }
 
@@ -759,20 +791,16 @@ NFRetornoDTO NfceACBR::gerarEnviarRetorno(){
     }
 
     QString cStat, xMotivo, msg, nProt;
-
-
-    QString finalidade;
-
-    finalidade = "NORMAL";
-    // Processa todas as linhas do retorno do ACBr
-
+    QString finalidade = "NORMAL";
     QStringList linhas = retorno.split('\n', Qt::SkipEmptyParts);
-
     QString nomeArq, chDFe;
+    bool contingencia = false;
 
     for (const QString &linha : linhas) {
-        QString linhaTrim = linha.trimmed(); // Remove espaços e quebras de linha
-        if (linhaTrim.startsWith("CStat="))
+        QString linhaTrim = linha.trimmed();
+        if (linhaTrim.startsWith("CONTINGENCIA=1"))
+            contingencia = true;
+        else if (linhaTrim.startsWith("CStat="))
             cStat = linhaTrim.section('=', 1).trimmed();
         else if (linhaTrim.startsWith("XMotivo="))
             xMotivo = linhaTrim.section('=', 1).trimmed();
@@ -786,11 +814,16 @@ NFRetornoDTO NfceACBR::gerarEnviarRetorno(){
             chDFe = linhaTrim.section('=', 1).trimmed();
     }
 
+    if (contingencia) {
+        cStat = "CONTINGENCIA";
+        nProt = "";
+    }
+
     qDebug() << "Retorno ACBr:" << retorno;
     qDebug() << "cStat:" << cStat << "xMotivo:" << xMotivo << "nProt:" << nProt;
 
     QString tpamb = (QString::fromStdString(tpAmb) == "1" ? "0" : "1");
-    nota.chNfe = !retornoForcado.isEmpty() ? chDFe : getChaveNf();
+    nota.chNfe = (!retornoForcado.isEmpty() || contingencia) ? chDFe : getChaveNf();
     nota.cnpjEmit = configDTO.cnpjEmpresa;
     nota.cstat = cStat;
     nota.cuf = configDTO.cUfFiscal;
@@ -802,7 +835,7 @@ NFRetornoDTO NfceACBR::gerarEnviarRetorno(){
     nota.serie = getSerie();
     nota.tpAmb = tpamb.toInt();
     nota.valorTotal = getVNF();
-    nota.xmlPath = !retornoForcado.isEmpty() ? nomeArq : getXmlPath();
+    nota.xmlPath = (!retornoForcado.isEmpty() || contingencia) ? nomeArq : getXmlPath();
     nota.xMotivo = xMotivo;
     nota.msg = msg;
     return nota;

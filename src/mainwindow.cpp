@@ -72,6 +72,11 @@ MainWindow::MainWindow(QWidget *parent)
     Config_service *confServ = new Config_service(this);
     configDTO = confServ->carregarTudo();
 
+    if (configDTO.emitNfFiscal) {
+        contingenciaService = new ContingenciaService(this);
+        contingenciaService->iniciar();
+    }
+
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
     // header estilizado via stylesheet global
     ui->Ledit_Pesquisa->installEventFilter(this);
@@ -520,9 +525,13 @@ void MainWindow::atualizarConfigAcbr(){
             }
 
         }else{
-            qDebug() << "Configurações salvas no arquivo acbrlib.ini";
+            qDebug() << res.msg;
         }
 
+        if (!contingenciaService && configDTO.emitNfFiscal) {
+            contingenciaService = new ContingenciaService(this);
+            contingenciaService->iniciar();
+        }
 }
 
 

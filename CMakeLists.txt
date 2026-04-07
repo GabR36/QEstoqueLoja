@@ -150,6 +150,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/services/barcode_service.h src/services/barcode_service.cpp
         src/util/codigobarrasutil.h src/util/codigobarrasutil.cpp
         src/services/acbr_service.h src/services/acbr_service.cpp
+        src/services/contingencia_service.h src/services/contingencia_service.cpp
         src/services/schemamigration_service.h src/services/schemamigration_service.cpp
         src/infra/apppath_service.h src/infra/apppath_service.cpp
         src/infra/databaseconnection_service.h src/infra/databaseconnection_service.cpp

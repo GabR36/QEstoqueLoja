@@ -235,7 +235,7 @@ FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNfcePadrao(VendasD
         return{false, FiscalEmitterErro::ErroAoEnviar, "Erro ao enviar nota."};
     }
 
-    if(notaRet.cstat != "100" || notaRet.cstat != "100"){
+    if(notaRet.cstat != "100" && notaRet.cstat != "150" && notaRet.cstat != "CONTINGENCIA"){
         return {false, FiscalEmitterErro::Recusado, QString("Nota Fiscal Recusada.\n"
                                                             "cStat:%1\n"
                                                             "Motivo:%2").arg(notaRet.cstat,
@@ -282,6 +282,11 @@ FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNfcePadrao(VendasD
         return {false, FiscalEmitterErro::Salvar, "Erro ao salvar nota fiscal."};
     }else{
         prodVendaServ.marcarComoEmitidoNF(venda.id, emitirTodos);
+        if(nota.cstat == "CONTINGENCIA"){
+            return{true, FiscalEmitterErro::Nenhum,
+                   "NFC-e salva em contingência offline.\n"
+                   "Será retransmitida automaticamente quando houver conexão com a SEFAZ."};
+        }
         QString msg = "Nota enviada e salva com sucesso.\ncStat:" + nota.cstat;
         return{true, FiscalEmitterErro::Nenhum, msg};
     }
@@ -363,7 +368,7 @@ FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNFePadrao(VendasDT
         return{false, FiscalEmitterErro::ErroAoEnviar, "Erro ao enviar nota."};
     }
 
-    if(notaRet.cstat != "100" || notaRet.cstat != "100"){
+    if(notaRet.cstat != "100" && notaRet.cstat != "150" && notaRet.cstat != "CONTINGENCIA"){
         return {false, FiscalEmitterErro::Recusado, QString("Nota Fiscal Recusada.\n"
                                                             "cStat:%1\n"
                                                             "Motivo:%2").arg(notaRet.cstat,
@@ -410,6 +415,11 @@ FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNFePadrao(VendasDT
         return {false, FiscalEmitterErro::Salvar, "Erro ao salvar nota fiscal."};
     }else{
         prodVendaServ.marcarComoEmitidoNF(venda.id, emitirTodos);
+        if(nota.cstat == "CONTINGENCIA"){
+            return{true, FiscalEmitterErro::Nenhum,
+                   "NF-e salva em contingência offline.\n"
+                   "Será retransmitida automaticamente quando houver conexão com a SEFAZ."};
+        }
         QDateTime datavenda = QDateTime::fromString(nota.atualizadoEm, "yyyy-MM-dd HH:mm:ss");
         auto r = emailServ.enviarEmailNFe(cliente.nome, cliente.email, nota.xmlPath,
                                           nfe->getPdfDanfe(), datavenda, confDTO.nomeEmpresa);

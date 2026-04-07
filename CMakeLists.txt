@@ -151,6 +151,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/util/codigobarrasutil.h src/util/codigobarrasutil.cpp
         src/services/acbr_service.h src/services/acbr_service.cpp
         src/services/contingencia_service.h src/services/contingencia_service.cpp
+        src/repository/contingencia_repository.h src/repository/contingencia_repository.cpp
         src/services/schemamigration_service.h src/services/schemamigration_service.cpp
         src/infra/apppath_service.h src/infra/apppath_service.cpp
         src/infra/databaseconnection_service.h src/infra/databaseconnection_service.cpp

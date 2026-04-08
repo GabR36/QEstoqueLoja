@@ -19,8 +19,7 @@ bool CsvExporter::exportar(QWidget *parent,
     QString filePath = QFileDialog::getSaveFileName(
         parent,
         "Salvar CSV",
-        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
-            + "/" + nomeArquivoPadrao,
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
         "CSV (*.csv)");
     if (filePath.isEmpty())
         return false;

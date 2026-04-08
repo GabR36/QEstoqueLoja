@@ -117,7 +117,7 @@ void PDFexporter::exportarGraficoRelatorio(QWidget *parent, QChartView *chartVie
     QString filePath = QFileDialog::getSaveFileName(
         parent,
         "Salvar PDF",
-        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/relatorio.pdf",
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
         "PDF (*.pdf)");
     if (filePath.isEmpty()) return;
 
@@ -191,7 +191,7 @@ void PDFexporter::exportarTabelaRelatorio(QWidget *parent,
     QString filePath = QFileDialog::getSaveFileName(
         parent,
         "Salvar PDF",
-        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/relatorio_inventario.pdf",
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
         "PDF (*.pdf)");
     if (filePath.isEmpty()) return;
 

@@ -18,7 +18,8 @@ QString Email_service::footer()
 {
     return "\n\n"
            "---\n"
-           "QEstoqueLoja - Sistema de Gestao de Estoque e Vendas";
+           "QEstoqueLoja - Sistema de Gestao de Estoque e Vendas Gratuito "
+           "e de Código Aberto.\nSaiba Mais: https://qestoqueloja.mentolog.top";
 }
 
 Email_service::Resultado Email_service::enviarEmailNFe(QString nomeCliente, QString emailCliente,

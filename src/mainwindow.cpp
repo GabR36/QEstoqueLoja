@@ -155,6 +155,8 @@ void MainWindow::iniciarMigration(){
     //conexões de ações para update de versao schema
     connect(schema, &SchemaMigration_service::dbVersao6, this,
             &MainWindow::atualizarConfigAcbr);
+    connect(schema, &SchemaMigration_service::dbVersao9, this,
+            &MainWindow::atualizarConfigAcbr);
 
     // schema->update();
     auto result = schema->update();

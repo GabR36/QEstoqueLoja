@@ -3,6 +3,7 @@
 #include <QFile>
 #include <QMutexLocker>
 #include <QDebug>
+#include <QSqlError>
 
 static const int     INTERVALO_MS  = 5 * 60 * 1000;   // 5 minutos
 static const QString DB_CONN_NAME  = QStringLiteral("contingencia_worker");

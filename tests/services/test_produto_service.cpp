@@ -173,7 +173,7 @@ void TestProdutoService::erro_quantidade_invalida()
     Produto_Service service;
 
     ProdutoDTO p;
-    p.quantidade = 0;
+    p.quantidade = -1;
     p.descricao = "Produto";
     p.preco = 10;
     p.codigoBarras = "222";

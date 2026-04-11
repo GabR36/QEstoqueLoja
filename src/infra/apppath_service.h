@@ -11,6 +11,7 @@ public:
 
     static QString appDataPath();
     static QString databasePath();
+    static QString configPath();
     static QString xmlPath();
     static QString schemaPath();
     static QString imagesPath();

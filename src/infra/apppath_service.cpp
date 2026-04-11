@@ -23,6 +23,11 @@ QString AppPath_service::databasePath()
     return path;
 }
 
+QString AppPath_service::configPath()
+{
+    return appDataPath() + "/config.ini";
+}
+
 QString AppPath_service::xmlPath()
 {
     QString path = appDataPath() + "/xmlNf";

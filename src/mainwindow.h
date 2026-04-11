@@ -22,9 +22,10 @@
 #include "nota/acbrmanager.h"
 #include "../services/Produto_service.h"
 #include "dto/Config_dto.h"
+#include "services/contingencia_service.h"
 
 
-#define VERSAO_QE "2.5.0"
+#define VERSAO_QE "2.6.0"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -111,12 +112,13 @@ private:
     QAction* actionVerProduto;
     Produto_Service *produtoService;
     ConfigDTO configDTO;
+    ContingenciaService *contingenciaService = nullptr;
 
 
     void setarIconesJanela();
     //QModelIndex selected_index;
 
-    const int ultimaVersaoSchema = 8;
+    const int ultimaVersaoSchema = 9;
 
 
     void mostrarProdutoPorCodigoBarras(const QString &codigo);

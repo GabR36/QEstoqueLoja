@@ -1022,30 +1022,38 @@ QString NfeACBR::gerarEnviar(){
         ibscbsTotais();
     }
 
+    // Erros de preparação (dados inválidos, certificado, etc.) retornam erro normal — sem contingência
     try {
         nfe->CarregarINI(ini.str());
         nfe->Assinar();
         nfe->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
-
         nfe->Validar();
+    } catch (std::exception &e) {
+        qDebug() << "Erro ao preparar NF-e:" << e.what();
+        return QString("Erro ao preparar nota %1:\n%2").arg(QString::fromStdString(nnf), e.what());
+    }
 
+    // Apenas falha no envio (sem internet) aciona contingência
+    try {
         std::string retorno = nfe->Enviar(1, false, true, false);
         QString ret = QString::fromUtf8(retorno.c_str());
         qDebug() << "nfe getpath: " << nfe->GetPath(0);
         qDebug() << "nfe chave: " << cnf;
-
         qDebug() << "Retorno SEFAZ:" << ret;
         return ret;
-        // nfe->Imprimir("", 1, "", true, std::nullopt, std::nullopt, std::nullopt);
-        // nfe->GravarXml(0, "xml_autorizado_nota_"+ nnf() + ".xml", "./xml");
-    }
-    catch (std::exception &e) {
-        qDebug() << "Erro std::exception:" << e.what();
+    } catch (std::exception &e) {
+        qDebug() << "Erro ao enviar NF-e, tentando salvar contingência:" << e.what();
+        try {
+            std::string rawCnf = cnf;
+            rawCnf.erase(std::find(rawCnf.begin(), rawCnf.end(), '\0'), rawCnf.end());
+            QString chaveContingencia = QString::fromStdString(rawCnf).trimmed();
+            QString nomeArq = chaveContingencia + "-cont-nfe.xml";
+            nfe->GravarXml(0, nomeArq.toStdString(), caminhoXml.toStdString());
+            QString xmlPathContingencia = caminhoXml + "/" + nomeArq;
+            qDebug() << "NF-e salva em contingência:" << xmlPathContingencia;
+            return QString("CONTINGENCIA=1\nchDFe=%1\nNomeArq=%2\n").arg(chaveContingencia, xmlPathContingencia);
+        } catch (...) {}
         return QString("Erro ao enviar nota %1:\n%2").arg(QString::fromStdString(nnf), e.what());
-    }
-    catch (...) {
-        qDebug() << "Erro desconhecido!";
-        return QString("Erro desconhecido ao enviar nota %1.").arg(QString::fromStdString(nnf));
     }
 }
 
@@ -1075,9 +1083,12 @@ NFRetornoDTO NfeACBR::gerarEnviarRetorno(){
         finalidade = "DEVOLUCAO";
         {
             QString nomeArq, chDFe;
+            bool contingencia = false;
             for (const QString &linha : linhas) {
                 QString linhaTrim = linha.trimmed();
-                if (linhaTrim.startsWith("CStat="))
+                if (linhaTrim.startsWith("CONTINGENCIA=1"))
+                    contingencia = true;
+                else if (linhaTrim.startsWith("CStat="))
                     cStat = linhaTrim.section('=', 1).trimmed();
                 else if (linhaTrim.startsWith("XMotivo="))
                     xMotivo = linhaTrim.section('=', 1).trimmed();
@@ -1090,7 +1101,8 @@ NFRetornoDTO NfeACBR::gerarEnviarRetorno(){
                 else if (linhaTrim.startsWith("chDFe="))
                     chDFe = linhaTrim.section('=', 1).trimmed();
             }
-            nota.chNfe = !retornoForcado.isEmpty() ? chDFe : getChaveNf();
+            if (contingencia) { cStat = "CONTINGENCIA"; nProt = ""; }
+            nota.chNfe = (!retornoForcado.isEmpty() || contingencia) ? chDFe : getChaveNf();
             nota.cnpjEmit = getCnpjEmit();
             nota.cstat = cStat;
             nota.cuf = getCuf();
@@ -1102,7 +1114,7 @@ NFRetornoDTO NfeACBR::gerarEnviarRetorno(){
             nota.serie = getSerie();
             nota.tpAmb = getTpAmb().toInt();
             nota.valorTotal = getVNF();
-            nota.xmlPath = !retornoForcado.isEmpty() ? nomeArq : getXmlPath();
+            nota.xmlPath = (!retornoForcado.isEmpty() || contingencia) ? nomeArq : getXmlPath();
             nota.xMotivo = xMotivo;
             nota.msg = msg;
         }
@@ -1116,9 +1128,12 @@ NFRetornoDTO NfeACBR::gerarEnviarRetorno(){
         finalidade = "NORMAL";
         {
             QString nomeArq, chDFe;
+            bool contingencia = false;
             for (const QString &linha : linhas) {
                 QString linhaTrim = linha.trimmed();
-                if (linhaTrim.startsWith("CStat="))
+                if (linhaTrim.startsWith("CONTINGENCIA=1"))
+                    contingencia = true;
+                else if (linhaTrim.startsWith("CStat="))
                     cStat = linhaTrim.section('=', 1).trimmed();
                 else if (linhaTrim.startsWith("XMotivo="))
                     xMotivo = linhaTrim.section('=', 1).trimmed();
@@ -1131,7 +1146,8 @@ NFRetornoDTO NfeACBR::gerarEnviarRetorno(){
                 else if (linhaTrim.startsWith("chDFe="))
                     chDFe = linhaTrim.section('=', 1).trimmed();
             }
-            nota.chNfe = !retornoForcado.isEmpty() ? chDFe : getChaveNf();
+            if (contingencia) { cStat = "CONTINGENCIA"; nProt = ""; }
+            nota.chNfe = (!retornoForcado.isEmpty() || contingencia) ? chDFe : getChaveNf();
             nota.cnpjEmit = getCnpjEmit();
             nota.cstat = cStat;
             nota.cuf = getCuf();
@@ -1143,7 +1159,7 @@ NFRetornoDTO NfeACBR::gerarEnviarRetorno(){
             nota.serie = getSerie();
             nota.tpAmb = getTpAmb().toInt();
             nota.valorTotal = getVNF();
-            nota.xmlPath = !retornoForcado.isEmpty() ? nomeArq : getXmlPath();
+            nota.xmlPath = (!retornoForcado.isEmpty() || contingencia) ? nomeArq : getXmlPath();
             nota.xMotivo = xMotivo;
             nota.msg = msg;
         }

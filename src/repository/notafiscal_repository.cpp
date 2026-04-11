@@ -558,6 +558,65 @@ QList<NotaFiscalDTO> notafiscal_repository::buscarPorPeriodo(QDateTime dtIni, QD
     return resultado;
 }
 
+QList<NotaFiscalDTO> notafiscal_repository::buscarContingencias()
+{
+    QList<NotaFiscalDTO> lista;
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco. buscarContingencias()";
+        return lista;
+    }
+
+    QSqlQuery q(db);
+    q.prepare("SELECT cstat, nnf, serie, modelo, tp_amb, xml_path, valor_total, "
+              "id_venda, cnpjemit, chnfe, nprot, cuf, finalidade, saida, id_nf_ref, dhemi "
+              "FROM notas_fiscais WHERE cstat = 'CONTINGENCIA'");
+
+    if (q.exec()) {
+        while (q.next()) {
+            NotaFiscalDTO nota;
+            nota.cstat      = q.value("cstat").toString();
+            nota.chNfe      = q.value("chnfe").toString();
+            nota.xmlPath    = q.value("xml_path").toString();
+            nota.modelo     = q.value("modelo").toString();
+            nota.nnf        = q.value("nnf").toLongLong();
+            nota.nProt      = q.value("nprot").toString();
+            nota.finalidade = q.value("finalidade").toString();
+            nota.dhEmi      = q.value("dhemi").toString();
+            lista.append(nota);
+        }
+    } else {
+        qDebug() << "Erro buscarContingencias:" << q.lastError().text();
+    }
+
+    db.close();
+    return lista;
+}
+
+bool notafiscal_repository::atualizarRetornoContingencia(const QString &chNfe, const QString &cstat, const QString &nProt)
+{
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco. atualizarRetornoContingencia()";
+        return false;
+    }
+
+    QSqlQuery q(db);
+    q.prepare("UPDATE notas_fiscais SET cstat = :cstat, nprot = :nprot, atualizado_em = :atualizadoem "
+              "WHERE chnfe = :chnfe");
+    q.bindValue(":cstat",       cstat);
+    q.bindValue(":nprot",       nProt);
+    q.bindValue(":chnfe",       chNfe);
+    q.bindValue(":atualizadoem", DataUtil::getDataAgoraUS());
+
+    bool ok = q.exec();
+    if (!ok)
+        qDebug() << "Erro atualizarRetornoContingencia:" << q.lastError().text();
+    else
+        qDebug() << "Contingência atualizada para chave:" << chNfe << "cStat:" << cstat;
+
+    db.close();
+    return ok;
+}
+
 void notafiscal_repository::listarMonitor(QSqlQueryModel *model, const QStringList &finalidades)
 {
     if(!model) return;

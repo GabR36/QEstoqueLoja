@@ -84,3 +84,4 @@ tests/Testing
 *_LOCAL_*
 *_BASE_*
 *_BACKUP_*
+*.ini

@@ -136,8 +136,7 @@ Acbr_service::Resultado Acbr_service::configurar(const QString &versaoApp)
     mail->ConfigGravarValor("Email", "SSL", sslEmail);
     mail->ConfigGravarValor("Email", "TLS", tlsEmail);
     mail->ConfigGravar("");
-
-    return {true, AcbrErro::Nenhum, ""};
+    return {true, AcbrErro::Nenhum, "Configurou ACBR."};
 }
 
 Acbr_service::Resultado Acbr_service::carregarConfigParaDFE(){

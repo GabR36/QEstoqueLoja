@@ -1,175 +1,139 @@
 #include "config_repository.h"
-#include "../infra/databaseconnection_service.h"
-#include <QSqlQuery>
-#include <QSqlError>
+#include "../infra/apppath_service.h"
+#include <QSettings>
 
 Config_repository::Config_repository(QObject *parent)
     : QObject{parent}
-{
-    m_db = DatabaseConnection_service::db();
-}
+{}
 
 ConfigDTO Config_repository::loadAll()
 {
     ConfigDTO dto;
+    QSettings s(AppPath_service::configPath(), QSettings::IniFormat);
 
-    if(!DatabaseConnection_service::open()){
-        qDebug() << "Erro ao abrir banco";
-        return dto;
-    }
+    dto.nomeEmpresa             = s.value("empresa/nome_empresa").toString();
+    dto.nomeFantasiaEmpresa     = s.value("empresa/nfant_empresa").toString();
+    dto.enderecoEmpresa         = s.value("empresa/endereco_empresa").toString();
+    dto.numeroEmpresa           = s.value("empresa/numero_empresa").toString();
+    dto.bairroEmpresa           = s.value("empresa/bairro_empresa").toString();
+    dto.cepEmpresa              = s.value("empresa/cep_empresa").toString();
+    dto.cidadeEmpresa           = s.value("empresa/cidade_empresa").toString();
+    dto.estadoEmpresa           = s.value("empresa/estado_empresa").toString();
+    dto.emailEmpresa            = s.value("empresa/email_empresa").toString();
+    dto.telefoneEmpresa         = s.value("empresa/telefone_empresa").toString();
+    dto.cnpjEmpresa             = s.value("empresa/cnpj_empresa").toString();
+    dto.logoPathEmpresa         = s.value("empresa/caminho_logo_empresa").toString();
 
-    QSqlQuery q(m_db);
-    q.exec("SELECT key, value FROM config");
+    dto.regimeTribFiscal        = s.value("fiscal/regime_trib").toInt();
+    dto.tpAmbFiscal             = s.value("fiscal/tp_amb").toInt();
+    dto.idCscFiscal             = s.value("fiscal/id_csc").toString();
+    dto.cscFiscal               = s.value("fiscal/csc").toString();
+    dto.schemaPathFiscal        = s.value("fiscal/caminho_schema").toString();
+    dto.certAcPathFiscal        = s.value("fiscal/caminho_certac").toString();
+    dto.certificadoPathFiscal   = s.value("fiscal/caminho_certificado").toString();
+    dto.senhaCertificadoFiscal  = s.value("fiscal/senha_certificado").toString();
+    dto.cUfFiscal               = s.value("fiscal/cuf").toString();
+    dto.cMunFiscal              = s.value("fiscal/cmun").toString();
+    dto.iEstadFiscal            = s.value("fiscal/iest").toString();
+    dto.cnpjRTFiscal            = s.value("fiscal/cnpj_rt").toString();
+    dto.nomeRTFiscal            = s.value("fiscal/nome_rt").toString();
+    dto.emailRTFiscal           = s.value("fiscal/email_rt").toString();
+    dto.foneRTFiscal            = s.value("fiscal/fone_rt").toString();
+    dto.idCSRTFiscal            = s.value("fiscal/id_csrt").toString();
+    dto.hashCSRTFiscal          = s.value("fiscal/hash_csrt").toString();
+    dto.emitNfFiscal            = s.value("fiscal/emit_nf").toString() == "1";
+    dto.usarIbsFiscal           = s.value("fiscal/usar_ibs").toString() == "1";
+    dto.nnfHomologFiscal        = s.value("fiscal/nnf_homolog").toInt();
+    dto.nnfProdFiscal           = s.value("fiscal/nnf_prod").toInt();
+    dto.nnfHomologNfeFiscal     = s.value("fiscal/nnf_homolog_nfe").toInt();
+    dto.nnfProdNfeFiscal        = s.value("fiscal/nnf_prod_nfe").toInt();
 
-    QMap<QString, QString> map;
-    while(q.next()){
-        map[q.value(0).toString()] = q.value(1).toString();
-    }
+    dto.ncmPadraoProduto        = s.value("produto/ncm_padrao").toString();
+    dto.csosnPadraoProduto      = s.value("produto/csosn_padrao").toString();
+    dto.pisPadraoProduto        = s.value("produto/pis_padrao").toString();
+    dto.cestPadraoProduto       = s.value("produto/cest_padrao").toString();
 
-    dto.nomeEmpresa = map["nome_empresa"];
-    dto.nomeFantasiaEmpresa = map["nfant_empresa"];
-    dto.enderecoEmpresa = map["endereco_empresa"];
-    dto.numeroEmpresa = map["numero_empresa"];
-    dto.bairroEmpresa = map["bairro_empresa"];
-    dto.cepEmpresa  = map["cep_empresa"];
-    dto.cidadeEmpresa = map["cidade_empresa"];
-    dto.estadoEmpresa = map["estado_empresa"];
-    dto.emailEmpresa = map["email_empresa"];
-    dto.telefoneEmpresa = map["telefone_empresa"];
-    dto.cnpjEmpresa = map["cnpj_empresa"];
-    dto.logoPathEmpresa = map["caminho_logo_empresa"];
+    dto.porcentLucroFinanceiro  = s.value("financeiro/porcent_lucro").toDouble();
+    dto.taxaDebitoFinanceiro    = s.value("financeiro/taxa_debito").toDouble();
+    dto.taxaCreditoFinanceiro   = s.value("financeiro/taxa_credito").toDouble();
 
-    dto.regimeTribFiscal= map["regime_trib"].toInt();
-    dto.tpAmbFiscal = map["tp_amb"].toInt();
-    dto.idCscFiscal = map["id_csc"];
-    dto.cscFiscal = map["csc"];
-    dto.schemaPathFiscal = map["caminho_schema"];
-    dto.certAcPathFiscal = map["caminho_certac"];
-    dto.certificadoPathFiscal = map["caminho_certificado"];
-    dto.senhaCertificadoFiscal = map["senha_certificado"];
-    dto.cUfFiscal = map["cuf"];
-    dto.cMunFiscal = map["cmun"];
-    dto.iEstadFiscal = map["iest"];
+    dto.nomeEmail               = s.value("email/email_nome").toString();
+    dto.smtpEmail               = s.value("email/email_smtp").toString();
+    dto.contaEmail              = s.value("email/email_conta").toString();
+    dto.usuarioEmail            = s.value("email/email_usuario").toString();
+    dto.senhaEmail              = s.value("email/email_senha").toString();
+    dto.portaEmail              = s.value("email/email_porta").toString();
+    dto.sslEmail                = s.value("email/email_ssl").toString() == "1";
+    dto.tlsEmail                = s.value("email/email_tls").toString() == "1";
 
-    dto.cnpjRTFiscal = map["cnpj_rt"];
-    dto.nomeRTFiscal = map["nome_rt"];
-    dto.emailRTFiscal = map["email_rt"];
-    dto.foneRTFiscal = map["fone_rt"];
-    dto.idCSRTFiscal = map["id_csrt"];
-    dto.hashCSRTFiscal = map["hash_csrt"];
-
-    dto.emitNfFiscal = map["emit_nf"] == "1";
-    dto.usarIbsFiscal = map["usar_ibs"] == "1";
-
-    dto.nnfHomologFiscal = map["nnf_homolog"].toInt();
-    dto.nnfProdFiscal = map["nnf_prod"].toInt();
-    dto.nnfHomologNfeFiscal = map["nnf_homolog_nfe"].toInt();
-    dto.nnfProdNfeFiscal = map["nnf_prod_nfe"].toInt();
-
-    dto.ncmPadraoProduto = map["ncm_padrao"];
-    dto.csosnPadraoProduto = map["csosn_padrao"];
-    dto.pisPadraoProduto = map["pis_padrao"];
-    dto.cestPadraoProduto = map["cest_padrao"];
-
-    dto.porcentLucroFinanceiro = map["porcent_lucro"].toDouble();
-    dto.taxaDebitoFinanceiro = map["taxa_debito"].toDouble();
-    dto.taxaCreditoFinanceiro = map["taxa_credito"].toDouble();
-
-    dto.nomeEmail = map["email_nome"];
-    dto.smtpEmail = map["email_smtp"];
-    dto.contaEmail = map["email_conta"];
-    dto.usuarioEmail = map["email_usuario"];
-    dto.senhaEmail = map["email_senha"];
-    dto.portaEmail = map["email_porta"];
-    dto.sslEmail  = map["email_ssl"] == "1";
-    dto.tlsEmail = map["email_tls"] == "1";
-
-    dto.nomeContador = map["contador_nome"];
-    dto.emailContador = map["contador_email"];
+    dto.nomeContador            = s.value("contador/contador_nome").toString();
+    dto.emailContador           = s.value("contador/contador_email").toString();
 
     return dto;
 }
 
 bool Config_repository::saveAll(const ConfigDTO &dto)
 {
-    QMap<QString, QString> map;
+    QSettings s(AppPath_service::configPath(), QSettings::IniFormat);
 
-    map["nome_empresa"] = dto.nomeEmpresa;
-    map["nfant_empresa"] = dto.nomeFantasiaEmpresa;
-    map["endereco_empresa"] = dto.enderecoEmpresa;
-    map["numero_empresa"] = dto.numeroEmpresa;
-    map["bairro_empresa"] = dto.bairroEmpresa;
-    map["cep_empresa"] = dto.cepEmpresa;
-    map["cidade_empresa"] = dto.cidadeEmpresa;
-    map["estado_empresa"] = dto.estadoEmpresa;
-    map["email_empresa"] = dto.emailEmpresa;
-    map["telefone_empresa"] = dto.telefoneEmpresa;
-    map["cnpj_empresa"] = dto.cnpjEmpresa;
-    map["caminho_logo_empresa"] = dto.logoPathEmpresa;
+    s.setValue("empresa/nome_empresa",          dto.nomeEmpresa);
+    s.setValue("empresa/nfant_empresa",         dto.nomeFantasiaEmpresa);
+    s.setValue("empresa/endereco_empresa",      dto.enderecoEmpresa);
+    s.setValue("empresa/numero_empresa",        dto.numeroEmpresa);
+    s.setValue("empresa/bairro_empresa",        dto.bairroEmpresa);
+    s.setValue("empresa/cep_empresa",           dto.cepEmpresa);
+    s.setValue("empresa/cidade_empresa",        dto.cidadeEmpresa);
+    s.setValue("empresa/estado_empresa",        dto.estadoEmpresa);
+    s.setValue("empresa/email_empresa",         dto.emailEmpresa);
+    s.setValue("empresa/telefone_empresa",      dto.telefoneEmpresa);
+    s.setValue("empresa/cnpj_empresa",          dto.cnpjEmpresa);
+    s.setValue("empresa/caminho_logo_empresa",  dto.logoPathEmpresa);
 
+    s.setValue("fiscal/regime_trib",            dto.regimeTribFiscal);
+    s.setValue("fiscal/tp_amb",                 dto.tpAmbFiscal);
+    s.setValue("fiscal/id_csc",                 dto.idCscFiscal);
+    s.setValue("fiscal/csc",                    dto.cscFiscal);
+    s.setValue("fiscal/caminho_schema",         dto.schemaPathFiscal);
+    s.setValue("fiscal/caminho_certac",         dto.certAcPathFiscal);
+    s.setValue("fiscal/caminho_certificado",    dto.certificadoPathFiscal);
+    s.setValue("fiscal/senha_certificado",      dto.senhaCertificadoFiscal);
+    s.setValue("fiscal/cuf",                    dto.cUfFiscal);
+    s.setValue("fiscal/cmun",                   dto.cMunFiscal);
+    s.setValue("fiscal/iest",                   dto.iEstadFiscal);
+    s.setValue("fiscal/cnpj_rt",                dto.cnpjRTFiscal);
+    s.setValue("fiscal/nome_rt",                dto.nomeRTFiscal);
+    s.setValue("fiscal/email_rt",               dto.emailRTFiscal);
+    s.setValue("fiscal/fone_rt",                dto.foneRTFiscal);
+    s.setValue("fiscal/id_csrt",                dto.idCSRTFiscal);
+    s.setValue("fiscal/hash_csrt",              dto.hashCSRTFiscal);
+    s.setValue("fiscal/emit_nf",                dto.emitNfFiscal  ? "1" : "0");
+    s.setValue("fiscal/usar_ibs",               dto.usarIbsFiscal ? "1" : "0");
+    s.setValue("fiscal/nnf_homolog",            dto.nnfHomologFiscal);
+    s.setValue("fiscal/nnf_prod",               dto.nnfProdFiscal);
+    s.setValue("fiscal/nnf_homolog_nfe",        dto.nnfHomologNfeFiscal);
+    s.setValue("fiscal/nnf_prod_nfe",           dto.nnfProdNfeFiscal);
 
-    map["regime_trib"] = QString::number(dto.regimeTribFiscal);
-    map["tp_amb"] = dto.tpAmbFiscal ? "1" : "0";
-    map["id_csc"] = dto.idCscFiscal;
-    map["csc"] = dto.cscFiscal;
-    map["caminho_schema"] = dto.schemaPathFiscal;
-    map["caminho_certac"] = dto.certificadoPathFiscal;
-    map["caminho_certificado"] = dto.certificadoPathFiscal;
-    map["senha_certificado"] = dto.senhaCertificadoFiscal;
-    map["cuf"] = dto.cUfFiscal;
-    map["cmun"] = dto.cMunFiscal;
-    map["iest"] = dto.iEstadFiscal;
+    s.setValue("produto/ncm_padrao",            dto.ncmPadraoProduto);
+    s.setValue("produto/csosn_padrao",          dto.csosnPadraoProduto);
+    s.setValue("produto/pis_padrao",            dto.pisPadraoProduto);
+    s.setValue("produto/cest_padrao",           dto.cestPadraoProduto);
 
-    map["cnpj_rt"] = dto.cnpjRTFiscal;
-    map["nome_rt"] = dto.nomeRTFiscal;
-    map["email_rt"] = dto.emailRTFiscal;
-    map["fone_rt"] = dto.foneRTFiscal;
-    map["id_csrt"] = dto.idCSRTFiscal;
-    map["hash_csrt"] = dto.hashCSRTFiscal;
-    map["emit_nf"] = dto.emitNfFiscal ? "1" : "0";
-    map["usar_ibs"] = dto.usarIbsFiscal ? "1" : "0";
-    map["nnf_homolog"] = QString::number(dto.nnfHomologFiscal);
-    map["nnf_prod"] = QString::number(dto.nnfProdFiscal);
-    map["nnf_homolog_nfe"] = QString::number(dto.nnfHomologNfeFiscal);
-    map["nnf_prod_nfe"] = QString::number(dto.nnfProdNfeFiscal);
+    s.setValue("financeiro/porcent_lucro",      dto.porcentLucroFinanceiro);
+    s.setValue("financeiro/taxa_debito",        dto.taxaDebitoFinanceiro);
+    s.setValue("financeiro/taxa_credito",       dto.taxaCreditoFinanceiro);
 
-    map["ncm_padrao"] = dto.ncmPadraoProduto;
-    map["csosn_padrao"] = dto.csosnPadraoProduto;
-    map["pis_padrao"] = dto.pisPadraoProduto;
-    map["cest_padrao"] = dto.cestPadraoProduto;
+    s.setValue("email/email_nome",              dto.nomeEmail);
+    s.setValue("email/email_smtp",              dto.smtpEmail);
+    s.setValue("email/email_conta",             dto.contaEmail);
+    s.setValue("email/email_usuario",           dto.usuarioEmail);
+    s.setValue("email/email_senha",             dto.senhaEmail);
+    s.setValue("email/email_porta",             dto.portaEmail);
+    s.setValue("email/email_ssl",               dto.sslEmail ? "1" : "0");
+    s.setValue("email/email_tls",               dto.tlsEmail ? "1" : "0");
 
-    map["porcent_lucro"] = QString::number(dto.porcentLucroFinanceiro);
-    map["taxa_debito"] = QString::number(dto.taxaDebitoFinanceiro);
-    map["taxa_credito"] = QString::number(dto.taxaCreditoFinanceiro);
+    s.setValue("contador/contador_nome",        dto.nomeContador);
+    s.setValue("contador/contador_email",       dto.emailContador);
 
-    map["email_nome"] = dto.nomeEmail;
-    map["email_smtp"] = dto.smtpEmail;
-    map["email_conta"] = dto.contaEmail;
-    map["email_usuario"] = dto.usuarioEmail;
-    map["email_senha"] = dto.senhaEmail;
-    map["email_porta"] = dto.portaEmail;
-    map["email_ssl"] = dto.sslEmail ? "1" : "0";
-    map["email_tls"] = dto.tlsEmail ? "1" : "0";
-
-    map["contador_nome"] = dto.nomeContador;
-    map["contador_email"] = dto.emailContador;
-
-
-    if(!DatabaseConnection_service::open()){
-        qDebug() << "Erro ao abrir banco";
-        return false;
-    }
-
-    QSqlQuery q(m_db);
-    q.prepare("UPDATE config SET value = :value WHERE key = :key");
-
-    for(auto it = map.begin(); it != map.end(); ++it){
-        q.bindValue(":value", it.value());
-        q.bindValue(":key", it.key());
-        if(!q.exec()){
-            qDebug() << "Erro update:" << it.key() << q.lastError().text();
-        }
-    }
-
-    return true;
+    s.sync();
+    return s.status() == QSettings::NoError;
 }

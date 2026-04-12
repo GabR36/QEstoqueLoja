@@ -4,7 +4,7 @@
 Vendas_service::Vendas_service(QObject *parent)
     : QObject{parent}
 {
-
+    confDTO = confServ.carregarTudo();
 }
 
 
@@ -42,7 +42,11 @@ ResumoVendasDTO Vendas_service::calcularResumo(
     bool somentePrazo,
     qlonglong idCliente)
 {
-    return vendasRepo.calcularResumo(dataDe, dataAte, somentePrazo, idCliente);
+    ResumoVendasDTO resumo = vendasRepo.calcularResumo(dataDe, dataAte, somentePrazo, idCliente);
+    double porcent = confDTO.porcentLucroFinanceiro;
+    double custo = resumo.total / (1.0 + (porcent / 100));
+    resumo.lucro = resumo.total - custo;
+    return resumo;
 }
 
 Vendas_service::Resultado Vendas_service::deletarVenda(qlonglong id){

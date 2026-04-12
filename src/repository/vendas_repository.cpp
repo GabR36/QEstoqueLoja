@@ -267,14 +267,9 @@ ResumoVendasDTO Vendas_repository::calcularResumo(
         resumo.quantidade = query.value(1).toInt();
     }
 
-    // PEGAR PORCENTAGEM DE LUCRO
-    query.prepare("SELECT value FROM config WHERE key = 'porcent_lucro'");
-    if (query.exec() && query.next()) {
-        double porcent = query.value(0).toDouble() / 100.0;
-        resumo.lucro = resumo.total * porcent / (1.0 + porcent);
-    }
-
     db.close();
+
+    qDebug() << "resumo.lucro: " << resumo.lucro;
 
     return resumo;
 }

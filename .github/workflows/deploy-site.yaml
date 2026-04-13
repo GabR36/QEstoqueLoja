@@ -3,7 +3,8 @@ name: Update site with latest version
 on:
   push:
     tags:
-      - 'v*'   # dispara quando criar tag tipo v1.2.0
+      - 'v*'
+  workflow_dispatch:
 
 jobs:
   update-site:
@@ -12,14 +13,25 @@ jobs:
     steps:
       - name: Checkout do repo do app
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # importante para pegar tags
 
-      - name: Pegar nome da tag
+      - name: Pegar versão
         id: tag
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
-      - name: Clonar repo do site
         run: |
-          git clone https://x-access-token:${{ secrets.SITE_REPO_TOKEN }}@github.com/GabR36/site-qestoqueloja.git
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/}"
+          else
+            VERSION=$(git describe --tags --abbrev=0)
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Checkout do repo do site
+        uses: actions/checkout@v4
+        with:
+          repository: GabR36/site-qestoqueloja
+          token: ${{ secrets.SITE_REPO_TOKEN }}
+          path: site-qestoqueloja
 
       - name: Atualizar data/version.yaml
         run: |
@@ -33,6 +45,4 @@ jobs:
           git config user.email "actions@github.com"
           git add data/version.yaml
           git commit -m "Atualiza versão para ${{ steps.tag.outputs.VERSION }}" || echo "Sem mudanças"
-
-          git remote set-url origin https://x-access-token:${{ secrets.SITE_REPO_TOKEN }}@github.com/GabR36/site-qestoqueloja.git
           git push

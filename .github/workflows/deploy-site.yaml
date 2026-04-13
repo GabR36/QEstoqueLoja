@@ -33,4 +33,6 @@ jobs:
           git config user.email "actions@github.com"
           git add data/version.yaml
           git commit -m "Atualiza versão para ${{ steps.tag.outputs.VERSION }}" || echo "Sem mudanças"
+
+          git remote set-url origin https://x-access-token:${{ secrets.SITE_REPO_TOKEN }}@github.com/GabR36/site-qestoqueloja.git
           git push

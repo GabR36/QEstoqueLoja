@@ -1,0 +1,36 @@
+name: Update site with latest version
+
+on:
+  push:
+    tags:
+      - 'v*'   # dispara quando criar tag tipo v1.2.0
+
+jobs:
+  update-site:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repo do app
+        uses: actions/checkout@v4
+
+      - name: Pegar nome da tag
+        id: tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Clonar repo do site
+        run: |
+          git clone https://x-access-token:${{ secrets.SITE_REPO_TOKEN }}@github.com/GabR36/site-qestoqueloja.git
+
+      - name: Atualizar data/version.yaml
+        run: |
+          cd site-qestoqueloja
+          echo "version: \"${{ steps.tag.outputs.VERSION }}\"" > data/version.yaml
+
+      - name: Commit e push
+        run: |
+          cd site-qestoqueloja
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data/version.yaml
+          git commit -m "Atualiza versão para ${{ steps.tag.outputs.VERSION }}" || echo "Sem mudanças"
+          git push

@@ -110,14 +110,14 @@ O projeto segue uma abordagem prática:
 
 ## Capturas de Tela
 
-![Tela Principal](/Imagens/capturaPrincipal.png)
+![Tela Principal](/Imagens/capturas_de_tela/capturaPrincipal.png)
 
-![Tela Vendas](/Imagens/capturaVendas.png)
+![Tela Vendas](/Imagens/capturas_de_tela/capturaVendas.png)
 
-![Tela Venda](/Imagens/capturaVenda.png)
+![Tela Venda](/Imagens/capturas_de_tela/capturaVenda.png)
 
-![Tela Venda](/Imagens/capturaPagamento.png)
+![Tela Venda](/Imagens/capturas_de_tela/capturaPagamento.png)
 
-![Tela Relatórios](/Imagens/capturaGrafico.png)
+![Tela Relatórios](/Imagens/capturas_de_tela/capturaGrafico.png)
 
-![Tela Monitor Fiscal](/Imagens/capturaMonitor.png)
+![Tela Monitor Fiscal](/Imagens/capturas_de_tela/capturaMonitor.png)

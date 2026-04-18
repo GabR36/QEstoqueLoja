@@ -37,6 +37,14 @@ jobs:
         run: |
           cd site-qestoqueloja
           echo "version: \"${{ steps.tag.outputs.VERSION }}\"" > data/version.yaml
+      - name: Copiar capturas de tela
+        run: |
+          mkdir -p site-qestoqueloja/static/capturas_de_tela
+          cp -r Imagens/capturas_de_tela/* site-qestoqueloja/static/capturas_de_tela
+      - name: Copiar documentação HTML
+        run: |
+          mkdir -p site-qestoqueloja/layouts/partials/ajuda
+          cp recursos/ajuda/help.html site-qestoqueloja/layouts/partials/ajuda/help.html
 
       - name: Commit e push
         run: |

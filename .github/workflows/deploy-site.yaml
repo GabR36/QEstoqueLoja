@@ -43,8 +43,8 @@ jobs:
           cp -r Imagens/capturas_de_tela/* site-qestoqueloja/static/capturas_de_tela
       - name: Copiar documentação HTML
         run: |
-          mkdir -p site-qestoqueloja/layouts/partials/ajuda
-          cp recursos/ajuda/help.html site-qestoqueloja/layouts/partials/ajuda/help.html
+          mkdir -p site-qestoqueloja/assets/ajuda
+          cp recursos/ajuda/help.html site-qestoqueloja/assets/ajuda/help.html
 
       - name: Commit e push
         run: |

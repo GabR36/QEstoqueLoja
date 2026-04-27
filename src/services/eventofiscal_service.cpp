@@ -1,4 +1,6 @@
 #include "eventofiscal_service.h"
+#include "../nota/eventocienciaop.h"
+#include "notafiscal_service.h"
 
 
 EventoFiscal_service::EventoFiscal_service(QObject *parent)
@@ -32,6 +34,32 @@ EventoFiscal_service::Resultado EventoFiscal_service::enviarCancelamento(qlonglo
         }else{
             return {true, EventoFiscalErro::Nenhum, "Evento Cancelamento enviado com sucesso."};
         }
+    }
+}
+
+EventoFiscal_service::Resultado EventoFiscal_service::enviarCienciaOp(QString chnfe, QString &retornoforcado){
+    EventoCienciaOP *evento = new EventoCienciaOP(this, chnfe);
+    if(!retornoforcado.isEmpty()){
+        evento->setRetornoForcado(retornoforcado);
+    }
+    EventoFiscalDTO info =  evento->gerarEnviarRetorno();
+    if(info.cstat == "128" || info.cstat == "135" || info.cstat == "136"){
+
+        NotaFiscal_service nfServ;
+        qlonglong idnf;
+        idnf = nfServ.getIdFromChave(chnfe);
+        EventoFiscalDTO evento;
+        evento = info;
+        evento.idNf = idnf;
+
+        auto result = inserir(evento);
+        if(!result.ok){
+            return {false, EventoFiscalErro::InsercaoInvalida, result.msg};
+        }
+
+        return {true, EventoFiscalErro::Nenhum, "Evento Enviado e Salvo com Sucesso."};
+    }else{
+        return {false, EventoFiscalErro::EventoRecusadoSefaz, "Evento Recusado Sefaz. CStat: " + info.cstat};
     }
 }
 

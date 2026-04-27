@@ -17,6 +17,7 @@ enum class EventoFiscalErro{
     InsercaoInvalida,
     UpdateInvalido,
     EnvioEvento,
+    EventoRecusadoSefaz
 };
 
 
@@ -35,6 +36,7 @@ public:
     void listarTodos(QSqlQueryModel *model);
     QMap<QString, int>             contarPorTipo(QDateTime dtIni, QDateTime dtFim);
     QList<QPair<QString, QString>> buscarXmlsPorPeriodo(QDateTime dtIni, QDateTime dtFim);
+    EventoFiscal_service::Resultado enviarCienciaOp(QString chnfe, QString &retornoforcado);
 private:
     EventoFiscal_repository eventoRepo;
 

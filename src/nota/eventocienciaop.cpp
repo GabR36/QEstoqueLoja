@@ -76,6 +76,10 @@ QString EventoCienciaOP::gerarEnviar(){
 
 }
 
+void EventoCienciaOP::setRetornoForcado(QString &retorno){
+    retornoForcado = retorno;
+}
+
 EventoFiscalDTO EventoCienciaOP::gerarEnviarRetorno()
 {
     preencherEvento();
@@ -89,8 +93,12 @@ EventoFiscalDTO EventoCienciaOP::gerarEnviarRetorno()
         acbr->CarregarEventoINI(ini.str());
         acbr->Assinar();
         acbr->Validar();
-
-        std::string retorno = acbr->EnviarEvento(1);
+        std::string retorno;
+        if(!retornoForcado.isEmpty()){
+            retorno = retornoForcado.toStdString();
+        }else{
+             retorno = acbr->EnviarEvento(1);
+        }
         QString ret = QString::fromUtf8(retorno.c_str());
         // QFile file("retorno_evento.txt");
         // QString ret;

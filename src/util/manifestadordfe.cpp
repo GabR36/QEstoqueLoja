@@ -284,7 +284,7 @@ void ManifestadorDFe::processarResumo(const QString &bloco)
     qDebug() << "\nResumo localizado:" << resumo.chNfe << nome;
 
     salvarResumoNota(resumo);
-    if(!retornoForcado.isEmpty()){
+    if(retornoForcado.isEmpty()){
         enviarCienciaOperacao(resumo.chNfe, resumo.cnpjEmit);
     }
 }

@@ -1,0 +1,12 @@
+[Evento]
+CStat=128
+XMotivo=Lote de Evento Processado
+
+[Evento001]
+CStat=135
+XMotivo=Evento registrado e vinculado a NF-e
+chNFe=00000000000000000000000000000000000000000000
+nSeqEvento=3
+tpEvento=110110
+arquivo=/tmp/evento_cce.xml
+nProt=000000000000000

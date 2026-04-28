@@ -9,5 +9,7 @@
         <file>recursos/nfce_sanitizada_windows.txt</file>
         <file>recursos/evento_cienciaop_sanitizado.txt</file>
         <file>recursos/evento_cienciaop_sanitizado_erro.txt</file>
+        <file>recursos/evento_cce_sanitizado.txt</file>
+        <file>recursos/evento_cce_sanitizado_erro.txt</file>
     </qresource>
 </RCC>

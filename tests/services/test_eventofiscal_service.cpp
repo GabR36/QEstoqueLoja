@@ -74,3 +74,64 @@ void test_eventofiscal_service::enviarCienciaOp_deveFalharQuandoSefazRejeita()
 
     // QVERIFY(resultado.msg.contains("580"));
 }
+
+void test_eventofiscal_service::enviarCCE_sucesso()
+{
+    QString caminhoArquivo = ":/recursos/evento_cce_sanitizado.txt";
+
+    QFile file(caminhoArquivo);
+    QVERIFY(file.open(QIODevice::ReadOnly | QIODevice::Text));
+
+    QString retornoFake = QString::fromUtf8(file.readAll());
+    file.close();
+
+    QVERIFY(!retornoFake.isEmpty());
+
+    EventoFiscal_service service;
+
+    QString chave = "00000000000000000000000000000000000000000000";
+    int nseq = 1;
+    QString correcao = "Texto de correcao valido com mais de 15 caracteres";
+
+    auto resultado = service.enviarCCE(chave, nseq, correcao, retornoFake);
+
+    QVERIFY(resultado.ok);
+    QCOMPARE(resultado.erro, EventoFiscalErro::Nenhum);
+
+    // valida banco
+    QVERIFY(DatabaseConnection_service::open());
+    QSqlQuery q(DatabaseConnection_service::db());
+
+    QVERIFY(q.exec("SELECT cstat, justificativa FROM eventos_fiscais ORDER BY id DESC LIMIT 1"));
+    QVERIFY(q.next());
+
+    QCOMPARE(q.value(0).toString(), QString("135"));
+    QVERIFY(q.value(1).toString().contains("Evento registrado"));
+}
+
+void test_eventofiscal_service::enviarCCE_deveFalharQuandoDuplicado()
+{
+    QString caminhoArquivo = ":/recursos/evento_cce_sanitizado_erro.txt";
+
+    QFile file(caminhoArquivo);
+    QVERIFY(file.open(QIODevice::ReadOnly | QIODevice::Text));
+
+    QString retornoFake = QString::fromUtf8(file.readAll());
+    file.close();
+
+    QVERIFY(!retornoFake.isEmpty());
+
+    EventoFiscal_service service;
+
+    QString chave = "00000000000000000000000000000000000000000000";
+    int nseq = 1;
+    QString correcao = "Texto de correcao valido com mais de 15 caracteres";
+
+    auto resultado = service.enviarCCE(chave, nseq, correcao, retornoFake);
+
+    QVERIFY(!resultado.ok);
+    QCOMPARE(resultado.erro, EventoFiscalErro::EventoRecusadoSefaz);
+
+    QVERIFY(resultado.msg.contains("573"));
+    QVERIFY(resultado.msg.contains("Duplicidade"));
+}

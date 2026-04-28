@@ -14,6 +14,8 @@ private slots:
     void enviarCienciaOp_sucesso();
     void enviarCienciaOp_deveFalharQuandoSefazRejeita();
     void init();
+    void enviarCCE_deveFalharQuandoDuplicado();
+    void enviarCCE_sucesso();
 private:
     QSqlDatabase db;
 

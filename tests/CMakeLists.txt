@@ -105,6 +105,8 @@ add_executable(QEstoqueLojaTests
     ${CMAKE_SOURCE_DIR}/src/util/ziputil.cpp
     ${CMAKE_SOURCE_DIR}/src/util/pdfexporter.cpp
     services/test_eventofiscal_service.h services/test_eventofiscal_service.cpp
+    ${CMAKE_SOURCE_DIR}/src/nota/eventocartacorrecao.cpp
+    ${CMAKE_SOURCE_DIR}/src/nota/eventocartacorrecao.h
 
 
 

@@ -5,6 +5,7 @@
 #include <QDomDocument>
 #include <QDir>
 #include "../util/NfUtilidades.h"
+#include <QDateTime>
 
 
 #define ID_LOTE 1

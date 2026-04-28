@@ -10,6 +10,7 @@
 #include "../repository/eventofiscal_repository.h"
 #include "../dto/EventoFiscal_dto.h"
 #include "../nota/cancelnf.h"
+#include "../services/notafiscal_service.h"
 
 enum class EventoFiscalErro{
     Nenhum,
@@ -17,7 +18,9 @@ enum class EventoFiscalErro{
     InsercaoInvalida,
     UpdateInvalido,
     EnvioEvento,
-    EventoRecusadoSefaz
+    EventoRecusadoSefaz,
+    Desconhecido,
+    QuebraDeRegra
 };
 
 
@@ -37,8 +40,10 @@ public:
     QMap<QString, int>             contarPorTipo(QDateTime dtIni, QDateTime dtFim);
     QList<QPair<QString, QString>> buscarXmlsPorPeriodo(QDateTime dtIni, QDateTime dtFim);
     EventoFiscal_service::Resultado enviarCienciaOp(QString chnfe, QString &retornoforcado);
+    EventoFiscal_service::Resultado enviarCCE(QString chnfe = "", int nseq = 1, QString correcao = "", QString retornoforcado = "");
 private:
     EventoFiscal_repository eventoRepo;
+    NotaFiscal_service nfServ;
 
 signals:
 };

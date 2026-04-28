@@ -725,6 +725,7 @@ QPushButton:pressed {
     <addaction name="actionMonitor_Fiscal"/>
     <addaction name="actionEnviar_Notas_Contador"/>
     <addaction name="actionInutilizar_Numera_o_NF"/>
+    <addaction name="actionEnviar_Carta_de_Corre_o"/>
    </widget>
    <addaction name="menuEditar"/>
    <addaction name="menuVendas"/>
@@ -803,6 +804,11 @@ QPushButton:pressed {
   <action name="actionInutilizar_Numera_o_NF">
    <property name="text">
     <string>Inutilizar Numeração NF</string>
+   </property>
+  </action>
+  <action name="actionEnviar_Carta_de_Corre_o">
+   <property name="text">
+    <string>Enviar Carta de Correção</string>
    </property>
   </action>
  </widget>

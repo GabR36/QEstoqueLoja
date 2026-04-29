@@ -4,6 +4,12 @@ CustomLineEdit::CustomLineEdit(QWidget *parent) : QLineEdit(parent) {
 }
 void CustomLineEdit::mousePressEvent(QMouseEvent *event)
 {
-    QLineEdit::mousePressEvent(event); // Chama a implementação base do QLineEdit
+    QLineEdit::mousePressEvent(event);
     selectAll();
+}
+
+void CustomLineEdit::focusInEvent(QFocusEvent *event)
+{
+    QLineEdit::focusInEvent(event);
+    QMetaObject::invokeMethod(this, "selectAll", Qt::QueuedConnection);
 }

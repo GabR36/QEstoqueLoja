@@ -7,228 +7,370 @@
     <x>0</x>
     <y>0</y>
     <width>880</width>
-    <height>522</height>
+    <height>560</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>750</width>
+    <height>480</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Compras</string>
   </property>
   <property name="styleSheet">
    <string notr="true">
-
-#Entradas{
-background-color: rgb(199, 199, 199);
-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(199, 199, 199, 255), stop:1 rgba(170, 170, 170, 255));
-
+#Entradas {
+  background-color: rgb(199, 199, 199);
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
+    stop:0 rgba(199, 199, 199, 255), stop:1 rgba(170, 170, 170, 255));
 }
-QPushButton{
-background-color: rgb(43, 132, 191);
-color: rgb(255, 255, 255);
-font-size: 15px;
-border-radius: 13px;
-
+QPushButton {
+  background-color: rgb(43, 132, 191);
+  color: rgb(255, 255, 255);
+  font-size: 13px;
+  border-radius: 10px;
 }
-
-QPushButton:hover{
-	background-color: rgb(13, 92, 161);
+QPushButton:hover {
+  background-color: rgb(13, 92, 161);
 }
-QPushButton:pressed{
-	
-color: rgb(255, 255, 255);
-	background-color: rgb(153, 193, 241);
-font-size: 15px;
-border-radius: 13px;
+QPushButton:pressed {
+  color: rgb(255, 255, 255);
+  background-color: rgb(153, 193, 241);
+  font-size: 13px;
+  border-radius: 10px;
 }
-QGroupBox{
-background-color:rgb(170, 170, 170);
-	font: 700 9pt &quot;Segoe UI&quot;;
-	font-size: 15px;
+QGroupBox {
+  background-color: rgb(170, 170, 170);
+  font: 700 9pt &quot;Segoe UI&quot;;
+  font-size: 15px;
 }
-</string>
+QTableView {
+  background-color: #ffffff;
+  alternate-background-color: #dce9f5;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  gridline-color: #e2e8f0;
+  selection-background-color: rgb(43, 132, 191);
+  selection-color: #ffffff;
+  outline: none;
+}
+QHeaderView::section {
+  background-color: #f1f5f9;
+  color: #475569;
+  font: 600 9pt &quot;Ubuntu&quot;;
+  border: none;
+  border-bottom: 2px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  padding: 6px 10px;
+}
+QHeaderView::section:last {
+  border-right: none;
+}
+QScrollBar:vertical {
+  background: #f1f5f9;
+  width: 8px;
+  border-radius: 4px;
+}
+QScrollBar::handle:vertical {
+  background: #cbd5e1;
+  border-radius: 4px;
+  min-height: 20px;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+  height: 0px;
+}
+   </string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="styleSheet">
-      <string notr="true">font: 700 15pt &quot;Ubuntu&quot;;</string>
-     </property>
-     <property name="text">
-      <string>COMPRAS</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>8</number>
+   </property>
+   <item row="0" column="0" colspan="2">
+    <widget class="QFrame" name="frameHeaderBar">
      <property name="minimumSize">
       <size>
-       <width>200</width>
-       <height>130</height>
+       <width>0</width>
+       <height>62</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>200</width>
-       <height>130</height>
+       <width>16777215</width>
+       <height>62</height>
       </size>
      </property>
-     <property name="title">
-      <string>Filtros</string>
+     <property name="styleSheet">
+      <string notr="true">
+QFrame {
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,
+    stop:0 rgb(38, 62, 92), stop:1 rgb(24, 42, 66));
+  border-bottom: 2px solid rgb(43, 132, 191);
+}
+QPushButton {
+  background-color: transparent;
+  font: 600 10pt &quot;Segoe UI&quot;;
+  color: rgb(195, 215, 235);
+  border: none;
+  border-radius: 7px;
+  padding: 4px 12px;
+}
+QPushButton:hover {
+  background-color: rgba(43, 132, 191, 150);
+  color: white;
+}
+QPushButton:pressed {
+  background-color: rgba(153, 193, 241, 100);
+  color: white;
+}
+QLabel {
+  color: rgb(195, 215, 235);
+  background-color: transparent;
+  border: none;
+}
+      </string>
      </property>
-     <widget class="QWidget" name="layoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>161</width>
-        <height>88</height>
-       </rect>
+     <property name="frameShape">
+      <enum>QFrame::Shape::NoFrame</enum>
+     </property>
+     <layout class="QHBoxLayout" name="headerLayout">
+      <property name="leftMargin">
+       <number>12</number>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="rightMargin">
+       <number>12</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_3">
+        <property name="styleSheet">
+         <string notr="true">font: 700 14pt &quot;Ubuntu&quot;;</string>
+        </property>
+        <property name="text">
+         <string>Compras</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="headerSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="contentLayout">
+     <property name="spacing">
+      <number>8</number>
+     </property>
+     <property name="leftMargin">
+      <number>8</number>
+     </property>
+     <property name="topMargin">
+      <number>8</number>
+     </property>
+     <property name="rightMargin">
+      <number>8</number>
+     </property>
+     <property name="bottomMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>200</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Filtros</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>Período considerado:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>De:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDateEdit" name="DateEdt_De">
+            <property name="calendarPopup">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Até:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDateEdit" name="DateEdt_Ate">
+            <property name="calendarPopup">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QPushButton" name="Btn_ConsultarDF">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Atualizar</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="filterSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="tablesLayout">
+       <property name="spacing">
+        <number>6</number>
+       </property>
        <item>
-        <widget class="QLabel" name="label_8">
+        <widget class="QLabel" name="label">
+         <property name="styleSheet">
+          <string notr="true">font: 700 10pt &quot;Ubuntu&quot;;</string>
+         </property>
          <property name="text">
-          <string>Período considerado:</string>
+          <string>Notas Fiscais de Compras:</string>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
-         <item>
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>De:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDateEdit" name="DateEdt_De">
-           <property name="calendarPopup">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QTableView" name="Tview_Entradas">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+         </property>
+         <property name="showGrid">
+          <bool>false</bool>
+         </property>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+        </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
-         <item>
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>Até:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QDateEdit" name="DateEdt_Ate">
-           <property name="calendarPopup">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QLabel" name="label_2">
+         <property name="styleSheet">
+          <string notr="true">font: 700 10pt &quot;Ubuntu&quot;;</string>
+         </property>
+         <property name="text">
+          <string>Produtos Contidos na Nota Selecionada:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTableView" name="Tview_ProdutosNota">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="contextMenuPolicy">
+          <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+         </property>
+         <property name="showGrid">
+          <bool>false</bool>
+         </property>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+        </widget>
        </item>
       </layout>
-     </widget>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="styleSheet">
-        <string notr="true">font: 700 10pt &quot;Ubuntu&quot;;</string>
-       </property>
-       <property name="text">
-        <string>Notas Fiscais de Compras:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QTableView" name="Tview_Entradas">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="alternatingRowColors">
-        <bool>true</bool>
-       </property>
-       <property name="selectionMode">
-        <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
-       </property>
-       <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="0">
-    <widget class="QPushButton" name="Btn_ConsultarDF">
-     <property name="minimumSize">
-      <size>
-       <width>110</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Atualizar</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <layout class="QVBoxLayout" name="verticalLayout_2">
-     <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Orientation::Vertical</enum>
-       </property>
-       <property name="sizeType">
-        <enum>QSizePolicy::Policy::MinimumExpanding</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_2">
-       <property name="styleSheet">
-        <string notr="true">font: 700 10pt &quot;Ubuntu&quot;;</string>
-       </property>
-       <property name="text">
-        <string>Produtos Contidos na Nota Selecionada:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QTableView" name="Tview_ProdutosNota">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="contextMenuPolicy">
-        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
-       </property>
-       <property name="selectionMode">
-        <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
-       </property>
-       <property name="selectionBehavior">
-        <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>

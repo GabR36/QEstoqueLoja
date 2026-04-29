@@ -30,6 +30,8 @@ public:
     QMap<QString, int>             contarPorFinalidade(QDateTime dtIni, QDateTime dtFim, int tpAmb);
     QList<QPair<QString, QString>> buscarXmlsPorPeriodo(QDateTime dtIni, QDateTime dtFim, int tpAmb);
     QList<NotaFiscalDTO>           buscarPorPeriodo(QDateTime dtIni, QDateTime dtFim, int tpAmb);
+    QList<NotaFiscalDTO>           buscarContingencias();
+    bool                           atualizarRetornoContingencia(const QString &chNfe, const QString &cstat, const QString &nProt);
 private:
     QSqlDatabase db;
 

@@ -64,6 +64,41 @@ QGroupBox {
   font: 700 9pt &quot;Segoe UI&quot;;
   font-size: 15px;
 }
+QTableView {
+  background-color: #ffffff;
+  alternate-background-color: #dce9f5;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  gridline-color: #e2e8f0;
+  selection-background-color: rgb(43, 132, 191);
+  selection-color: #ffffff;
+  outline: none;
+}
+QHeaderView::section {
+  background-color: #f1f5f9;
+  color: #475569;
+  font: 600 9pt &quot;Ubuntu&quot;;
+  border: none;
+  border-bottom: 2px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  padding: 6px 10px;
+}
+QHeaderView::section:last {
+  border-right: none;
+}
+QScrollBar:vertical {
+  background: #f1f5f9;
+  width: 8px;
+  border-radius: 4px;
+}
+QScrollBar::handle:vertical {
+  background: #cbd5e1;
+  border-radius: 4px;
+  min-height: 20px;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+  height: 0px;
+}
    </string>
   </property>
   <property name="dockNestingEnabled">
@@ -633,8 +668,8 @@ QPushButton:pressed {
         <property name="selectionBehavior">
          <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
         </property>
-        <property name="gridStyle">
-         <enum>Qt::PenStyle::SolidLine</enum>
+        <property name="showGrid">
+         <bool>false</bool>
         </property>
         <attribute name="horizontalHeaderCascadingSectionResizes">
          <bool>false</bool>
@@ -690,6 +725,7 @@ QPushButton:pressed {
     <addaction name="actionMonitor_Fiscal"/>
     <addaction name="actionEnviar_Notas_Contador"/>
     <addaction name="actionInutilizar_Numera_o_NF"/>
+    <addaction name="actionEnviar_Carta_de_Corre_o"/>
    </widget>
    <addaction name="menuEditar"/>
    <addaction name="menuVendas"/>
@@ -768,6 +804,11 @@ QPushButton:pressed {
   <action name="actionInutilizar_Numera_o_NF">
    <property name="text">
     <string>Inutilizar Numeração NF</string>
+   </property>
+  </action>
+  <action name="actionEnviar_Carta_de_Corre_o">
+   <property name="text">
+    <string>Enviar Carta de Correção</string>
    </property>
   </action>
  </widget>

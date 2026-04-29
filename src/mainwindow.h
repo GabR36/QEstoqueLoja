@@ -22,9 +22,10 @@
 #include "nota/acbrmanager.h"
 #include "../services/Produto_service.h"
 #include "dto/Config_dto.h"
+#include "services/contingencia_service.h"
 
 
-#define VERSAO_QE "2.5.0"
+#define VERSAO_QE "2.6.1"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -98,6 +99,8 @@ private slots:
 
     void on_actionInutilizar_Numera_o_NF_triggered();
 
+    void on_actionEnviar_Carta_de_Corre_o_triggered();
+
 private:
     Ui::MainWindow *ui;
     // ACBrNFe *acbr;
@@ -111,12 +114,13 @@ private:
     QAction* actionVerProduto;
     Produto_Service *produtoService;
     ConfigDTO configDTO;
+    ContingenciaService *contingenciaService = nullptr;
 
 
     void setarIconesJanela();
     //QModelIndex selected_index;
 
-    const int ultimaVersaoSchema = 8;
+    const int ultimaVersaoSchema = 9;
 
 
     void mostrarProdutoPorCodigoBarras(const QString &codigo);

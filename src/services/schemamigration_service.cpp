@@ -7,9 +7,12 @@
 #include <QFileInfo>
 #include <QSql>
 #include <QSqlError>
+#include <QSettings>
+#include <QMap>
 #include "../configuracao.h"
 #include "../services/Produto_service.h"
 #include "../infra/databaseconnection_service.h"
+#include "../infra/apppath_service.h"
 
 SchemaMigration_service::SchemaMigration_service(QObject *parent, int dbLastVersion)
     : QObject{parent}
@@ -771,6 +774,134 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             } else {
                 dbSchemaVersion = 8;
                 qDebug() << "Migracao para versao 8 concluida com sucesso.";
+            }
+
+            break;
+        }
+        case 8:
+        {
+            // schema versao 8 atualizar para a versao 9
+            // Migrar configurações da tabela config do banco de dados para o arquivo .ini
+
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+                break;
+            }
+
+            qDebug() << "Atualizando para versao 9: migrando config para .ini";
+
+            // Mapeamento de chave DB -> grupo/chave INI
+            QMap<QString, QString> keyToIni = {
+                // empresa
+                {"nome_empresa",        "empresa/nome_empresa"},
+                {"nfant_empresa",       "empresa/nfant_empresa"},
+                {"endereco_empresa",    "empresa/endereco_empresa"},
+                {"numero_empresa",      "empresa/numero_empresa"},
+                {"bairro_empresa",      "empresa/bairro_empresa"},
+                {"cep_empresa",         "empresa/cep_empresa"},
+                {"cidade_empresa",      "empresa/cidade_empresa"},
+                {"estado_empresa",      "empresa/estado_empresa"},
+                {"email_empresa",       "empresa/email_empresa"},
+                {"telefone_empresa",    "empresa/telefone_empresa"},
+                {"cnpj_empresa",        "empresa/cnpj_empresa"},
+                {"caminho_logo_empresa","empresa/caminho_logo_empresa"},
+                // fiscal
+                {"regime_trib",         "fiscal/regime_trib"},
+                {"tp_amb",              "fiscal/tp_amb"},
+                {"id_csc",              "fiscal/id_csc"},
+                {"csc",                 "fiscal/csc"},
+                {"caminho_schema",      "fiscal/caminho_schema"},
+                {"caminho_certac",      "fiscal/caminho_certac"},
+                {"caminho_certificado", "fiscal/caminho_certificado"},
+                {"senha_certificado",   "fiscal/senha_certificado"},
+                {"cuf",                 "fiscal/cuf"},
+                {"cmun",                "fiscal/cmun"},
+                {"iest",                "fiscal/iest"},
+                {"cnpj_rt",             "fiscal/cnpj_rt"},
+                {"nome_rt",             "fiscal/nome_rt"},
+                {"email_rt",            "fiscal/email_rt"},
+                {"fone_rt",             "fiscal/fone_rt"},
+                {"id_csrt",             "fiscal/id_csrt"},
+                {"hash_csrt",           "fiscal/hash_csrt"},
+                {"emit_nf",             "fiscal/emit_nf"},
+                {"usar_ibs",            "fiscal/usar_ibs"},
+                {"nnf_homolog",         "fiscal/nnf_homolog"},
+                {"nnf_prod",            "fiscal/nnf_prod"},
+                {"nnf_homolog_nfe",     "fiscal/nnf_homolog_nfe"},
+                {"nnf_prod_nfe",        "fiscal/nnf_prod_nfe"},
+                // produto
+                {"ncm_padrao",          "produto/ncm_padrao"},
+                {"csosn_padrao",        "produto/csosn_padrao"},
+                {"pis_padrao",          "produto/pis_padrao"},
+                {"cest_padrao",         "produto/cest_padrao"},
+                // financeiro
+                {"porcent_lucro",       "financeiro/porcent_lucro"},
+                {"taxa_debito",         "financeiro/taxa_debito"},
+                {"taxa_credito",        "financeiro/taxa_credito"},
+                // email
+                {"email_nome",          "email/email_nome"},
+                {"email_smtp",          "email/email_smtp"},
+                {"email_conta",         "email/email_conta"},
+                {"email_usuario",       "email/email_usuario"},
+                {"email_senha",         "email/email_senha"},
+                {"email_porta",         "email/email_porta"},
+                {"email_ssl",           "email/email_ssl"},
+                {"email_tls",           "email/email_tls"},
+                // contador
+                {"contador_nome",       "contador/contador_nome"},
+                {"contador_email",      "contador/contador_email"},
+            };
+
+            QSqlQuery query(db);
+            bool ok = true;
+
+            if (!query.exec("SELECT key, value FROM config")) {
+                qDebug() << "Erro ao ler tabela config:" << query.lastError().text();
+                db.rollback();
+                break;
+            }
+
+            QSettings s(AppPath_service::configPath(), QSettings::IniFormat);
+
+            while (query.next()) {
+                QString key   = query.value(0).toString();
+                QString value = query.value(1).toString();
+
+                if (keyToIni.contains(key)) {
+                    s.setValue(keyToIni.value(key), value);
+                } else {
+                    qDebug() << "Chave config nao mapeada para .ini:" << key;
+                }
+            }
+
+            s.sync();
+            if (s.status() != QSettings::NoError) {
+                qDebug() << "Erro ao gravar .ini durante migracao para versao 9";
+                ok = false;
+            }
+
+            query.finish();
+
+            if (ok && !query.exec("DROP TABLE config")) {
+                qDebug() << "Erro ao dropar tabela config:" << query.lastError().text();
+                ok = false;
+            }
+
+            if (ok && !query.exec("PRAGMA user_version = 9")) {
+                qDebug() << "Erro ao atualizar user_version para 9:" << query.lastError().text();
+                ok = false;
+            }
+
+            if (!ok) {
+                db.rollback();
+                qDebug() << "Migracao para versao 9 revertida devido a erros.";
+            } else if (!db.commit()) {
+                qDebug() << "Erro ao dar commit na migracao 9:" << db.lastError().text();
+                db.rollback();
+            } else {
+                dbSchemaVersion = 9;
+                qDebug() << "Migracao para versao 9 concluida: config migrada para .ini.";
+                emit dbVersao9();
             }
 
             break;

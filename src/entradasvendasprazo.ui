@@ -261,7 +261,7 @@ CustomLineEdit:focus, QLineEdit:focus {
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">QHeaderView::section { background-color: rgb(33,105,149); }</string>
+          <string notr="true"/>
          </property>
          <property name="alternatingRowColors">
           <bool>true</bool>

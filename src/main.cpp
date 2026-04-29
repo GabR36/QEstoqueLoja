@@ -3,15 +3,13 @@
     #include <QApplication>
     #include <QLocale>
     #include <QTranslator>
-    // #include <qguiapplication.h>
     #include <qicon.h>
     #include <QStyleFactory>
+    #include <QGuiApplication>
 
     int main(int argc, char *argv[])
     {
-
-        // QGuiApplication app(argc, argv);
-        // QGuiApplication::setWindowIcon(QIcon(":/QEstoqueLOja/QeLogo.png"));
+        QGuiApplication::setDesktopFileName("qestoqueloja");
 
 
         QApplication a(argc, argv);
@@ -25,7 +23,7 @@
         lightPalette.setColor(QPalette::Window, QColor(255, 255, 255));
         lightPalette.setColor(QPalette::WindowText, Qt::black);
         lightPalette.setColor(QPalette::Base, QColor(255, 255, 255));
-        lightPalette.setColor(QPalette::AlternateBase, QColor(240, 240, 240));
+        lightPalette.setColor(QPalette::AlternateBase, QColor(220, 234, 245));
         lightPalette.setColor(QPalette::ToolTipBase, Qt::black);
         lightPalette.setColor(QPalette::ToolTipText, Qt::white);
         lightPalette.setColor(QPalette::Text, Qt::black);

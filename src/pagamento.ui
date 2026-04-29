@@ -29,32 +29,33 @@
    <string>Pagamento - QEstoqueLoja</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#pagamento{
-background-color: rgb(199, 199, 199);
+   <string notr="true">
+#pagamento {
+  background-color: rgb(199, 199, 199);
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0,
+    stop:0 rgba(199, 199, 199, 255), stop:1 rgba(170, 170, 170, 255));
 }
-QPushButton{
-background-color: rgb(43, 132, 191);
-color: rgb(255, 255, 255);
-font-size: 15px;
-border-radius: 13px;
-
+QPushButton {
+  background-color: rgb(43, 132, 191);
+  color: rgb(255, 255, 255);
+  font-size: 13px;
+  border-radius: 10px;
 }
-
-QPushButton:hover{
-	background-color: rgb(13, 92, 161);
+QPushButton:hover {
+  background-color: rgb(13, 92, 161);
 }
-QPushButton:pressed{
-	
-color: rgb(255, 255, 255);
-	background-color: rgb(153, 193, 241);
-font-size: 15px;
-border-radius: 13px;
+QPushButton:pressed {
+  color: rgb(255, 255, 255);
+  background-color: rgb(153, 193, 241);
+  font-size: 13px;
+  border-radius: 10px;
 }
-QGroupBox{
-background-color:rgb(170, 170, 170);
-	font: 700 7pt &quot;Segoe UI&quot;;
-	font-size: 15px;
-}</string>
+QGroupBox {
+  background-color: rgb(170, 170, 170);
+  font: 700 7pt &quot;Segoe UI&quot;;
+  font-size: 15px;
+}
+   </string>
   </property>
   <property name="modal">
    <bool>true</bool>
@@ -165,10 +166,7 @@ background-color:rgb(170, 170, 170);
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color:rgb(170, 170, 170);
-font: 700 9pt &quot;Segoe UI&quot;;
-font-size: 15px;
-</string>
+    <string notr="true">background-color: rgb(170, 170, 170); border-radius: 8px; font: 700 9pt &quot;Segoe UI&quot;; font-size: 15px;</string>
    </property>
    <property name="frameShape">
     <enum>QFrame::Shape::StyledPanel</enum>

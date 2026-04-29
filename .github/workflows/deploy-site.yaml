@@ -1,0 +1,56 @@
+name: Update site with latest version
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  update-site:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repo do app
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # importante para pegar tags
+
+      - name: Pegar versão
+        id: tag
+        run: |
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/}"
+          else
+            VERSION=$(git describe --tags --abbrev=0)
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Checkout do repo do site
+        uses: actions/checkout@v4
+        with:
+          repository: GabR36/site-qestoqueloja
+          token: ${{ secrets.SITE_REPO_TOKEN }}
+          path: site-qestoqueloja
+
+      - name: Atualizar data/version.yaml
+        run: |
+          cd site-qestoqueloja
+          echo "version: \"${{ steps.tag.outputs.VERSION }}\"" > data/version.yaml
+      - name: Copiar capturas de tela
+        run: |
+          mkdir -p site-qestoqueloja/static/capturas_de_tela
+          cp -r Imagens/capturas_de_tela/* site-qestoqueloja/static/capturas_de_tela
+      - name: Copiar documentação HTML
+        run: |
+          mkdir -p site-qestoqueloja/assets/ajuda
+          cp recursos/ajuda/help.html site-qestoqueloja/assets/ajuda/help.html
+
+      - name: Commit e push
+        run: |
+          cd site-qestoqueloja
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Atualiza versão para ${{ steps.tag.outputs.VERSION }}" || echo "Sem mudanças"
+          git push

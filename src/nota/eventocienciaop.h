@@ -26,6 +26,7 @@ public:
     QString gerarEnviar();
     QString getCampo(const QString &texto, const QString &campo);
     EventoFiscalDTO gerarEnviarRetorno();
+    void setRetornoForcado(QString &retorno);
 private:
     std::stringstream ini;
     QMap<QString, QString> fiscalValues;
@@ -33,6 +34,7 @@ private:
     QString chnfe_global;
     ACBrNFe *acbr;
     ConfigDTO configDTO;
+    QString retornoForcado = "";
 
 
     void preencherEvento();

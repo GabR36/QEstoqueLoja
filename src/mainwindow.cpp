@@ -48,6 +48,7 @@
 #include "services/config_service.h"
 #include "services/dfe_service.h"
 #include "inutilizacaodialog.h"
+#include "cartacorrecaojanela.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -72,8 +73,13 @@ MainWindow::MainWindow(QWidget *parent)
     Config_service *confServ = new Config_service(this);
     configDTO = confServ->carregarTudo();
 
+    if (configDTO.emitNfFiscal) {
+        contingenciaService = new ContingenciaService(this);
+        contingenciaService->iniciar();
+    }
+
     // mostrar na tabela da aplicaçao a tabela do banco de dados.
-    ui->Tview_Produtos->horizontalHeader()->setStyleSheet("background-color: rgb(33, 105, 149)");
+    // header estilizado via stylesheet global
     ui->Ledit_Pesquisa->installEventFilter(this);
     atualizarTableview();
     model->setHeaderData(0, Qt::Horizontal, tr("ID"));
@@ -149,6 +155,8 @@ void MainWindow::iniciarMigration(){
     SchemaMigration_service *schema = new SchemaMigration_service(this, ultimaVersaoSchema);
     //conexões de ações para update de versao schema
     connect(schema, &SchemaMigration_service::dbVersao6, this,
+            &MainWindow::atualizarConfigAcbr);
+    connect(schema, &SchemaMigration_service::dbVersao9, this,
             &MainWindow::atualizarConfigAcbr);
 
     // schema->update();
@@ -520,9 +528,13 @@ void MainWindow::atualizarConfigAcbr(){
             }
 
         }else{
-            qDebug() << "Configurações salvas no arquivo acbrlib.ini";
+            qDebug() << res.msg;
         }
 
+        if (!contingenciaService && configDTO.emitNfFiscal) {
+            contingenciaService = new ContingenciaService(this);
+            contingenciaService->iniciar();
+        }
 }
 
 
@@ -571,5 +583,12 @@ void MainWindow::on_actionInutilizar_Numera_o_NF_triggered()
 {
     InutilizacaoDialog *inu = new InutilizacaoDialog();
     inu->show();
+}
+
+
+void MainWindow::on_actionEnviar_Carta_de_Corre_o_triggered()
+{
+    CartaCorrecaoJanela *janela = new CartaCorrecaoJanela();
+    janela->show();
 }
 

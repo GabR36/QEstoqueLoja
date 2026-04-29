@@ -16,8 +16,9 @@ bool EventoFiscal_repository::inserir(EventoFiscalDTO evento){
         return false;
     }
     QSqlQuery q(db);
+    QString dataAgora = DataUtil::getDataAgoraUS();
 
-    evento.atualizadoEm = DataUtil::getDataAgoraUS();
+    evento.atualizadoEm = dataAgora;
 
     q.prepare(R"(
         INSERT INTO eventos_fiscais
@@ -35,7 +36,7 @@ bool EventoFiscal_repository::inserir(EventoFiscalDTO evento){
     q.bindValue(":nprot", evento.nProt);
     q.bindValue(":idnf", evento.idNf > 0 ? QVariant(evento.idNf) : QVariant(QMetaType(QMetaType::LongLong)));
     q.bindValue(":atualizado", evento.atualizadoEm);
-    q.bindValue(":adicionadoem", evento.adicionadoEm);
+    q.bindValue(":adicionadoem", dataAgora);
 
     if(!q.exec()){
         qDebug() << "Query inserção evento não rodou:" << q.lastError().text();

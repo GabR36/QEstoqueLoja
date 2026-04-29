@@ -1,0 +1,33 @@
+[Evento]
+CStat=128
+CUF=0
+DhRecbto=
+Msg=
+VerAplic=AN_1.9.3
+Versao=
+XMotivo=Lote de evento processado
+cOrgao=91
+idLote=1
+tpAmb=1
+
+[Evento001]
+CNPJDest=03307205000102
+CStat=580
+Id=ID891265977657389
+VerAplic=AN_1.9.3
+XMotivo=Rejeicao: Evento fora do prazo permitido
+cOrgao=91
+dhRegEvento=27/04/2026 09:35:13
+digVal=
+emailDest=
+nProt=891265977657389
+nSeqEvento=1
+tpAmb=1
+tpEvento=210210
+xEvento=Ciencia da Operacao
+
+[DetEvento]
+descEvento=Ciencia da Operacao
+nProtEvento=
+verAplic=1.0
+

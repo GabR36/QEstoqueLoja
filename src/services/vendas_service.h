@@ -13,6 +13,7 @@
 #include "produtovenda_service.h"
 #include "Produto_service.h"
 #include "entradasvendas_service.h"
+#include "config_service.h"
 
 
 enum class VendasErro {
@@ -70,6 +71,8 @@ private:
     NotaFiscal_service notaServ;
     Produto_Service prodServ;
     EntradasVendas_service entradaServ;
+    Config_service confServ;
+    ConfigDTO confDTO;
 
 signals:
 };

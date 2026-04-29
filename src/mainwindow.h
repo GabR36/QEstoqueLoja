@@ -25,7 +25,7 @@
 #include "services/contingencia_service.h"
 
 
-#define VERSAO_QE "2.6.0"
+#define VERSAO_QE "2.6.1"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -98,6 +98,8 @@ private slots:
     void on_actionMonitor_Fiscal_triggered();
 
     void on_actionInutilizar_Numera_o_NF_triggered();
+
+    void on_actionEnviar_Carta_de_Corre_o_triggered();
 
 private:
     Ui::MainWindow *ui;

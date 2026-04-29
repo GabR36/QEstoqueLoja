@@ -198,6 +198,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/services/relatorios_service.h src/services/relatorios_service.cpp
         src/inutilizacaodialog.h src/inutilizacaodialog.cpp src/inutilizacaodialog.ui
         Imagens/QEstoqueLOja/light-icons/QeLogo-claro.png
+        src/cartacorrecaojanela.h src/cartacorrecaojanela.cpp src/cartacorrecaojanela.ui
+        src/nota/eventocartacorrecao.h src/nota/eventocartacorrecao.cpp
 
 
 

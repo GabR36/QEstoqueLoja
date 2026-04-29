@@ -1,0 +1,11 @@
+[Evento]
+CStat=128
+XMotivo=Lote de Evento Processado
+
+[Evento001]
+CStat=573
+XMotivo=Duplicidade de Evento
+chNFe=00000000000000000000000000000000000000000000
+nSeqEvento=1
+tpEvento=110110
+arquivo=

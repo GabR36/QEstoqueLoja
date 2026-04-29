@@ -48,6 +48,7 @@
 #include "services/config_service.h"
 #include "services/dfe_service.h"
 #include "inutilizacaodialog.h"
+#include "cartacorrecaojanela.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -582,5 +583,12 @@ void MainWindow::on_actionInutilizar_Numera_o_NF_triggered()
 {
     InutilizacaoDialog *inu = new InutilizacaoDialog();
     inu->show();
+}
+
+
+void MainWindow::on_actionEnviar_Carta_de_Corre_o_triggered()
+{
+    CartaCorrecaoJanela *janela = new CartaCorrecaoJanela();
+    janela->show();
 }
 

@@ -23,6 +23,8 @@ private slots:
     void deletar_produto_inexistente();
     void alterar_produto_ok();
     void init();
+    void atualizar_campos_map_ok();
+    void atualizar_sem_ncm_nao_quebra();
 };
 
 #endif // TEST_PRODUTO_SERVICE_H

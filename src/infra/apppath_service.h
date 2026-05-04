@@ -15,6 +15,10 @@ public:
     static QString xmlPath();
     static QString schemaPath();
     static QString imagesPath();
+    static QString generalConfigPath();
+    static QString nfeConfigPath();
+    static QString consultaCnpjConfigPath();
+    static QString mailConfigPath();
 signals:
 };
 

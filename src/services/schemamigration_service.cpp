@@ -906,6 +906,55 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
 
             break;
         }
+        case 9:
+        {
+            // schema versao 8 atualizar para a versao 9
+            // Migrar configurações da tabela config do banco de dados para o arquivo .ini
+
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+                break;
+            }
+            qDebug() << "Atualizando para versao 10: migrando appdata config para .config";
+            // Caminho antigo (exemplo manual)
+
+            QString oldDirPath = AppPath_service::appDataPath();
+
+            QString newDirPath = AppPath_service::generalConfigPath();
+
+            QDir oldDir(oldDirPath);
+            if (!oldDir.exists()) {
+                qDebug() << "Pasta antiga não existe.";
+                db.rollback();
+            }
+
+            QStringList filters;
+            filters << "*.ini";
+
+            QFileInfoList files = oldDir.entryInfoList(filters, QDir::Files);
+
+            for (const QFileInfo &fileInfo : files) {
+                QString oldFilePath = fileInfo.absoluteFilePath();
+                QString newFilePath = newDirPath + "/" + fileInfo.fileName();
+
+                if (QFile::exists(newFilePath)) {
+                    qDebug() << "Arquivo já existe, ignorando:" << fileInfo.fileName();
+                    continue;
+                }
+
+                if (QFile::copy(oldFilePath, newFilePath)) {
+                    qDebug() << "Copiado:" << fileInfo.fileName();
+                    QFile::remove(oldFilePath);
+                } else {
+                    qDebug() << "Erro ao copiar:" << fileInfo.fileName();
+                }
+            }
+
+
+            dbSchemaVersion = 10;
+            qDebug() << "Migracao para versao 9 concluida: config migrada para .ini.";
+            emit dbVersao10();
+        }
 
         }
     }

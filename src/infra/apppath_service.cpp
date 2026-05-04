@@ -17,6 +17,7 @@ QString AppPath_service::appDataPath()
     return path;
 }
 
+
 QString AppPath_service::databasePath()
 {
     QString path = appDataPath() + "/estoque.db";
@@ -25,8 +26,43 @@ QString AppPath_service::databasePath()
 
 QString AppPath_service::configPath()
 {
-    return appDataPath() + "/config.ini";
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QDir().mkpath(path);
+    return path + "/config.ini";
 }
+
+QString AppPath_service::generalConfigPath()
+{
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QDir().mkpath(path);
+
+    return path;
+}
+
+QString AppPath_service::nfeConfigPath()
+{
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QDir().mkpath(path);
+
+    return path + "/acbrnfe_config.ini";
+}
+
+QString AppPath_service::mailConfigPath()
+{
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QDir().mkpath(path);
+
+    return path + "/acbrmail_config.ini";
+}
+
+QString AppPath_service::consultaCnpjConfigPath()
+{
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
+    QDir().mkpath(path);
+
+    return path + "/acbrconsultacnpj_config.ini";
+}
+
 
 QString AppPath_service::xmlPath()
 {

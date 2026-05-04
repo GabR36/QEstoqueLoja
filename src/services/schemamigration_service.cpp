@@ -926,6 +926,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             if (!oldDir.exists()) {
                 qDebug() << "Pasta antiga não existe.";
                 db.rollback();
+                break;
             }
 
             QStringList filters;
@@ -935,19 +936,35 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
 
             for (const QFileInfo &fileInfo : files) {
                 QString oldFilePath = fileInfo.absoluteFilePath();
-                QString newFilePath = newDirPath + "/" + fileInfo.fileName();
+
+                QString fileName = fileInfo.fileName();
+
+                if (fileName.compare("acbr_config.ini", Qt::CaseInsensitive) == 0) {
+                    fileName = "acbrnfe_config.ini"; // (corrigi o typo "congfig")
+                }
+
+                QString newFilePath = newDirPath + "/" + fileName;
 
                 if (QFile::exists(newFilePath)) {
-                    qDebug() << "Arquivo já existe, ignorando:" << fileInfo.fileName();
+                    qDebug() << "Arquivo já existe, ignorando:" << fileName;
                     continue;
                 }
 
                 if (QFile::copy(oldFilePath, newFilePath)) {
-                    qDebug() << "Copiado:" << fileInfo.fileName();
+                    qDebug() << "Copiado:" << fileName;
                     QFile::remove(oldFilePath);
                 } else {
-                    qDebug() << "Erro ao copiar:" << fileInfo.fileName();
+                    qDebug() << "Erro ao copiar:" << fileName;
                 }
+            }
+            QSqlQuery query(db);
+            if (!query.exec("PRAGMA user_version = 10")) {
+                qDebug() << "Erro ao atualizar user_version para 10:" << query.lastError().text();
+                db.rollback();
+                break;
+            }
+            if (!db.commit()) {
+                qDebug() << "Erro ao dar commit!";
             }
 
 

@@ -94,3 +94,11 @@ QString AppPath_service::imagesPath()
     }
     return path;
 }
+
+// QString AppPath_service::docPath()
+// {
+//     QString path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+//     QDir().mkpath(path);
+
+//     return path + "/acbrconsultacnpj_config.ini";
+// }

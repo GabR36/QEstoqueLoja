@@ -376,14 +376,10 @@ void Entradas::addProdComCodBarras(QString idProd, QString codBarras){
         }
     }
 
-    if (produto["ncm"].toString() != produtoNota["ncm"].toString()) {
-        if (produto["ncm"].toString() == "" || produto["ncm"] == "00000000") {
-            resultado["ncm"] = produtoNota["ncm"].toString();
-        }
-        else {
-            resultado["ncm"] = produto["ncm"].toString();
-        }
-    }
+    resultado["ncm"] =
+        produto["ncm"].toString().isEmpty() || produto["ncm"] == "00000000"
+            ? produtoNota["ncm"].toString()
+            : produto["ncm"].toString();
 
     qDebug() << "teste antes: " << resultado["ncm"];
 

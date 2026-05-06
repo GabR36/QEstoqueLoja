@@ -120,7 +120,7 @@ private:
     void setarIconesJanela();
     //QModelIndex selected_index;
 
-    const int ultimaVersaoSchema = 9;
+    const int ultimaVersaoSchema = 10;
 
 
     void mostrarProdutoPorCodigoBarras(const QString &codigo);

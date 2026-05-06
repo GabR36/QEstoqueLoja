@@ -24,7 +24,6 @@ public:
     explicit EventoCienciaOP(QObject *parent = nullptr, QString chnfe = "");
 
     QString gerarEnviar();
-    QString getCampo(const QString &texto, const QString &campo);
     EventoFiscalDTO gerarEnviarRetorno();
     void setRetornoForcado(QString &retorno);
 private:
@@ -38,6 +37,7 @@ private:
 
 
     void preencherEvento();
+    QString getCampo(const QString &texto, const QString &campo, const QString &secao);
 signals:
 };
 

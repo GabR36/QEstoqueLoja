@@ -1,5 +1,6 @@
 #include "mailmanager.h"
 #include <QStandardPaths>
+#include "../infra/apppath_service.h"
 
 MailManager::MailManager(QObject *parent)
     : QObject(parent)
@@ -15,9 +16,7 @@ MailManager& MailManager::instance()
 ACBrMail* MailManager::mail()
 {
     if (!m_mail) {
-        QString configLibPath =
-            QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-            + "/acbrmail_config.ini";
+        QString configLibPath = AppPath_service::mailConfigPath();
 
         m_mail = std::make_unique<ACBrMail>(
             configLibPath.toStdString(),

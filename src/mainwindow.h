@@ -25,7 +25,7 @@
 #include "services/contingencia_service.h"
 
 
-#define VERSAO_QE "2.6.1"
+#define VERSAO_QE "2.6.2"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

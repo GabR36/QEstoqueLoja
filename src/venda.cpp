@@ -240,6 +240,7 @@ void venda::configurarPaginaPagamento()
     ui->Ledit_Desconto->setText("0");
     ui->Ledit_Taxa->setText("0");
     ui->Lbl_TotalTaxa->setText(Total());
+    ui->Lbl_Total->setText(Total());
 
     // dinheiro: hide taxa, show troco
     ui->lbl_taxa->hide();
@@ -287,6 +288,7 @@ void venda::descontoTaxa()
 
     QString valorFinal = portugues.toString(obterValorFinal(novaTaxa, desconto), 'f', 2);
     ui->Lbl_TotalTaxa->setText(valorFinal);
+    ui->Lbl_Total->setText(valorFinal);
     ui->Ledit_Recebido->setText(valorFinal);
     ui->Lbl_Troco->setText("0");
 }
@@ -305,6 +307,7 @@ void venda::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Desconto->setText("0");
         ui->Ledit_Taxa->setText("0");
         ui->Lbl_TotalTaxa->setText(Total());
+        ui->Lbl_Total->setText(Total());
         break;
     case 2: // crédito
         ui->label_2->hide(); ui->label_3->hide(); ui->Ledit_Recebido->hide(); ui->Lbl_Troco->hide();
@@ -312,6 +315,7 @@ void venda::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Desconto->setText("0");
         ui->Ledit_Taxa->setText(taxaCredito);
         ui->Lbl_TotalTaxa->setText(portugues.toString(obterValorFinal(taxaCredito, "0"), 'f', 2));
+        ui->Lbl_Total->setText(ui->Lbl_TotalTaxa->text());
         break;
     case 3: // débito
         ui->label_2->hide(); ui->label_3->hide(); ui->Ledit_Recebido->hide(); ui->Lbl_Troco->hide();
@@ -319,6 +323,7 @@ void venda::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Desconto->setText("0");
         ui->Ledit_Taxa->setText(taxaDebito);
         ui->Lbl_TotalTaxa->setText(portugues.toString(obterValorFinal(taxaDebito, "0"), 'f', 2));
+        ui->Lbl_Total->setText(ui->Lbl_TotalTaxa->text());
         break;
     default:
         ui->label_2->hide(); ui->label_3->hide(); ui->Ledit_Recebido->hide(); ui->Lbl_Troco->hide();
@@ -326,6 +331,7 @@ void venda::on_CBox_FormaPagamento_activated(int index)
         ui->Ledit_Desconto->setText("0");
         ui->Ledit_Taxa->setText("0");
         ui->Lbl_TotalTaxa->setText(Total());
+        ui->Lbl_Total->setText(Total());
         break;
     }
 }

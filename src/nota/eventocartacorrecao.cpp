@@ -80,14 +80,13 @@ EventoFiscalDTO EventoCartaCorrecao::gerarEnviarRetorno()
     evento.tipoEvento = "Carta de Correção";
 
     try {
-        acbr->LimparListaEventos();
-        acbr->CarregarEventoINI(ini.str());
-
         std::string retorno = "";
 
         if (!retornoForcado.isEmpty()) {
             retorno = retornoForcado.toStdString();
         } else {
+            acbr->LimparListaEventos();
+            acbr->CarregarEventoINI(ini.str());
             retorno = acbr->EnviarEvento(1);
         }
 

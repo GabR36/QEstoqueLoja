@@ -10,8 +10,11 @@
 NfeACBR::NfeACBR(QObject *parent, bool saida, bool devolucao)
     : QObject{parent}
 {
-    //pega o ponteiro da lib acbr do singleton
+#ifndef TEST_ENV
     nfe = AcbrManager::instance()->nfe();
+#else
+    nfe = nullptr;
+#endif
     db = QSqlDatabase::database();
 
     Config_service *confServ = new Config_service();
@@ -51,7 +54,9 @@ NfeACBR::NfeACBR(QObject *parent, bool saida, bool devolucao)
     tpAmb = (configDTO.tpAmbFiscal == 0 ? "1" : "0");
 
     caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/xmlNf";
+#ifndef TEST_ENV
     nfe->LimparLista();//evita acumular notas
+#endif
 
     usarIBS = configDTO.usarIbsFiscal;
 

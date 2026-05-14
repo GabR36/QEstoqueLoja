@@ -9,8 +9,11 @@
 NfceACBR::NfceACBR(QObject *parent)
     : QObject{parent}
 {
-    //pega o ponteiro da lib acbr do singleton
+#ifndef TEST_ENV
     nfce = AcbrManager::instance()->nfe();
+#else
+    nfce = nullptr;
+#endif
     db = QSqlDatabase::database();
 
     Config_service *confServ = new Config_service(this);
@@ -23,7 +26,9 @@ NfceACBR::NfceACBR(QObject *parent)
     tpAmb = (configDTO.tpAmbFiscal == 0 ? "1" : "0");
 
     caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/xmlNf";
+#ifndef TEST_ENV
     nfce->LimparLista();//evita acumular notas
+#endif
     //carregarConfig();
     usarIBS = configDTO.usarIbsFiscal;
 

@@ -43,7 +43,7 @@ ACBrConsultaCNPJ::ACBrConsultaCNPJ(std::string eArqConfig, std::string eChaveCry
 }
 
 ACBrConsultaCNPJ::~ACBrConsultaCNPJ() {
-    qDebug() << "~ACBrConsultaCNPJ() chamado";
+    qDebug() << "Destrutor ACBrConsultaCNPJ() chamado";
     if (!nHandler) return;
 
     CNPJ_Finalizar method;

@@ -309,10 +309,41 @@ FiscalEmitter_service::Resultado FiscalEmitter_service::enviarNFePadrao(VendasDT
         }
     }
 
-    if(cliente.nome.isEmpty() || cliente.email.isEmpty() || cliente.endereco.isEmpty() || cliente.cpf.isEmpty() ||
-        cliente.numeroEnd <= 0 || cliente.bairro.isEmpty() || cliente.xMun.isEmpty() || cliente.cMun.isEmpty() ||
-        cliente.uf.isEmpty() || cliente.cep.isEmpty()){
-        return {false, FiscalEmitterErro::QuebraDeRegra, "Informações sobre cliente incompletas."};
+    QStringList camposInvalidos;
+
+    if(cliente.nome.isEmpty())
+        camposInvalidos.append("Nome");
+
+    if(cliente.email.isEmpty())
+        camposInvalidos.append("E-mail");
+
+    if(cliente.endereco.isEmpty())
+        camposInvalidos.append("Endereço");
+
+    if(cliente.cpf.isEmpty())
+        camposInvalidos.append("CPF/CNPJ");
+
+    if(cliente.numeroEnd < 0)
+        camposInvalidos.append("Número do Endereço");
+
+    if(cliente.bairro.isEmpty())
+        camposInvalidos.append("Bairro");
+
+    if(cliente.xMun.isEmpty())
+        camposInvalidos.append("Município");
+
+    if(cliente.cMun.isEmpty())
+        camposInvalidos.append("Código do Município");
+
+    if(cliente.uf.isEmpty())
+        camposInvalidos.append("UF");
+
+    if(cliente.cep.isEmpty())
+        camposInvalidos.append("CEP");
+
+    if(!camposInvalidos.isEmpty()) {
+        return {false, FiscalEmitterErro::QuebraDeRegra,
+                "Informações do cliente incompletas:\n" + camposInvalidos.join("\n")};
     }
 
     bool algumProdTemNota = false;

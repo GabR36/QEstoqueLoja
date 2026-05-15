@@ -407,6 +407,8 @@ void venda::terminarPagamento()
     newVenda.valorFinal     = portugues.toDouble(valor_final);
     newVenda.valorRecebido  = portugues.toDouble(recebido);
 
+    if(idClienteAtual > 0)
+        CLIENTE = cliServ.getClienteByID(idClienteAtual);
     ClienteDTO cli = CLIENTE;
     cli.cpf = ui->Ledit_CpfCnpjCliente->text().trimmed();
 

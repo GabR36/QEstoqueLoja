@@ -142,8 +142,38 @@ venda::venda(QWidget *parent) :
     ui->Lbl_Step4->setVisible(configDTO.emitNfFiscal);
     ui->lbl_sep3->setVisible(configDTO.emitNfFiscal);
 
+    rascunhoTimer = new QTimer(this);
+    rascunhoTimer->setSingleShot(true);
+    rascunhoTimer->setInterval(400);
+    connect(rascunhoTimer, &QTimer::timeout, this, &venda::salvarRascunho);
+
+    auto agendarSalvar = [=]() { rascunhoTimer->start(); };
+
+    // produtos
+    connect(modeloSelecionados, &QStandardItemModel::itemChanged,  this, agendarSalvar);
+    connect(modeloSelecionados, &QStandardItemModel::rowsInserted, this, agendarSalvar);
+    connect(modeloSelecionados, &QStandardItemModel::rowsRemoved,  this, agendarSalvar);
+
+    // cliente e data
+    connect(ui->Ledit_Cliente,   &QLineEdit::editingFinished,  this, agendarSalvar);
+    connect(ui->DateEdt_Venda,   &QDateTimeEdit::dateTimeChanged, this, agendarSalvar);
+
+    // pagamento
+    connect(ui->CBox_FormaPagamento, QOverload<int>::of(&QComboBox::currentIndexChanged), this, agendarSalvar);
+    connect(ui->Ledit_Desconto,  &QLineEdit::textChanged, this, agendarSalvar);
+    connect(ui->Ledit_Taxa,      &QLineEdit::textChanged, this, agendarSalvar);
+    connect(ui->Ledit_Recebido,  &QLineEdit::textChanged, this, agendarSalvar);
+    connect(ui->CheckPorcentagem, &QCheckBox::stateChanged, this, agendarSalvar);
+
+    // nota fiscal
+    connect(ui->CBox_ModeloEmit, QOverload<int>::of(&QComboBox::currentIndexChanged), this, agendarSalvar);
+    connect(ui->RadioBtn_EmitNfTodos,  &QRadioButton::toggled, this, agendarSalvar);
+    connect(ui->RadioBtn_EmitNfApenas, &QRadioButton::toggled, this, agendarSalvar);
+
     irParaPagina(0);
     ui->Ledit_Pesquisa->setFocus();
+
+    verificarRascunho();
 }
 
 // ─── Navigation ──────────────────────────────────────────────────────────────
@@ -242,25 +272,51 @@ void venda::configurarPaginaPagamento()
     ui->Lbl_TotalTaxa->setText(Total());
     ui->Lbl_Total->setText(Total());
 
-    // dinheiro: hide taxa, show troco
-    ui->lbl_taxa->hide();
-    ui->Ledit_Taxa->hide();
-    ui->label_2->show();
-    ui->label_3->show();
-    ui->Ledit_Recebido->show();
-    ui->Lbl_Troco->show();
+    if (temRascunhoPendente) {
+        // aplica forma de pagamento salva e reconfigura visibilidade dos campos
+        int idxForma = ui->CBox_FormaPagamento->findText(rascunhoPendente.formaPagamento);
+        if (idxForma >= 0)
+            ui->CBox_FormaPagamento->setCurrentIndex(idxForma);
+        on_CBox_FormaPagamento_activated(ui->CBox_FormaPagamento->currentIndex());
 
+        ui->CheckPorcentagem->setChecked(rascunhoPendente.descontoPorcentagem);
+        ui->Ledit_Desconto->setText(rascunhoPendente.desconto);
+        ui->Ledit_Taxa->setText(rascunhoPendente.taxa);
+        ui->Ledit_Recebido->setText(rascunhoPendente.recebido);
+    } else {
+        // defaults para nova venda: dinheiro — hide taxa, show troco
+        ui->lbl_taxa->hide();
+        ui->Ledit_Taxa->hide();
+        ui->label_2->show();
+        ui->label_3->show();
+        ui->Ledit_Recebido->show();
+        ui->Lbl_Troco->show();
+    }
 }
 
 void venda::configurarPaginaNF()
 {
-    // número da nota conforme modelo selecionado
+    if (temRascunhoPendente) {
+        ui->CBox_ModeloEmit->setCurrentIndex(rascunhoPendente.modeloNf);
+        if (rascunhoPendente.emitirTodos)
+            ui->RadioBtn_EmitNfTodos->setChecked(true);
+        else
+            ui->RadioBtn_EmitNfApenas->setChecked(true);
+        temRascunhoPendente = false;
+    }
+
     int idx = ui->CBox_ModeloEmit->currentIndex();
     ModeloNota modelo = (idx == 1) ? ModeloNota::NFe : ModeloNota::NFCe;
     ui->Ledit_NNF->setText(QString::number(notaServ.getProximoNNF(configDTO.tpAmbFiscal, modelo)));
-    ui->Ledit_CpfCnpjCliente->setText(CLIENTE.cpf);
 
-    // radiobuttons visíveis apenas quando emitindo NF
+    // na primeira entrada com rascunho usa o CPF salvo; nas demais usa o do cliente
+    if (!rascunhoPendente.cpfManual.isEmpty()) {
+        ui->Ledit_CpfCnpjCliente->setText(rascunhoPendente.cpfManual);
+        rascunhoPendente.cpfManual.clear();
+    } else {
+        ui->Ledit_CpfCnpjCliente->setText(CLIENTE.cpf);
+    }
+
     bool emite = (idx != 2);
     ui->RadioBtn_EmitNfApenas->setVisible(emite);
     ui->RadioBtn_EmitNfTodos->setVisible(emite);
@@ -507,6 +563,7 @@ void venda::terminarPagamento()
         // index 2 = Não Emitir NF — nada a fazer
     }
 
+    descartarRascunho();
     emit vendaConcluida();
     this->close();
 }
@@ -537,6 +594,99 @@ void venda::atualizarListaCliente()
 }
 
 venda::~venda() { delete ui; }
+
+// ─── Rascunho ────────────────────────────────────────────────────────────────
+
+void venda::salvarRascunho()
+{
+    QList<ProdutoVendidoDTO> produtos;
+    for (int row = 0; row < modeloSelecionados->rowCount(); ++row) {
+        ProdutoVendidoDTO p;
+        p.idProduto    = modeloSelecionados->item(row, 0)->text().toLongLong();
+        p.quantidade   = portugues.toDouble(modeloSelecionados->item(row, 1)->text());
+        p.descricao    = modeloSelecionados->item(row, 2)->text();
+        p.precoVendido = portugues.toDouble(modeloSelecionados->item(row, 3)->text());
+        produtos.append(p);
+    }
+
+    // extrai ID direto do campo — idClienteAtual só é setado ao clicar "Próximo"
+    auto [nomeIgnorado, idCli] = cliServ.extrairNomeId(ui->Ledit_Cliente->text());
+
+    rascunhoServ.salvar(
+        idCli > 0 ? idCli : idClienteAtual,
+        ui->Ledit_CpfCnpjCliente->text().trimmed(),
+        ui->DateEdt_Venda->dateTime().toString("yyyy-MM-dd HH:mm:ss"),
+        produtos,
+        ui->CBox_FormaPagamento->currentText(),
+        ui->Ledit_Desconto->text(),
+        ui->Ledit_Taxa->text(),
+        ui->Ledit_Recebido->text(),
+        ui->CheckPorcentagem->isChecked(),
+        ui->CBox_ModeloEmit->currentIndex(),
+        ui->RadioBtn_EmitNfTodos->isChecked()
+    );
+}
+
+void venda::descartarRascunho()
+{
+    rascunhoServ.descartar();
+}
+
+void venda::verificarRascunho()
+{
+    if (!rascunhoServ.existe()) return;
+
+    RascunhoVendaDTO rascunho = rascunhoServ.carregar();
+    QList<ProdutoVendidoDTO> produtos = rascunhoServ.carregarProdutos(rascunho.produtosJson);
+    if (produtos.isEmpty()) { descartarRascunho(); return; }
+
+    auto resp = QMessageBox::question(this, "Rascunho de venda",
+        QString("Existe um rascunho com %1 produto(s) não finalizado.\n"
+                "Deseja continuar de onde parou?").arg(produtos.size()),
+        QMessageBox::Yes | QMessageBox::No);
+
+    if (resp == QMessageBox::No) { descartarRascunho(); return; }
+
+    // restaura produtos
+    for (const ProdutoVendidoDTO &p : produtos) {
+        QStandardItem *itemPreco = new QStandardItem();
+        itemPreco->setData(p.precoVendido, Qt::EditRole);
+        itemPreco->setText(portugues.toString(p.precoVendido, 'f', 2));
+
+        QStandardItem *itemTotal = new QStandardItem();
+        itemTotal->setData(p.quantidade * p.precoVendido, Qt::EditRole);
+        itemTotal->setText(portugues.toString(p.quantidade * p.precoVendido, 'f', 2));
+
+        modeloSelecionados->appendRow({
+            new QStandardItem(QString::number(p.idProduto)),
+            new QStandardItem(portugues.toString(p.quantidade, 'f', 2)),
+            new QStandardItem(p.descricao),
+            itemPreco,
+            itemTotal
+        });
+    }
+
+    // restaura cliente e data
+    if (rascunho.idCliente > 0) {
+        for (const QString &s : clientesComId) {
+            if (s.contains(QString("(ID: %1)").arg(rascunho.idCliente))) {
+                ui->Ledit_Cliente->setText(s);
+                idClienteAtual = rascunho.idCliente;
+                break;
+            }
+        }
+    }
+
+    if (!rascunho.dataHora.isEmpty())
+        ui->DateEdt_Venda->setDateTime(QDateTime::fromString(rascunho.dataHora, "yyyy-MM-dd HH:mm:ss"));
+
+    // pagamento e NF serão aplicados em configurarPaginaPagamento/configurarPaginaNF
+    // para não serem sobrescritos pelos defaults dessas funções
+    rascunhoPendente    = rascunho;
+    temRascunhoPendente = true;
+
+    ui->Lbl_Total->setText(Total());
+}
 
 qlonglong venda::validarCliente(bool mostrarMensagens)
 {
@@ -704,7 +854,17 @@ void venda::on_Ledit_Pesquisa_returnPressed()
     ui->Lbl_Total->setText(Total());
 }
 
-void venda::on_Btn_CancelarVenda_clicked() { this->close(); }
+void venda::on_Btn_CancelarVenda_clicked()
+{
+    if (modeloSelecionados->rowCount() > 0) {
+        auto resp = QMessageBox::question(this, "Cancelar Venda",
+            "Deseja salvar um rascunho para continuar esta venda depois?",
+            QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+        if (resp == QMessageBox::Cancel) return;
+        if (resp == QMessageBox::No) descartarRascunho();
+    }
+    this->close();
+}
 
 void venda::selecionarClienteNovo()
 {

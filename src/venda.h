@@ -4,6 +4,8 @@
 #include <QVector>
 #include <QSqlDatabase>
 #include <QStandardItemModel>
+#include <QTimer>
+#include "services/rascunhovenda_service.h"
 #include "vendas.h"
 #include <QItemSelection>
 #include "mainwindow.h"
@@ -86,9 +88,16 @@ private:
     float obterValorFinal(QString taxa, QString desconto);
     void descontoTaxa();
     void terminarPagamento();
+    void salvarRascunho();
+    void descartarRascunho();
+    void verificarRascunho();
     Produto_Service prodServ;
     Cliente_service cliServ;
     QList<ProdutoVendidoDTO> obterProdutosSelecionados();
+    QTimer *rascunhoTimer = nullptr;
+    RascunhoVenda_service rascunhoServ;
+    RascunhoVendaDTO rascunhoPendente;
+    bool temRascunhoPendente = false;
 
 signals:
     void vendaConcluida();

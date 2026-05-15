@@ -972,6 +972,51 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             qDebug() << "Migracao para versao 9 concluida: config migrada para .ini.";
             emit dbVersao10();
         }
+        case 10:
+        {
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+                break;
+            }
+            qDebug() << "Atualizando para versao 11: criando tabela rascunho_venda";
+            QSqlQuery query(db);
+            bool ok = query.exec(
+                "CREATE TABLE IF NOT EXISTS rascunho_venda ("
+                "  id                   INTEGER PRIMARY KEY,"
+                "  id_cliente           INTEGER DEFAULT -1,"
+                "  cpf_manual           TEXT    DEFAULT '',"
+                "  data_hora            TEXT    DEFAULT '',"
+                "  produtos_json        TEXT    DEFAULT '[]',"
+                "  forma_pagamento      TEXT    DEFAULT '',"
+                "  desconto             TEXT    DEFAULT '0',"
+                "  taxa                 TEXT    DEFAULT '0',"
+                "  recebido             TEXT    DEFAULT '0',"
+                "  desconto_porcentagem INTEGER DEFAULT 0,"
+                "  modelo_nf            INTEGER DEFAULT 0,"
+                "  emitir_todos         INTEGER DEFAULT 0,"
+                "  atualizado_em        TEXT    DEFAULT ''"
+                ")"
+            );
+            if (!ok) {
+                qDebug() << "Erro ao criar rascunho_venda:" << query.lastError().text();
+                db.rollback();
+                break;
+            }
+            if (!query.exec("PRAGMA user_version = 11")) {
+                qDebug() << "Erro ao atualizar user_version para 11:" << query.lastError().text();
+                db.rollback();
+                break;
+            }
+            if (!db.commit()) {
+                qDebug() << "Erro ao dar commit:" << db.lastError().text();
+                db.rollback();
+                break;
+            }
+            dbSchemaVersion = 11;
+            qDebug() << "Migracao para versao 11 concluida.";
+            emit dbVersao11();
+            break;
+        }
 
         }
     }

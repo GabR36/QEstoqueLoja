@@ -43,6 +43,7 @@ signals:
     void dbVersao7();
     void dbVersao9();
     void dbVersao10();
+    void dbVersao11();
 };
 
 #endif // SCHEMAMANAGER_H

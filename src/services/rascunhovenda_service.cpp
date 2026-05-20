@@ -10,20 +10,10 @@ RascunhoVenda_service::RascunhoVenda_service(QObject *parent)
 {
 }
 
-bool RascunhoVenda_service::salvar(qlonglong idCliente,
-                                   const QString &cpfManual,
-                                   const QString &dataHora,
-                                   const QList<ProdutoVendidoDTO> &produtos,
-                                   const QString &formaPagamento,
-                                   const QString &desconto,
-                                   const QString &taxa,
-                                   const QString &recebido,
-                                   bool descontoPorcentagem,
-                                   int  modeloNf,
-                                   bool emitirTodos)
+bool RascunhoVenda_service::salvar(const RascunhoVendaSaveDTO &saveDto)
 {
     QJsonArray arr;
-    for (const ProdutoVendidoDTO &p : produtos) {
+    for (const ProdutoVendidoDTO &p : saveDto.produtos) {
         QJsonObject obj;
         obj["idProduto"]    = p.idProduto;
         obj["quantidade"]   = p.quantidade;
@@ -33,17 +23,17 @@ bool RascunhoVenda_service::salvar(qlonglong idCliente,
     }
 
     RascunhoVendaDTO rascunho;
-    rascunho.idCliente           = idCliente;
-    rascunho.cpfManual           = cpfManual;
-    rascunho.dataHora            = dataHora;
+    rascunho.idCliente           = saveDto.idCliente;
+    rascunho.cpfManual           = saveDto.cpfManual;
+    rascunho.dataHora            = saveDto.dataHora;
     rascunho.produtosJson        = QString(QJsonDocument(arr).toJson(QJsonDocument::Compact));
-    rascunho.formaPagamento      = formaPagamento;
-    rascunho.desconto            = desconto;
-    rascunho.taxa                = taxa;
-    rascunho.recebido            = recebido;
-    rascunho.descontoPorcentagem = descontoPorcentagem;
-    rascunho.modeloNf            = modeloNf;
-    rascunho.emitirTodos         = emitirTodos;
+    rascunho.formaPagamento      = saveDto.formaPagamento;
+    rascunho.desconto            = saveDto.desconto;
+    rascunho.taxa                = saveDto.taxa;
+    rascunho.recebido            = saveDto.recebido;
+    rascunho.descontoPorcentagem = saveDto.descontoPorcentagem;
+    rascunho.modeloNf            = saveDto.modeloNf;
+    rascunho.emitirTodos         = saveDto.emitirTodos;
     rascunho.atualizadoEm        = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
 
     return rascunhoRepo.salvar(rascunho);

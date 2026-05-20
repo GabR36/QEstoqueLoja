@@ -599,32 +599,31 @@ venda::~venda() { delete ui; }
 
 void venda::salvarRascunho()
 {
-    QList<ProdutoVendidoDTO> produtos;
+    RascunhoVendaSaveDTO dto;
+
     for (int row = 0; row < modeloSelecionados->rowCount(); ++row) {
         ProdutoVendidoDTO p;
         p.idProduto    = modeloSelecionados->item(row, 0)->text().toLongLong();
         p.quantidade   = portugues.toDouble(modeloSelecionados->item(row, 1)->text());
         p.descricao    = modeloSelecionados->item(row, 2)->text();
         p.precoVendido = portugues.toDouble(modeloSelecionados->item(row, 3)->text());
-        produtos.append(p);
+        dto.produtos.append(p);
     }
 
     // extrai ID direto do campo — idClienteAtual só é setado ao clicar "Próximo"
     auto [nomeIgnorado, idCli] = cliServ.extrairNomeId(ui->Ledit_Cliente->text());
+    dto.idCliente           = idCli > 0 ? idCli : idClienteAtual;
+    dto.cpfManual           = ui->Ledit_CpfCnpjCliente->text().trimmed();
+    dto.dataHora            = ui->DateEdt_Venda->dateTime().toString("yyyy-MM-dd HH:mm:ss");
+    dto.formaPagamento      = ui->CBox_FormaPagamento->currentText();
+    dto.desconto            = ui->Ledit_Desconto->text();
+    dto.taxa                = ui->Ledit_Taxa->text();
+    dto.recebido            = ui->Ledit_Recebido->text();
+    dto.descontoPorcentagem = ui->CheckPorcentagem->isChecked();
+    dto.modeloNf            = ui->CBox_ModeloEmit->currentIndex();
+    dto.emitirTodos         = ui->RadioBtn_EmitNfTodos->isChecked();
 
-    rascunhoServ.salvar(
-        idCli > 0 ? idCli : idClienteAtual,
-        ui->Ledit_CpfCnpjCliente->text().trimmed(),
-        ui->DateEdt_Venda->dateTime().toString("yyyy-MM-dd HH:mm:ss"),
-        produtos,
-        ui->CBox_FormaPagamento->currentText(),
-        ui->Ledit_Desconto->text(),
-        ui->Ledit_Taxa->text(),
-        ui->Ledit_Recebido->text(),
-        ui->CheckPorcentagem->isChecked(),
-        ui->CBox_ModeloEmit->currentIndex(),
-        ui->RadioBtn_EmitNfTodos->isChecked()
-    );
+    rascunhoServ.salvar(dto);
 }
 
 void venda::descartarRascunho()

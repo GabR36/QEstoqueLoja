@@ -178,6 +178,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/repository/vendas_repository.h src/repository/vendas_repository.cpp
         src/services/vendas_service.h src/services/vendas_service.cpp
         src/dto/RascunhoVenda_dto.h
+        src/dto/RascunhoVendaSave_dto.h
         src/repository/rascunhovenda_repository.h src/repository/rascunhovenda_repository.cpp
         src/services/rascunhovenda_service.h src/services/rascunhovenda_service.cpp
         src/repository/entradasvendas_repository.h src/repository/entradasvendas_repository.cpp

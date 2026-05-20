@@ -34,6 +34,7 @@ void test_eventofiscal_service::enviarCienciaOp_sucesso()
     QString chave = "00000000000000000000000000000000000000000000";
 
     auto resultado = service.enviarCienciaOp(chave, retornoFake);
+    qDebug() << "Erro testes  enviar ciencia op: " << resultado.msg;
 
     QVERIFY(resultado.ok);
     QCOMPARE(resultado.erro, EventoFiscalErro::Nenhum);

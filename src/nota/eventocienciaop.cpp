@@ -39,10 +39,31 @@ void EventoCienciaOP::preencherEvento(){
 
 }
 
-QString EventoCienciaOP::getCampo(const QString &texto, const QString &campo)
+QString EventoCienciaOP::getCampo(const QString &texto, const QString &campo, const QString &secao)
 {
-    QRegularExpression re(campo + R"(=([^\r\n]*))");
-    QRegularExpressionMatch m = re.match(texto);
+    QString conteudo = texto;
+
+    // Se foi passada uma seção, extrai só ela
+    if (!secao.isEmpty()) {
+        QRegularExpression reSecao(
+            QString(R"(\[%1\]([\s\S]*?)(\n\[|$))").arg(secao)
+            );
+
+        QRegularExpressionMatch match = reSecao.match(texto);
+        if (match.hasMatch()) {
+            conteudo = match.captured(1);
+        } else {
+            return "";
+        }
+    }
+
+    // Agora busca o campo dentro do conteúdo filtrado
+    QRegularExpression reCampo(
+        QString(R"(%1=([^\r\n]*))").arg(campo),
+        QRegularExpression::CaseInsensitiveOption
+        );
+
+    QRegularExpressionMatch m = reCampo.match(conteudo);
     return m.hasMatch() ? m.captured(1).trimmed() : "";
 }
 
@@ -92,6 +113,7 @@ EventoFiscalDTO EventoCienciaOP::gerarEnviarRetorno()
     try {
         std::string retorno;
         if(!retornoForcado.isEmpty()){
+            // qDebug() << "Chegou aqui";
             retorno = retornoForcado.toStdString();
         }else{
             acbr->LimparListaEventos();
@@ -113,8 +135,11 @@ EventoFiscalDTO EventoCienciaOP::gerarEnviarRetorno()
 
         qDebug() << "Retorno SEFAZ Evento:" << ret;
 
+
         // 1. obtém caminho do evento gravado
-        QString eventoPath = getCampo(ret, "arquivo");
+        QString eventoPath = getCampo(ret, "arquivo", "Evento001");
+
+
 
         eventoPath.remove('\r');
         eventoPath.remove('\n');
@@ -126,22 +151,28 @@ EventoFiscalDTO EventoCienciaOP::gerarEnviarRetorno()
         evento.xmlPath = eventoPath;
 
 
-        // 2. lê e parseia o XML completo
-        QFile f(eventoPath);
-        if (f.open(QIODevice::ReadOnly)) {
-            QDomDocument doc;
-            doc.setContent(&f);
-            f.close();
+        // le o xml ou pega as infos
+        if (!eventoPath.isEmpty() && QFile::exists(eventoPath)) {
+            QFile f(eventoPath);
+            if (f.open(QIODevice::ReadOnly)) {
+                QDomDocument doc;
+                doc.setContent(&f);
+                f.close();
 
-            auto ev = doc.firstChildElement("procEventoNFe")
-                          .firstChildElement("retEvento")
-                          .firstChildElement("infEvento");
+                auto ev = doc.firstChildElement("procEventoNFe")
+                              .firstChildElement("retEvento")
+                              .firstChildElement("infEvento");
 
-            evento.cstat   = ev.firstChildElement("cStat").text();
-            evento.justificativa = ev.firstChildElement("xMotivo").text();
-            evento.nProt   = ev.firstChildElement("nProt").text();
-
+                evento.cstat = ev.firstChildElement("cStat").text();
+                evento.justificativa = ev.firstChildElement("xMotivo").text();
+                evento.nProt = ev.firstChildElement("nProt").text();
+            }
+        } else {
+            evento.cstat = getCampo(ret, "CStat", "Evento001");
+            evento.justificativa = getCampo(ret, "XMotivo", "Evento001");
+            evento.nProt = getCampo(ret, "nProt", "Evento001");
         }
+
 
         return evento;
     }

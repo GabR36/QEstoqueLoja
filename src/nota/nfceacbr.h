@@ -25,7 +25,6 @@ public:
     int getProximoNNF();
     void setNNF(int nNF);
     void setCliente(QString cpf, bool ehPf);
-    void setProdutosVendidos(QList<QList<QVariant> > produtosVendidos, bool emitirTodos);
     void setPagamentoValores(QString formaPag, double desconto, double recebido, double troco,
                              double taxa);
     qlonglong getNNF();
@@ -63,6 +62,9 @@ private:
     float taxaPercentual;
     double totalGeral;
     bool usarIBS;
+    double totalIBSUFAccum = 0.0;
+    double totalIBSMunAccum = 0.0;
+    double totalCBSAccum = 0.0;
     std::string dataHora;
     QString retornoForcado = "";
     Produto_Service prodServ;

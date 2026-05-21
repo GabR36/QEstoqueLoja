@@ -5,6 +5,31 @@
 #include <fstream>
 #include <qrandom.h>
 #include <QSqlError>
+#include <map>
+#include <cmath>
+
+struct IBSTaxas { double pIBSUF; double pIBSMun; double pCBS; };
+
+// Alíquotas de referência IBS/CBS por cUF (período 2026 — LC 214/2025).
+// Em 2026 as alíquotas são uniformes para todas as UFs.
+// A partir de 2027 cada estado publica sua própria alíquota de referência:
+// basta atualizar o valor de pIBSUF e pIBSMun para o cUF correspondente.
+static IBSTaxas getIBSTaxas(const std::string &cuf) {
+    static const std::map<std::string, IBSTaxas> tabela = {
+        //CUF,{ ibsUF,ibsMUN,CBS }
+        {"11",{0.05,0.05,0.90}},{"12",{0.05,0.05,0.90}},{"13",{0.05,0.05,0.90}},
+        {"14",{0.05,0.05,0.90}},{"15",{0.05,0.05,0.90}},{"16",{0.05,0.05,0.90}},
+        {"17",{0.05,0.05,0.90}},{"21",{0.05,0.05,0.90}},{"22",{0.05,0.05,0.90}},
+        {"23",{0.05,0.05,0.90}},{"24",{0.05,0.05,0.90}},{"25",{0.05,0.05,0.90}},
+        {"26",{0.05,0.05,0.90}},{"27",{0.05,0.05,0.90}},{"28",{0.05,0.05,0.90}},
+        {"29",{0.05,0.05,0.90}},{"31",{0.05,0.05,0.90}},{"32",{0.05,0.05,0.90}},
+        {"33",{0.05,0.05,0.90}},{"35",{0.05,0.05,0.90}},{"41",{0.10,0.00,0.90}},
+        {"42",{0.05,0.05,0.90}},{"43",{0.05,0.05,0.90}},{"50",{0.05,0.05,0.90}},
+        {"51",{0.05,0.05,0.90}},{"52",{0.05,0.05,0.90}},{"53",{0.05,0.05,0.90}},
+    };
+    auto it = tabela.find(cuf);
+    return (it != tabela.end()) ? it->second : IBSTaxas{0.05, 0.05, 0.90};
+}
 
 NfceACBR::NfceACBR(QObject *parent)
     : QObject{parent}
@@ -167,98 +192,6 @@ void NfceACBR::setProdutosVendidosNew(QList<ProdutoVendidoDTO> listaProds, bool 
     }
     listaProdutosNFCe = lista;
     quantProds = listaProdutosNFCe.size();
-}
-
-
-void NfceACBR::setProdutosVendidos(QList<QList<QVariant>> produtosVendidos, bool emitirTodos){
-    // if (!db.open()) {
-    //     qDebug() << "não abriu bd setprodutosvendidos";
-    //     return;
-    // }
-    // emitirApenasNf = !emitirTodos;
-
-    // QLocale usa(QLocale::English, QLocale::UnitedStates); // <<< NOVO
-
-    // QList<QList<QVariant>> produtosFiltrados;
-
-    // for (int i = 0; i < produtosVendidos.size(); ++i) {
-    //     QList<QVariant> produto = produtosVendidos[i];
-
-    //     // Verificar campo 'nf'
-    //     QSqlQuery nfQuery;
-    //     nfQuery.prepare("SELECT nf FROM produtos WHERE id = :idprod");
-    //     nfQuery.bindValue(":idprod", produto[0]);
-    //     if (!nfQuery.exec() || !nfQuery.next()) {
-    //         qWarning() << "Erro ao consultar campo 'nf' do produto ID:" << produto[0].toString()
-    //         << nfQuery.lastError().text();
-    //         continue;
-    //     }
-
-    //     int nf = nfQuery.value("nf").toInt();
-    //     if (!emitirTodos && nf != 1) {
-    //         continue;
-    //     }
-
-    //     // Agora os valores já vêm no formato USA: "3.50", "12.90"
-    //     QString quantidadeStr   = produto[1].toString();
-    //     QString valorUnitarioStr = produto[3].toString();
-
-    //     // Converte corretamente do formato americano
-    //     double quantidade    = usa.toDouble(quantidadeStr);
-    //     double valorUnitario = usa.toDouble(valorUnitarioStr);
-
-    //     double valorTotal = quantidade * valorUnitario;
-
-    //     produto[1] = quantidade;
-    //     produto[3] = valorUnitario;
-    //     produto.append(QVariant(valorTotal)); // [4] total
-
-    //     // Buscar outros dados
-    //     QSqlQuery query;
-    //     query.prepare("SELECT codigo_barras, un_comercial, ncm, cest, csosn, pis,"
-    //                   " aliquota_imposto FROM produtos WHERE id = :idprod");
-    //     query.bindValue(":idprod", produto[0]);
-
-    //     if (query.exec() && query.next()) {
-    //         QString codigoBarras = query.value("codigo_barras").toString();
-    //         QString unComercial  = query.value("un_comercial").toString();
-    //         QString ncm          = query.value("ncm").toString();
-    //         QString cest         = query.value("cest").toString();
-    //         QString csosn        = query.value("csosn").toString();
-    //         QString pis          = query.value("pis").toString();
-    //         double aliquotaImposto = query.value("aliquota_imposto").toDouble();
-
-    //         if (!isValidGTIN(codigoBarras)) {
-    //             codigoBarras = "SEM GTIN";
-    //         }
-
-    //         produto.append(codigoBarras);    // [5]
-    //         produto.append(unComercial);     // [6]
-    //         produto.append(ncm);             // [7]
-    //         produto.append(cest);            // [8]
-    //         produto.append(aliquotaImposto); // [9]
-    //         produto.append(csosn);           // [10]
-    //         produto.append(pis);             // [11]
-
-    //     } else {
-    //         qWarning() << "Produto ID não encontrado ou erro:" << produto[0].toString()
-    //                    << query.lastError().text();
-
-    //         produto.append("");  // codigo_barras
-    //         produto.append("");  // un_comercial
-    //         produto.append("");  // ncm
-    //         produto.append("");  // cest
-    //         produto.append(0.0); // aliquota
-    //         produto.append("");  // csosn
-    //         produto.append("");  // pis
-    //     }
-
-    //     produtosFiltrados.append(produto);
-    // }
-
-    // quantProds = produtosFiltrados.size();
-    // vTotTribProduto.resize(produtosFiltrados.size());
-    // // listaProdutos = produtosFiltrados;
 }
 
 float NfceACBR::corrigirTaxa(float taxaAntiga, float desconto){
@@ -488,6 +421,9 @@ void NfceACBR::dest()
 
 void NfceACBR::carregarProds()
 {
+    totalIBSUFAccum = 0.0;
+    totalIBSMunAccum = 0.0;
+    totalCBSAccum = 0.0;
     aplicarDescontoTotal(descontoNf);
     aplicarAcrescimoProporcional(taxaPercentual);
 
@@ -557,25 +493,44 @@ void NfceACBR::carregarProds()
         ini << "pCOFINS=0.00\n";
         ini << "vCOFINS=0.00\n\n";
         if(usarIBS){
+            IBSTaxas taxas = getIBSTaxas(cuf);
+            double vBC_ibs = produto.valorTotal;
+            double vIBSUF  = vBC_ibs * taxas.pIBSUF / 100.0;
+            double vIBSMun = vBC_ibs * taxas.pIBSMun / 100.0;
+            double vIBS    = vIBSUF + vIBSMun;
+            double vCBS    = vBC_ibs * taxas.pCBS / 100.0;
+
+            auto fmt = [](double v){
+                return QString::number(v, 'f', 2).toStdString();
+            };
+
+            // Acumula os valores já arredondados para que o total bata com a soma dos itens
+            auto round2 = [](double v){ return std::round(v * 100.0) / 100.0; };
+            totalIBSUFAccum += round2(vIBSUF);
+            totalIBSMunAccum += round2(vIBSMun);
+            totalCBSAccum += round2(vCBS);
+
             ini << secIBS << "\n";
             ini << "CST=000\n";
             ini << "cClassTrib=000001\n\n";
 
             ini << secGIBS << "\n";
             ini << "vBC=" << vProd.toStdString() << "\n";
-            ini << "vIBS=0.00\n\n";
+            ini << "vIBS=" << fmt(vIBS) << "\n\n";
 
             ini << secGIBSUF << "\n";
-            ini << "pIBSUF=0.00\n";
-            ini << "vIBSUF=0.00\n\n";
+            ini << "pIBSUF=" << fmt(taxas.pIBSUF) << "\n";
+            ini << "vIBSUF=" << fmt(vIBSUF) << "\n\n";
 
-            ini << secGIBSMUN << "\n";
-            ini << "pIBSMun=0.00\n";
-            ini << "vIBSMun=0.00\n\n";
+            if(taxas.pIBSMun > 0.0){
+                ini << secGIBSMUN << "\n";
+                ini << "pIBSMun=" << fmt(taxas.pIBSMun) << "\n";
+                ini << "vIBSMun=" << fmt(vIBSMun) << "\n\n";
+            }
 
             ini << secGCBS << "\n";
-            ini << "pCBS=0.00\n";
-            ini << "vCBS=0.00\n\n";
+            ini << "pCBS=" << fmt(taxas.pCBS) << "\n";
+            ini << "vCBS=" << fmt(vCBS) << "\n\n";
         }
     }
 }
@@ -610,20 +565,6 @@ void NfceACBR::total()
     ini << "vNF=" << QString::number(vNf, 'f', 2).replace('.', ',').toStdString() << "\n";
     ini << "vFCP=0,00\n";
     ini << "vTotTrib=" << QString::number(totalTributo, 'f', 2).replace('.', ',').toStdString() << "\n\n";
-    if(usarIBS){
-        ini << "[IBSCBSTot]\n";
-        ini << "vBCIBSCBS=" << QString::number(totalGeral, 'f', 2).replace('.', ',').toStdString() << "\n\n";
-
-        ini << "[gIBS]\n";
-        ini << "vIBS=0,00\n";
-        ini << "vCredPres=0,00\n";
-        ini << "vCredPresCondSus=0,00\n\n";
-
-        ini << "[gCBSTot]\n";
-        ini << "vCBS=0,00\n";
-        ini << "vCredPres=0,00\n";
-        ini << "vCredPresCondSus=0,00\n\n";
-    }
 }
 
 
@@ -687,16 +628,36 @@ void NfceACBR::infRespTec()
 
 void NfceACBR::ibscbsTotais()
 {
+    auto fmtBR = [](double v){
+        return QString::number(v, 'f', 2).replace('.', ',').toStdString();
+    };
+
+    double totalIBSAccum = totalIBSUFAccum + totalIBSMunAccum;
+
     ini << "[IBSCBSTot]\n";
-    ini << "vBCIBSCBS=" << QString::number(totalGeral, 'f', 2).replace('.', ',').toStdString() << "\n\n";
+    ini << "vBCIBSCBS=" << fmtBR(totalGeral) << "\n\n";
 
     ini << "[gIBS]\n";
-    ini << "vIBS=0,00\n";
+    ini << "vIBS=" << fmtBR(totalIBSAccum) << "\n";
     ini << "vCredPres=0,00\n";
     ini << "vCredPresCondSus=0,00\n\n";
 
+    ini << "[gIBSUFTot]\n";
+    ini << "vDif=0,00\n";
+    ini << "vDevTrib=0,00\n";
+    ini << "vIBSUF=" << fmtBR(totalIBSUFAccum) << "\n\n";
+
+    if(totalIBSMunAccum > 0.0){
+        ini << "[gIBSMunTot]\n";
+        ini << "vDif=0,00\n";
+        ini << "vDevTrib=0,00\n";
+        ini << "vIBSMun=" << fmtBR(totalIBSMunAccum) << "\n\n";
+    }
+
     ini << "[gCBSTot]\n";
-    ini << "vCBS=0,00\n";
+    ini << "vDif=0,00\n";
+    ini << "vDevTrib=0,00\n";
+    ini << "vCBS=" << fmtBR(totalCBSAccum) << "\n";
     ini << "vCredPres=0,00\n";
     ini << "vCredPresCondSus=0,00\n\n";
 }
@@ -748,6 +709,7 @@ QString NfceACBR::gerarEnviar(){
         qDebug() << "nfce getpath: " << nfce->GetPath(0);
         qDebug() << "nfce chave: " << cnf;
         qDebug() << "Retorno SEFAZ:" << ret;
+        nfce->GravarXml(0, "nfce_xml_debug.xml", caminhoXml.toStdString());
         return ret;
     } catch (std::exception &e) {
         qDebug() << "Erro ao enviar NFC-e, tentando contingência offline:" << e.what();

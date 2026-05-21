@@ -7,6 +7,8 @@
 #include <QSqlError>
 #include <map>
 #include <cmath>
+#include "../infra/apppath_service.h"
+
 
 struct IBSTaxas { double pIBSUF; double pIBSMun; double pCBS; };
 
@@ -737,8 +739,8 @@ QString NfceACBR::gerarEnviar(){
             rawCnf.erase(std::find(rawCnf.begin(), rawCnf.end(), '\0'), rawCnf.end());
             QString chaveContingencia = QString::fromStdString(rawCnf).trimmed();
             QString nomeArq = chaveContingencia + "-cont-nfe.xml";
-            nfce->GravarXml(0, nomeArq.toStdString(), caminhoXml.toStdString());
-            QString xmlPathContingencia = caminhoXml + "/" + nomeArq;
+            nfce->GravarXml(0, nomeArq.toStdString(), AppPath_service::contingenciaPath().toStdString());
+            QString xmlPathContingencia = AppPath_service::contingenciaPath() + "/" + nomeArq;
             qDebug() << "NFC-e salva em contingência:" << xmlPathContingencia;
             return QString("CONTINGENCIA=1\nchDFe=%1\nNomeArq=%2\n").arg(chaveContingencia, xmlPathContingencia);
         } catch (std::exception &e2) {

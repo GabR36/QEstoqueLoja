@@ -19,6 +19,7 @@ public:
     static QString nfeConfigPath();
     static QString consultaCnpjConfigPath();
     static QString mailConfigPath();
+    static QString contingenciaPath();
 signals:
 };
 

@@ -6,6 +6,26 @@
 #include <qrandom.h>
 #include <QSqlError>
 #include "../util/datautil.h"
+#include <map>
+#include <cmath>
+
+struct IBSTaxasNfe { double pIBSUF; double pIBSMun; double pCBS; };
+
+static IBSTaxasNfe getIBSTaxasNfe(const std::string &cuf) {
+    static const std::map<std::string, IBSTaxasNfe> tabela = {
+        {"11",{0.05,0.05,0.90}},{"12",{0.05,0.05,0.90}},{"13",{0.05,0.05,0.90}},
+        {"14",{0.05,0.05,0.90}},{"15",{0.05,0.05,0.90}},{"16",{0.05,0.05,0.90}},
+        {"17",{0.05,0.05,0.90}},{"21",{0.05,0.05,0.90}},{"22",{0.05,0.05,0.90}},
+        {"23",{0.05,0.05,0.90}},{"24",{0.05,0.05,0.90}},{"25",{0.05,0.05,0.90}},
+        {"26",{0.05,0.05,0.90}},{"27",{0.05,0.05,0.90}},{"28",{0.05,0.05,0.90}},
+        {"29",{0.05,0.05,0.90}},{"31",{0.05,0.05,0.90}},{"32",{0.05,0.05,0.90}},
+        {"33",{0.05,0.05,0.90}},{"35",{0.05,0.05,0.90}},{"41",{0.10,0.00,0.90}},
+        {"42",{0.05,0.05,0.90}},{"43",{0.05,0.05,0.90}},{"50",{0.05,0.05,0.90}},
+        {"51",{0.05,0.05,0.90}},{"52",{0.05,0.05,0.90}},{"53",{0.05,0.05,0.90}},
+    };
+    auto it = tabela.find(cuf);
+    return (it != tabela.end()) ? it->second : IBSTaxasNfe{0.05, 0.05, 0.90};
+}
 
 NfeACBR::NfeACBR(QObject *parent, bool saida, bool devolucao)
     : QObject{parent}
@@ -760,6 +780,10 @@ void NfeACBR::dest()
 
 void NfeACBR::carregarProds()
 {
+    totalIBSUFAccum  = 0.0;
+    totalIBSMunAccum = 0.0;
+    totalCBSAccum    = 0.0;
+
     aplicarDescontoTotal(descontoNf);
     aplicarAcrescimoProporcional(taxaPercentual);
 
@@ -836,25 +860,43 @@ void NfeACBR::carregarProds()
         ini << "vCOFINS=0.00\n\n";
 
         if(usarIBS){
+            IBSTaxasNfe taxas = getIBSTaxasNfe(cuf);
+            double vBC_ibs = produto.valorTotal;
+            double vIBSUF  = vBC_ibs * taxas.pIBSUF / 100.0;
+            double vIBSMun = vBC_ibs * taxas.pIBSMun / 100.0;
+            double vIBS    = vIBSUF + vIBSMun;
+            double vCBS    = vBC_ibs * taxas.pCBS / 100.0;
+
+            auto fmt = [](double v){
+                return QString::number(v, 'f', 2).toStdString();
+            };
+
+            auto round2 = [](double v){ return std::round(v * 100.0) / 100.0; };
+            totalIBSUFAccum  += round2(vIBSUF);
+            totalIBSMunAccum += round2(vIBSMun);
+            totalCBSAccum    += round2(vCBS);
+
             ini << secIBS << "\n";
             ini << "CST=000\n";
             ini << "cClassTrib=000001\n\n";
 
             ini << secGIBS << "\n";
             ini << "vBC=" << vProd.toStdString() << "\n";
-            ini << "vIBS=0.00\n\n";
+            ini << "vIBS=" << fmt(vIBS) << "\n\n";
 
             ini << secGIBSUF << "\n";
-            ini << "pIBSUF=0.00\n";
-            ini << "vIBSUF=0.00\n\n";
+            ini << "pIBSUF=" << fmt(taxas.pIBSUF) << "\n";
+            ini << "vIBSUF=" << fmt(vIBSUF) << "\n\n";
 
-            ini << secGIBSMUN << "\n";
-            ini << "pIBSMun=0.00\n";
-            ini << "vIBSMun=0.00\n\n";
+            if(taxas.pIBSMun > 0.0){
+                ini << secGIBSMUN << "\n";
+                ini << "pIBSMun=" << fmt(taxas.pIBSMun) << "\n";
+                ini << "vIBSMun=" << fmt(vIBSMun) << "\n\n";
+            }
 
             ini << secGCBS << "\n";
-            ini << "pCBS=0.00\n";
-            ini << "vCBS=0.00\n\n";
+            ini << "pCBS=" << fmt(taxas.pCBS) << "\n";
+            ini << "vCBS=" << fmt(vCBS) << "\n\n";
         }
     }
 }
@@ -896,21 +938,6 @@ void NfeACBR::total()
     ini << "vNF=" << QString::number(vNf, 'f', 2).replace('.', ',').toStdString() << "\n";
     ini << "vFCP=0,00\n";
     ini << "vTotTrib=" << QString::number(totalTributo, 'f', 2).replace('.', ',').toStdString() << "\n\n";
-    if(usarIBS){
-        ini << "[IBSCBSTot]\n";
-        ini << "vBCIBSCBS=" << QString::number(totalGeral, 'f', 2).replace('.', ',').toStdString() << "\n\n";
-
-        ini << "[gIBS]\n";
-        ini << "vIBS=0,00\n";
-        ini << "vCredPres=0,00\n";
-        ini << "vCredPresCondSus=0,00\n\n";
-
-        ini << "[gCBSTot]\n";
-        ini << "vCBS=0,00\n";
-        ini << "vCredPres=0,00\n";
-        ini << "vCredPresCondSus=0,00\n\n";
-    }
-
 }
 
 
@@ -980,16 +1007,36 @@ void NfeACBR::infRespTec()
 
 void NfeACBR::ibscbsTotais()
 {
+    auto fmtBR = [](double v){
+        return QString::number(v, 'f', 2).replace('.', ',').toStdString();
+    };
+
+    double totalIBSAccum = totalIBSUFAccum + totalIBSMunAccum;
+
     ini << "[IBSCBSTot]\n";
-    ini << "vBCIBSCBS=" << QString::number(totalGeral, 'f', 2).replace('.', ',').toStdString() << "\n\n";
+    ini << "vBCIBSCBS=" << fmtBR(totalGeral) << "\n\n";
 
     ini << "[gIBS]\n";
-    ini << "vIBS=0,00\n";
+    ini << "vIBS=" << fmtBR(totalIBSAccum) << "\n";
     ini << "vCredPres=0,00\n";
     ini << "vCredPresCondSus=0,00\n\n";
 
+    ini << "[gIBSUFTot]\n";
+    ini << "vDif=0,00\n";
+    ini << "vDevTrib=0,00\n";
+    ini << "vIBSUF=" << fmtBR(totalIBSUFAccum) << "\n\n";
+
+    if(totalIBSMunAccum > 0.0){
+        ini << "[gIBSMunTot]\n";
+        ini << "vDif=0,00\n";
+        ini << "vDevTrib=0,00\n";
+        ini << "vIBSMun=" << fmtBR(totalIBSMunAccum) << "\n\n";
+    }
+
     ini << "[gCBSTot]\n";
-    ini << "vCBS=0,00\n";
+    ini << "vDif=0,00\n";
+    ini << "vDevTrib=0,00\n";
+    ini << "vCBS=" << fmtBR(totalCBSAccum) << "\n";
     ini << "vCredPres=0,00\n";
     ini << "vCredPresCondSus=0,00\n\n";
 }
@@ -1031,7 +1078,7 @@ QString NfeACBR::gerarEnviar(){
     try {
         nfe->CarregarINI(ini.str());
         nfe->Assinar();
-        nfe->GravarXml(0, "xml_naoaut_nota_"+ nnf + ".xml", "./xml");
+        nfe->GravarXml(0, "nfe_xml_debug.xml", caminhoXml.toStdString());
         nfe->Validar();
     } catch (std::exception &e) {
         qDebug() << "Erro ao preparar NF-e:" << e.what();

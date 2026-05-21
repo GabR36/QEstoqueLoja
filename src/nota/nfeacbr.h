@@ -77,6 +77,9 @@ private:
     bool ehPfCli = false;
     int indiedestCli = 0;
     bool usarIBS;
+    double totalIBSUFAccum = 0.0;
+    double totalIBSMunAccum = 0.0;
+    double totalCBSAccum = 0.0;
     QString idDest;
     QString retornoForcado = "";
 

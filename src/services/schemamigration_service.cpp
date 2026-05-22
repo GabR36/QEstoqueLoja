@@ -978,7 +978,45 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
                 qDebug() << "Error: unable to start transaction";
                 break;
             }
-            qDebug() << "Atualizando para versao 11: criando tabela rascunho_venda";
+            qDebug() << "Atualizando para versao 11: criando tabela rascunho_venda e concluindo migracao de configs";
+
+            // Concluir migracao de .ini de appdata para .config (o que a versao 10 nao fez direito no Linux)
+            QString oldDirPath = AppPath_service::appDataPath();
+            QString newDirPath = AppPath_service::generalConfigPath();
+            QDir oldDir(oldDirPath);
+
+            if (oldDir.exists()) {
+                QFileInfoList files = oldDir.entryInfoList(QStringList() << "*.ini", QDir::Files);
+                for (const QFileInfo &fileInfo : files) {
+                    QString oldFilePath = fileInfo.absoluteFilePath();
+                    QString fileName = fileInfo.fileName();
+
+                    if (fileName.compare("acbr_config.ini", Qt::CaseInsensitive) == 0) {
+                        fileName = "acbrnfe_config.ini";
+                    }
+
+                    QString newFilePath = newDirPath + "/" + fileName;
+
+                    if (!QFile::exists(newFilePath)) {
+                        // Arquivo ainda nao foi copiado: copiar agora
+                        if (!QFile::copy(oldFilePath, newFilePath)) {
+                            qDebug() << "Erro ao copiar" << fileName << "para .config";
+                            continue;
+                        }
+                        qDebug() << "Copiado:" << fileName;
+                    }
+
+                    // Arquivo ja existe em .config: remover da pasta antiga
+                    if (!QFile::remove(oldFilePath)) {
+                        qDebug() << "Erro ao remover arquivo antigo:" << oldFilePath;
+                    } else {
+                        qDebug() << "Removido da pasta antiga:" << fileInfo.fileName();
+                    }
+                }
+            } else {
+                qDebug() << "Pasta antiga nao existe, nada a migrar.";
+            }
+
             QSqlQuery query(db);
             bool ok = query.exec(
                 "CREATE TABLE IF NOT EXISTS rascunho_venda ("

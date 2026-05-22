@@ -292,6 +292,7 @@ void NfceACBR::aplicarAcrescimoProporcional(float taxaPercentual)
 
         produto.valorTotal = valorTotalComAcrescimo;
         produto.valorUnitario = valorUnitarioComAcrescimo;
+        listaProdutosNFCe[i] = produto;
 
         somaDistribuida += valorTotalComAcrescimo;
     }
@@ -299,7 +300,7 @@ void NfceACBR::aplicarAcrescimoProporcional(float taxaPercentual)
     // Compensar diferença de centavos no último item
     double diferenca = totalComAcrescimo - somaDistribuida;
     if (!listaProdutosNFCe.isEmpty()) {
-        ProdutoParaNFeDTO ultimo = listaProdutosNFCe.last();
+        ProdutoParaNFeDTO &ultimo = listaProdutosNFCe.last();
         double quant = ultimo.quantidade;
 
         double novoTotal = ultimo.valorTotal + diferenca;

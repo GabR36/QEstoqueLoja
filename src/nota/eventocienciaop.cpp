@@ -111,16 +111,16 @@ EventoFiscalDTO EventoCienciaOP::gerarEnviarRetorno()
     evento.tipoEvento = "Ciencia de Operacao";
 
     try {
-        acbr->LimparListaEventos();
-        acbr->CarregarEventoINI(ini.str());
-        acbr->Assinar();
-        acbr->Validar();
         std::string retorno;
         if(!retornoForcado.isEmpty()){
             // qDebug() << "Chegou aqui";
             retorno = retornoForcado.toStdString();
         }else{
-             retorno = acbr->EnviarEvento(1);
+            acbr->LimparListaEventos();
+            acbr->CarregarEventoINI(ini.str());
+            acbr->Assinar();
+            acbr->Validar();
+            retorno = acbr->EnviarEvento(1);
         }
         QString ret = QString::fromUtf8(retorno.c_str());
         // QFile file("retorno_evento.txt");

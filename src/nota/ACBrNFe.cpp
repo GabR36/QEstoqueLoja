@@ -4,6 +4,7 @@
 #include <functional>
 #include <stdexcept>
 #include "ACBrNFe.h"
+#include <QDebug>
 
 #if defined(ISWINDOWS)
 #include <windows.h>
@@ -41,6 +42,7 @@ ACBrNFe::ACBrNFe(std::string eArqConfig, std::string eChaveCrypt) {
 }
 
 ACBrNFe::~ACBrNFe() {
+    qDebug() << "Destrutor ACBrNFE() chamado";
 	NFE_Finalizar method;
 
 #if defined(ISWINDOWS)
@@ -49,13 +51,17 @@ ACBrNFe::~ACBrNFe() {
 	method = reinterpret_cast<NFE_Finalizar>(dlsym(nHandler, "NFE_Finalizar"));
 #endif
 
-	method(this->libHandler);
+    // method(this->libHandler);
+    if (method)
+        method(this->libHandler);
 
 #if defined(ISWINDOWS)
 	FreeLibrary(nHandler);
 #else
 	dlclose(nHandler);
 #endif
+    qDebug() << "Finalização concluída";
+
 }
 
 std::string ACBrNFe::Nome() const

@@ -105,9 +105,6 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
    </string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <property name="spacing">
-    <number>0</number>
-   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -119,6 +116,9 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
    </property>
    <property name="bottomMargin">
     <number>8</number>
+   </property>
+   <property name="spacing">
+    <number>0</number>
    </property>
    <item row="0" column="0" colspan="2">
     <widget class="QFrame" name="frameHeaderBar">
@@ -561,7 +561,7 @@ QLabel {
           <bool>true</bool>
          </property>
          <property name="selectionMode">
-          <enum>QAbstractItemView::SelectionMode::MultiSelection</enum>
+          <enum>QAbstractItemView::SelectionMode::ExtendedSelection</enum>
          </property>
          <property name="selectionBehavior">
           <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>

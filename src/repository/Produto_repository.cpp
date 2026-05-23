@@ -445,23 +445,27 @@ bool Produto_Repository::atualizarCamposMap(qlonglong id, const QVariantMap &cam
         return true;
     }
 
-    QSqlQuery query(db);
-    query.prepare("UPDATE produtos SET " + sets.join(", ") + ", atualizado_em = :atualizadoem " +
-                  " WHERE id = ?");
+    sets << "atualizado_em = ?";
 
+    QSqlQuery query(db);
+    query.prepare("UPDATE produtos SET " + sets.join(", ") + " WHERE id = ?");
+
+    // binds dos campos
     for(const QVariant &v : binds)
         query.addBindValue(v);
 
-    query.addBindValue(id);
-    query.bindValue(":atualizadoem", DataUtil::getDataAgoraUS());
+    // atualizado_em
+    query.addBindValue(DataUtil::getDataAgoraUS());
 
+    // id
+    query.addBindValue(id);
 
     if(!query.exec()){
-        qDebug() << "atualizarCamposMap: query falhou" << query.lastError().text();
+        qDebug() << "SQL:" << query.lastQuery();
+        qDebug() << "ERRO:" << query.lastError().text();
         db.close();
         return false;
     }
-
     db.close();
     return true;
 }

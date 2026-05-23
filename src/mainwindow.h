@@ -25,7 +25,7 @@
 #include "services/contingencia_service.h"
 
 
-#define VERSAO_QE "2.6.1"
+#define VERSAO_QE "2.7.0"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -120,7 +120,7 @@ private:
     void setarIconesJanela();
     //QModelIndex selected_index;
 
-    const int ultimaVersaoSchema = 9;
+    const int ultimaVersaoSchema = 11;
 
 
     void mostrarProdutoPorCodigoBarras(const QString &codigo);

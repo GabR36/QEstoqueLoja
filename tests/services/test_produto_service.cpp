@@ -353,4 +353,87 @@ void TestProdutoService::cleanup()
     q.exec("DELETE FROM produtos");
 }
 
+// confirma que esta atualizando campo de produto existente em mergeprodutos
+void TestProdutoService::atualizar_campos_map_ok()
+{
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco nao aberto teste atualizar_campos_map_ok";
+    }
+    Produto_Service service;
 
+    // inserir produto base
+    ProdutoDTO p;
+    p.quantidade = 10;
+    p.descricao = "Produto";
+    p.preco = 10;
+    p.codigoBarras = "MAP001";
+    p.nf = false;
+    p.uCom = "UN";
+    p.precoFornecedor = 5;
+    p.percentLucro = 10;
+    p.ncm = "12345678";
+    p.aliquotaIcms = 18;
+    p.csosn = "102";
+    p.pis = "1";
+
+    QVERIFY(service.inserir(p).ok);
+    DatabaseConnection_service::open();
+
+    QSqlQuery q(db);
+    QVERIFY(q.exec("SELECT id FROM produtos WHERE codigo_barras = 'MAP001'"));
+    QVERIFY(q.next());
+    qlonglong id = q.value(0).toLongLong();
+
+    QVariantMap campos;
+    campos["preco"] = 20.0;
+    campos["porcent_lucro"] = 50.0;
+
+    auto r = service.atualizarCamposMap(id, campos, false);
+    QVERIFY(r.ok);
+
+    QSqlQuery q2(db);
+    DatabaseConnection_service::open();
+    QVERIFY(q2.exec("SELECT preco, porcent_lucro FROM produtos WHERE id = " + QString::number(id)));
+    QVERIFY(q2.next());
+
+    QCOMPARE(q2.value(0).toDouble(), 20.0);
+    QCOMPARE(q2.value(1).toDouble(), 50.0);
+}
+
+// confirma que ncm nao quebra em mergeprodutos
+void TestProdutoService::atualizar_sem_ncm_nao_quebra()
+{
+    Produto_Service service;
+
+    ProdutoDTO p;
+    p.descricao = "Produto";
+    p.preco = 10;
+    p.codigoBarras = "MAP002";
+    p.percentLucro = 10;
+    p.codigoBarras = "123";
+    p.nf = false;
+    p.uCom = "UN";
+    p.precoFornecedor = 5;
+    p.percentLucro = 10;
+    p.ncm = "12345678";
+    p.aliquotaIcms = 18;
+    p.csosn = "102";
+    p.pis = "1";
+    DatabaseConnection_service::open();
+    auto result = service.inserir(p);
+    qDebug() << "RESULTADO: " << result.msg;
+
+    QVERIFY(result.ok);
+
+    DatabaseConnection_service::open();
+    QSqlQuery q(db);
+    q.exec("SELECT id FROM produtos WHERE codigo_barras = 'MAP002'");
+    q.next();
+    qlonglong id = q.value(0).toLongLong();
+
+    QVariantMap campos;
+    campos["preco"] = 30.0;
+
+    auto r = service.atualizarCamposMap(id, campos, false);
+    QVERIFY(r.ok);
+}

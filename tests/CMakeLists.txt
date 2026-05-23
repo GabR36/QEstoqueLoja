@@ -167,13 +167,13 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
 endif()
 
 
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/recursos/
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/QEstoqueLojaTests/recursos
-)
+# install(DIRECTORY ${CMAKE_SOURCE_DIR}/recursos/
+#     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/QEstoqueLojaTests/recursos
+# )
 
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/reports/
-    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/QEstoqueLojaTests/reports
-)
+# install(DIRECTORY ${CMAKE_SOURCE_DIR}/reports/
+#     DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/QEstoqueLojaTests/reports
+# )
 
 # --- Definir APPDATA_DIR corretamente ---
 if (WIN32)

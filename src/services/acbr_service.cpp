@@ -7,12 +7,15 @@
 Acbr_service::Acbr_service(QObject *parent)
     : QObject{parent}
 {
-    // fiscalValues  = Configuracao::get_All_Fiscal_Values();
-    // empresaValues = Configuracao::get_All_Empresa_Values();
-    // emailValues   = Configuracao::get_All_Email_Values();
-    nfe = AcbrManager::instance()->nfe();
+#ifndef TEST_ENV
+    nfe  = AcbrManager::instance()->nfe();
     cnpj = ConsultaCnpjManager::instance()->cnpj();
     mail = MailManager::instance().mail();
+#else
+    nfe  = nullptr;
+    cnpj = nullptr;
+    mail = nullptr;
+#endif
 }
 
 Acbr_service::Resultado Acbr_service::configurar(const QString &versaoApp)
@@ -140,6 +143,7 @@ Acbr_service::Resultado Acbr_service::configurar(const QString &versaoApp)
 }
 
 Acbr_service::Resultado Acbr_service::carregarConfigParaDFE(){
+    if (!nfe) return {true, AcbrErro::Nenhum, ""};
     nfe->ConfigGravarValor("NFe", "ModeloDF", "0");
 
     return {true, AcbrErro::Nenhum, ""};

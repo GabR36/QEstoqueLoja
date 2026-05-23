@@ -906,6 +906,135 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
 
             break;
         }
+        case 9:
+        {
+            // schema versao 8 atualizar para a versao 9
+            // Migrar configurações da tabela config do banco de dados para o arquivo .ini
+
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+                break;
+            }
+            qDebug() << "Atualizando para versao 10: migrando appdata config para .config";
+            // Caminho antigo (exemplo manual)
+
+            QString oldDirPath = AppPath_service::appDataPath();
+
+            QString newDirPath = AppPath_service::generalConfigPath();
+
+            QDir oldDir(oldDirPath);
+            if (!oldDir.exists()) {
+                qDebug() << "Pasta antiga não existe.";
+                db.rollback();
+                break;
+            }
+
+            QStringList filters;
+            filters << "*.ini";
+
+            QFileInfoList files = oldDir.entryInfoList(filters, QDir::Files);
+
+            for (const QFileInfo &fileInfo : files) {
+                QString oldFilePath = fileInfo.absoluteFilePath();
+
+                QString fileName = fileInfo.fileName();
+
+                if (fileName.compare("acbr_config.ini", Qt::CaseInsensitive) == 0) {
+                    fileName = "acbrnfe_config.ini"; // (corrigi o typo "congfig")
+                }
+
+                QString newFilePath = newDirPath + "/" + fileName;
+
+                if (QFile::exists(newFilePath)) {
+                    qDebug() << "Arquivo já existe, ignorando:" << fileName;
+                    continue;
+                }
+
+                if (QFile::copy(oldFilePath, newFilePath)) {
+                    qDebug() << "Copiado:" << fileName;
+                    QFile::remove(oldFilePath);
+                } else {
+                    qDebug() << "Erro ao copiar:" << fileName;
+                }
+            }
+            QSqlQuery query(db);
+            if (!query.exec("PRAGMA user_version = 10")) {
+                qDebug() << "Erro ao atualizar user_version para 10:" << query.lastError().text();
+                db.rollback();
+                break;
+            }
+            if (!db.commit()) {
+                qDebug() << "Erro ao dar commit!";
+            }
+
+
+            dbSchemaVersion = 10;
+            qDebug() << "Migracao para versao 9 concluida: config migrada para .ini.";
+            emit dbVersao10();
+        }
+        case 10:
+        {
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+                break;
+            }
+            qDebug() << "Atualizando para versao 11: criando tabela rascunho_venda e removendo configs antigas";
+
+            // Remover .ini da pasta antiga (appdata) — ja foram copiados para .config na versao 10
+            QString oldDirPath = AppPath_service::appDataPath();
+            QDir oldDir(oldDirPath);
+
+            if (oldDir.exists()) {
+                QFileInfoList files = oldDir.entryInfoList(QStringList() << "*.ini", QDir::Files);
+                for (const QFileInfo &fileInfo : files) {
+                    if (!QFile::remove(fileInfo.absoluteFilePath())) {
+                        qDebug() << "Erro ao remover arquivo antigo:" << fileInfo.fileName();
+                    } else {
+                        qDebug() << "Removido da pasta antiga:" << fileInfo.fileName();
+                    }
+                }
+            } else {
+                qDebug() << "Pasta antiga nao existe, nada a remover.";
+            }
+
+            QSqlQuery query(db);
+            bool ok = query.exec(
+                "CREATE TABLE IF NOT EXISTS rascunho_venda ("
+                "  id                   INTEGER PRIMARY KEY,"
+                "  id_cliente           INTEGER DEFAULT -1,"
+                "  cpf_manual           TEXT    DEFAULT '',"
+                "  data_hora            TEXT    DEFAULT '',"
+                "  produtos_json        TEXT    DEFAULT '[]',"
+                "  forma_pagamento      TEXT    DEFAULT '',"
+                "  desconto             TEXT    DEFAULT '0',"
+                "  taxa                 TEXT    DEFAULT '0',"
+                "  recebido             TEXT    DEFAULT '0',"
+                "  desconto_porcentagem INTEGER DEFAULT 0,"
+                "  modelo_nf            INTEGER DEFAULT 0,"
+                "  emitir_todos         INTEGER DEFAULT 0,"
+                "  atualizado_em        TEXT    DEFAULT ''"
+                ")"
+            );
+            if (!ok) {
+                qDebug() << "Erro ao criar rascunho_venda:" << query.lastError().text();
+                db.rollback();
+                break;
+            }
+            if (!query.exec("PRAGMA user_version = 11")) {
+                qDebug() << "Erro ao atualizar user_version para 11:" << query.lastError().text();
+                db.rollback();
+                break;
+            }
+            if (!db.commit()) {
+                qDebug() << "Erro ao dar commit:" << db.lastError().text();
+                db.rollback();
+                break;
+            }
+            dbSchemaVersion = 11;
+            qDebug() << "Migracao para versao 11 concluida.";
+            emit dbVersao11();
+            break;
+        }
 
         }
     }

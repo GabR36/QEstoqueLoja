@@ -12,7 +12,9 @@ cancelNf::cancelNf(QObject *parent, qlonglong idnf)
     acbr = AcbrManager::instance()->nfe();
     db = QSqlDatabase::database();
     pegarDados(idnf);
+#ifndef TEST_ENV
     acbr->LimparListaEventos();
+#endif
     //acbr->LimparLista();
 }
 void cancelNf::pegarDados(qlonglong idnf){

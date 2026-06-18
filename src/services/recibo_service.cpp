@@ -4,7 +4,7 @@
 #include <QPainter>
 #include "../infra/databaseconnection_service.h"
 #include "config_service.h"
-
+#include <QFontMetrics>
 
 Recibo_service::Recibo_service(QObject *parent)
     : QObject{parent}
@@ -69,43 +69,101 @@ void Recibo_service::imprimirReciboVenda(qlonglong idvenda){
     painter.drawText(xPos, yPos, "Produtos vendidos:");
     int xPosValor = 210;
     xPos = xPosValor;
-    painter.drawText(xPos, yPos, "Valor(R$):");
+    painter.drawText(xPos, yPos, "Valor Total:");
     yPos += 20;
 
     font.setPointSize(8);
     font.setBold(false);
     painter.setFont(font);
     //painter.setFont(QFont("Arial", 10));
-    int lineHeight = 25; // Altura da linha
+    int lineHeight = 30; // Altura da linha
     int pageWidth = printer.pageLayout().paintRectPixels(printer.resolution()).width();
 
     auto produtos = prodVendaServ.getProdutosVendidos(idvenda);
     //QStringList descricoes = getDescricoesProdutos(produtos);
     //int index = 0;  // Índice para acessar as descrições
 
+    QFontMetrics fm(painter.font());
+
+    const int larguraDescricao = xPosValor - xPosProds - 30;
+    const int alturaDuasLinhas = fm.lineSpacing() * 3;
+
     for (int i = 0; i < produtos.size(); i++) {
+
         QString descricaoProduto = produtos[i].descricao;
         double quantidadProduto = produtos[i].quantidade;
         double valorProduto = produtos[i].precoVendido;
 
-        //tudo isso para formatar o valor maior q 1k para br
         double totalprods = valorProduto * quantidadProduto;
         QString totalFormatado = portugues.toString(totalprods, 'f', 2);
 
+        // Limita descrição a no máximo 2 linhas
+        QString descricaoLimitada = descricaoProduto;
 
+        QRect areaTeste(
+            0,
+            0,
+            larguraDescricao,
+            alturaDuasLinhas
+            );
+
+        while (
+            !descricaoLimitada.isEmpty() &&
+            fm.boundingRect(
+                  areaTeste,
+                  Qt::TextWordWrap,
+                  descricaoLimitada + "..."
+                  ).height() > alturaDuasLinhas
+            ) {
+            descricaoLimitada.chop(1);
+        }
+
+        if (descricaoLimitada != descricaoProduto)
+            descricaoLimitada += "...";
 
         QTextOption textOption;
-
-        QRect rectQuantProd(xPosPrm, yPos, xPosProds - xPosPrm, lineHeight);
-        painter.drawText(rectQuantProd, QString::number(quantidadProduto), textOption);
-
-        QRect rectDesc(xPosProds, yPos, xPosValor - xPosProds - 30, lineHeight);
         textOption.setWrapMode(QTextOption::WordWrap);
-        painter.drawText(rectDesc, descricaoProduto, textOption);
 
-        QRect rectValor(xPosValor, yPos, pageWidth - xPosValor, lineHeight);
-        painter.drawText(rectValor, totalFormatado, textOption);
-        yPos += lineHeight;
+        QRect rectQuantProd(
+            xPosPrm,
+            yPos,
+            xPosProds - xPosPrm,
+            alturaDuasLinhas
+            );
+
+        painter.drawText(
+            rectQuantProd,
+            QString::number(quantidadProduto),
+            textOption
+            );
+
+        QRect rectDesc(
+            xPosProds,
+            yPos,
+            larguraDescricao,
+            alturaDuasLinhas
+            );
+
+        painter.drawText(
+            rectDesc,
+            descricaoLimitada,
+            textOption
+            );
+
+        QRect rectValor(
+            xPosValor,
+            yPos,
+            pageWidth - xPosValor,
+            alturaDuasLinhas
+            );
+
+        painter.drawText(
+            rectValor,
+            totalFormatado,
+            textOption
+            );
+
+        yPos += alturaDuasLinhas + 5;
     }
     int posx = xPosPrm;
     yPos += 5;
@@ -173,7 +231,11 @@ void Recibo_service::imprimirReciboVenda(qlonglong idvenda){
             double taxaEntrada = listaEntradas[i].taxa;
             double valorFinalEntrada = listaEntradas[i].valorFinal;
 
-            QDate dataEntrada = portugues.toDate(data_horaEntrada, "dd/MM/yyyy hh:mm");
+            QDateTime dataEntrada = QDateTime::fromString(
+                data_horaEntrada,
+                "yyyy-MM-dd HH:mm:ss"
+                );
+            QString dataFormatada = dataEntrada.toString("dd/MM/yyyy HH:mm");
             // QString descontoEntrada = query.value("desconto").toString();
             xPos = 60;
             yPos += 30;
@@ -191,18 +253,19 @@ void Recibo_service::imprimirReciboVenda(qlonglong idvenda){
             font.setBold(false);
             painter.setFont(font);
 
+            int secColParcelaGap = 13;
             if(forma_pagamentoEntrada == "Dinheiro" ){
                 font.setBold(true);
                 painter.setFont(font);
                 painter.drawText(xPos, yPos, "Descontado(R$): " + portugues.toString(totalEntrada,'f',2));
                 font.setBold(false);
                 painter.setFont(font);
-                xPos = xPosParcela;
-                painter.drawText(xPos, yPos, "Data: " + dataEntrada.toString());
+                xPos = xPosParcela + secColParcelaGap;
+                painter.drawText(xPos, yPos, "Data: " + dataFormatada);
                 yPos += 20;
                 xPos = xPosPrm;
                 painter.drawText(xPos, yPos, "Forma Pag: " + forma_pagamentoEntrada);
-                xPos = xPosParcela;
+                xPos = xPosParcela + secColParcelaGap;
                 painter.drawText(xPos, yPos, "Valor Rec.(R$): " + portugues.toString(valor_recebidoEntrada,'f',2));
                 yPos += 20;
                 painter.drawText(xPos,yPos, "Troco(R$): " + portugues.toString(trocoEntrada,'f',2));
@@ -212,8 +275,8 @@ void Recibo_service::imprimirReciboVenda(qlonglong idvenda){
                 painter.drawText(xPos, yPos, "Descontado(R$): " + portugues.toString(totalEntrada,'f',2));
                 font.setBold(false);
                 painter.setFont(font);
-                xPos = xPosParcela;
-                painter.drawText(xPos, yPos, "Data: " + dataEntrada.toString());
+                xPos = xPosParcela + secColParcelaGap;
+                painter.drawText(xPos, yPos, "Data: " + dataFormatada);
                 yPos += 20;
                 painter.drawText(xPos, yPos, "Forma Pag: " + forma_pagamentoEntrada);
                 yPos += 20;
@@ -223,12 +286,12 @@ void Recibo_service::imprimirReciboVenda(qlonglong idvenda){
                 painter.drawText(xPos, yPos, "Descontado(R$): " + portugues.toString(totalEntrada,'f',2));
                 font.setBold(false);
                 painter.setFont(font);
-                xPos = xPosParcela;
-                painter.drawText(xPos, yPos, "Data: " + dataEntrada.toString());
+                xPos = xPosParcela + secColParcelaGap;
+                painter.drawText(xPos, yPos, "Data: " + dataFormatada);
                 yPos += 20;
                 xPos = xPosPrm;
                 painter.drawText(xPos, yPos, "Forma Pag: " + forma_pagamentoEntrada);
-                xPos = xPosParcela;
+                xPos = xPosParcela + secColParcelaGap;
                 painter.drawText(xPos, yPos, "Taxa(%): " + portugues.toString(taxaEntrada, 'f',2));
                 yPos += 20;
                 painter.drawText(xPos, yPos, "Valor Final(R$): " + portugues.toString(valorFinalEntrada, 'f', 2 ));
@@ -239,12 +302,12 @@ void Recibo_service::imprimirReciboVenda(qlonglong idvenda){
                 painter.drawText(xPos, yPos, "Descontado(R$): " + portugues.toString(totalEntrada,'f',2));
                 font.setBold(false);
                 painter.setFont(font);
-                xPos = xPosParcela;
-                painter.drawText(xPos, yPos, "Data: " + dataEntrada.toString());
+                xPos = xPosParcela + secColParcelaGap;
+                painter.drawText(xPos, yPos, "Data: " + dataFormatada);
                 yPos += 20;
                 xPos = xPosPrm;
                 painter.drawText(xPos, yPos, "Forma Pag: " + forma_pagamentoEntrada);
-                xPos = xPosParcela;
+                xPos = xPosParcela + secColParcelaGap;
                 painter.drawText(xPos, yPos, "Taxa(%): " + portugues.toString(taxaEntrada,'f',2));
                 yPos += 20;
                 painter.drawText(xPos, yPos, "Valor Final(R$): " + portugues.toString(valorFinalEntrada, 'f', 2 ));
@@ -255,8 +318,8 @@ void Recibo_service::imprimirReciboVenda(qlonglong idvenda){
                 painter.drawText(xPos, yPos, "Descontado(R$): " + portugues.toString(totalEntrada,'f',2));
                 font.setBold(false);
                 painter.setFont(font);
-                xPos = xPosParcela;
-                painter.drawText(xPos, yPos, "Data: " + dataEntrada.toString());
+                xPos = xPosParcela + secColParcelaGap;
+                painter.drawText(xPos, yPos, "Data: " + dataFormatada);
                 yPos += 20;
                 xPos = xPosPrm;
                 painter.drawText(xPos, yPos, "Forma Pag: " + forma_pagamentoEntrada);

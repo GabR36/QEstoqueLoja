@@ -344,6 +344,11 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
     }
     query.bindValue(":dhemi", nota.dhEmi);
     query.bindValue(":idemissor", nota.idEmissorCliente);
+    if(nota.idEmissorCliente <= 0){
+        query.bindValue(":idemissor", QVariant());
+    }else{
+        query.bindValue(":idemissor", nota.idEmissorCliente);
+    }
     query.bindValue(":adicionadoem", dataFormatada);
 
 

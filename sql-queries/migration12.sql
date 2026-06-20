@@ -572,3 +572,8 @@ WHERE valor_recebido >= 100000000;
 UPDATE vendas2
 SET troco = NULL
 WHERE troco >= 100000000;
+
+-- corrige chaves estrangeiras inexistentes em id_nf produtos nota
+UPDATE produtos_nota
+SET id_nf = NULL
+WHERE id_nf <= 0;

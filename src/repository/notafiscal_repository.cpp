@@ -310,6 +310,9 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
     // QString dhemi = nota.dhEmi;
     // QString dhemiFormatada = dt.toString("yyyy-MM-dd HH:mm:ss");
     // qDebug() << "dhemi formatada:" << dhemiFormatada;
+    if(nota.idNfRef <= 0){
+        nota.idNfRef = 0;
+    }
 
     query.prepare("INSERT INTO notas_fiscais (cstat, nnf, serie, modelo, tp_amb, xml_path, valor_total, "
                   "atualizado_em, id_venda, "
@@ -333,7 +336,12 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
     query.bindValue(":cuf", nota.cuf);
     query.bindValue(":finalidade", nota.finalidade);
     query.bindValue(":saida", nota.saida);
-    query.bindValue(":idnfref", nota.idNfRef);
+    //IDNFREF deve ser null quando <= 0
+    if(nota.idNfRef <= 0){
+        query.bindValue(":idnfref", QVariant());
+    }else{
+        query.bindValue(":idnfref", nota.idNfRef);
+    }
     query.bindValue(":dhemi", nota.dhEmi);
     query.bindValue(":idemissor", nota.idEmissorCliente);
     query.bindValue(":adicionadoem", dataFormatada);

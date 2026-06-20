@@ -4,6 +4,7 @@
 #include <QSqlError>
 #include "../util/dbutil.h"
 #include "../util/datautil.h"
+#include <QVariant>
 
 ProdutoNota_repository::ProdutoNota_repository(QObject *parent)
     : QObject{parent}
@@ -63,7 +64,12 @@ bool ProdutoNota_repository::inserir(ProdutoNotaDTO produtoNota){
         " :ncm, :csosn, :pis, :cfop, :aliquota, :cst_icms, :tem_st, :status, :adicionado, "
         ":adicionadoem, :atualizadoem)"
         );
-
+    if(produtoNota.idNf <= 0){
+        produtoNota.idNf = 0;
+        q.bindValue(":idnfref", QVariant());
+    }else{
+        q.bindValue(":idnfref", produtoNota.idNf);
+    }
     q.bindValue(":id_nf",        produtoNota.idNf);
     q.bindValue(":nitem",        produtoNota.nitem);
     q.bindValue(":quant",        produtoNota.quantidade);

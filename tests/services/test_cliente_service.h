@@ -25,6 +25,7 @@ private slots:
     void deletar_cliente_protegido();
     void alterar_cliente_ok();
     void alterar_cliente_invalido();
+    void inserir_cliente_data_nascimento_vazia();
 };
 
 #endif // TEST_CLIENTE_SERVICE_H

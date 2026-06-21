@@ -114,6 +114,7 @@ void TestVendasService::inserir_venda_ok()
     db.close();
 }
 
+
 void TestVendasService::erro_desconto_maior_que_total()
 {
     qlonglong idProd = inserirProdutoTeste(db, "VT002");
@@ -251,4 +252,42 @@ void TestVendasService::calcular_resumo()
 
     QVERIFY(resumo.total >= 60.0);
     QVERIFY(resumo.quantidade >= 1);
+}
+
+void TestVendasService::valor_recebido_troco_maior_decimal_bloqueia()
+{
+    qlonglong idProd = inserirProdutoTeste(db, "VT007");
+
+    VendasDTO v;
+
+    v.clienteNome = "Consumidor";
+    v.dataHora = "2026-03-16 10:00:00";
+    v.total = 100.00;
+
+    v.formaPagamento = "Dinheiro";
+
+    v.valorRecebido = 356269248;
+    v.troco = 356269148;
+
+    v.taxa = 0;
+    v.valorFinal = 100.00;
+    v.desconto = 0;
+
+    v.estaPago = true;
+    v.idCliente = 1;
+
+
+    ProdutoVendidoDTO pv;
+    pv.idProduto = idProd;
+    pv.quantidade = 1;
+    pv.precoVendido = 100.00;
+
+
+    Vendas_service service;
+
+    auto r = service.inserirVendaRegraDeNegocio(v, {pv});
+
+
+    QVERIFY(!r.ok);
+    QCOMPARE(r.erro, VendasErro::QuebraDeRegra);
 }

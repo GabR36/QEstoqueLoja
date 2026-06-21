@@ -13,6 +13,7 @@
 #include "../services/Produto_service.h"
 #include "../infra/databaseconnection_service.h"
 #include "../infra/apppath_service.h"
+#include <QFile>
 
 SchemaMigration_service::SchemaMigration_service(QObject *parent, int dbLastVersion)
     : QObject{parent}
@@ -60,6 +61,115 @@ SchemaMigration_service::SchemaMigration_service(QObject *parent, int dbLastVers
     db.close();
 }
 
+int SchemaMigration_service::getSchemaVersion()
+{
+    QSqlDatabase db = DatabaseConnection_service::db();
+    QSqlQuery query(db);
+
+    if(db.driverName() == "QSQLITE")
+    {
+        if(query.exec("PRAGMA user_version") && query.next())
+            return query.value(0).toInt();
+    }
+    else if(db.driverName() == "QPSQL")
+    {
+        if(query.exec(
+                "SELECT version "
+                "FROM schema_version "
+                "LIMIT 1"
+                ) && query.next())
+        {
+            return query.value(0).toInt();
+        }
+    }
+
+    return 0;
+}
+
+bool SchemaMigration_service::setSchemaVersion(int version)
+{
+    QSqlDatabase db = DatabaseConnection_service::db();
+    QSqlQuery query(db);
+
+    if(db.driverName() == "QSQLITE")
+    {
+        return query.exec(
+            QString("PRAGMA user_version=%1")
+                .arg(version)
+            );
+    }
+    else if(db.driverName() == "QPSQL")
+    {
+        query.exec(
+            "CREATE TABLE IF NOT EXISTS schema_version ("
+            "version INTEGER NOT NULL)"
+            );
+
+        query.exec("DELETE FROM schema_version");
+
+        query.prepare(
+            "INSERT INTO schema_version(version)"
+            " VALUES(:version)"
+            );
+
+        query.bindValue(":version", version);
+
+        return query.exec();
+    }
+
+    return false;
+}
+
+bool SchemaMigration_service::executarArquivoSql(const QString &caminho)
+{
+    QFile file(caminho);
+
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        qDebug() << "Erro ao abrir arquivo SQL:" << caminho;
+        return false;
+    }
+
+
+    QTextStream stream(&file);
+
+    QString sqlCompleto = stream.readAll();
+
+    file.close();
+
+
+    QSqlQuery query(db);
+
+
+    QStringList comandos = sqlCompleto.split(";");
+
+
+    for(QString comando : comandos){
+
+        comando = comando.trimmed();
+
+
+        if(comando.isEmpty())
+            continue;
+
+
+        if(!query.exec(comando)){
+
+            qDebug()
+            << "Erro executando SQL:"
+            << comando.left(100);
+
+            qDebug()
+                << query.lastError().text();
+
+
+            return false;
+        }
+    }
+
+
+    return true;
+}
+
 SchemaMigration_service::Resultado SchemaMigration_service::update() {
     if(!DatabaseConnection_service::open()){
         qDebug() << "erro ao abrir banco de dados.";
@@ -68,15 +178,11 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
 
     QSqlQuery query(db);
     // obter a versao do esquema do banco de dados
-    if (query.exec("PRAGMA user_version")) {
-        if (query.next()) {
-            dbSchemaVersion = query.value(0).toInt();
-        }
-    } else {
-        qDebug() << "Failed to execute PRAGMA user_version:";
-        return {false, SchemaErro::FalhaConexao, "erro ao iniciar banco de dados", 0};
-
+    int versao = getSchemaVersion();
+    if (versao >= 0) {
+            dbSchemaVersion = versao;
     }
+
     query.finish();
     qDebug() << dbSchemaVersion;
 
@@ -114,7 +220,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
                        "desconto = 0");
 
             // mudar a versao para 1
-            query.exec("PRAGMA user_version = 1");
+            setSchemaVersion(1);
 
             query.finish();
 
@@ -176,7 +282,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             }
 
             // mudar a versao para 2
-            query.exec("PRAGMA user_version = 2");
+            setSchemaVersion(2);
 
             // terminar transacao
             if (!db.commit()) {
@@ -256,8 +362,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             }
 
             // mudar a versao para 3
-            query.exec("PRAGMA user_version = 3");
-
+            setSchemaVersion(3);
             // terminar transacao
             if (!db.commit()) {
                 qDebug() << "Error: unable to commit transaction";
@@ -336,7 +441,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
 
 
             // mudar a versao para 4
-            query.exec("PRAGMA user_version = 4");
+            setSchemaVersion(4);
 
             // terminar transacao
             if (!db.commit()) {
@@ -538,7 +643,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
 
             // Atualizar versão do schema se tudo correu bem
             if (!hasErrors) {
-                if (!query.exec("PRAGMA user_version = 5")) {
+                if (!setSchemaVersion(5)) {
                     qDebug() << "Erro ao atualizar user_version:" << query.lastError().text();
                     hasErrors = true;
                 }
@@ -595,7 +700,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             }
 
             // Atualizar versão do schema se tudo correu bem
-            if (!query.exec("PRAGMA user_version = 6")) {
+            if (!setSchemaVersion(6)) {
                 qDebug() << "Erro ao atualizar user_version:" << query.lastError().text();
             }
 
@@ -684,7 +789,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             }
 
             // Atualizar versão do schema se tudo correu bem
-            if (!query.exec("PRAGMA user_version = 7")) {
+            if (!setSchemaVersion(7)) {
                 qDebug() << "Erro ao atualizar user_version:" << query.lastError().text();
             }
 
@@ -762,7 +867,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             ok &= execQuery("UPDATE vendas2 SET adicionado_em = data_hora, atualizado_em = data_hora");
 
             if (ok) {
-                ok &= execQuery("PRAGMA user_version = 8");
+                ok &= setSchemaVersion(8);
             }
 
             if (!ok) {
@@ -887,7 +992,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
                 ok = false;
             }
 
-            if (ok && !query.exec("PRAGMA user_version = 9")) {
+            if (ok && !setSchemaVersion(9)) {
                 qDebug() << "Erro ao atualizar user_version para 9:" << query.lastError().text();
                 ok = false;
             }
@@ -958,7 +1063,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
                 }
             }
             QSqlQuery query(db);
-            if (!query.exec("PRAGMA user_version = 10")) {
+            if (!setSchemaVersion(10)) {
                 qDebug() << "Erro ao atualizar user_version para 10:" << query.lastError().text();
                 db.rollback();
                 break;
@@ -1020,7 +1125,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
                 db.rollback();
                 break;
             }
-            if (!query.exec("PRAGMA user_version = 11")) {
+            if (!setSchemaVersion(11)) {
                 qDebug() << "Erro ao atualizar user_version para 11:" << query.lastError().text();
                 db.rollback();
                 break;
@@ -1033,6 +1138,35 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             dbSchemaVersion = 11;
             qDebug() << "Migracao para versao 11 concluida.";
             emit dbVersao11();
+            break;
+        }
+        case 11:
+        {
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+                break;
+            }
+            qDebug() << "Atualizando para versao 12: fazendo a correção e limpeza do banco de dados.";
+
+            if(!executarArquivoSql(":/sql-queries/migration12.sql")){
+                qDebug() << "Não executou migração 12 por arquivo .sql";
+            }else{
+                qDebug() << "executou arquivo .sql migração 12";
+            }
+
+            if (!setSchemaVersion(12)) {
+                qDebug() << "Erro ao atualizar user_version para 12:" << query.lastError().text();
+                db.rollback();
+                break;
+            }
+            if (!db.commit()) {
+                qDebug() << "Erro ao dar commit:" << db.lastError().text();
+                db.rollback();
+                break;
+            }
+            dbSchemaVersion = 12;
+            qDebug() << "Migracao para versao 12 concluida.";
+            // emit dbVersao11();
             break;
         }
 

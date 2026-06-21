@@ -204,6 +204,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         Imagens/QEstoqueLOja/light-icons/QeLogo-claro.png
         src/cartacorrecaojanela.h src/cartacorrecaojanela.cpp src/cartacorrecaojanela.ui
         src/nota/eventocartacorrecao.h src/nota/eventocartacorrecao.cpp
+        sql-queries/migration12.sql
+        recusos-geral.qrc
 
 
 

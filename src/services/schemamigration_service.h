@@ -44,6 +44,11 @@ signals:
     void dbVersao9();
     void dbVersao10();
     void dbVersao11();
+private slots:
+    bool executarArquivoSql(const QString &caminho);
+private:
+    int getSchemaVersion();
+    bool setSchemaVersion(int version);
 };
 
 #endif // SCHEMAMANAGER_H

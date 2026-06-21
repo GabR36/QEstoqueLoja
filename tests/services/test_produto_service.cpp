@@ -5,6 +5,7 @@
 #include <QLocale>
 #include <QSqlQuery>
 #include "infra/databaseconnection_service.h"
+#include <QVariant>
 
 void TestProdutoService::inserir_produto_ok()
 {
@@ -71,6 +72,75 @@ void TestProdutoService::inserir_produto_ok()
     QVERIFY(!adicionadoEm.isEmpty());
     QVERIFY(!atualizadoEm.isEmpty());
 
+}
+
+void TestProdutoService::inserir_produto_precoforn_vazio()
+{
+    Produto_Service service;
+
+
+    ProdutoDTO p;
+    p.quantidade = 10.00;
+    p.descricao = "Produto Teste";
+    p.preco = 5.50;
+    p.codigoBarras = "7898765430018";
+    p.nf = 0;
+    p.uCom = "UN";
+
+    // campo vazio
+    p.precoFornecedor = 0;
+
+    p.percentLucro = 20.00;
+    p.ncm = "00000000";
+    p.cest = "";
+    p.aliquotaIcms = 32.50;
+    p.csosn = "102";
+    p.pis = "49";
+
+
+    auto r = service.inserir(p);
+
+    QVERIFY(r.ok);
+
+
+    QVERIFY(DatabaseConnection_service::open());
+
+
+    QSqlQuery query(db);
+
+    QVERIFY(query.exec(
+        "SELECT * FROM produtos ORDER BY id DESC LIMIT 1"
+        ));
+
+
+    QVERIFY(query.next());
+
+
+    QCOMPARE(query.value("quantidade").toDouble(), 10.0);
+    QCOMPARE(query.value("descricao").toString(), "Produto Teste");
+    QCOMPARE(query.value("preco").toDouble(), 5.5);
+    QCOMPARE(query.value("codigo_barras").toString(), "7898765430018");
+    QCOMPARE(query.value("nf").toInt(), 0);
+    QCOMPARE(query.value("un_comercial").toString(), "UN");
+
+
+    // aqui é o teste importante
+    QCOMPARE(query.value("preco_fornecedor").toDouble(), 0.0);
+
+
+    QCOMPARE(query.value("porcent_lucro").toDouble(), 20.0);
+    QCOMPARE(query.value("ncm").toString(), "00000000");
+    QCOMPARE(query.value("cest").toString(), "");
+    QCOMPARE(query.value("aliquota_imposto").toDouble(), 32.5);
+    QCOMPARE(query.value("csosn").toString(), "102");
+    QCOMPARE(query.value("pis").toString(), "49");
+
+
+    QVERIFY(!query.value("adicionado_em").toString().isEmpty());
+    QVERIFY(!query.value("atualizado_em").toString().isEmpty());
+
+
+    db.close();
 }
 
 void TestProdutoService::init()

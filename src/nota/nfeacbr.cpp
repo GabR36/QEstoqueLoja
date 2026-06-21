@@ -874,9 +874,14 @@ void NfeACBR::carregarProds()
             };
 
             auto round2 = [](double v){ return std::round(v * 100.0) / 100.0; };
-            totalIBSUFAccum  += round2(vIBSUF);
-            totalIBSMunAccum += round2(vIBSMun);
-            totalCBSAccum    += round2(vCBS);
+            double vIBSUF_r  = round2(vIBSUF);
+            double vIBSMun_r = round2(vIBSMun);
+            double vCBS_r    = round2(vCBS);
+            double vIBS_r    = vIBSUF_r + vIBSMun_r;
+
+            totalIBSUFAccum  += vIBSUF_r;
+            totalIBSMunAccum += vIBSMun_r;
+            totalCBSAccum    += vCBS_r;
 
             ini << secIBS << "\n";
             ini << "CST=000\n";
@@ -884,21 +889,21 @@ void NfeACBR::carregarProds()
 
             ini << secGIBS << "\n";
             ini << "vBC=" << vProd.toStdString() << "\n";
-            ini << "vIBS=" << fmt(vIBS) << "\n\n";
+            ini << "vIBS=" << fmt(vIBS_r) << "\n\n";
 
             ini << secGIBSUF << "\n";
             ini << "pIBSUF=" << fmt(taxas.pIBSUF) << "\n";
-            ini << "vIBSUF=" << fmt(vIBSUF) << "\n\n";
+            ini << "vIBSUF=" << fmt(vIBSUF_r) << "\n\n";
 
             if(taxas.pIBSMun > 0.0){
                 ini << secGIBSMUN << "\n";
                 ini << "pIBSMun=" << fmt(taxas.pIBSMun) << "\n";
-                ini << "vIBSMun=" << fmt(vIBSMun) << "\n\n";
+                ini << "vIBSMun=" << fmt(vIBSMun_r) << "\n\n";
             }
 
             ini << secGCBS << "\n";
             ini << "pCBS=" << fmt(taxas.pCBS) << "\n";
-            ini << "vCBS=" << fmt(vCBS) << "\n\n";
+            ini << "vCBS=" << fmt(vCBS_r) << "\n\n";
         }
     }
 }

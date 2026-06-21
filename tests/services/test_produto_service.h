@@ -25,6 +25,7 @@ private slots:
     void init();
     void atualizar_campos_map_ok();
     void atualizar_sem_ncm_nao_quebra();
+    void inserir_produto_precoforn_vazio();
 };
 
 #endif // TEST_PRODUTO_SERVICE_H

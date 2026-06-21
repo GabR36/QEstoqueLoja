@@ -158,12 +158,22 @@ void Vendas_service::listarVendasCliente(QSqlQueryModel *model, qlonglong idclie
 
 Vendas_service::ResultadoInsercaoRN Vendas_service::inserirVendaRegraDeNegocio(VendasDTO venda,
                                                                      QList<ProdutoVendidoDTO> listaProds){
+    constexpr double LIMITE_DECIMAL_10_2 = 99999999.99;
 
     //  ser menor ou igual ao valor final
     bool menorQueTotal = venda.desconto <= venda.total;
 
     if (!menorQueTotal){
         return {false, VendasErro::QuebraDeRegra, "Valor do desconto maior que o total.", -1};
+    }
+    if (venda.valorRecebido > LIMITE_DECIMAL_10_2) {
+        return {false, VendasErro::QuebraDeRegra,
+                "Valor recebido ultrapassa o limite permitido.", -1};
+    }
+
+    if (venda.troco > LIMITE_DECIMAL_10_2) {
+        return {false, VendasErro::QuebraDeRegra,
+                "Troco ultrapassa o limite permitido.", -1};
     }
 
     if(venda.formaPagamento == "Prazo" && venda.idCliente <= 1){

@@ -62,7 +62,11 @@ bool Cliente_repository::inserir(ClienteDTO cliente){
     query.bindValue(":telefone", cliente.telefone);
     query.bindValue(":endereco", cliente.endereco);
     query.bindValue(":cpf", cliente.cpf);
-    query.bindValue(":data_nascimento", cliente.dataNasc);
+    if(cliente.dataNasc.isEmpty() || cliente.dataNasc == "//"){
+        query.bindValue(":data_nascimento", QVariant()); // Salva como null
+    }else{
+        query.bindValue(":data_nascimento", cliente.dataNasc);
+    }
     query.bindValue(":data_cadastro", dataFormatada);
     query.bindValue(":eh_pf", cliente.ehPf);
     query.bindValue(":numero_end", cliente.endereco);

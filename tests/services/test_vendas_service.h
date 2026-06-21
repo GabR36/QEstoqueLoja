@@ -19,6 +19,7 @@ private slots:
     void deletar_venda_ok();
     void devolver_produto_ok();
     void calcular_resumo();
+    void valor_recebido_troco_maior_decimal_bloqueia();
 };
 
 #endif // TEST_VENDAS_SERVICE_H

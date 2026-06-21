@@ -32,6 +32,28 @@ void test_cliente_service::inserir_cliente_nome_vazio()
     QCOMPARE(r.erro, ClienteErro::CampoVazio);
 }
 
+void test_cliente_service::inserir_cliente_data_nascimento_vazia()
+{
+    Cliente_service service;
+
+    ClienteDTO c;
+    c.nome = "Neige";
+    c.dataNasc = "//";
+    c.ehPf = true;
+
+    auto r = service.inserirCliente(c);
+
+    QVERIFY(r.ok);
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "banco nao aberto teste cliente";
+    }
+    QSqlQuery q(db);
+    QVERIFY(q.exec("SELECT data_nascimento FROM clientes WHERE nome = 'Neige'"));
+    QVERIFY(q.next());
+    QString data = q.value(0).toString();
+    QCOMPARE(data, "");
+}
+
 
 void test_cliente_service::erro_cpf_duplicado()
 {
@@ -94,7 +116,7 @@ void test_cliente_service::deletar_cliente_ok()
     QVERIFY(service.inserirCliente(c).ok);
 
     if(!DatabaseConnection_service::open()){
-        qDebug() << "banco nao aberto teste produtos";
+        qDebug() << "banco nao aberto teste cliente";
     }
     QSqlQuery q(db);
     QVERIFY(q.exec("SELECT id FROM clientes WHERE cpf = '44444444444'"));
@@ -106,7 +128,7 @@ void test_cliente_service::deletar_cliente_ok()
     QVERIFY(r.ok);
 
     if(!DatabaseConnection_service::open()){
-        qDebug() << "banco nao aberto teste produtos";
+        qDebug() << "banco nao aberto teste";
     }
 
     QSqlQuery q2(db);
@@ -138,7 +160,7 @@ void test_cliente_service::alterar_cliente_ok()
 
     QVERIFY(service.inserirCliente(c).ok);
     if(!DatabaseConnection_service::open()){
-        qDebug() << "banco nao aberto teste produtos";
+        qDebug() << "banco nao aberto teste";
     }
     QSqlQuery q(db);
     QVERIFY(q.exec("SELECT id FROM clientes WHERE cpf = '55555555555'"));
@@ -155,7 +177,7 @@ void test_cliente_service::alterar_cliente_ok()
     QVERIFY(r.ok);
 
     if(!DatabaseConnection_service::open()){
-        qDebug() << "banco nao aberto teste produtos";
+        qDebug() << "banco nao aberto teste";
     }
     QSqlQuery q2(db);
     QVERIFY(q2.exec("SELECT nome FROM clientes WHERE id = " + QString::number(id)));

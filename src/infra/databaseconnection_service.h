@@ -3,6 +3,16 @@
 
 #include <QObject>
 #include <QSqlDatabase>
+struct DatabaseConfig
+{
+    QString driver;
+    QString host;
+    int port;
+    QString database;
+    QString user;
+    QString password;
+};
+
 
 class DatabaseConnection_service : public QObject
 {

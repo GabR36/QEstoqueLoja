@@ -136,3 +136,30 @@ QSqlDatabase DatabaseConnection_service::db()
                : QSqlDatabase::database();
 }
 
+
+QSqlDatabase DatabaseConnection_service::createThreadConnection(const QString &name)
+{
+    if (QSqlDatabase::contains(name))
+        return QSqlDatabase::database(name);
+
+
+    QSqlDatabase db =
+        QSqlDatabase::addDatabase(config.driver, name);
+
+
+    if(config.driver == "QSQLITE")
+    {
+        db.setDatabaseName(AppPath_service::databasePath());
+    }
+    else if(config.driver == "QPSQL")
+    {
+        db.setHostName(config.host);
+        db.setPort(config.port);
+        db.setDatabaseName(config.database);
+        db.setUserName(config.user);
+        db.setPassword(config.password);
+    }
+
+
+    return db;
+}

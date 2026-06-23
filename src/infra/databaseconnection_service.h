@@ -25,6 +25,7 @@ public:
     static QSqlDatabase db();
     static void setDatabase(QSqlDatabase database);
     static bool isPostgres();
+    static QSqlDatabase createThreadConnection(const QString &name);
 private:
      static bool initialized;
 

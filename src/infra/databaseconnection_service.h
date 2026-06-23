@@ -24,6 +24,7 @@ public:
     void close();
     static QSqlDatabase db();
     static void setDatabase(QSqlDatabase database);
+    static bool isPostgres();
 private:
      static bool initialized;
 

@@ -270,11 +270,20 @@ bool ProdutoVenda_repository::inserir(ProdutoVendidoDTO prod){
     query.bindValue(":precovendido", prod.precoVendido);
     query.bindValue(":adicionadoem", data);
     query.bindValue(":atualizadoem", data);
-    query.bindValue(":emitidonf", prod.emitidoNf);
+    query.bindValue(":emitidonf", prod.emitidoNf ? 1 : 0);
 
     if(!query.exec()){
-        qDebug() << "Query não executou  inserir produto vendido.";
+
+        qDebug()
+        << "Erro inserir produto vendido:"
+        << query.lastError().text();
+
+        qDebug()
+            << "SQL:"
+            << query.lastQuery();
+
         db.close();
+
         return false;
     }
     db.close();

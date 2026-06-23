@@ -188,7 +188,7 @@ qlonglong notafiscal_repository::getProximoNNF55(QString serie, bool tpAmb, qlon
 
     query.bindValue(":modelo", "55");
     query.bindValue(":serie", serie);
-    query.bindValue(":tp_amb", tpAmb);
+    query.bindValue(":tp_amb", tpAmb ? 1 : 0);
 
     if(!query.exec()){
         qWarning() << "Erro na consulta NNF:" << query.lastError().text();
@@ -231,7 +231,7 @@ qlonglong notafiscal_repository::getProximoNNF65(QString serie, bool tpAmb, qlon
 
     query.bindValue(":modelo", "65");
     query.bindValue(":serie", serie);
-    query.bindValue(":tp_amb", tpAmb);
+    query.bindValue(":tp_amb", tpAmb ? 1 : 0);
 
     if(!query.exec()){
         qWarning() << "Erro na consulta NNF:" << query.lastError().text();

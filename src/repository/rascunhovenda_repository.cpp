@@ -17,36 +17,118 @@ bool RascunhoVenda_repository::salvar(const RascunhoVendaDTO &rascunho)
         return false;
     }
 
-    QSqlQuery query(db);
-    query.prepare(
-        "INSERT OR REPLACE INTO rascunho_venda "
-        "(id, id_cliente, cpf_manual, data_hora, produtos_json, "
-        " forma_pagamento, desconto, taxa, recebido, desconto_porcentagem, "
-        " modelo_nf, emitir_todos, atualizado_em) "
-        "VALUES (1, :idCliente, :cpf, :dataHora, :json, "
-        " :formaPag, :desconto, :taxa, :recebido, :descontoPorcentagem, "
-        " :modeloNf, :emitirTodos, :atualizadoEm)"
-    );
-    query.bindValue(":idCliente",          rascunho.idCliente);
-    query.bindValue(":cpf",                rascunho.cpfManual);
-    query.bindValue(":dataHora",           rascunho.dataHora);
-    query.bindValue(":json",               rascunho.produtosJson);
-    query.bindValue(":formaPag",           rascunho.formaPagamento);
-    query.bindValue(":desconto",           rascunho.desconto);
-    query.bindValue(":taxa",               rascunho.taxa);
-    query.bindValue(":recebido",           rascunho.recebido);
-    query.bindValue(":descontoPorcentagem", rascunho.descontoPorcentagem ? 1 : 0);
-    query.bindValue(":modeloNf",           rascunho.modeloNf);
-    query.bindValue(":emitirTodos",        rascunho.emitirTodos ? 1 : 0);
-    query.bindValue(":atualizadoEm",       rascunho.atualizadoEm);
 
-    if (!query.exec()) {
-        qDebug() << "Erro ao salvar rascunho:" << query.lastError().text();
+    QSqlQuery query(db);
+
+
+    QString sql;
+
+
+    if (DatabaseConnection_service::isPostgres()) {
+
+        sql =
+            "INSERT INTO rascunho_venda "
+            "(id, id_cliente, cpf_manual, data_hora, produtos_json, "
+            "forma_pagamento, desconto, taxa, recebido, desconto_porcentagem, "
+            "modelo_nf, emitir_todos, atualizado_em) "
+
+            "VALUES "
+            "(1, :idCliente, :cpf, :dataHora, :json, "
+            ":formaPag, :desconto, :taxa, :recebido, "
+            ":descontoPorcentagem, :modeloNf, :emitirTodos, "
+            ":atualizadoEm) "
+
+            "ON CONFLICT (id) DO UPDATE SET "
+
+            "id_cliente = EXCLUDED.id_cliente, "
+            "cpf_manual = EXCLUDED.cpf_manual, "
+            "data_hora = EXCLUDED.data_hora, "
+            "produtos_json = EXCLUDED.produtos_json, "
+            "forma_pagamento = EXCLUDED.forma_pagamento, "
+            "desconto = EXCLUDED.desconto, "
+            "taxa = EXCLUDED.taxa, "
+            "recebido = EXCLUDED.recebido, "
+            "desconto_porcentagem = EXCLUDED.desconto_porcentagem, "
+            "modelo_nf = EXCLUDED.modelo_nf, "
+            "emitir_todos = EXCLUDED.emitir_todos, "
+            "atualizado_em = EXCLUDED.atualizado_em";
+
+
+    } else {
+
+        sql =
+            "INSERT OR REPLACE INTO rascunho_venda "
+            "(id, id_cliente, cpf_manual, data_hora, produtos_json, "
+            "forma_pagamento, desconto, taxa, recebido, desconto_porcentagem, "
+            "modelo_nf, emitir_todos, atualizado_em) "
+
+            "VALUES "
+            "(1, :idCliente, :cpf, :dataHora, :json, "
+            ":formaPag, :desconto, :taxa, :recebido, "
+            ":descontoPorcentagem, :modeloNf, :emitirTodos, "
+            ":atualizadoEm)";
+    }
+
+
+    if (!query.prepare(sql)) {
+
+        qDebug()
+        << "Erro prepare salvar rascunho:"
+        << query.lastError().text();
+
         db.close();
+
         return false;
     }
 
+
+    query.bindValue(":idCliente", rascunho.idCliente);
+    query.bindValue(":cpf", rascunho.cpfManual);
+    query.bindValue(":dataHora", rascunho.dataHora);
+    query.bindValue(":json", rascunho.produtosJson);
+    query.bindValue(":formaPag", rascunho.formaPagamento);
+
+    query.bindValue(":desconto",
+                    rascunho.desconto.isEmpty()
+                        ? 0
+                        : rascunho.desconto.toDouble());
+
+    query.bindValue(":taxa",
+                    rascunho.taxa.isEmpty()
+                        ? 0
+                        : rascunho.taxa.toDouble());
+
+    query.bindValue(":recebido",
+                    rascunho.recebido.isEmpty()
+                        ? 0
+                        : rascunho.recebido.toDouble());
+
+    query.bindValue(":descontoPorcentagem",
+                    rascunho.descontoPorcentagem ? 1 : 0);
+
+    query.bindValue(":modeloNf", rascunho.modeloNf);
+
+    query.bindValue(":emitirTodos",
+                    rascunho.emitirTodos ? 1 : 0);
+
+    query.bindValue(":atualizadoEm",
+                    rascunho.atualizadoEm);
+
+
+    if (!query.exec()) {
+
+        qDebug()
+        << "Erro ao salvar rascunho:"
+        << query.lastError().text();
+
+        db.close();
+
+        return false;
+    }
+
+
     db.close();
+
     return true;
 }
 

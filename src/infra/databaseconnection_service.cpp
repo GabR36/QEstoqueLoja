@@ -39,7 +39,7 @@ void DatabaseConnection_service::setDatabase(QSqlDatabase database)
 
 bool DatabaseConnection_service::init()
 {
-    qDebug() << QSqlDatabase::drivers();
+    // qDebug() << QSqlDatabase::drivers();
     if (hasExternalDb) return true;
     if (initialized) return true;
 
@@ -73,6 +73,13 @@ bool DatabaseConnection_service::init()
     }
 }
 
+bool DatabaseConnection_service::isPostgres()
+{
+    QSqlDatabase db = hasExternalDb
+                          ? externalDb
+                          : QSqlDatabase::database();
+    return db.driverName().contains("QPSQL");
+}
 
 bool DatabaseConnection_service::open()
 {
@@ -82,12 +89,12 @@ bool DatabaseConnection_service::open()
                           ? externalDb
                           : QSqlDatabase::database();
 
-    qDebug() << "Driver:" << db.driverName();
-    qDebug() << "Host:" << db.hostName();
-    qDebug() << "Database:" << db.databaseName();
-    qDebug() << "User:" << db.userName();
-    qDebug() << "IsValid:" << db.isValid();
-    qDebug() << "IsOpen:" << db.isOpen();
+    // qDebug() << "Driver:" << db.driverName();
+    // qDebug() << "Host:" << db.hostName();
+    // qDebug() << "Database:" << db.databaseName();
+    // qDebug() << "User:" << db.userName();
+    // qDebug() << "IsValid:" << db.isValid();
+    // qDebug() << "IsOpen:" << db.isOpen();
 
     if (!db.isOpen()) {
 

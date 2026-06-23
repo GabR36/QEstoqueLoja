@@ -386,7 +386,7 @@ void notafiscal_repository::listarEntradas(QSqlQueryModel *model, const QString 
         LEFT JOIN clientes c
             ON c.id = n.id_emissorcliente
         WHERE n.finalidade = 'ENTRADA EXTERNA'
-          AND n.cstat IN (100, 150)
+          AND n.cstat IN ('100', '150')
     )";
 
     if (!de.isEmpty() && !ate.isEmpty())

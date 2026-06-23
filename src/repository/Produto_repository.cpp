@@ -59,7 +59,7 @@ bool Produto_Repository::inserir(const ProdutoDTO &p, QString &erroSQL)
     query.bindValue(":descricao", p.descricao);
     query.bindValue(":preco", p.preco);
     query.bindValue(":codigo_barras", p.codigoBarras);
-    query.bindValue(":nf", p.nf);
+    query.bindValue(":nf", p.nf ? 1 : 0);
     query.bindValue(":un_comercial", p.uCom);
     query.bindValue(":preco_fornecedor", p.precoFornecedor);
     query.bindValue(":porcent_lucro", p.percentLucro);
@@ -228,7 +228,7 @@ bool Produto_Repository::alterar(
     query.bindValue(":desc", Produto_Service::normalizeText(p.descricao));
     query.bindValue(":preco", p.preco);
     query.bindValue(":barras", p.codigoBarras);
-    query.bindValue(":nf", p.nf);
+    query.bindValue(":nf", p.nf ? 1 : 0);
     query.bindValue(":ucom", p.uCom);
     query.bindValue(":precoforn", p.precoFornecedor);
     query.bindValue(":porcentlucro", p.percentLucro);

@@ -40,9 +40,16 @@ bool Dfe_service::possoConsultar(){
     if(maxData != "-1"){
         QDateTime dataMod = QDateTime::fromString(maxData, "yyyy-MM-dd HH:mm:ss");
 
+        // formato PostgreSQL ISO
         if (!dataMod.isValid()) {
-            qDebug() << "Data inválida em dfe_info:" << maxData;
-            return true; // se inválida, permite consultar
+            dataMod = QDateTime::fromString(maxData,Qt::ISODate);
+            qDebug() << "Data inválida para sqlite, consultando formato postgre:";
+        }
+        if (!dataMod.isValid()) {
+            qDebug()
+            << "Data inválida em dfe_info:"
+            << maxData;
+            return true;
         }
 
         QDateTime agora = QDateTime::currentDateTime();

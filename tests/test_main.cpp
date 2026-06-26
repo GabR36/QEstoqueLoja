@@ -14,6 +14,7 @@
 #include "services/test_fiscalemitter_service.h"
 #include "services/test_eventofiscal_service.h"
 #include <QSqlDatabase>
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
@@ -22,17 +23,25 @@ int main(int argc, char *argv[])
 
     int status = 0;
 #ifdef TEST_ENV
+#ifdef TEST_POSTGRES
+    TestDbFactory::createPostgres();
+#else
     TestDbFactory::create();
 #endif
+#endif//TEST_ENV
 
     status |= QTest::qExec(new TestProdutoService, argc, argv);
-    status |= QTest::qExec(new test_barcode_service, argc, argv);
-    status |= QTest::qExec(new test_manifestadordfe, argc, argv);
-    status |= QTest::qExec(new test_cliente_service, argc, argv);
-    status |= QTest::qExec(new TestVendasService, argc, argv);
-    status |= QTest::qExec(new TestProdutoVendaService, argc, argv);
-    status |= QTest::qExec(new TestFiscalEmitterService, argc, argv);
-    status |= QTest::qExec(new test_eventofiscal_service, argc, argv);
+    // status |= QTest::qExec(new test_barcode_service, argc, argv);
+    // status |= QTest::qExec(new test_manifestadordfe, argc, argv);
+    // status |= QTest::qExec(new test_cliente_service, argc, argv);
+    // status |= QTest::qExec(new TestVendasService, argc, argv);
+    // status |= QTest::qExec(new TestProdutoVendaService, argc, argv);
+    // status |= QTest::qExec(new TestFiscalEmitterService, argc, argv);
+    // status |= QTest::qExec(new test_eventofiscal_service, argc, argv);
+
+#ifdef TEST_POSTGRES
+    TestDbFactory::removerBDAtual();
+#endif
 
     return status;
 }

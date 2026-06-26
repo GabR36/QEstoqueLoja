@@ -70,7 +70,7 @@ void TestFiscalEmitterService::enviarNfcePadrao_retornoForcado_ok()
     QVERIFY(idProd > 0);
 
     VendasDTO venda;
-    venda.id             = 1;
+    venda.id             = 0;
     venda.total          = 50.00;
     venda.formaPagamento = "Dinheiro";
     venda.valorRecebido  = 50.00;
@@ -80,11 +80,11 @@ void TestFiscalEmitterService::enviarNfcePadrao_retornoForcado_ok()
 
     ProdutoVendidoDTO pv;
     pv.idProduto    = idProd;
-    pv.idVenda      = 1;
+    pv.idVenda      = 0;
     pv.quantidade   = 1;
     pv.precoVendido = 50.00;
 
-    ClienteDTO cliente;
+    ClienteDTO cliente{};
     // sem CPF: consumidor final
 
     FiscalEmitter_service service;
@@ -188,7 +188,7 @@ void TestFiscalEmitterService::enviarNFePadrao_retornoForcado_ok()
     QVERIFY(idProd > 0);
 
     VendasDTO venda;
-    venda.id             = 1;
+    venda.id             = 0;
     venda.total          = 50.00;
     venda.formaPagamento = "Dinheiro";
     venda.valorRecebido  = 50.00;
@@ -198,7 +198,7 @@ void TestFiscalEmitterService::enviarNFePadrao_retornoForcado_ok()
 
     ProdutoVendidoDTO pv;
     pv.idProduto    = idProd;
-    pv.idVenda      = 1;
+    pv.idVenda      = 0;
     pv.quantidade   = 1;
     pv.precoVendido = 50.00;
 
@@ -300,7 +300,7 @@ void TestFiscalEmitterService::enviarNfcePadrao_retornoForcado_windows_ok()
     QVERIFY(idProd > 0);
 
     VendasDTO venda;
-    venda.id             = 1;
+    venda.id             = 0;
     venda.total          = 50.00;
     venda.formaPagamento = "Dinheiro";
     venda.valorRecebido  = 50.00;
@@ -310,7 +310,7 @@ void TestFiscalEmitterService::enviarNfcePadrao_retornoForcado_windows_ok()
 
     ProdutoVendidoDTO pv;
     pv.idProduto    = idProd;
-    pv.idVenda      = 1;
+    pv.idVenda      = 0;
     pv.quantidade   = 1;
     pv.precoVendido = 50.00;
 

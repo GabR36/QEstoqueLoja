@@ -17,7 +17,7 @@ void TestProdutoService::inserir_produto_ok()
     p.descricao = "Produto Teste";
     p.preco = 5.50;
     p.codigoBarras = "7898765430018";
-    p.nf = 0;
+    p.nf = false;
     p.uCom = "UN";
     p.precoFornecedor = 4.00;
     p.percentLucro = 20.00;

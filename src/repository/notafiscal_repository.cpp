@@ -2,6 +2,7 @@
 #include "../infra/databaseconnection_service.h"
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QMapIterator>
 #include "../util/datautil.h"
 
 notafiscal_repository::notafiscal_repository(QObject *parent)
@@ -329,7 +330,11 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
     query.bindValue(":xmlpath", nota.xmlPath);
     query.bindValue(":vnf", nota.valorTotal);
     query.bindValue(":atualizadoem", dataFormatada);
-    query.bindValue(":idvenda", nota.idVenda);
+    if(nota.idVenda <= 0){
+        query.bindValue(":idvenda", QVariant());
+    }else{
+        query.bindValue(":idvenda", nota.idVenda);
+    }
     query.bindValue(":cnpjemit", nota.cnpjEmit);
     query.bindValue(":chnf", nota.chNfe);
     query.bindValue(":nprot", nota.nProt);
@@ -354,6 +359,16 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
 
     if(!query.exec()){
         qDebug() << "ERRO INSERT notas_fiscais:" << query.lastError().text();
+        if(!query.exec()){
+            qDebug() << "SQL:" << query.lastQuery();
+
+            qDebug() << "ERRO INSERT notas_fiscais:"
+                     << query.lastError().text();
+
+            db.close();
+            return false;
+        }
+
         db.close();
         return false;
     } else {

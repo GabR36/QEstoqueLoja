@@ -17,7 +17,8 @@ QString DfeInfo_repository::getUltimaIdentificaçãoUsada(){
     }
 
     QSqlQuery q(m_db);
-    q.exec("SELECT identificacao FROM dfe_info ORDER BY datetime(data_modificado) DESC LIMIT 1");
+    q.exec("SELECT identificacao FROM dfe_info ORDER BY "
+           "data_modificado DESC LIMIT 1");
 
     QString ultimaAcao;
 

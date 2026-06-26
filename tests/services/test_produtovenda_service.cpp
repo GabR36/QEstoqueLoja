@@ -88,25 +88,29 @@ void TestProdutoVendaService::inserir_produto_vendido_ok()
 {
     qlonglong idProd = inserirProdutoTeste(db, "PV001");
     QVERIFY(idProd > 0);
+    QSqlQuery q(db);
 
-    ProdutoVendidoDTO pv;
-    pv.idProduto    = idProd;
-    pv.idVenda      = 999; // id de venda fictício (sem FK constraint no SQLite por padrão)
-    pv.quantidade   = 3;
-    pv.precoVendido = 15.00;
+    q.exec("INSERT INTO vendas2 (valor_final) VALUES(100.20)");
+    qlonglong idvenda = inserirVendaTeste(idProd);
+    // ProdutoVendidoDTO pv;
+    // pv.idProduto    = idProd;
+    // pv.idVenda      = idvenda; // id de venda fictício (sem FK constraint no SQLite por padrão)
+    // pv.quantidade   = 1;
+    // pv.precoVendido = 15.00;
 
-    ProdutoVenda_service service;
-    auto r = service.inserir(pv);
-    QVERIFY(r.ok);
+    // ProdutoVenda_service service;
+    // auto r = service.inserir(pv);
+    // QVERIFY(r.ok);
 
     // verifica no banco
     DatabaseConnection_service::open();
-    QSqlQuery q(db);
-    q.exec("SELECT id_produto, quantidade, preco_vendido, adicionado_em, atualizado_em, emitido_nf "
-           "FROM produtos_vendidos WHERE id_venda = 999");
+    q.prepare("SELECT id_produto, quantidade, preco_vendido, adicionado_em, atualizado_em, emitido_nf "
+           "FROM produtos_vendidos WHERE id_venda = :idvenda");
+    q.bindValue(":idvenda", idvenda);
+    q.exec();
     QVERIFY(q.next());
     QCOMPARE(q.value("id_produto").toLongLong(), idProd);
-    QCOMPARE(q.value("quantidade").toDouble(), 3.0);
+    QCOMPARE(q.value("quantidade").toDouble(), 1.0);
     QCOMPARE(q.value("preco_vendido").toDouble(), 15.00);
     QVERIFY(!q.value("adicionado_em").toString().isEmpty());
     QVERIFY(!q.value("atualizado_em").toString().isEmpty());

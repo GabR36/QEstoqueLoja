@@ -7,6 +7,14 @@ class TestDbFactory
 {
 public:
     static QSqlDatabase create();
+    // static QSqlDatabase createPostgres();
+    static QSqlDatabase createPostgres();
+    static void removerBDAtual();
+private:
+    static QString currentConnectionName;
+    static QString currentDatabaseName;
+private slots:
+
 };
 
 #endif

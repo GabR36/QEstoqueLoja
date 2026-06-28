@@ -20,10 +20,11 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
-
     int status = 0;
 #ifdef TEST_ENV
 #ifdef TEST_POSTGRES
+    // Se a varivel de compilação "TEST_WITH_POSTGRES=ON" estiver sendo usada, criará um banco de dados postgre usando as
+    // credenciais definidas em variaveis de sistema (ver definição da função)
     TestDbFactory::createPostgres();
 #else
     TestDbFactory::create();

@@ -6,6 +6,7 @@
 #include <QProcess>
 #include <QSqlQuery>
 #include <QUuid>
+#include <QSqlError>
 
 QString TestDbFactory::currentConnectionName;
 QString TestDbFactory::currentDatabaseName;
@@ -42,8 +43,10 @@ QSqlDatabase TestDbFactory::create()
     return db;
 }
 
+// Usa as informações nas variaveis de sistema para criar um banco de dados postgre e rodar os testes
 QSqlDatabase TestDbFactory::createPostgres()
 {
+
     qDebug() << "Rodando Teste usando Postgre.";
 
     QString connName = "test_pg_conn";
@@ -63,30 +66,21 @@ QSqlDatabase TestDbFactory::createPostgres()
     QSqlDatabase admin =
         QSqlDatabase::addDatabase("QPSQL", adminConnName);
 
-    // admin.setHostName("localhost");
-    // admin.setPort(5432);
-    // admin.setDatabaseName("postgres");
-    // admin.setUserName("qestoque-user");
-    // admin.setPassword("1234");
+    QString adminTestIPHost = qEnvironmentVariable("TEST_DB_HOST", "localhost");
+    int adminTestDbPort = qEnvironmentVariableIntValue("TEST_DB_PORT");
+    QString adminTestDbName = qEnvironmentVariable("TEST_DB_NAME", "postgres");
+    QString adminTestDbUser = qEnvironmentVariable("TEST_DB_USER", "postgres");
+    QString adminTestDbUserPassword = qEnvironmentVariable("TEST_DB_PASSWORD");
 
-    admin.setHostName(
-        qEnvironmentVariable("TEST_DB_HOST", "localhost")
-        );
+    admin.setHostName(adminTestIPHost);
 
-    admin.setPort(
-        qEnvironmentVariableIntValue("TEST_DB_PORT")
-        );
+    admin.setPort(adminTestDbPort);
 
-    admin.setDatabaseName("postgres");
+    admin.setDatabaseName(adminTestDbName);
 
-    admin.setUserName(
-        qEnvironmentVariable("TEST_DB_USER", "postgres")
-        );
+    admin.setUserName(adminTestDbUser);
 
-    admin.setPassword(
-        qEnvironmentVariable("TEST_DB_PASSWORD")
-        );
-
+    admin.setPassword(adminTestDbUserPassword);
 
     if (!admin.open()) {
         qFatal("Erro ao conectar no postgres admin: %s",
@@ -119,11 +113,11 @@ QSqlDatabase TestDbFactory::createPostgres()
         QSqlDatabase::addDatabase("QPSQL", connName);
 
 
-    db.setHostName("localhost");
-    db.setPort(5432);
+    db.setHostName(adminTestIPHost);
+    db.setPort(adminTestDbPort);
     db.setDatabaseName(dbName);
-    db.setUserName("qestoque-user");
-    db.setPassword("1234");
+    db.setUserName(adminTestDbUser);
+    db.setPassword(adminTestDbUserPassword);
 
 
     if (!db.open()) {
@@ -166,9 +160,9 @@ void TestDbFactory::removerBDAtual(){
         QString adminConnName = "postgres_admin_drop";
 
         QSqlDatabase admin = QSqlDatabase::addDatabase("QPSQL", adminConnName);
-        admin.setHostName("localhost");
+        admin.setHostName("192.168.18.150");
         admin.setPort(5432);
-        admin.setDatabaseName("postgres");
+        admin.setDatabaseName("qestoque-teste");
         admin.setUserName("qestoque-user");
         admin.setPassword("1234");
 

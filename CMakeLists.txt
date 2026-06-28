@@ -41,6 +41,27 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
 endif()
 
 
+
+if (WIN32)
+    add_library(QtRPT STATIC IMPORTED GLOBAL)
+
+    set_target_properties(QtRPT PROPERTIES
+        IMPORTED_LOCATION
+            ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/bin/release/lib/QtRPT.lib
+        INTERFACE_INCLUDE_DIRECTORIES
+            ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/QtRPT
+    )
+
+    add_library(zlib_dll STATIC IMPORTED GLOBAL)
+
+    set_target_properties(zlib_dll PROPERTIES
+        IMPORTED_LOCATION
+            ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/lib/zdll.lib
+        INTERFACE_INCLUDE_DIRECTORIES
+            ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/include
+    )
+endif()
+
 set(TS_FILES QEstoqueLoja_pt_BR.ts)
 if(CMAKE_SYSTEM MATCHES "Windows")
 
@@ -147,7 +168,7 @@ elseif(WIN32)
     target_link_libraries(QEstoqueLib PUBLIC
         quazip1-qt6
         QtRPT
-        zdll
+        zlib_dll
     )
 endif()
 

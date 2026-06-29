@@ -1,4 +1,5 @@
 #include "config_service.h"
+#include <QDir>
 
 Config_service::Config_service(QObject *parent)
     : QObject{parent}
@@ -33,5 +34,53 @@ bool Config_service::validarFiscal(const ConfigDTO &dto, QString &erro)
             return false;
         }
     }
+    return true;
+}
+
+
+bool Config_service::verificarInfoDB(const ConfigDTO &dto, QString &erro)
+{
+    if(dto.driverDB == 1){ // postgre
+        // Campos obrigatórios
+        if (dto.ipHostDB.isEmpty()) {
+            erro = "Informe o endereço do servidor.";
+            return false;
+        }
+
+        if (dto.nomeDB.isEmpty()) {
+            erro = "Informe o nome do banco de dados.";
+            return false;
+        }
+
+        if (dto.userDB.isEmpty()) {
+            erro = "Informe o usuário do banco.";
+            return false;
+        }
+
+        if (dto.senhaDB.isEmpty()) {
+            erro = "Informe a senha do banco.";
+            return false;
+        }
+
+        if (!m_repo->testarConexaoBanco(dto, erro))
+            return false;
+
+        // Verificar pasta compartilhada
+        QDir dir(dto.pathPastaPostgreDB);
+
+        if (!dir.exists()) {
+            erro = "A pasta compartilhada não existe ou não está acessível.";
+            return false;
+        }
+    }else if(dto.driverDB == 0){ // sqlite
+        QDir dir(dto.pathPastaSqliteDB);
+
+        if (!dir.exists()) {
+            erro = "A pasta do banco de dados não existe ou não está acessível.";
+            return false;
+        }
+    }
+
+
     return true;
 }

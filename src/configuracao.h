@@ -34,11 +34,18 @@ private slots:
 
     void on_label_35_linkActivated(const QString &link);
 
+    void on_Btn_DBSqlitePasta_clicked();
+
+    void on_Btn_DBPostgrePasta_clicked();
+
+    void on_CBox_DBDriver_currentIndexChanged(int index);
+
 private:
     Ui::Config *ui;
     QSqlDatabase db = QSqlDatabase::database();
     QLocale portugues;
     Config_service *configService;
+    void atualizarPaginaDB(int indexDriver);
 signals:
     void alterouConfig();
 };

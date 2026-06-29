@@ -11,6 +11,7 @@ public:
     explicit Config_repository(QObject *parent = nullptr);
     ConfigDTO loadAll();
     bool saveAll(const ConfigDTO &config);
+    bool testarConexaoBanco(const ConfigDTO &dto, QString &erro);
 signals:
 };
 

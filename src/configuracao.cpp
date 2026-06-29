@@ -93,6 +93,15 @@ Configuracao::Configuracao(QWidget *parent)
     ui->Ledit_ContadorNome->setText(configDTO.nomeContador);
     ui->Ledit_ContadorEmail->setText(configDTO.emailContador);
 
+    ui->CBox_DBDriver->setCurrentIndex(configDTO.driverDB);
+    ui->Ledit_DbIPHost->setText(configDTO.ipHostDB);
+    ui->Ledit_DBPort->setText(configDTO.portaDB);
+    ui->Ledit_DBName->setText(configDTO.nomeDB);
+    ui->Ledit_DBUser->setText(configDTO.userDB);
+    ui->Ledit_DBSenha->setText(configDTO.senhaDB);
+    ui->Lbl_DBPathPastaSqlite->setText(configDTO.pathPastaSqliteDB);
+    ui->Lbl_DBPathPastaPostgre->setText(configDTO.pathPastaPostgreDB);
+
 
 
     // validador
@@ -128,6 +137,8 @@ Configuracao::Configuracao(QWidget *parent)
     ui->Ledt_TelEmpresa->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
     ui->Ledt_CnpjEmpresa->setValidator(new QRegularExpressionValidator(sohNumeroRegex, this));
 
+    atualizarPaginaDB(ui->CBox_DBDriver->currentIndex());
+
 }
 
 Configuracao::~Configuracao()
@@ -138,13 +149,6 @@ Configuracao::~Configuracao()
 
 void Configuracao::on_Btn_Aplicar_clicked()
 {
-    // QString nomeEmpresa, nomeFant, enderecoEmpresa, numeroEmpresa, bairroEmpresa, cepEmpresa, emailEmpresa,
-    //     cnpjEmpresa, telEmpresa, lucro, debito, credito, cidadeEmpresa, estadoEmpresa, logoEmpresa, regimeTrib, tpAmb,
-    //     idCsc, csc, pastaSchema, pastaCertificadoAc, certificado, senhaCertificado, cUf, cMun, iEstad, cnpjRT, nomeRT,
-    //     emailRt, foneRt, idCSRT, hasCsrt, nnfHomolog, nnfProd, csosnPadrao, ncmPadrao, cestPadrao, pisPadrao,
-    //     nnfHomologNfe, nnfProdNfe, email_nome, email_smtp, email_conta, email_usuario, email_senha, email_porta,
-    //     contador_nome, contador_email;
-    // bool emitNf, usarIbs, email_ssl, email_tls;
 
     ConfigDTO dtoInserir;
 
@@ -202,8 +206,22 @@ void Configuracao::on_Btn_Aplicar_clicked()
     dtoInserir.nomeContador = ui->Ledit_ContadorNome->text().trimmed();
     dtoInserir.emailContador = ui->Ledit_ContadorEmail->text().trimmed();
 
+    dtoInserir.driverDB = ui->CBox_DBDriver->currentIndex();
+    dtoInserir.ipHostDB = ui->Ledit_DbIPHost->text().trimmed();
+    dtoInserir.portaDB = ui->Ledit_DBPort->text().trimmed();
+    dtoInserir.nomeDB = ui->Ledit_DBName->text().trimmed();
+    dtoInserir.userDB = ui->Ledit_DBUser->text().trimmed();
+    dtoInserir.senhaDB = ui->Ledit_DBSenha->text().trimmed();
+    dtoInserir.pathPastaSqliteDB = ui->Lbl_DBPathPastaSqlite->text().trimmed();
+    dtoInserir.pathPastaPostgreDB = ui->Lbl_DBPathPastaPostgre->text().trimmed();
+
+
 
     QString erro = "";
+    if(!configService->verificarInfoDB(dtoInserir, erro)){
+        QMessageBox::warning(this, "Erro", erro);
+        return;
+    }
     if(!configService->salvarTudo(dtoInserir, erro)){
         QMessageBox::warning(this, "Erro", erro);
         return;
@@ -283,5 +301,94 @@ void Configuracao::on_label_35_linkActivated(const QString &link)
         HelpPage *help = new HelpPage(this, "fiscal");
         help->show();
     }
+}
+
+
+void Configuracao::on_Btn_DBSqlitePasta_clicked()
+{
+    QString pastaSelecionada = QFileDialog::getExistingDirectory(
+        this,
+        tr("Selecionar a Pasta Geral para salvar arquivos"),
+        "",
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+        );
+
+    if (pastaSelecionada.isEmpty())
+        return;
+
+    ui->Lbl_DBPathPastaSqlite->setText(pastaSelecionada);
+}
+
+
+void Configuracao::on_Btn_DBPostgrePasta_clicked()
+{
+    QString pastaSelecionada = QFileDialog::getExistingDirectory(
+        this,
+        tr("Selecionar a Pasta Geral para salvar arquivos"),
+        "",
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+        );
+
+    if (pastaSelecionada.isEmpty())
+        return;
+
+    ui->Lbl_DBPathPastaPostgre->setText(pastaSelecionada);
+}
+void Configuracao::atualizarPaginaDB(int indexDriver){
+    if(indexDriver == 0){ //sqlite
+        ui->Ledit_DbIPHost->setVisible(false);
+        ui->Ledit_DBUser->setVisible(false);
+        ui->Ledit_DBPort->setVisible(false);
+        ui->Ledit_DBName->setVisible(false);
+        ui->Ledit_DBSenha->setVisible(false);
+        ui->Lbl_DBPastaPostgre->setVisible(false);
+
+        ui->Lbl_DBIPHost->setVisible(false);
+        ui->Lbl_DBPort->setVisible(false);
+        ui->Lbl_DBName->setVisible(false);
+        ui->Lbl_DBUser->setVisible(false);
+
+
+        ui->Lbl_DBName->setVisible(false);
+        ui->Lbl_DBSenha->setVisible(false);
+        ui->Lbl_DBPastaPostgre->setVisible(false);
+        ui->Lbl_DBPathPastaPostgre->setVisible(false);
+
+
+        ui->Btn_DBPostgrePasta->setVisible(false);
+
+        ui->Lbl_DBPastaSqlite->setVisible(true);
+        ui->Btn_DBSqlitePasta->setVisible(true);
+        ui->Lbl_DBPathPastaSqlite->setVisible(true);
+
+    }else if(indexDriver == 1){ //postgre
+        ui->Ledit_DbIPHost->setVisible(true);
+        ui->Ledit_DBPort->setVisible(true);
+        ui->Ledit_DBUser->setVisible(true);
+        ui->Ledit_DBName->setVisible(true);
+        ui->Ledit_DBSenha->setVisible(true);
+        ui->Lbl_DBPastaPostgre->setVisible(true);
+
+        ui->Lbl_DBIPHost->setVisible(true);
+        ui->Lbl_DBPort->setVisible(true);
+        ui->Lbl_DBName->setVisible(true);
+        ui->Lbl_DBUser->setVisible(true);
+        ui->Lbl_DBSenha->setVisible(true);
+        ui->Lbl_DBPastaPostgre->setVisible(true);
+        ui->Lbl_DBPathPastaPostgre->setVisible(true);
+
+
+        ui->Btn_DBPostgrePasta->setVisible(true);
+
+        ui->Lbl_DBPastaSqlite->setVisible(false);
+        ui->Btn_DBSqlitePasta->setVisible(false);
+        ui->Lbl_DBPathPastaSqlite->setVisible(false);
+    }
+}
+
+
+void Configuracao::on_CBox_DBDriver_currentIndexChanged(int index)
+{
+    atualizarPaginaDB(index);
 }
 

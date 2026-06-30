@@ -49,6 +49,7 @@
 #include "services/dfe_service.h"
 #include "inutilizacaodialog.h"
 #include "cartacorrecaojanela.h"
+#include "services/export_service.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -595,5 +596,22 @@ void MainWindow::on_actionEnviar_Carta_de_Corre_o_triggered()
 {
     CartaCorrecaoJanela *janela = new CartaCorrecaoJanela();
     janela->show();
+}
+
+
+void MainWindow::on_actionSQLite_triggered()
+{
+    QString pastaDestino = QFileDialog::getExistingDirectory(
+        this,
+        "Escolha a pasta para salvar o banco"
+        );
+    Export_service expServ;
+    auto r1 = expServ.exportarSqliteDB(pastaDestino);
+    if(r1.ok){
+        QMessageBox::information(this, "Sucesso", r1.msg);
+    }else{
+        QMessageBox::warning(this, "Erro ao exportar banco", r1.msg);
+    }
+
 }
 

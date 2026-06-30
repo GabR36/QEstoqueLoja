@@ -323,6 +323,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         sql-queries/migration12.sql
         recusos-geral.qrc
         src/dto/ConfigDB_dto.h
+        src/services/export_service.h src/services/export_service.cpp
 
 
 

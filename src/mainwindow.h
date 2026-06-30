@@ -101,6 +101,8 @@ private slots:
 
     void on_actionEnviar_Carta_de_Corre_o_triggered();
 
+    void on_actionSQLite_triggered();
+
 private:
     Ui::MainWindow *ui;
     // ACBrNFe *acbr;

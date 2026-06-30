@@ -7,27 +7,45 @@ bool DatabaseConnection_service::initialized = false;
 
 static QSqlDatabase externalDb;
 static bool hasExternalDb = false;
+
 static DatabaseConfig config = {
-    "QPSQL",
-    "localhost",
-    5432,
-    "qestoque-script",
-    "qestoque-user",
-    "1234"
+    "QSQLITE",
+    "",
+    0,
+    "",
+    "",
+    ""
 };
-// static DatabaseConfig config = {
-//     "QSQLITE",
-//     "",
-//     0,
-//     "",
-//     "",
-//     ""
-// };
 
 
-DatabaseConnection_service::DatabaseConnection_service(QObject *parent)
-    : QObject{parent}
-{}
+void DatabaseConnection_service::changeDatabase(ConfigDTO configDto){
+    qDebug() << "Mudando o banco de dados.";
+    DatabaseConfig conf;
+    if(configDto.driverDB == 1){//postgre
+        conf = {
+            "QPSQL",
+            configDto.ipHostDB,
+            configDto.portaDB.toInt(),
+            configDto.nomeDB,
+            configDto.userDB,
+            configDto.senhaDB
+
+        };
+    }else if(configDto.driverDB == 0){//sqlite
+          conf = {
+            "QSQLITE",
+            "",
+            0,
+            "",
+            "",
+            ""
+        };
+    }
+    config = conf;
+    qDebug() << "Novo driver:" << config.driver;
+    qDebug() << "Novo host:" << config.host;
+    qDebug() << "Novo banco:" << config.database;
+}
 
 void DatabaseConnection_service::setDatabase(QSqlDatabase database)
 {
@@ -39,6 +57,7 @@ void DatabaseConnection_service::setDatabase(QSqlDatabase database)
 
 bool DatabaseConnection_service::init()
 {
+
     // qDebug() << QSqlDatabase::drivers();
     if (hasExternalDb) return true;
     if (initialized) return true;
@@ -61,6 +80,7 @@ bool DatabaseConnection_service::init()
                 db.setDatabaseName(config.database);
                 db.setUserName(config.user);
                 db.setPassword(config.password);
+                qDebug() << db.lastError().text();
             }
         }
 

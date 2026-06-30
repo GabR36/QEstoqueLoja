@@ -45,6 +45,7 @@ private:
     QSqlDatabase db = QSqlDatabase::database();
     QLocale portugues;
     Config_service *configService;
+    ConfigDTO configDTO_preMudancas;
     void atualizarPaginaDB(int indexDriver);
 signals:
     void alterouConfig();

@@ -31,6 +31,7 @@ Configuracao::Configuracao(QWidget *parent)
     configService = new Config_service(this);
 
     configDTO = configService->carregarTudo();
+    configDTO_preMudancas = configDTO;
 
     ui->Ledt_CnpjEmpresa->setText(configDTO.cnpjEmpresa);
     ui->Ledt_EmailEmpresa->setText(configDTO.emailEmpresa);
@@ -222,9 +223,16 @@ void Configuracao::on_Btn_Aplicar_clicked()
         QMessageBox::warning(this, "Erro", erro);
         return;
     }
+
     if(!configService->salvarTudo(dtoInserir, erro)){
         QMessageBox::warning(this, "Erro", erro);
         return;
+    }
+    if(dtoInserir.driverDB != configDTO_preMudancas.driverDB){
+        QMessageBox::warning(this, "Mudança de banco de dados", "Você salvou outro banco de dados, "
+                                                                "é necessário reiniciar o QEstoqueLoja.");
+        configService->mudarDatabase(dtoInserir);
+         QApplication::closeAllWindows();
     }
     emit alterouConfig();
 

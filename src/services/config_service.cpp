@@ -1,5 +1,6 @@
 #include "config_service.h"
 #include <QDir>
+#include "../infra/databaseconnection_service.h"
 
 Config_service::Config_service(QObject *parent)
     : QObject{parent}
@@ -83,4 +84,8 @@ bool Config_service::verificarInfoDB(const ConfigDTO &dto, QString &erro)
 
 
     return true;
+}
+
+void Config_service::mudarDatabase(ConfigDTO config){
+    DatabaseConnection_service::changeDatabase(config);
 }

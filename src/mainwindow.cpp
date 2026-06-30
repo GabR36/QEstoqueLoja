@@ -60,7 +60,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     model = new QSqlQueryModel(this);
 
+    //carrega as configurações no DTO
+    Config_service *confServ = new Config_service(this);
+    configDTO = confServ->carregarTudo();
+
+    DatabaseConnection_service::changeDatabase(configDTO);
+
     iniciarMigration();
+
+
     db = DatabaseConnection_service::db();
 
     produtoService = new Produto_Service();
@@ -69,9 +77,6 @@ MainWindow::MainWindow(QWidget *parent)
     // configuracao do modelo e view produtos
     ui->Tview_Produtos->setModel(model);
 
-    //carrega as configurações no DTO
-    Config_service *confServ = new Config_service(this);
-    configDTO = confServ->carregarTudo();
 
     if (configDTO.emitNfFiscal) {
         contingenciaService = new ContingenciaService(this);

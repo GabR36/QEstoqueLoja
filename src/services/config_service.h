@@ -15,9 +15,10 @@ public:
 
     // Save
     bool salvarTudo(const ConfigDTO &dto, QString &erro);
+
     bool verificarInfoDB(const ConfigDTO &dto, QString &erro);
 
-
+    void mudarDatabase(ConfigDTO config);
 private:
     Config_repository *m_repo;
 

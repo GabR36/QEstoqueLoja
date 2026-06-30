@@ -682,3 +682,24 @@ void notafiscal_repository::listarMonitor(QSqlQueryModel *model, const QStringLi
 
     db.close();
 }
+
+QString notafiscal_repository::getXmlPathFromIdVenda(qlonglong idvenda){
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "Erro ao abrir banco getXmlPathFromIdVEnda()";
+        return "";
+    }
+    QString xmlPath = "";
+    QSqlQuery q(db);
+    q.prepare("SELECT xml_path FROM notas_fiscais WHERE id_venda = :idvenda");
+    q.bindValue(":idvenda", idvenda);
+    if (!q.exec()) {
+        qDebug() << q.lastError().text();
+        return {};
+    }
+
+    if (!q.next()) {
+        return {};
+    }
+    return q.value(0).toString();
+
+}

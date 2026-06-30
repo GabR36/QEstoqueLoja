@@ -89,3 +89,8 @@ bool Config_service::verificarInfoDB(const ConfigDTO &dto, QString &erro)
 void Config_service::mudarDatabase(ConfigDTO config){
     DatabaseConnection_service::changeDatabase(config);
 }
+
+ConfigDbDTO Config_service::getConfigsDB(){
+    return m_repo->getConfigsDb();
+}
+

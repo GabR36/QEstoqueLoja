@@ -6,14 +6,15 @@
 #include <QMap>
 #include "../nota/acbrmanager.h"
 #include "../services/config_service.h"
-
+#include "../infra/apppath_service.h"
+#include "../services/notafiscal_service.h"
 
 class DanfeUtil : public QObject
 {
     Q_OBJECT
 public:
     explicit DanfeUtil(QObject *parent = nullptr);
-    bool abrirDanfe(int idVenda);
+    bool abrirDanfe(qlonglong idVenda);
     void imprimirDanfe(const ACBrNFe *nf);
     void setCaminhoLogo(QString logo);
     bool abrirDanfePorXml(const QString& xmlPath);
@@ -25,6 +26,7 @@ private:
     QString caminhoReportNFe,caminhoReportNFCe,caminhoLogo;
     QMap<QString,QString> empresaValues;
     ConfigDTO configDTO;
+    NotaFiscal_service notaServ;
 signals:
 };
 

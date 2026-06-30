@@ -4,6 +4,7 @@
 #include <QObject>
 #include "../dto/Config_dto.h"
 #include "../repository/config_repository.h"
+#include "../dto/ConfigDB_dto.h"
 
 class Config_service : public QObject
 {
@@ -19,6 +20,7 @@ public:
     bool verificarInfoDB(const ConfigDTO &dto, QString &erro);
 
     void mudarDatabase(ConfigDTO config);
+    ConfigDbDTO getConfigsDB();
 private:
     Config_repository *m_repo;
 

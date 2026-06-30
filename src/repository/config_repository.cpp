@@ -186,3 +186,20 @@ bool Config_repository::testarConexaoBanco(const ConfigDTO &dto, QString &erro)
 
     return true;
 }
+
+ConfigDbDTO Config_repository::getConfigsDb(){
+
+    ConfigDbDTO dto;
+    QSettings s(AppPath_service::configPath(), QSettings::IniFormat);
+    dto.driverDB = s.value("database/driver").toInt();
+    dto.ipHostDB = s.value("database/ip").toString();
+    dto.portaDB = s.value("database/porta").toString();
+    dto.nomeDB = s.value("database/nome_db").toString();
+    dto.userDB = s.value("database/usuario_db").toString();
+    dto.senhaDB = s.value("database/senha").toString();
+    dto.pathPastaSqliteDB = s.value("database/path_pasta_sqlite").toString();
+    dto.pathPastaPostgreDB = s.value("database/path_pasta_postgre").toString();
+
+    return dto;
+
+}

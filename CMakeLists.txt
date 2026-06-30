@@ -322,6 +322,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/nota/eventocartacorrecao.h src/nota/eventocartacorrecao.cpp
         sql-queries/migration12.sql
         recusos-geral.qrc
+        src/dto/ConfigDB_dto.h
 
 
 

@@ -1,5 +1,6 @@
 #include "notafiscal_service.h"
 #include <qdebug.h>
+#include <QDir>
 
 NotaFiscal_service::NotaFiscal_service(QObject *parent)
     : QObject{parent}
@@ -73,6 +74,19 @@ NotaFiscalDTO NotaFiscal_service::getNotaById(qlonglong id){
 }
 
 NotaFiscal_service::Resultado NotaFiscal_service::inserir(NotaFiscalDTO nota){
+    QString caminhoCompleto = nota.xmlPath;
+
+    if(confDTO.driverDB == 0){
+        QDir baseDir(confDTO.pathPastaSqliteDB);
+
+        nota.xmlPath = baseDir.relativeFilePath(caminhoCompleto);
+    }else if(confDTO.driverDB == 1){
+        QDir baseDir(confDTO.pathPastaPostgreDB);
+
+        nota.xmlPath = baseDir.relativeFilePath(caminhoCompleto);
+    }
+
+
     if(!notaRepo.inserir(nota)){
         return {false, NotaErro::Salvar, "Erro ao inserir Nota Fiscal"};
     }else{
@@ -113,4 +127,8 @@ QList<QPair<QString, QString>> NotaFiscal_service::buscarXmlsPorPeriodo(QDateTim
 QList<NotaFiscalDTO> NotaFiscal_service::buscarPorPeriodo(QDateTime dtIni, QDateTime dtFim, int tpAmb)
 {
     return notaRepo.buscarPorPeriodo(dtIni, dtFim, tpAmb);
+}
+
+QString NotaFiscal_service::getXmlPathFromIdVenda(qlonglong idvenda){
+    return notaRepo.getXmlPathFromIdVenda(idvenda);
 }

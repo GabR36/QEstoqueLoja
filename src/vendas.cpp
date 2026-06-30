@@ -466,7 +466,7 @@ void Vendas::mostrarVendasCliente(qlonglong idCliente) {
 
 void Vendas::abrirDanfeXml(QString id_Venda){
     QSharedPointer<DanfeUtil> danfe(new DanfeUtil(this));
-    if(danfe->abrirDanfe(id_Venda.toInt())){
+    if(danfe->abrirDanfe(id_Venda.toLongLong())){
         qDebug() << "abrindo danfe IDVenda:" << id_Venda;
     }else{
         QMessageBox::warning(this, "Aviso", "Não foi possivel gerar DANFE com essa venda");

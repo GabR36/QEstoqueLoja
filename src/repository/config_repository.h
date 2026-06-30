@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "../dto/Config_dto.h"
+#include "../dto/ConfigDB_dto.h"
 
 class Config_repository : public QObject
 {
@@ -12,6 +13,7 @@ public:
     ConfigDTO loadAll();
     bool saveAll(const ConfigDTO &config);
     bool testarConexaoBanco(const ConfigDTO &dto, QString &erro);
+    ConfigDbDTO getConfigsDb();
 signals:
 };
 

@@ -1473,6 +1473,65 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             // emit dbVersao11();
             break;
         }
+        case 12:
+        {
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+                break;
+            }
+            qDebug() << "Atualizando para versao 13: corrigindo caminhos relativos de xmlpath.";
+            QSqlQuery query(db);
+            qDebug() << "É Postgre?: " << DatabaseConnection_service::isPostgres();
+
+            if(DatabaseConnection_service::isPostgres()){
+
+                if(!query.exec("UPDATE notas_fiscais SET xml_path = substring(xml_path FROM 'xmlNf/.*') "
+                                "WHERE xml_path LIKE '%xmlNf/%'")){
+                    qDebug() << "Não executou query postgre migração 13";
+                }else{
+                    qDebug() << "executou query notas_fiscais migração 13";
+                }
+                if(!query.exec("UPDATE eventos_fiscais SET xml_path = substring(xml_path FROM 'xmlNf/.*') "
+                                "WHERE xml_path LIKE '%xmlNf/%'")){
+                    qDebug() << "Não executou query postgre migração 13";
+                }else{
+                    qDebug() << "executou query eventos_fiscais migração 13";
+                }
+
+            }else{
+                if(DatabaseConnection_service::open())
+                if(!query.exec("UPDATE notas_fiscais SET xml_path = substr(xml_path, instr(xml_path, "
+                                "'xmlNf/')) "
+                                "WHERE xml_path LIKE '%xmlNf/%'")){
+                    qDebug() << "Não executou query sqlite migração 13: " <<  query.lastError().text();
+                }else{
+                    qDebug() << "executou query notas_fiscais migração 13";
+                }
+                if(!query.exec("UPDATE eventos_fiscais SET xml_path = substr(xml_path, instr(xml_path, "
+                                "'xmlNf/')) "
+                                "WHERE xml_path LIKE '%xmlNf/%'")){
+                    qDebug() << "Não executou query postgre migração 13" <<  query.lastError().text();
+                }else{
+                    qDebug() << "executou query eventos_fiscais migração 13";
+                }
+            }
+
+
+            if (!setSchemaVersion(13)) {
+                qDebug() << "Erro ao atualizar user_version para 13:" << query.lastError().text();
+                db.rollback();
+                break;
+            }
+            if (!db.commit()) {
+                qDebug() << "Erro ao dar commit:" << db.lastError().text();
+                db.rollback();
+                break;
+            }
+            dbSchemaVersion = 13;
+            qDebug() << "Migracao para versao 13 concluida.";
+            emit dbVersao13();
+            break;
+        }
 
         }
     }

@@ -21,6 +21,7 @@ public:
 
     void mudarDatabase(ConfigDTO config);
     ConfigDbDTO getConfigsDB();
+    bool salvarMudancasMigration13();
 private:
     Config_repository *m_repo;
 

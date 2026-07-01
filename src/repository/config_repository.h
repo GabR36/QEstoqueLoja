@@ -14,6 +14,7 @@ public:
     bool saveAll(const ConfigDTO &config);
     bool testarConexaoBanco(const ConfigDTO &dto, QString &erro);
     ConfigDbDTO getConfigsDb();
+    bool saveMigration13Changes();
 signals:
 };
 

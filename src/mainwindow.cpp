@@ -62,8 +62,8 @@ MainWindow::MainWindow(QWidget *parent)
     model = new QSqlQueryModel(this);
 
     //carrega as configurações no DTO
-    Config_service *confServ = new Config_service(this);
     configDTO = confServ->carregarTudo();
+    qDebug() << "driver: " << configDTO.driverDB;
 
     DatabaseConnection_service::changeDatabase(configDTO);
 
@@ -163,6 +163,10 @@ void MainWindow::iniciarMigration(){
     connect(schema, &SchemaMigration_service::dbVersao6, this,
             &MainWindow::atualizarConfigAcbr);
     connect(schema, &SchemaMigration_service::dbVersao9, this,
+            &MainWindow::atualizarConfigAcbr);
+    connect(schema, &SchemaMigration_service::dbVersao13, confServ,
+            &Config_service::salvarMudancasMigration13);
+    connect(schema, &SchemaMigration_service::dbVersao13, this,
             &MainWindow::atualizarConfigAcbr);
 
     // schema->update();

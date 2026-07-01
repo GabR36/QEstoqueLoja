@@ -94,3 +94,6 @@ ConfigDbDTO Config_service::getConfigsDB(){
     return m_repo->getConfigsDb();
 }
 
+bool Config_service::salvarMudancasMigration13(){
+    return m_repo->saveMigration13Changes();
+}

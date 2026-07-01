@@ -115,6 +115,7 @@ private:
     QAction* actionMenuPrintBarCode3;
     QAction* actionVerProduto;
     Produto_Service *produtoService;
+    Config_service *confServ = new Config_service(this);
     ConfigDTO configDTO;
     ContingenciaService *contingenciaService = nullptr;
 
@@ -122,7 +123,7 @@ private:
     void setarIconesJanela();
     //QModelIndex selected_index;
 
-    const int ultimaVersaoSchema = 12;
+    const int ultimaVersaoSchema = 13;
 
 
     void mostrarProdutoPorCodigoBarras(const QString &codigo);

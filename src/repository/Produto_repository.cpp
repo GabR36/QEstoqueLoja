@@ -93,7 +93,7 @@ void Produto_Repository::listarProdutos(QSqlQueryModel* model)
         qDebug() << "db nao aberto ao salvar resumo nota";
         return;
     }
-    model->setQuery("SELECT * FROM produtos ORDER BY id DESC", db);
+    model->setQuery("SELECT * FROM produtos ORDER BY id DESC LIMIT 240", db);
 
     db.close();
 }

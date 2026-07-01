@@ -163,7 +163,7 @@ void MonitorFiscal::on_Btn_Danfe_clicked()
         (m_tipoAtual == TipoVisualizacao::Evento) ? modelEventos : modelSaida;
 
     QModelIndex xmlIndex = modelAtual->index(row, colunaXml);
-    QString xmlPath = AppPath_service::pastaArmazenamentoArquivos() +
+    QString xmlPath = AppPath_service::pastaArmazenamentoArquivos() + "/" +
                       modelAtual->data(xmlIndex).toString();
 
     if (xmlPath.isEmpty()) {

@@ -66,13 +66,51 @@ QString AppPath_service::consultaCnpjConfigPath()
 
 QString AppPath_service::xmlPath()
 {
-    QString path = appDataPath() + "/xmlNf";
-    QDir dir(path);
-    if (!dir.exists()) {
-        dir.mkpath(".");
+    Config_service serv;
+    ConfigDbDTO dto = serv.getConfigsDB();
+    if(dto.driverDB == 0){//sqlite
+        QString path = dto.pathPastaSqliteDB + "/xmlNf";
+        QDir dir(path);
+        if (!dir.exists()) {
+            dir.mkpath(".");
+        }
+        return path;
+    }else if(dto.driverDB == 1){//postgre
+        QString path = dto.pathPastaPostgreDB + "/xmlNf";
+        QDir dir(path);
+        if (!dir.exists()) {
+            dir.mkpath(".");
+        }
+        return path;
     }
-    return path;
+
 }
+
+QString AppPath_service::pastaArmazenamentoArquivos()
+{
+    Config_service serv;
+    ConfigDbDTO dto = serv.getConfigsDB();
+    if(dto.driverDB == 0){//sqlite
+        QString path = dto.pathPastaSqliteDB;
+        qDebug() << "pasta sqlite:" << path;
+        QDir dir(path);
+        if (!dir.exists()) {
+            dir.mkpath(".");
+        }
+        return path;
+    }else if(dto.driverDB == 1){//postgre
+        QString path = dto.pathPastaPostgreDB;
+        qDebug() << "pasta postgre:" << path;
+
+        QDir dir(path);
+        if (!dir.exists()) {
+            dir.mkpath(".");
+        }
+        return path;
+    }
+
+}
+
 
 QString AppPath_service::schemaPath()
 {

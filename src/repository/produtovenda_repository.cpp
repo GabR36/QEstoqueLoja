@@ -265,16 +265,29 @@ bool ProdutoVenda_repository::inserir(ProdutoVendidoDTO prod){
                   ":atualizadoem, :emitidonf)");
 
     query.bindValue(":idprod", prod.idProduto);
-    query.bindValue(":idvenda", prod.idVenda);
+    if(prod.idVenda <= 0){
+        query.bindValue(":idvenda", QVariant());
+    }else{
+        query.bindValue(":idvenda", prod.idVenda);
+    }
     query.bindValue(":quantidade", prod.quantidade);
     query.bindValue(":precovendido", prod.precoVendido);
     query.bindValue(":adicionadoem", data);
     query.bindValue(":atualizadoem", data);
-    query.bindValue(":emitidonf", prod.emitidoNf);
+    query.bindValue(":emitidonf", prod.emitidoNf ? 1 : 0);
 
     if(!query.exec()){
-        qDebug() << "Query não executou  inserir produto vendido.";
+
+        qDebug()
+        << "Erro inserir produto vendido:"
+        << query.lastError().text();
+
+        qDebug()
+            << "SQL:"
+            << query.lastQuery();
+
         db.close();
+
         return false;
     }
     db.close();

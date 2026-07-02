@@ -8,9 +8,44 @@ bool DatabaseConnection_service::initialized = false;
 static QSqlDatabase externalDb;
 static bool hasExternalDb = false;
 
-DatabaseConnection_service::DatabaseConnection_service(QObject *parent)
-    : QObject{parent}
-{}
+static DatabaseConfig config = {
+    "QSQLITE",
+    "",
+    0,
+    "",
+    "",
+    ""
+};
+
+
+void DatabaseConnection_service::changeDatabase(ConfigDTO configDto){
+    qDebug() << "Mudando o banco de dados.";
+    DatabaseConfig conf;
+    if(configDto.driverDB == 1){//postgre
+        conf = {
+            "QPSQL",
+            configDto.ipHostDB,
+            configDto.portaDB.toInt(),
+            configDto.nomeDB,
+            configDto.userDB,
+            configDto.senhaDB
+
+        };
+    }else if(configDto.driverDB == 0){//sqlite
+          conf = {
+            "QSQLITE",
+            "",
+            0,
+            "",
+            "",
+            ""
+        };
+    }
+    config = conf;
+    qDebug() << "Novo driver:" << config.driver;
+    qDebug() << "Novo host:" << config.host;
+    qDebug() << "Novo banco:" << config.database;
+}
 
 void DatabaseConnection_service::setDatabase(QSqlDatabase database)
 {
@@ -19,28 +54,51 @@ void DatabaseConnection_service::setDatabase(QSqlDatabase database)
     initialized = true;
 }
 
+
 bool DatabaseConnection_service::init()
 {
 
+    // qDebug() << QSqlDatabase::drivers();
     if (hasExternalDb) return true;
     if (initialized) return true;
 
     try {
-        if (!QSqlDatabase::contains("qt_sql_default_connection")) {
-            QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-            db.setDatabaseName(AppPath_service::databasePath());
 
-            if (db.databaseName().isEmpty()) {
-                return false;
+        if (!QSqlDatabase::contains("qt_sql_default_connection")) {
+
+            QSqlDatabase db =
+                QSqlDatabase::addDatabase(config.driver);
+
+            if(config.driver == "QSQLITE")
+            {
+                db.setDatabaseName(AppPath_service::databasePath());
+            }
+            else if(config.driver == "QPSQL")
+            {
+                db.setHostName(config.host);
+                db.setPort(config.port);
+                db.setDatabaseName(config.database);
+                db.setUserName(config.user);
+                db.setPassword(config.password);
+                qDebug() << db.lastError().text();
             }
         }
 
         initialized = true;
         return true;
     }
-    catch (...) {
+    catch (...)
+    {
         return false;
     }
+}
+
+bool DatabaseConnection_service::isPostgres()
+{
+    QSqlDatabase db = hasExternalDb
+                          ? externalDb
+                          : QSqlDatabase::database();
+    return db.driverName().contains("QPSQL");
 }
 
 bool DatabaseConnection_service::open()
@@ -51,14 +109,33 @@ bool DatabaseConnection_service::open()
                           ? externalDb
                           : QSqlDatabase::database();
 
+    // qDebug() << "Driver:" << db.driverName();
+    // qDebug() << "Host:" << db.hostName();
+    // qDebug() << "Database:" << db.databaseName();
+    // qDebug() << "User:" << db.userName();
+    // qDebug() << "IsValid:" << db.isValid();
+    // qDebug() << "IsOpen:" << db.isOpen();
+
     if (!db.isOpen()) {
+
+        qDebug() << "Tentando abrir conexão...";
+
         if (!db.open()) {
-            qDebug() << "[DB ERROR]" << db.lastError().text();
+
+            qDebug() << "ERRO AO ABRIR";
+            qDebug() << db.lastError().text();
+            qDebug() << db.lastError().driverText();
+            qDebug() << db.lastError().databaseText();
+
             return false;
         }
     }
+
+    qDebug() << "Conectado com sucesso";
+
     return true;
 }
+
 void DatabaseConnection_service::close()
 {
     QSqlDatabase db = hasExternalDb
@@ -79,3 +156,30 @@ QSqlDatabase DatabaseConnection_service::db()
                : QSqlDatabase::database();
 }
 
+
+QSqlDatabase DatabaseConnection_service::createThreadConnection(const QString &name)
+{
+    if (QSqlDatabase::contains(name))
+        return QSqlDatabase::database(name);
+
+
+    QSqlDatabase db =
+        QSqlDatabase::addDatabase(config.driver, name);
+
+
+    if(config.driver == "QSQLITE")
+    {
+        db.setDatabaseName(AppPath_service::databasePath());
+    }
+    else if(config.driver == "QPSQL")
+    {
+        db.setHostName(config.host);
+        db.setPort(config.port);
+        db.setDatabaseName(config.database);
+        db.setUserName(config.user);
+        db.setPassword(config.password);
+    }
+
+
+    return db;
+}

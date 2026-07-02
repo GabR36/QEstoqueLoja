@@ -2,13 +2,31 @@
 #include "../nota/eventocienciaop.h"
 #include "notafiscal_service.h"
 #include "../nota/eventocartacorrecao.h"
-
+#include <QDir>
+#include "../services/config_service.h"
 
 EventoFiscal_service::EventoFiscal_service(QObject *parent)
     : QObject{parent}
 {}
 
 EventoFiscal_service::Resultado EventoFiscal_service::inserir(EventoFiscalDTO evento){
+    QString caminhoCompleto = evento.xmlPath;
+
+    //pegar configs sobre db e salvar o caminho xml relativo ao inves do completo
+    Config_service confServ;
+    ConfigDbDTO dto = confServ.getConfigsDB();
+    if(dto.driverDB == 0){
+        QDir baseDir(dto.pathPastaSqliteDB);
+
+        evento.xmlPath = baseDir.relativeFilePath(caminhoCompleto);
+    }else if(dto.driverDB == 1){
+        QDir baseDir(dto.pathPastaPostgreDB);
+
+        evento.xmlPath = baseDir.relativeFilePath(caminhoCompleto);
+    }
+    qDebug() << "xmlPath Evento Relativo: " << evento.xmlPath;
+    qDebug() << "base dir: " << dto.pathPastaPostgreDB;
+
     if(eventoRepo.inserir(evento)){
         qDebug() << "Evento Fiscal Inserido";
         return {true, EventoFiscalErro::Nenhum, ""};
@@ -30,7 +48,8 @@ EventoFiscal_service::Resultado EventoFiscal_service::enviarCancelamento(qlonglo
         QString msgErro = "Erro ao enviar cancelamento:\n" + just;
         return {false, EventoFiscalErro::EnvioEvento, msgErro};
     }else{
-        if(!eventoRepo.inserir(evento)){
+        auto r1 = inserir(evento);
+        if(!r1.ok){
             return {false, EventoFiscalErro::Banco, "Problema com banco de dados."};
         }else{
             return {true, EventoFiscalErro::Nenhum, "Evento Cancelamento enviado com sucesso."};

@@ -26,6 +26,8 @@ Vendas::Vendas(QWidget *parent, int idCliente) :
     // configuracao modelos e views tabelas vendas e produtosvendidos
 
     vendaServ.listarVendas(modeloVendas2);
+    ui->Tview_Vendas2->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->Tview_Vendas2->setSelectionMode(QAbstractItemView::SingleSelection);
 
     modeloVendas2->setHeaderData(0, Qt::Horizontal, tr("ID"));
     modeloVendas2->setHeaderData(1, Qt::Horizontal, tr("Valor Final"));
@@ -58,6 +60,7 @@ Vendas::Vendas(QWidget *parent, int idCliente) :
 
     // Selecionar a primeira linha das tabelas
     QModelIndex firstIndex = modeloVendas2->index(0, 0);
+
     ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
   // QModelIndex firstIndex2 = modeloProdVendidos->index(0, 0);
     // Obter o modelo de seleção da tabela
@@ -101,8 +104,10 @@ Vendas::Vendas(QWidget *parent, int idCliente) :
     IDCLIENTE = idCliente;
     mostrarVendasCliente(IDCLIENTE);
 
-    ui->Tview_Vendas2->selectionModel()->select(firstIndex, QItemSelectionModel::Select);
-
+    ui->Tview_Vendas2->selectionModel()->select(
+        firstIndex,
+        QItemSelectionModel::Select | QItemSelectionModel::Rows
+        );
 }
 
 Vendas::~Vendas()
@@ -466,7 +471,7 @@ void Vendas::mostrarVendasCliente(qlonglong idCliente) {
 
 void Vendas::abrirDanfeXml(QString id_Venda){
     QSharedPointer<DanfeUtil> danfe(new DanfeUtil(this));
-    if(danfe->abrirDanfe(id_Venda.toInt())){
+    if(danfe->abrirDanfe(id_Venda.toLongLong())){
         qDebug() << "abrindo danfe IDVenda:" << id_Venda;
     }else{
         QMessageBox::warning(this, "Aviso", "Não foi possivel gerar DANFE com essa venda");

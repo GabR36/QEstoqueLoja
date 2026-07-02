@@ -231,10 +231,19 @@ void Recibo_service::imprimirReciboVenda(qlonglong idvenda){
             double taxaEntrada = listaEntradas[i].taxa;
             double valorFinalEntrada = listaEntradas[i].valorFinal;
 
-            QDateTime dataEntrada = QDateTime::fromString(
-                data_horaEntrada,
-                "yyyy-MM-dd HH:mm:ss"
-                );
+            QDateTime dataEntrada;
+            if (data_horaEntrada.contains("T")) {
+                dataEntrada = QDateTime::fromString(
+                    data_horaEntrada,
+                    Qt::ISODateWithMs
+                    );
+            } else {
+                dataEntrada = QDateTime::fromString(
+                    data_horaEntrada,
+                    "yyyy-MM-dd HH:mm:ss"
+                    );
+            }
+
             QString dataFormatada = dataEntrada.toString("dd/MM/yyyy HH:mm");
             // QString descontoEntrada = query.value("desconto").toString();
             xPos = 60;

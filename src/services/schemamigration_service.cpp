@@ -37,28 +37,59 @@ SchemaMigration_service::SchemaMigration_service(QObject *parent, int dbLastVers
     }
     // criar a versao 0 se o banco de dados estiver vazio
     QSqlQuery query(db);
-    query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2), codigo_barras VARCHAR(20), nf BOOLEAN)");
-    if (query.isActive()) {
-        qDebug() << "Tabela produtos criada com sucesso!";
-    } else {
-        qDebug() << "Erro ao criar tabela produtos";
-    }
-    query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2))");
-    if (query.isActive()) {
-        qDebug() << "Tabela de vendas2 criada com sucesso!";
-    } else {
-        qDebug() << "Erro ao criar tabela de vendas2: ";
-    }
-    query.exec("CREATE TABLE produtos_vendidos (id INTEGER PRIMARY KEY AUTOINCREMENT, id_produto INTEGER, id_venda INTEGER, quantidade INTEGER, preco_vendido DECIMAL(10,2), FOREIGN KEY (id_produto) REFERENCES produtos(id), FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
-    if (query.isActive()) {
-        qDebug() << "Tabela de produtos_vendidos criada com sucesso!";
-    } else {
-        qDebug() << "Erro ao criar tabela de produtos_vendidos: ";
+    if (DatabaseConnection_service::isPostgres()){
+        query.exec("CREATE TABLE produtos (id SERIAL PRIMARY KEY, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2), codigo_barras VARCHAR(20), nf BOOLEAN)");
+        if (query.isActive()) {
+            qDebug() << "Tabela produtos criada com sucesso!";
+        } else {
+            qDebug() << "Erro ao criar tabela produtos";
+        }
+
+        query.exec("CREATE TABLE vendas2 (id SERIAL PRIMARY KEY, cliente TEXT, "
+                   "data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2))");
+        if (query.isActive()) {
+            qDebug() << "Tabela de vendas2 criada com sucesso!";
+        } else {
+            qDebug() << "Erro ao criar tabela de vendas2: ";
+        }
+
+        query.exec("CREATE TABLE produtos_vendidos (id SERIAL PRIMARY KEY, id_produto INTEGER, "
+                   "id_venda INTEGER, quantidade INTEGER, preco_vendido DECIMAL(10,2), "
+                   "FOREIGN KEY (id_produto) REFERENCES produtos(id), "
+                   "FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
+        if (query.isActive()) {
+            qDebug() << "Tabela de produtos_vendidos criada com sucesso!";
+        } else {
+            qDebug() << "Erro ao criar tabela de produtos_vendidos: ";
+        }
+
+    }else{
+        query.exec("CREATE TABLE produtos (id INTEGER PRIMARY KEY AUTOINCREMENT, quantidade INTEGER, descricao TEXT, preco DECIMAL(10,2), codigo_barras VARCHAR(20), nf BOOLEAN)");
+        if (query.isActive()) {
+            qDebug() << "Tabela produtos criada com sucesso!";
+        } else {
+            qDebug() << "Erro ao criar tabela produtos";
+        }
+
+        query.exec("CREATE TABLE vendas2 (id INTEGER PRIMARY KEY AUTOINCREMENT, cliente TEXT, data_hora DATETIME DEFAULT CURRENT_TIMESTAMP, total DECIMAL(10,2))");
+        if (query.isActive()) {
+            qDebug() << "Tabela de vendas2 criada com sucesso!";
+        } else {
+            qDebug() << "Erro ao criar tabela de vendas2: ";
+        }
+
+        query.exec("CREATE TABLE produtos_vendidos (id INTEGER PRIMARY KEY AUTOINCREMENT, id_produto INTEGER, id_venda INTEGER, quantidade INTEGER, preco_vendido DECIMAL(10,2), FOREIGN KEY (id_produto) REFERENCES produtos(id), FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
+        if (query.isActive()) {
+            qDebug() << "Tabela de produtos_vendidos criada com sucesso!";
+        } else {
+            qDebug() << "Erro ao criar tabela de produtos_vendidos: ";
+        }
+
+        qDebug() << db.tables();
+
+        db.close();
     }
 
-    qDebug() << db.tables();
-
-    db.close();
 }
 
 int SchemaMigration_service::getSchemaVersion()
@@ -192,25 +223,65 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
         case 0:
         {
             // atualizar da versao 0 para a versao 1 do schema
-
+            qDebug() << "Atualizando de 0 para 1 schema";
             // comecar transacao
             if (!db.transaction()) {
                 qDebug() << "Error: unable to start transaction";
             }
+            // QSqlQuery query(db);
 
-            QSqlQuery query(db);
+            auto exec = [&](QString sql){
 
-            query.exec("ALTER TABLE vendas2 ADD COLUMN forma_pagamento VARCHAR(20)");
-            query.exec("ALTER TABLE vendas2 ADD COLUMN valor_recebido DECIMAL(10,2)");
-            query.exec("ALTER TABLE vendas2 ADD COLUMN troco DECIMAL(10,2)");
-            query.exec("ALTER TABLE vendas2 ADD COLUMN taxa DECIMAL(10,2)");
-            query.exec("ALTER TABLE vendas2 ADD COLUMN valor_final DECIMAL(10,2)");
-            query.exec("ALTER TABLE vendas2 ADD COLUMN desconto DECIMAL(10,2)");
+                if(!query.exec(sql)){
+                    qDebug()
+                    << "ERRO SQL:"
+                    << sql;
 
-            // converter as datas no formato dd-MM-yyyy para yyyy-MM-dd
-            query.exec("UPDATE vendas2 "
-                       "SET data_hora = strftime('%Y-%m-%d %H:%M:%S', substr(data_hora, 7, 4) || '-' || substr(data_hora, 4, 2) || '-' || substr(data_hora, 1, 2) || ' ' || substr(data_hora, 12, 8)) "
-                       "WHERE substr(data_hora, 3, 1) = '-' AND substr(data_hora, 6, 1) = '-'");
+                    qDebug()
+                        << query.lastError().text();
+
+                    db.rollback();
+                    return false;
+                }
+
+                return true;
+            };
+
+
+            bool ok = true;
+
+            ok &= exec("ALTER TABLE vendas2 ADD COLUMN forma_pagamento VARCHAR(20)");
+            ok &= exec("ALTER TABLE vendas2 ADD COLUMN valor_recebido DECIMAL(10,2)");
+            ok &= exec("ALTER TABLE vendas2 ADD COLUMN troco DECIMAL(10,2)");
+            ok &= exec("ALTER TABLE vendas2 ADD COLUMN taxa DECIMAL(10,2)");
+            ok &= exec("ALTER TABLE vendas2 ADD COLUMN valor_final DECIMAL(10,2)");
+            ok &= exec("ALTER TABLE vendas2 ADD COLUMN desconto DECIMAL(10,2)");
+
+            if(!ok){
+                db.rollback();
+                break;
+            }
+
+
+            if(DatabaseConnection_service::isPostgres()){
+                // query.exec(
+                //     "UPDATE vendas2 "
+                //     "SET data_hora = to_timestamp("
+                //     "    substr(data_hora, 7, 4) || '-' || "
+                //     "    substr(data_hora, 4, 2) || '-' || "
+                //     "    substr(data_hora, 1, 2) || ' ' || "
+                //     "    substr(data_hora, 12, 8), "
+                //     "    'YYYY-MM-DD HH24:MI:SS'"
+                //     ") "
+                //     "WHERE substr(data_hora, 3, 1) = '-' "
+                //     "AND substr(data_hora, 6, 1) = '-'"
+                //     );
+            }else{
+                // converter as datas no formato dd-MM-yyyy para yyyy-MM-dd
+                query.exec("UPDATE vendas2 "
+                           "SET data_hora = strftime('%Y-%m-%d %H:%M:%S', substr(data_hora, 7, 4) || '-' || substr(data_hora, 4, 2) || '-' || substr(data_hora, 1, 2) || ' ' || substr(data_hora, 12, 8)) "
+                           "WHERE substr(data_hora, 3, 1) = '-' AND substr(data_hora, 6, 1) = '-'");
+            }
 
             // colocar valores nas novas colunas
             query.exec("UPDATE vendas2 SET forma_pagamento = 'Não Sei', "
@@ -244,9 +315,15 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             }
             QSqlQuery query(db);
 
-            query.exec("CREATE TABLE config (id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                       "key TEXT NOT NULL UNIQUE, "
-                       "value TEXT)");
+            if(DatabaseConnection_service::isPostgres()){
+                query.exec("CREATE TABLE config(id SERIAL PRIMARY KEY, "
+                           "key TEXT NOT NULL UNIQUE, value TEXT)");
+            }else{
+                query.exec("CREATE TABLE config (id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                           "key TEXT NOT NULL UNIQUE, "
+                           "value TEXT)");
+            }
+
             query.exec("INSERT INTO config (key, value) VALUES ('nome_empresa', '')");
             query.exec("INSERT INTO config (key, value) VALUES ('endereco_empresa', '')");
             query.exec("INSERT INTO config (key, value) VALUES ('telefone_empresa', '')");
@@ -303,18 +380,36 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
                 qDebug() << "Error: unable to start transaction";
             }
             QSqlQuery query(db);
+            if(DatabaseConnection_service::isPostgres()){
+                query.exec(
+                    "CREATE TABLE entradas_vendas ("
+                    "id SERIAL PRIMARY KEY, "
+                    "id_venda INTEGER, "
+                    "total DECIMAL(10,2), "
+                    "data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+                    "forma_pagamento VARCHAR(20), "
+                    "valor_recebido DECIMAL(10,2), "
+                    "troco DECIMAL(10,2), "
+                    "taxa DECIMAL(10,2), "
+                    "valor_final DECIMAL(10,2), "
+                    "desconto DECIMAL(10,2), "
+                    "FOREIGN KEY (id_venda) REFERENCES vendas2(id)"
+                    ")"
+                    );
+            }else{
+                query.exec("CREATE TABLE entradas_vendas (id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                           "id_venda INTEGER, "
+                           "total DECIMAL(10,2),"
+                           "data_hora DATETIME DEFAULT CURRENT_TIMESTAMP,"
+                           "forma_pagamento VARCHAR(20),"
+                           "valor_recebido DECIMAL(10,2),"
+                           "troco DECIMAL(10,2),"
+                           "taxa DECIMAL(10,2),"
+                           "valor_final DECIMAL(10,2),"
+                           "desconto DECIMAL(10,2),"
+                           "FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
+            }
 
-            query.exec("CREATE TABLE entradas_vendas (id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                       "id_venda INTEGER, "
-                       "total DECIMAL(10,2),"
-                       "data_hora DATETIME DEFAULT CURRENT_TIMESTAMP,"
-                       "forma_pagamento VARCHAR(20),"
-                       "valor_recebido DECIMAL(10,2),"
-                       "troco DECIMAL(10,2),"
-                       "taxa DECIMAL(10,2),"
-                       "valor_final DECIMAL(10,2),"
-                       "desconto DECIMAL(10,2),"
-                       "FOREIGN KEY (id_venda) REFERENCES vendas2(id))");
 
             // normalizar dados existentes
             if (!query.exec("SELECT id, descricao FROM produtos")) {
@@ -339,7 +434,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
                     db.rollback();
                 }
             }
-            if(!query.exec("ALTER TABLE vendas2 ADD COLUMN esta_pago BOOLEAN DEFAULT 1")){
+            if(!query.exec("ALTER TABLE vendas2 ADD COLUMN esta_pago BOOLEAN DEFAULT true")){
                 qDebug() << "erro ao adicionar coluna estapago";
             }
 
@@ -352,7 +447,7 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
                 // bool esta_pago = query.value(1).toInt();
 
                 QSqlQuery updateQuery(db);
-                updateQuery.prepare("UPDATE vendas2 SET esta_pago = 1 WHERE id = :id");
+                updateQuery.prepare("UPDATE vendas2 SET esta_pago = true WHERE id = :id");
                 updateQuery.bindValue(":id", id);
 
                 if (!updateQuery.exec()) {
@@ -384,36 +479,76 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
 
             QSqlQuery query(db);
 
-            query.exec("CREATE TABLE clientes (id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                       "nome TEXT NOT NULL,"
-                       "email TEXT,"
-                       "telefone TEXT,"
-                       "endereco TEXT,"
-                       "cpf TEXT,"
-                       "data_nascimento DATE,"
-                       "data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,"
-                       "eh_pf BOOLEAN )");
-            query.exec("INSERT INTO clientes(nome, eh_pf) VALUES ('Consumidor', true)");
+            if(DatabaseConnection_service::isPostgres()){
+                query.exec("CREATE TABLE clientes (id SERIAL PRIMARY KEY, "
+                           "nome TEXT NOT NULL,"
+                           "email TEXT,"
+                           "telefone TEXT,"
+                           "endereco TEXT,"
+                           "cpf TEXT,"
+                           "data_nascimento DATE,"
+                           "data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                           "eh_pf BOOLEAN )");
+                query.exec("INSERT INTO clientes(nome, eh_pf) VALUES ('Consumidor', true)");
 
-            if(!query.exec("CREATE TABLE vendas (  id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                            "cliente TEXT, "
-                            "data_hora DATETIME DEFAULT CURRENT_TIMESTAMP,"
-                            "total DECIMAL(10,2), "
-                            "forma_pagamento VARCHAR(20), "
-                            "valor_recebido DECIMAL(10,2),"
-                            "troco DECIMAL(10,2),"
-                            "taxa DECIMAL(10,2),"
-                            "valor_final DECIMAL(10,2),"
-                            "desconto DECIMAL(10,2),"
-                            "esta_pago BOOLEAN DEFAULT 1,"
-                            "id_cliente INTEGER,"
-                            "FOREIGN KEY (id_cliente) REFERENCES clientes (id)) ")){
-                qDebug() << "Erro ao criar nova tabela vendas";
+                if(!query.exec("CREATE TABLE vendas (  id SERIAL PRIMARY KEY,"
+                                "cliente TEXT, "
+                                "data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                                "total DECIMAL(10,2), "
+                                "forma_pagamento VARCHAR(20), "
+                                "valor_recebido DECIMAL(10,2),"
+                                "troco DECIMAL(10,2),"
+                                "taxa DECIMAL(10,2),"
+                                "valor_final DECIMAL(10,2),"
+                                "desconto DECIMAL(10,2),"
+                                "esta_pago BOOLEAN DEFAULT true,"
+                                "id_cliente INTEGER,"
+                                "FOREIGN KEY (id_cliente) REFERENCES clientes (id))")){
+                    qDebug() << "Erro ao criar nova tabela vendas";
+                }
+
+                query.exec(
+                    "ALTER TABLE produtos_vendidos "
+                    "DROP CONSTRAINT IF EXISTS produtos_vendidos_id_venda_fkey"
+                    );
+
+                query.exec(
+                    "ALTER TABLE entradas_vendas "
+                    "DROP CONSTRAINT IF EXISTS entradas_vendas_id_venda_fkey"
+                    );
+            }else{
+                query.exec("CREATE TABLE clientes (id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                           "nome TEXT NOT NULL,"
+                           "email TEXT,"
+                           "telefone TEXT,"
+                           "endereco TEXT,"
+                           "cpf TEXT,"
+                           "data_nascimento DATE,"
+                           "data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP,"
+                           "eh_pf BOOLEAN )");
+                query.exec("INSERT INTO clientes(nome, eh_pf) VALUES ('Consumidor', true)");
+
+                if(!query.exec("CREATE TABLE vendas (  id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                                "cliente TEXT, "
+                                "data_hora DATETIME DEFAULT CURRENT_TIMESTAMP,"
+                                "total DECIMAL(10,2), "
+                                "forma_pagamento VARCHAR(20), "
+                                "valor_recebido DECIMAL(10,2),"
+                                "troco DECIMAL(10,2),"
+                                "taxa DECIMAL(10,2),"
+                                "valor_final DECIMAL(10,2),"
+                                "desconto DECIMAL(10,2),"
+                                "esta_pago BOOLEAN DEFAULT 1,"
+                                "id_cliente INTEGER,"
+                                "FOREIGN KEY (id_cliente) REFERENCES clientes (id)) ")){
+                    qDebug() << "Erro ao criar nova tabela vendas";
+                }
             }
 
-            if(!query.exec("INSERT INTO vendas (id, cliente, data_hora, total, forma_pagamento, "
+
+            if(!query.exec("INSERT INTO vendas (cliente, data_hora, total, forma_pagamento, "
                             "valor_recebido, troco, taxa, valor_final, desconto, esta_pago, id_cliente) "
-                            "SELECT id, cliente, data_hora, total, forma_pagamento, "
+                            "SELECT cliente, data_hora, total, forma_pagamento, "
                             "valor_recebido, troco, taxa, valor_final, desconto, esta_pago, NULL "
                             "FROM vendas2")){
                 qDebug() << "nao copiou dados de vendas2 para vendas";
@@ -426,6 +561,24 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             if(!query.exec("ALTER TABLE vendas RENAME TO vendas2")){
                 qDebug() << "nao renomeou tabela vendas para vendas2";
             }
+            if(DatabaseConnection_service::isPostgres()){
+                if(!query.exec("ALTER SEQUENCE vendas_id_seq RENAME TO vendas2_id_seq")){
+                    qDebug() << "nao renomeou tabela vendas para vendas2";
+                }
+            }
+
+            query.exec(
+                "ALTER TABLE produtos_vendidos "
+                "ADD CONSTRAINT produtos_vendidos_id_venda_fkey "
+                "FOREIGN KEY (id_venda) REFERENCES vendas2(id)"
+                );
+
+
+            query.exec(
+                "ALTER TABLE entradas_vendas "
+                "ADD CONSTRAINT entradas_vendas_id_venda_fkey "
+                "FOREIGN KEY (id_venda) REFERENCES vendas2(id)"
+                );
 
             if(!query.exec("INSERT INTO config (key, value) VALUES ('cidade_empresa', '')")){
                 qDebug() << "nao inserir config cidade_empresa";
@@ -569,23 +722,44 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
                 qDebug() << "nao inserir config cest_padrao";
             }
 
-            if (!query.exec(
-                    "CREATE TABLE IF NOT EXISTS notas_fiscais ("
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                    "cstat TEXT, "
-                    "nnf INTEGER NOT NULL, "
-                    "serie TEXT NOT NULL, "
-                    "modelo TEXT NOT NULL DEFAULT '65',"
-                    "tp_amb BOOLEAN, "
-                    "xml_path TEXT, "
-                    "valor_total DECIMAL(10,2), "
-                    "atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP, "
-                    "id_venda INTEGER, "
-                    "FOREIGN KEY (id_venda) REFERENCES vendas2(id)"
-                    ")"
-                    )) {
-                qDebug() << "Erro ao criar tabela notas_fiscais:" << query.lastError().text();
+            if(DatabaseConnection_service::isPostgres()){
+                if (!query.exec(
+                        "CREATE TABLE IF NOT EXISTS notas_fiscais ("
+                        "id SERIAL PRIMARY KEY, "
+                        "cstat TEXT, "
+                        "nnf INTEGER NOT NULL, "
+                        "serie TEXT NOT NULL, "
+                        "modelo TEXT NOT NULL DEFAULT '65',"
+                        "tp_amb BOOLEAN, "
+                        "xml_path TEXT, "
+                        "valor_total DECIMAL(10,2), "
+                        "atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+                        "id_venda INTEGER, "
+                        "FOREIGN KEY (id_venda) REFERENCES vendas2(id)"
+                        ")"
+                        )) {
+                    qDebug() << "Erro ao criar tabela notas_fiscais:" << query.lastError().text();
+                }
+            }else{
+                if (!query.exec(
+                        "CREATE TABLE IF NOT EXISTS notas_fiscais ("
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        "cstat TEXT, "
+                        "nnf INTEGER NOT NULL, "
+                        "serie TEXT NOT NULL, "
+                        "modelo TEXT NOT NULL DEFAULT '65',"
+                        "tp_amb BOOLEAN, "
+                        "xml_path TEXT, "
+                        "valor_total DECIMAL(10,2), "
+                        "atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP, "
+                        "id_venda INTEGER, "
+                        "FOREIGN KEY (id_venda) REFERENCES vendas2(id)"
+                        ")"
+                        )) {
+                    qDebug() << "Erro ao criar tabela notas_fiscais:" << query.lastError().text();
+                }
             }
+
 
             // Adicionar colunas à tabela produtos
             QStringList alterStatements = {
@@ -674,24 +848,45 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             }
 
             QSqlQuery query(db);
+            QStringList alterStatements;
+            if(DatabaseConnection_service::isPostgres()){
+                // Adicionar colunas à tabela produtos
+                 alterStatements = {
+                    "ALTER TABLE notas_fiscais ADD COLUMN cnpjemit TEXT",
+                    "ALTER TABLE notas_fiscais ADD COLUMN chnfe TEXT",
+                    "ALTER TABLE notas_fiscais ADD COLUMN nprot TEXT",
+                    "ALTER TABLE notas_fiscais ADD COLUMN cuf TEXT",
+                    "CREATE TABLE eventos_fiscais(id SERIAL NOT NULL PRIMARY KEY, tipo_evento TEXT,"
+                    "id_lote INTEGER, cstat TEXT, justificativa TEXT, codigo TEXT, xml_path TEXT,"
+                    "nprot TEXT, id_nf INTEGER, atualizado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY "
+                    "(id_nf) REFERENCES notas_fiscais(id))",
+                    "INSERT INTO config (key, value) VALUES ('usar_ibs', '0')",
+                    "ALTER TABLE notas_fiscais ADD COLUMN finalidade TEXT",
+                    "ALTER TABLE notas_fiscais ADD COLUMN saida BOOL",
+                    "ALTER TABLE notas_fiscais ADD COLUMN id_nf_ref INTEGER",
+                    "UPDATE notas_fiscais SET saida = true",
+                    "UPDATE notas_fiscais SET finalidade = 'NORMAL'"
+                };
 
-            // Adicionar colunas à tabela produtos
-            QStringList alterStatements = {
-                "ALTER TABLE notas_fiscais ADD COLUMN cnpjemit TEXT",
-                "ALTER TABLE notas_fiscais ADD COLUMN chnfe TEXT",
-                "ALTER TABLE notas_fiscais ADD COLUMN nprot TEXT",
-                "ALTER TABLE notas_fiscais ADD COLUMN cuf TEXT",
-                "CREATE TABLE eventos_fiscais(id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT, tipo_evento TEXT,"
-                "id_lote INTEGER, cstat TEXT, justificativa TEXT, codigo TEXT, xml_path TEXT,"
-                "nprot TEXT, id_nf INTEGER, atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY "
-                "(id_nf) REFERENCES notas_fiscais(id))",
-                "INSERT INTO config (key, value) VALUES ('usar_ibs', '0')",
-                "ALTER TABLE notas_fiscais ADD COLUMN finalidade TEXT",
-                "ALTER TABLE notas_fiscais ADD COLUMN saida BOOL",
-                "ALTER TABLE notas_fiscais ADD COLUMN id_nf_ref INTEGER",
-                "UPDATE notas_fiscais SET saida = 1",
-                "UPDATE notas_fiscais SET finalidade = 'NORMAL'"
-            };
+            }else{
+                // Adicionar colunas à tabela produtos
+                 alterStatements = {
+                    "ALTER TABLE notas_fiscais ADD COLUMN cnpjemit TEXT",
+                    "ALTER TABLE notas_fiscais ADD COLUMN chnfe TEXT",
+                    "ALTER TABLE notas_fiscais ADD COLUMN nprot TEXT",
+                    "ALTER TABLE notas_fiscais ADD COLUMN cuf TEXT",
+                    "CREATE TABLE eventos_fiscais(id INTEGER NOT NULL UNIQUE PRIMARY KEY AUTOINCREMENT, tipo_evento TEXT,"
+                    "id_lote INTEGER, cstat TEXT, justificativa TEXT, codigo TEXT, xml_path TEXT,"
+                    "nprot TEXT, id_nf INTEGER, atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP, FOREIGN KEY "
+                    "(id_nf) REFERENCES notas_fiscais(id))",
+                    "INSERT INTO config (key, value) VALUES ('usar_ibs', '0')",
+                    "ALTER TABLE notas_fiscais ADD COLUMN finalidade TEXT",
+                    "ALTER TABLE notas_fiscais ADD COLUMN saida BOOL",
+                    "ALTER TABLE notas_fiscais ADD COLUMN id_nf_ref INTEGER",
+                    "UPDATE notas_fiscais SET saida = 1",
+                    "UPDATE notas_fiscais SET finalidade = 'NORMAL'"
+                };
+            }
 
             foreach (const QString &sql, alterStatements) {
                 if (!query.exec(sql)) {
@@ -746,35 +941,69 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             QString dataFormatada = dataIngles.toString("yyyy-MM-dd HH:mm:ss");
             QSqlQuery query(db);
 
-            QStringList alterStatements = {
-                "ALTER TABLE notas_fiscais ADD COLUMN dhemi TEXT",
-                "ALTER TABLE notas_fiscais ADD COLUMN id_emissorcliente INTEGER",
-                "UPDATE notas_fiscais SET dhemi = atualizado_em",
-                "CREATE TABLE IF NOT EXISTS dfe_info(id INTEGER NOT NULL UNIQUE PRIMARY KEY "
-                "AUTOINCREMENT, ult_nsu TEXT, data_modificado TEXT, identificacao TEXT) ",
-                "INSERT INTO dfe_info (ult_nsu, data_modificado, identificacao) VALUES "
-                "(0, '2025-12-01 00:01:00', 'consulta_xml')",
-                "INSERT INTO dfe_info (ult_nsu, data_modificado, identificacao) VALUES "
-                "(0, '2025-12-01 00:00:00', 'consulta_resumo')",
-                "CREATE TABLE produtos_nota (id	INTEGER NOT NULL UNIQUE, quantidade	REAL, "
-                "descricao	TEXT, preco	NUMERIC, codigo_barras	TEXT, un_comercial	TEXT, "
-                "ncm	TEXT, csosn	INTEGER, pis	INTEGER, cfop TEXT, "
-                "aliquota_imposto REAL, nitem INTEGER, id_nf INTEGER, status TEXT, "
-                "cst_icms TEXT, tem_st BOOLEAN, id_nfDevol INTEGER, adicionado BOOLEAN, "
-                "PRIMARY KEY(id AUTOINCREMENT))",
-                "INSERT INTO config (key, value) VALUES ('email_cliente', '')",
-                "INSERT INTO config (key, value) VALUES ('email_nome', '')",
-                "INSERT INTO config (key, value) VALUES ('email_smtp', '')",
-                "INSERT INTO config (key, value) VALUES ('email_conta', '')",
-                "INSERT INTO config (key, value) VALUES ('email_usuario', '')",
-                "INSERT INTO config (key, value) VALUES ('email_senha', '')",
-                "INSERT INTO config (key, value) VALUES ('email_porta', '')",
-                "INSERT INTO config (key, value) VALUES ('email_ssl', '0')",
-                "INSERT INTO config (key, value) VALUES ('email_tls', '0')",
-                "INSERT INTO config (key, value) VALUES ('contador_nome', '')",
-                "INSERT INTO config (key, value) VALUES ('contador_email', '')",
+            QStringList alterStatements;
+            if(DatabaseConnection_service::isPostgres()){
+                alterStatements = {
+                    "ALTER TABLE notas_fiscais ADD COLUMN dhemi TEXT",
+                    "ALTER TABLE notas_fiscais ADD COLUMN id_emissorcliente INTEGER",
+                    "UPDATE notas_fiscais SET dhemi = atualizado_em::TEXT",
+                    "CREATE TABLE IF NOT EXISTS dfe_info(id SERIAL PRIMARY KEY "
+                    ", ult_nsu TEXT, data_modificado TEXT, identificacao TEXT) ",
+                    "INSERT INTO dfe_info (ult_nsu, data_modificado, identificacao) VALUES "
+                    "('0', '2025-12-01 00:01:00', 'consulta_xml')",
+                    "INSERT INTO dfe_info (ult_nsu, data_modificado, identificacao) VALUES "
+                    "('0', '2025-12-01 00:00:00', 'consulta_resumo')",
+                    "CREATE TABLE produtos_nota (id	SERIAL PRIMARY KEY, quantidade REAL, "
+                    "descricao	TEXT, preco	NUMERIC, codigo_barras	TEXT, un_comercial	TEXT, "
+                    "ncm	TEXT, csosn	INTEGER, pis	INTEGER, cfop TEXT, "
+                    "aliquota_imposto REAL, nitem INTEGER, id_nf INTEGER, status TEXT, "
+                    "cst_icms TEXT, tem_st BOOLEAN, id_nfDevol INTEGER, adicionado BOOLEAN"
+                    ")",
+                    "INSERT INTO config (key, value) VALUES ('email_cliente', '')",
+                    "INSERT INTO config (key, value) VALUES ('email_nome', '')",
+                    "INSERT INTO config (key, value) VALUES ('email_smtp', '')",
+                    "INSERT INTO config (key, value) VALUES ('email_conta', '')",
+                    "INSERT INTO config (key, value) VALUES ('email_usuario', '')",
+                    "INSERT INTO config (key, value) VALUES ('email_senha', '')",
+                    "INSERT INTO config (key, value) VALUES ('email_porta', '')",
+                    "INSERT INTO config (key, value) VALUES ('email_ssl', '0')",
+                    "INSERT INTO config (key, value) VALUES ('email_tls', '0')",
+                    "INSERT INTO config (key, value) VALUES ('contador_nome', '')",
+                    "INSERT INTO config (key, value) VALUES ('contador_email', '')",
 
-            };
+                };
+            }else{
+                alterStatements = {
+                    "ALTER TABLE notas_fiscais ADD COLUMN dhemi TEXT",
+                    "ALTER TABLE notas_fiscais ADD COLUMN id_emissorcliente INTEGER",
+                    "UPDATE notas_fiscais SET dhemi = atualizado_em",
+                    "CREATE TABLE IF NOT EXISTS dfe_info(id INTEGER NOT NULL UNIQUE PRIMARY KEY "
+                    "AUTOINCREMENT, ult_nsu TEXT, data_modificado TEXT, identificacao TEXT) ",
+                    "INSERT INTO dfe_info (ult_nsu, data_modificado, identificacao) VALUES "
+                    "(0, '2025-12-01 00:01:00', 'consulta_xml')",
+                    "INSERT INTO dfe_info (ult_nsu, data_modificado, identificacao) VALUES "
+                    "(0, '2025-12-01 00:00:00', 'consulta_resumo')",
+                    "CREATE TABLE produtos_nota (id	INTEGER NOT NULL UNIQUE, quantidade	REAL, "
+                    "descricao	TEXT, preco	NUMERIC, codigo_barras	TEXT, un_comercial	TEXT, "
+                    "ncm	TEXT, csosn	INTEGER, pis	INTEGER, cfop TEXT, "
+                    "aliquota_imposto REAL, nitem INTEGER, id_nf INTEGER, status TEXT, "
+                    "cst_icms TEXT, tem_st BOOLEAN, id_nfDevol INTEGER, adicionado BOOLEAN, "
+                    "PRIMARY KEY(id AUTOINCREMENT))",
+                    "INSERT INTO config (key, value) VALUES ('email_cliente', '')",
+                    "INSERT INTO config (key, value) VALUES ('email_nome', '')",
+                    "INSERT INTO config (key, value) VALUES ('email_smtp', '')",
+                    "INSERT INTO config (key, value) VALUES ('email_conta', '')",
+                    "INSERT INTO config (key, value) VALUES ('email_usuario', '')",
+                    "INSERT INTO config (key, value) VALUES ('email_senha', '')",
+                    "INSERT INTO config (key, value) VALUES ('email_porta', '')",
+                    "INSERT INTO config (key, value) VALUES ('email_ssl', '0')",
+                    "INSERT INTO config (key, value) VALUES ('email_tls', '0')",
+                    "INSERT INTO config (key, value) VALUES ('contador_nome', '')",
+                    "INSERT INTO config (key, value) VALUES ('contador_email', '')",
+
+                };
+            }
+
             foreach (const QString &sql, alterStatements) {
                 if (!query.exec(sql)) {
                     qDebug() << "Erro ao executar:" << sql << ":" << query.lastError().text();
@@ -827,44 +1056,86 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
 
             bool ok = true;
 
-            // clientes
-            ok &= execQuery("ALTER TABLE clientes ADD COLUMN adicionado_em DATETIME");
-            ok &= execQuery("ALTER TABLE clientes ADD COLUMN atualizado_em DATETIME");
-            ok &= execQuery("UPDATE clientes SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+            if(DatabaseConnection_service::isPostgres()){
+                // clientes
+                ok &= execQuery("ALTER TABLE clientes ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("ALTER TABLE clientes ADD COLUMN atualizado_em TIMESTAMP");
+                ok &= execQuery("UPDATE clientes SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
 
-            // entradas_vendas
-            ok &= execQuery("ALTER TABLE entradas_vendas ADD COLUMN adicionado_em DATETIME");
-            ok &= execQuery("ALTER TABLE entradas_vendas ADD COLUMN atualizado_em DATETIME");
-            ok &= execQuery("UPDATE entradas_vendas SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+                // entradas_vendas
+                ok &= execQuery("ALTER TABLE entradas_vendas ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("ALTER TABLE entradas_vendas ADD COLUMN atualizado_em TIMESTAMP");
+                ok &= execQuery("UPDATE entradas_vendas SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
 
-            // eventos_fiscais
-            ok &= execQuery("ALTER TABLE eventos_fiscais ADD COLUMN adicionado_em DATETIME");
-            ok &= execQuery("UPDATE eventos_fiscais SET adicionado_em = atualizado_em");
+                // eventos_fiscais
+                ok &= execQuery("ALTER TABLE eventos_fiscais ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("UPDATE eventos_fiscais SET adicionado_em = atualizado_em");
 
-            // notas_fiscais
-            ok &= execQuery("ALTER TABLE notas_fiscais ADD COLUMN adicionado_em DATETIME");
-            ok &= execQuery("UPDATE notas_fiscais SET adicionado_em = atualizado_em");
+                // notas_fiscais
+                ok &= execQuery("ALTER TABLE notas_fiscais ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("UPDATE notas_fiscais SET adicionado_em = atualizado_em");
 
-            // produtos
-            ok &= execQuery("ALTER TABLE produtos ADD COLUMN adicionado_em DATETIME");
-            ok &= execQuery("ALTER TABLE produtos ADD COLUMN atualizado_em DATETIME");
-            ok &= execQuery("UPDATE produtos SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+                // produtos
+                ok &= execQuery("ALTER TABLE produtos ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("ALTER TABLE produtos ADD COLUMN atualizado_em TIMESTAMP");
+                ok &= execQuery("UPDATE produtos SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
 
-            // produtos_nota
-            ok &= execQuery("ALTER TABLE produtos_nota ADD COLUMN adicionado_em DATETIME");
-            ok &= execQuery("ALTER TABLE produtos_nota ADD COLUMN atualizado_em DATETIME");
-            ok &= execQuery("UPDATE produtos_nota SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+                // produtos_nota
+                ok &= execQuery("ALTER TABLE produtos_nota ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("ALTER TABLE produtos_nota ADD COLUMN atualizado_em TIMESTAMP");
+                ok &= execQuery("UPDATE produtos_nota SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
 
-            // produtos_vendidos
-            ok &= execQuery("ALTER TABLE produtos_vendidos ADD COLUMN adicionado_em DATETIME");
-            ok &= execQuery("ALTER TABLE produtos_vendidos ADD COLUMN atualizado_em DATETIME");
-            ok &= execQuery("ALTER TABLE produtos_vendidos ADD COLUMN emitido_nf INTEGER DEFAULT 0");
-            ok &= execQuery("UPDATE produtos_vendidos SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+                // produtos_vendidos
+                ok &= execQuery("ALTER TABLE produtos_vendidos ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("ALTER TABLE produtos_vendidos ADD COLUMN atualizado_em TIMESTAMP");
+                ok &= execQuery("ALTER TABLE produtos_vendidos ADD COLUMN emitido_nf INTEGER DEFAULT 0");
+                ok &= execQuery("UPDATE produtos_vendidos SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
 
-            // vendas2
-            ok &= execQuery("ALTER TABLE vendas2 ADD COLUMN adicionado_em DATETIME");
-            ok &= execQuery("ALTER TABLE vendas2 ADD COLUMN atualizado_em DATETIME");
-            ok &= execQuery("UPDATE vendas2 SET adicionado_em = data_hora, atualizado_em = data_hora");
+                // vendas2
+                ok &= execQuery("ALTER TABLE vendas2 ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("ALTER TABLE vendas2 ADD COLUMN atualizado_em TIMESTAMP");
+                ok &= execQuery("UPDATE vendas2 SET adicionado_em = data_hora, atualizado_em = data_hora");
+            }else{
+                // clientes
+                ok &= execQuery("ALTER TABLE clientes ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("ALTER TABLE clientes ADD COLUMN atualizado_em TIMESTAMP");
+                ok &= execQuery("UPDATE clientes SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+
+                // entradas_vendas
+                ok &= execQuery("ALTER TABLE entradas_vendas ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("ALTER TABLE entradas_vendas ADD COLUMN atualizado_em TIMESTAMP");
+                ok &= execQuery("UPDATE entradas_vendas SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+
+                // eventos_fiscais
+                ok &= execQuery("ALTER TABLE eventos_fiscais ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("UPDATE eventos_fiscais SET adicionado_em = atualizado_em");
+
+                // notas_fiscais
+                ok &= execQuery("ALTER TABLE notas_fiscais ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("UPDATE notas_fiscais SET adicionado_em = atualizado_em");
+
+                // produtos
+                ok &= execQuery("ALTER TABLE produtos ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("ALTER TABLE produtos ADD COLUMN atualizado_em TIMESTAMP");
+                ok &= execQuery("UPDATE produtos SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+
+                // produtos_nota
+                ok &= execQuery("ALTER TABLE produtos_nota ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("ALTER TABLE produtos_nota ADD COLUMN atualizado_em TIMESTAMP");
+                ok &= execQuery("UPDATE produtos_nota SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+
+                // produtos_vendidos
+                ok &= execQuery("ALTER TABLE produtos_vendidos ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("ALTER TABLE produtos_vendidos ADD COLUMN atualizado_em TIMESTAMP");
+                ok &= execQuery("ALTER TABLE produtos_vendidos ADD COLUMN emitido_nf INTEGER DEFAULT 0");
+                ok &= execQuery("UPDATE produtos_vendidos SET adicionado_em = CURRENT_TIMESTAMP, atualizado_em = CURRENT_TIMESTAMP");
+
+                // vendas2
+                ok &= execQuery("ALTER TABLE vendas2 ADD COLUMN adicionado_em TIMESTAMP");
+                ok &= execQuery("ALTER TABLE vendas2 ADD COLUMN atualizado_em TIMESTAMP");
+                ok &= execQuery("UPDATE vendas2 SET adicionado_em = data_hora, atualizado_em = data_hora");
+            }
+
 
             if (ok) {
                 ok &= setSchemaVersion(8);
@@ -1103,23 +1374,46 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             }
 
             QSqlQuery query(db);
-            bool ok = query.exec(
-                "CREATE TABLE IF NOT EXISTS rascunho_venda ("
-                "  id                   INTEGER PRIMARY KEY,"
-                "  id_cliente           INTEGER DEFAULT -1,"
-                "  cpf_manual           TEXT    DEFAULT '',"
-                "  data_hora            TEXT    DEFAULT '',"
-                "  produtos_json        TEXT    DEFAULT '[]',"
-                "  forma_pagamento      TEXT    DEFAULT '',"
-                "  desconto             TEXT    DEFAULT '0',"
-                "  taxa                 TEXT    DEFAULT '0',"
-                "  recebido             TEXT    DEFAULT '0',"
-                "  desconto_porcentagem INTEGER DEFAULT 0,"
-                "  modelo_nf            INTEGER DEFAULT 0,"
-                "  emitir_todos         INTEGER DEFAULT 0,"
-                "  atualizado_em        TEXT    DEFAULT ''"
-                ")"
-            );
+
+            bool ok;
+            if(DatabaseConnection_service::isPostgres()){
+                ok = query.exec(
+                    "CREATE TABLE IF NOT EXISTS rascunho_venda ("
+                    "  id                   SERIAL PRIMARY KEY,"
+                    "  id_cliente           INTEGER DEFAULT -1,"
+                    "  cpf_manual           TEXT    DEFAULT '',"
+                    "  data_hora            TEXT    DEFAULT '',"
+                    "  produtos_json        TEXT    DEFAULT '[]',"
+                    "  forma_pagamento      TEXT    DEFAULT '',"
+                    "  desconto             TEXT    DEFAULT '0',"
+                    "  taxa                 TEXT    DEFAULT '0',"
+                    "  recebido             TEXT    DEFAULT '0',"
+                    "  desconto_porcentagem INTEGER DEFAULT 0,"
+                    "  modelo_nf            INTEGER DEFAULT 0,"
+                    "  emitir_todos         INTEGER DEFAULT 0,"
+                    "  atualizado_em        TEXT    DEFAULT ''"
+                    ")"
+                    );
+            }else{
+                ok = query.exec(
+                    "CREATE TABLE IF NOT EXISTS rascunho_venda ("
+                    "  id                   INTEGER PRIMARY KEY,"
+                    "  id_cliente           INTEGER DEFAULT -1,"
+                    "  cpf_manual           TEXT    DEFAULT '',"
+                    "  data_hora            TEXT    DEFAULT '',"
+                    "  produtos_json        TEXT    DEFAULT '[]',"
+                    "  forma_pagamento      TEXT    DEFAULT '',"
+                    "  desconto             TEXT    DEFAULT '0',"
+                    "  taxa                 TEXT    DEFAULT '0',"
+                    "  recebido             TEXT    DEFAULT '0',"
+                    "  desconto_porcentagem INTEGER DEFAULT 0,"
+                    "  modelo_nf            INTEGER DEFAULT 0,"
+                    "  emitir_todos         INTEGER DEFAULT 0,"
+                    "  atualizado_em        TEXT    DEFAULT ''"
+                    ")"
+                    );
+            }
+
             if (!ok) {
                 qDebug() << "Erro ao criar rascunho_venda:" << query.lastError().text();
                 db.rollback();
@@ -1148,11 +1442,21 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             }
             qDebug() << "Atualizando para versao 12: fazendo a correção e limpeza do banco de dados.";
 
-            if(!executarArquivoSql(":/sql-queries/migration12.sql")){
-                qDebug() << "Não executou migração 12 por arquivo .sql";
+
+            if(DatabaseConnection_service::isPostgres()){
+                if(!executarArquivoSql(":/sql-queries/migration12-postgre.sql")){
+                    qDebug() << "Não executou migração 12 por arquivo .sql";
+                }else{
+                    qDebug() << "executou arquivo .sql migração 12";
+                }
             }else{
-                qDebug() << "executou arquivo .sql migração 12";
+                if(!executarArquivoSql(":/sql-queries/migration12.sql")){
+                    qDebug() << "Não executou migração 12 por arquivo .sql";
+                }else{
+                    qDebug() << "executou arquivo .sql migração 12";
+                }
             }
+
 
             if (!setSchemaVersion(12)) {
                 qDebug() << "Erro ao atualizar user_version para 12:" << query.lastError().text();
@@ -1167,6 +1471,65 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             dbSchemaVersion = 12;
             qDebug() << "Migracao para versao 12 concluida.";
             // emit dbVersao11();
+            break;
+        }
+        case 12:
+        {
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+                break;
+            }
+            qDebug() << "Atualizando para versao 13: corrigindo caminhos relativos de xmlpath.";
+            QSqlQuery query(db);
+            qDebug() << "É Postgre?: " << DatabaseConnection_service::isPostgres();
+
+            if(DatabaseConnection_service::isPostgres()){
+
+                if(!query.exec("UPDATE notas_fiscais SET xml_path = substring(xml_path FROM 'xmlNf/.*') "
+                                "WHERE xml_path LIKE '%xmlNf/%'")){
+                    qDebug() << "Não executou query postgre migração 13";
+                }else{
+                    qDebug() << "executou query notas_fiscais migração 13";
+                }
+                if(!query.exec("UPDATE eventos_fiscais SET xml_path = substring(xml_path FROM 'xmlNf/.*') "
+                                "WHERE xml_path LIKE '%xmlNf/%'")){
+                    qDebug() << "Não executou query postgre migração 13";
+                }else{
+                    qDebug() << "executou query eventos_fiscais migração 13";
+                }
+
+            }else{
+                if(DatabaseConnection_service::open())
+                if(!query.exec("UPDATE notas_fiscais SET xml_path = substr(xml_path, instr(xml_path, "
+                                "'xmlNf/')) "
+                                "WHERE xml_path LIKE '%xmlNf/%'")){
+                    qDebug() << "Não executou query sqlite migração 13: " <<  query.lastError().text();
+                }else{
+                    qDebug() << "executou query notas_fiscais migração 13";
+                }
+                if(!query.exec("UPDATE eventos_fiscais SET xml_path = substr(xml_path, instr(xml_path, "
+                                "'xmlNf/')) "
+                                "WHERE xml_path LIKE '%xmlNf/%'")){
+                    qDebug() << "Não executou query postgre migração 13" <<  query.lastError().text();
+                }else{
+                    qDebug() << "executou query eventos_fiscais migração 13";
+                }
+            }
+
+
+            if (!setSchemaVersion(13)) {
+                qDebug() << "Erro ao atualizar user_version para 13:" << query.lastError().text();
+                db.rollback();
+                break;
+            }
+            if (!db.commit()) {
+                qDebug() << "Erro ao dar commit:" << db.lastError().text();
+                db.rollback();
+                break;
+            }
+            dbSchemaVersion = 13;
+            qDebug() << "Migracao para versao 13 concluida.";
+            emit dbVersao13();
             break;
         }
 

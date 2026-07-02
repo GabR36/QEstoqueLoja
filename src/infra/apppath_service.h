@@ -2,6 +2,7 @@
 #define APPPATH_SERVICE_H
 
 #include <QObject>
+#include "../services/config_service.h"
 
 class AppPath_service : public QObject
 {
@@ -20,6 +21,9 @@ public:
     static QString consultaCnpjConfigPath();
     static QString mailConfigPath();
     static QString contingenciaPath();
+    static QString pastaArmazenamentoArquivos();
+private:
+    Config_service confServ;
 signals:
 };
 

@@ -44,6 +44,7 @@ signals:
     void dbVersao9();
     void dbVersao10();
     void dbVersao11();
+    void dbVersao13();
 private slots:
     bool executarArquivoSql(const QString &caminho);
 private:

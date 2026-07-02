@@ -727,9 +727,22 @@ QPushButton:pressed {
     <addaction name="actionInutilizar_Numera_o_NF"/>
     <addaction name="actionEnviar_Carta_de_Corre_o"/>
    </widget>
+   <widget class="QMenu" name="menuExportar">
+    <property name="title">
+     <string>Exportar</string>
+    </property>
+    <widget class="QMenu" name="menuBanco_de_Dados">
+     <property name="title">
+      <string>Banco de Dados</string>
+     </property>
+     <addaction name="actionSQLite"/>
+    </widget>
+    <addaction name="menuBanco_de_Dados"/>
+   </widget>
    <addaction name="menuEditar"/>
    <addaction name="menuVendas"/>
    <addaction name="menuFiscal"/>
+   <addaction name="menuExportar"/>
    <addaction name="menuAjuda"/>
   </widget>
   <action name="actionteste">
@@ -809,6 +822,11 @@ QPushButton:pressed {
   <action name="actionEnviar_Carta_de_Corre_o">
    <property name="text">
     <string>Enviar Carta de Correção</string>
+   </property>
+  </action>
+  <action name="actionSQLite">
+   <property name="text">
+    <string>SQLite</string>
    </property>
   </action>
  </widget>

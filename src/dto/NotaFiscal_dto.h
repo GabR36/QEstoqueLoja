@@ -4,23 +4,23 @@
 
 struct NotaFiscalDTO {
     QString cstat;
-    qlonglong nnf;
-    int serie;
+    qlonglong nnf = 0;
+    int serie = 0;
     QString modelo;
     int tpAmb;
     QString xmlPath;
     double valorTotal = 0;
     QString atualizadoEm;
-    qlonglong idVenda;
+    qlonglong idVenda = 0;
     QString cnpjEmit;
     QString chNfe;
     QString nProt;
     QString cuf;
     QString finalidade;
     bool saida;
-    qlonglong idNfRef;
+    qlonglong idNfRef = 0;
     QString dhEmi;
-    qlonglong idEmissorCliente;
+    qlonglong idEmissorCliente = 0;
     QString adicionadoEm;
 };
 

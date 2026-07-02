@@ -2,6 +2,7 @@
 #include "../infra/databaseconnection_service.h"
 #include <QSqlQuery>
 #include <QSqlError>
+#include <QMapIterator>
 #include "../util/datautil.h"
 
 notafiscal_repository::notafiscal_repository(QObject *parent)
@@ -188,7 +189,7 @@ qlonglong notafiscal_repository::getProximoNNF55(QString serie, bool tpAmb, qlon
 
     query.bindValue(":modelo", "55");
     query.bindValue(":serie", serie);
-    query.bindValue(":tp_amb", tpAmb);
+    query.bindValue(":tp_amb", tpAmb ? 1 : 0);
 
     if(!query.exec()){
         qWarning() << "Erro na consulta NNF:" << query.lastError().text();
@@ -231,7 +232,7 @@ qlonglong notafiscal_repository::getProximoNNF65(QString serie, bool tpAmb, qlon
 
     query.bindValue(":modelo", "65");
     query.bindValue(":serie", serie);
-    query.bindValue(":tp_amb", tpAmb);
+    query.bindValue(":tp_amb", tpAmb ? 1 : 0);
 
     if(!query.exec()){
         qWarning() << "Erro na consulta NNF:" << query.lastError().text();
@@ -329,7 +330,11 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
     query.bindValue(":xmlpath", nota.xmlPath);
     query.bindValue(":vnf", nota.valorTotal);
     query.bindValue(":atualizadoem", dataFormatada);
-    query.bindValue(":idvenda", nota.idVenda);
+    if(nota.idVenda <= 0){
+        query.bindValue(":idvenda", QVariant());
+    }else{
+        query.bindValue(":idvenda", nota.idVenda);
+    }
     query.bindValue(":cnpjemit", nota.cnpjEmit);
     query.bindValue(":chnf", nota.chNfe);
     query.bindValue(":nprot", nota.nProt);
@@ -354,6 +359,16 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
 
     if(!query.exec()){
         qDebug() << "ERRO INSERT notas_fiscais:" << query.lastError().text();
+        if(!query.exec()){
+            qDebug() << "SQL:" << query.lastQuery();
+
+            qDebug() << "ERRO INSERT notas_fiscais:"
+                     << query.lastError().text();
+
+            db.close();
+            return false;
+        }
+
         db.close();
         return false;
     } else {
@@ -386,7 +401,7 @@ void notafiscal_repository::listarEntradas(QSqlQueryModel *model, const QString 
         LEFT JOIN clientes c
             ON c.id = n.id_emissorcliente
         WHERE n.finalidade = 'ENTRADA EXTERNA'
-          AND n.cstat IN (100, 150)
+          AND n.cstat IN ('100', '150')
     )";
 
     if (!de.isEmpty() && !ate.isEmpty())
@@ -666,4 +681,25 @@ void notafiscal_repository::listarMonitor(QSqlQueryModel *model, const QStringLi
         qDebug() << "Erro SQL listarMonitor:" << model->lastError().text();
 
     db.close();
+}
+
+QString notafiscal_repository::getXmlPathFromIdVenda(qlonglong idvenda){
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "Erro ao abrir banco getXmlPathFromIdVEnda()";
+        return "";
+    }
+    QString xmlPath = "";
+    QSqlQuery q(db);
+    q.prepare("SELECT xml_path FROM notas_fiscais WHERE id_venda = :idvenda");
+    q.bindValue(":idvenda", idvenda);
+    if (!q.exec()) {
+        qDebug() << q.lastError().text();
+        return {};
+    }
+
+    if (!q.next()) {
+        return {};
+    }
+    return q.value(0).toString();
+
 }

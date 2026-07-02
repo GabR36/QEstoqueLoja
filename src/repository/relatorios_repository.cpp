@@ -127,7 +127,6 @@ QMap<QString, int> Relatorios_repository::buscarQuantVendasPeriodo(
     }
 
 
-    db.close();
 
     return resultado;
 }
@@ -210,7 +209,6 @@ QMap<QString, QPair<double,double>> Relatorios_repository::buscarValorVendasPeri
     }
 
 
-    db.close();
 
     return resultado;
 }
@@ -263,7 +261,6 @@ QMap<QString, int> Relatorios_repository::buscarTopProdutosVendidosPeriodo(
         << query.lastError().text();
     }
 
-    db.close();
 
     return topProdutos;
 }
@@ -317,7 +314,6 @@ QMap<QString, QMap<QString,int>> Relatorios_repository::buscarFormasPagamentoPer
         << "Erro buscarFormasPagamentoPeriodo:"
         << query.lastError().text();
     }
-    db.close();
     return resultado;
 }
 
@@ -455,7 +451,6 @@ QMap<QString, float> Relatorios_repository::produtosMaisLucrativosPeriodo(
         << query.lastError().text();
     }
 
-    db.close();
     return produtosLucro;
 }
 
@@ -469,14 +464,12 @@ bool Relatorios_repository::existeProdutoVendido()
     QSqlQuery query(db);
     if (query.exec("SELECT 1 FROM produtos_vendidos LIMIT 1")) {
         if (query.next()) {
-            db.close();
             return true;
         }
     } else {
         qDebug() << "Erro na consulta:" << query.lastError().text();
     }
 
-    db.close();
     return false;
 }
 
@@ -526,7 +519,6 @@ QList<QStringList> Relatorios_repository::buscarInventario(
         qDebug()
         << "Erro buscarInventario:"
         << query.lastError().text();
-        db.close();
         return resultado;
     }
 
@@ -544,7 +536,6 @@ QList<QStringList> Relatorios_repository::buscarInventario(
         };
     }
 
-    db.close();
     return resultado;
 }
 
@@ -559,7 +550,6 @@ QList<QStringList> Relatorios_repository::buscarTodosProdutosParaCsv()
     QSqlQuery query(db);
     if (!query.exec("SELECT * FROM produtos")) {
         qDebug() << "Erro ao buscar produtos para CSV:" << query.lastError().text();
-        db.close();
         return resultado;
     }
 
@@ -570,6 +560,5 @@ QList<QStringList> Relatorios_repository::buscarTodosProdutosParaCsv()
         resultado << row;
     }
 
-    db.close();
     return resultado;
 }

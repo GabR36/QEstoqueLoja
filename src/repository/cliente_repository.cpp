@@ -29,7 +29,6 @@ qlonglong Cliente_repository::contarQuantosRegistrosPorCPFCNPJ(const QString &cp
 
     q.next();
     qlonglong total = q.value(0).toLongLong();
-    db.close();
     return total;
 }
 
@@ -83,13 +82,11 @@ bool Cliente_repository::inserir(ClienteDTO cliente){
 
     if(!query.exec()){
         qDebug() << "Query insert Cliente nao funcionou!";
-        db.close();
         return false;
     }else{
         qDebug() << "cliente adicionado com sucesso!";
 
     }
-    db.close();
     return true;
 }
 
@@ -104,13 +101,11 @@ qlonglong Cliente_repository::getIdFromCPFCNPJ(const QString &cpfcnpj){
     q.bindValue(":cnpjemit", cpfcnpj);
     if(!q.exec()){
         qDebug() << "nao executou query para achar idcliente em atualizarNotaBanco()";
-        db.close();
         return -1;
 
     }else{
         if (q.next()) {
             idcliente = q.value(0).toLongLong();
-            db.close();
             return idcliente;
         }
     }
@@ -130,7 +125,6 @@ void Cliente_repository::listarClientes(QSqlQueryModel *model)
 
     model->setQuery("SELECT * FROM clientes", db);
 
-    db.close();
 }
 
 bool Cliente_repository::deletarCliente(qlonglong id){
@@ -145,10 +139,8 @@ bool Cliente_repository::deletarCliente(qlonglong id){
     q.bindValue(":valor1", id);
     if(!q.exec()){
         qDebug() << "Não conseguiu deletar cliente";
-        db.close();
         return false;
     }else{
-        db.close();
         return true;
     }
 
@@ -205,7 +197,6 @@ ClienteDTO Cliente_repository::getClienteByID(qlonglong id){
     query.bindValue(":valor1", id);
     if(!query.exec()){
         qDebug() << "Query erro, getClienteByID cliente.";
-        db.close();
         return cli;
     }
 
@@ -228,7 +219,6 @@ ClienteDTO Cliente_repository::getClienteByID(qlonglong id){
     cli.ie = query.value(14).toString();
     cli.adicionadoEm = query.value(15).toString();
     cli.atualizadoEm = query.value(16).toString();
-    db.close();
     return cli;
 
 }
@@ -267,10 +257,8 @@ bool Cliente_repository::updateCliente(qlonglong id, ClienteDTO cliente){
 
     if(!query.exec()){
         qDebug() << "erro query, update clientes";
-        db.close();
         return false;
     }else{
-        db.close();
         return true;
     }
 }
@@ -286,7 +274,6 @@ QList<ClienteDTO> Cliente_repository::getListAllClientes(){
     QSqlQuery query(db);
     if(!query.exec("SELECT * FROM clientes")){
         qDebug() << "Não executou query getListAllClientes";
-        db.close();
         return lista;
     }
 
@@ -314,7 +301,6 @@ QList<ClienteDTO> Cliente_repository::getListAllClientes(){
 
         lista.append(cli);
     }
-    db.close();
     return lista;
 }
 
@@ -336,14 +322,12 @@ bool Cliente_repository::verificarNomeId(const QString &nome, qlonglong id)
     query.bindValue(":nome", nome);
 
     if(!query.exec()){
-        db.close();
         return false;
     }
 
     query.next();
     bool existe = query.value(0).toInt() > 0;
 
-    db.close();
     return existe;
 }
 
@@ -373,6 +357,5 @@ ClienteDTO Cliente_repository::buscarClientePorNomeAproximado(const QString &nom
         cli.nome = query.value("nome").toString();
     }
 
-    db.close();
     return cli;
 }

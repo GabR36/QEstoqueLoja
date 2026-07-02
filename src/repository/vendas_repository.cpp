@@ -23,15 +23,12 @@ qlonglong Vendas_repository::getQuantidadeComprasCliente(qlonglong idcliente){
     query.bindValue(":id", idcliente);
 
     if(!query.exec()){
-        db.close();
         return 0;
     }
     if(!query.next()){
-        db.close();
         return 0;
     }else{
         quantCompras = query.value(0).toLongLong();
-        db.close();
         return quantCompras;
     }
 }
@@ -56,10 +53,8 @@ double Vendas_repository::getValorTotalVendasPrazoCliente(qlonglong idcliente){
         totalVendas = queryVendas.value(0).toDouble();
     } else {
         qDebug() << "Erro ao calcular total de vendas:" << queryVendas.lastError().text();
-        db.close();
         return 0.0;
     }
-    db.close();
     return totalVendas;
 }
 void Vendas_repository::listarVendas(QSqlQueryModel *model)
@@ -87,7 +82,6 @@ void Vendas_repository::listarVendas(QSqlQueryModel *model)
         qDebug() << "Erro SQL:" << model->lastError().text();
     }
 
-    db.close();
 }
 QPair<QDate, QDate> Vendas_repository::getMinMaxData(){
     QPair<QDate, QDate> dataRange;
@@ -103,7 +97,6 @@ QPair<QDate, QDate> Vendas_repository::getMinMaxData(){
         dataRange.first = query.value(0).toDate();
     }else{
         qDebug() << "Data Minima query nao rodou";
-        db.close();
         return dataRange;
     }
 
@@ -113,11 +106,9 @@ QPair<QDate, QDate> Vendas_repository::getMinMaxData(){
         dataRange.second = query.value(0).toDate();
     }else{
         qDebug() << "Data Maxima query nao rodou";
-        db.close();
         return dataRange;
     }
     query.finish();
-    db.close();
     return dataRange;
 }
 
@@ -149,7 +140,6 @@ VendasDTO Vendas_repository::getVenda(qlonglong id){
 
         }
     }else{
-        db.close();
         qDebug() << "erro query venda2 imprimir";
     }
     return result;
@@ -267,7 +257,6 @@ ResumoVendasDTO Vendas_repository::calcularResumo(
         resumo.quantidade = query.value(1).toInt();
     }
 
-    db.close();
 
     qDebug() << "resumo.lucro: " << resumo.lucro;
 
@@ -286,10 +275,8 @@ bool Vendas_repository::deletarVenda(qlonglong id){
     query.bindValue(":id", id);
     if(!query.exec()){
         qDebug()<< "Não executou query deletarVenda";
-        db.close();
         return false;
     }else{
-        db.close();
         return true;
     }
 }
@@ -311,10 +298,8 @@ bool Vendas_repository::updateNewTotalTrocoValorFinal(double total, double troco
     query.bindValue(":id", id);
     if(!query.exec()){
         qDebug() << "Query não rodou updateNewTotalTrocoValorFinal";
-        db.close();
         return false;
     }
-    db.close();
     return true;
 }
 
@@ -339,13 +324,10 @@ void Vendas_repository::listarVendasCliente(QSqlQueryModel *model, qlonglong idc
 
     if (!query.exec()) {
         qDebug() << "Erro SQL:" << query.lastError().text();
-        db.close();
         return;
     }
 
     model->setQuery(query);
-
-    db.close();
 }
 
 qlonglong Vendas_repository::inserir(VendasDTO venda){
@@ -374,13 +356,11 @@ qlonglong Vendas_repository::inserir(VendasDTO venda){
 
     if(!query.exec()){
         qDebug() << "Query não executou inserir venda()";
-        db.close();
         return -1;
     }
 
     qlonglong idVenda = query.lastInsertId().toInt();
 
-    db.close();
     return idVenda;
 }
 
@@ -397,10 +377,8 @@ bool Vendas_repository::atualizarEstaPago(qlonglong idVenda, int estaPago){
 
     if (!query.exec()) {
         qDebug() << "Query nao rodou atualizarEstaPago:" << query.lastError().text();
-        db.close();
         return false;
     }
-    db.close();
     return true;
 }
 

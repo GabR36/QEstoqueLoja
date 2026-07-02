@@ -25,7 +25,6 @@ QString DfeInfo_repository::getUltimaIdentificaçãoUsada(){
     if (q.next()) {
         ultimaAcao = q.value(0).toString();
     }
-    m_db.close();
 
     return ultimaAcao;
 }

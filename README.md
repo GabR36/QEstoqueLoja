@@ -54,6 +54,7 @@ Basta baixar e executar — não é necessário configurar servidor ou dependên
 # PostgreSQL
 
 Pode ser configurado para usar o PostgreSQL e compartilhar os dados pela rede com múltiplos computadores ao mesmo tempo.
+Instale o pacote libqt6sql6-psql (linux) e configure o banco nas configurações.
 
 ---
 
@@ -68,6 +69,7 @@ Pode ser configurado para usar o PostgreSQL e compartilhar os dados pela rede co
 - qt6-charts-dev  
 - qt6-tools-dev  
 - libzint-dev
+- libqt6sql6-psql **opcional para postgresql**
   
 **dependências externas**
 - libquazip1-qt6-dev  

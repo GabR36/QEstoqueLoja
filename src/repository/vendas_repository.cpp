@@ -79,7 +79,7 @@ void Vendas_repository::listarVendas(QSqlQueryModel *model)
         "SELECT id, valor_final, forma_pagamento, data_hora, "
         "cliente, esta_pago, total, desconto, taxa, "
         "valor_recebido, id_cliente, troco "
-        "FROM vendas2 ORDER BY id DESC",
+        "FROM vendas2 ORDER BY id DESC LIMIT 240",
         db
         );
 
@@ -179,7 +179,7 @@ void Vendas_repository::listarVendasDeAteFormaPagamento(
         "SELECT id, valor_final, forma_pagamento, data_hora, cliente, "
         "esta_pago, total, desconto, taxa, valor_recebido, troco "
         "FROM vendas2 "
-        "WHERE data_hora BETWEEN :de AND :ate ";
+        "WHERE data_hora BETWEEN :de AND :ate LIMIT 240";
 
     // filtro por cliente
     if (idCliente > 0) {

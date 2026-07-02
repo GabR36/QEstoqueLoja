@@ -1,6 +1,10 @@
 #include "config_repository.h"
 #include "../infra/apppath_service.h"
 #include <QSettings>
+#include <QSql>
+#include <quuid.h>
+#include <QSqlDatabase>
+#include <QSqlError>
 
 Config_repository::Config_repository(QObject *parent)
     : QObject{parent}
@@ -69,6 +73,15 @@ ConfigDTO Config_repository::loadAll()
     dto.nomeContador            = s.value("contador/contador_nome").toString();
     dto.emailContador           = s.value("contador/contador_email").toString();
 
+    dto.driverDB = s.value("database/driver").toInt();
+    dto.ipHostDB = s.value("database/ip").toString();
+    dto.portaDB = s.value("database/porta").toString();
+    dto.nomeDB = s.value("database/nome_db").toString();
+    dto.userDB = s.value("database/usuario_db").toString();
+    dto.senhaDB = s.value("database/senha").toString();
+    dto.pathPastaSqliteDB = s.value("database/path_pasta_sqlite").toString();
+    dto.pathPastaPostgreDB = s.value("database/path_pasta_postgre").toString();
+
     return dto;
 }
 
@@ -134,6 +147,69 @@ bool Config_repository::saveAll(const ConfigDTO &dto)
     s.setValue("contador/contador_nome",        dto.nomeContador);
     s.setValue("contador/contador_email",       dto.emailContador);
 
+    s.setValue("database/driver", dto.driverDB);
+    s.setValue("database/ip", dto.ipHostDB);
+    s.setValue("database/porta", dto.portaDB);
+    s.setValue("database/nome_db", dto.nomeDB);
+    s.setValue("database/usuario_db", dto.userDB);
+    s.setValue("database/senha", dto.senhaDB);
+    s.setValue("database/path_pasta_sqlite", dto.pathPastaSqliteDB);
+    s.setValue("database/path_pasta_postgre", dto.pathPastaPostgreDB);
+
+
+
+    s.sync();
+    return s.status() == QSettings::NoError;
+}
+
+bool Config_repository::testarConexaoBanco(const ConfigDTO &dto, QString &erro)
+{
+    QString connName = QUuid::createUuid().toString();
+
+    QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL", connName);
+
+    db.setHostName(dto.ipHostDB);
+    db.setPort(dto.portaDB.toInt());
+    db.setDatabaseName(dto.nomeDB);
+    db.setUserName(dto.userDB);
+    db.setPassword(dto.senhaDB);
+
+    if (!db.open()) {
+        erro = db.lastError().text();
+
+        QSqlDatabase::removeDatabase(connName);
+        return false;
+    }
+
+    db.close();
+    QSqlDatabase::removeDatabase(connName);
+
+    return true;
+}
+
+ConfigDbDTO Config_repository::getConfigsDb(){
+
+    ConfigDbDTO dto;
+    QSettings s(AppPath_service::configPath(), QSettings::IniFormat);
+    dto.driverDB = s.value("database/driver").toInt();
+    dto.ipHostDB = s.value("database/ip").toString();
+    dto.portaDB = s.value("database/porta").toString();
+    dto.nomeDB = s.value("database/nome_db").toString();
+    dto.userDB = s.value("database/usuario_db").toString();
+    dto.senhaDB = s.value("database/senha").toString();
+    dto.pathPastaSqliteDB = s.value("database/path_pasta_sqlite").toString();
+    dto.pathPastaPostgreDB = s.value("database/path_pasta_postgre").toString();
+
+    return dto;
+
+}
+
+bool Config_repository::saveMigration13Changes()
+{
+    QSettings s(AppPath_service::configPath(), QSettings::IniFormat);
+
+    s.setValue("database/river",0);
+    s.setValue("database/path_pasta_sqlite", AppPath_service::appDataPath());
     s.sync();
     return s.status() == QSettings::NoError;
 }

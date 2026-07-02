@@ -74,6 +74,16 @@ struct ConfigDTO {
     // Contador
     QString nomeContador;
     QString emailContador;
+
+    //DB
+    int driverDB = 0;
+    QString ipHostDB;
+    QString portaDB;
+    QString nomeDB;
+    QString userDB;
+    QString senhaDB;
+    QString pathPastaSqliteDB;
+    QString pathPastaPostgreDB;
 };
 
 #endif // CONFIG_DTO_H

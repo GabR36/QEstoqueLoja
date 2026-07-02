@@ -29,8 +29,17 @@ Acbr_service::Resultado Acbr_service::configurar(const QString &versaoApp)
     }
 
 
-    QString caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
-                         "/xmlNf";
+    // QString caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) +
+    //                      "/xmlNf";
+    QString caminhoXml;
+    if(configDTO.driverDB == 0){ //sqlite
+        caminhoXml = configDTO.pathPastaSqliteDB + "/xmlNf";
+    }else if(configDTO.driverDB == 1){
+        caminhoXml = configDTO.pathPastaPostgreDB + "/xmlNf";
+    }else{
+        caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/xmlNf";
+    }
+
     QString caminhoEntradas = caminhoXml + "/entradas";
     QDir dir;
     if(!dir.exists(caminhoXml)){

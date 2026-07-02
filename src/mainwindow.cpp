@@ -49,6 +49,7 @@
 #include "services/dfe_service.h"
 #include "inutilizacaodialog.h"
 #include "cartacorrecaojanela.h"
+#include "services/export_service.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -60,7 +61,15 @@ MainWindow::MainWindow(QWidget *parent)
 
     model = new QSqlQueryModel(this);
 
+    //carrega as configurações no DTO
+    configDTO = confServ->carregarTudo();
+    qDebug() << "driver: " << configDTO.driverDB;
+
+    DatabaseConnection_service::changeDatabase(configDTO);
+
     iniciarMigration();
+
+
     db = DatabaseConnection_service::db();
 
     produtoService = new Produto_Service();
@@ -69,9 +78,6 @@ MainWindow::MainWindow(QWidget *parent)
     // configuracao do modelo e view produtos
     ui->Tview_Produtos->setModel(model);
 
-    //carrega as configurações no DTO
-    Config_service *confServ = new Config_service(this);
-    configDTO = confServ->carregarTudo();
 
     if (configDTO.emitNfFiscal) {
         contingenciaService = new ContingenciaService(this);
@@ -157,6 +163,10 @@ void MainWindow::iniciarMigration(){
     connect(schema, &SchemaMigration_service::dbVersao6, this,
             &MainWindow::atualizarConfigAcbr);
     connect(schema, &SchemaMigration_service::dbVersao9, this,
+            &MainWindow::atualizarConfigAcbr);
+    connect(schema, &SchemaMigration_service::dbVersao13, confServ,
+            &Config_service::salvarMudancasMigration13);
+    connect(schema, &SchemaMigration_service::dbVersao13, this,
             &MainWindow::atualizarConfigAcbr);
 
     // schema->update();
@@ -590,5 +600,22 @@ void MainWindow::on_actionEnviar_Carta_de_Corre_o_triggered()
 {
     CartaCorrecaoJanela *janela = new CartaCorrecaoJanela();
     janela->show();
+}
+
+
+void MainWindow::on_actionSQLite_triggered()
+{
+    QString pastaDestino = QFileDialog::getExistingDirectory(
+        this,
+        "Escolha a pasta para salvar o banco"
+        );
+    Export_service expServ;
+    auto r1 = expServ.exportarSqliteDB(pastaDestino);
+    if(r1.ok){
+        QMessageBox::information(this, "Sucesso", r1.msg);
+    }else{
+        QMessageBox::warning(this, "Erro ao exportar banco", r1.msg);
+    }
+
 }
 

@@ -13,7 +13,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # set(CMAKE_PREFIX_PATH "C:/Qt/6.6.2/mingw_64/lib/cmake")
 
-
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core Network Core5Compat)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools Sql PrintSupport Charts Xml Qml Core Network Core5Compat)
 if (CMAKE_SYSTEM MATCHES "Linux")
@@ -42,6 +41,27 @@ elseif (CMAKE_SYSTEM MATCHES "Windows")
 endif()
 
 
+
+if (WIN32)
+    add_library(QtRPT STATIC IMPORTED GLOBAL)
+
+    set_target_properties(QtRPT PROPERTIES
+        IMPORTED_LOCATION
+            ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/bin/release/lib/QtRPT.lib
+        INTERFACE_INCLUDE_DIRECTORIES
+            ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/QtRptProject-Source/QtRptProject/QtRPT
+    )
+
+    add_library(zlib_dll STATIC IMPORTED GLOBAL)
+
+    set_target_properties(zlib_dll PROPERTIES
+        IMPORTED_LOCATION
+            ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/lib/zdll.lib
+        INTERFACE_INCLUDE_DIRECTORIES
+            ${CMAKE_CURRENT_SOURCE_DIR}/libs-externas/cppbrasil/third-party/windows/zlib-1.3/include
+    )
+endif()
+
 set(TS_FILES QEstoqueLoja_pt_BR.ts)
 if(CMAKE_SYSTEM MATCHES "Windows")
 
@@ -66,6 +86,102 @@ if(WIN32)
        list(APPEND PROJECT_SOURCES ${APP_ICON_RESOURCE_WINDOWS})
 endif()
 include_directories(${CMAKE_SOURCE_DIR}/src/subclass)
+
+
+set(QESTOQUE_SOURCES
+
+    src/util/dbutil.cpp
+
+    src/services/Produto_service.cpp
+    src/services/barcode_service.cpp
+    src/services/config_service.cpp
+    src/services/cliente_service.cpp
+    src/services/dfe_service.cpp
+    src/services/eventofiscal_service.cpp
+    src/services/notafiscal_service.cpp
+    src/services/produtonota_service.cpp
+    src/services/vendas_service.cpp
+    src/services/produtovenda_service.cpp
+    src/services/entradasvendas_service.cpp
+    src/services/fiscalemitter_service.cpp
+    src/services/email_service.cpp
+    src/services/acbr_service.cpp
+    src/services/schemamigration_service.cpp
+
+    src/repository/Produto_repository.cpp
+    src/repository/config_repository.cpp
+    src/repository/cliente_repository.cpp
+    src/repository/dfeinfo_repository.cpp
+    src/repository/eventofiscal_repository.cpp
+    src/repository/notafiscal_repository.cpp
+    src/repository/produtonota_repository.cpp
+    src/repository/vendas_repository.cpp
+    src/repository/produtovenda_repository.cpp
+    src/repository/entradasvendas_repository.cpp
+
+    src/util/datautil.cpp
+    src/util/ibptutil.cpp
+    src/util/nfxmlutil.cpp
+    src/util/NFUtilidades.cpp
+    src/util/manifestadordfe.cpp
+    src/util/consultacnpjmanager.cpp
+    src/util/ziputil.cpp
+    src/util/pdfexporter.cpp
+    src/util/mailmanager.cpp
+    src/util/ACBrConsultaCNPJ.cpp
+    src/util/ACBrMail.cpp
+    src/util/vendasutil.cpp
+
+    src/nota/ACBrNFe.cpp
+    src/nota/cancelnf.cpp
+    src/nota/eventocienciaop.cpp
+    src/nota/nfceacbr.cpp
+    src/nota/nfeacbr.cpp
+    src/nota/acbrmanager.cpp
+    src/nota/eventocartacorrecao.cpp
+
+    src/infra/databaseconnection_service.cpp
+    src/infra/apppath_service.cpp
+)
+
+add_library(QEstoqueLib STATIC
+    ${QESTOQUE_SOURCES}
+)
+
+target_include_directories(QEstoqueLib PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/util
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/services
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/repository
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/dto
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/nota
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/infra
+)
+
+if (CMAKE_SYSTEM MATCHES "Linux")
+    target_link_libraries(QEstoqueLib PUBLIC
+        QuaZip::QuaZip
+        QtRPT
+        z
+    )
+elseif(WIN32)
+    target_link_libraries(QEstoqueLib PUBLIC
+        quazip1-qt6
+        QtRPT
+        zlib_dll
+    )
+endif()
+
+target_link_libraries(QEstoqueLib PUBLIC
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Sql
+    Qt${QT_VERSION_MAJOR}::Xml
+    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::PrintSupport
+    Qt${QT_VERSION_MAJOR}::Charts
+    Qt${QT_VERSION_MAJOR}::Core5Compat
+    zint
+)
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     #set(APP_ICON_RESOURCE_WINDOWS "${CMAKE_CURRENT_SOURCE_DIR}/Imagens/QEstoqueLOja/AppIcon.rc")
 
@@ -206,6 +322,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         src/nota/eventocartacorrecao.h src/nota/eventocartacorrecao.cpp
         sql-queries/migration12.sql
         recusos-geral.qrc
+        src/dto/ConfigDB_dto.h
+        src/services/export_service.h src/services/export_service.cpp
 
 
 

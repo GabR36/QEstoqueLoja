@@ -32,6 +32,7 @@ public:
     QList<NotaFiscalDTO>           buscarPorPeriodo(QDateTime dtIni, QDateTime dtFim, int tpAmb);
     QList<NotaFiscalDTO>           buscarContingencias();
     bool                           atualizarRetornoContingencia(const QString &chNfe, const QString &cstat, const QString &nProt);
+    QString getXmlPathFromIdVenda(qlonglong idvenda);
 private:
     QSqlDatabase db;
 

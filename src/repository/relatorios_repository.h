@@ -31,6 +31,8 @@ private:
     QSqlDatabase db;
     static QString strftimeFormato(Agrupamento agrup);
 
+    QString dateFormatSql(Agrupamento agrup);
+    QString dateFormatSql(Agrupamento agrup, const QString &campo);
 signals:
 };
 

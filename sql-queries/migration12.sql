@@ -149,7 +149,6 @@ CREATE TABLE eventos_fiscais_nova (
     justificativa TEXT,
     codigo TEXT,
     xml_path TEXT,
-    xml_content TEXT,
     nprot TEXT,
     id_nf INTEGER,
     atualizado_em DATETIME DEFAULT CURRENT_TIMESTAMP,

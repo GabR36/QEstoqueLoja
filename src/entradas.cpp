@@ -252,7 +252,7 @@ void Entradas::enviarEmailNFe(QString nomeCliente, QString emailCliente,
             );
 
         corpo = "Olá " + nomeCliente + "\n\n"
-            "Foi emitido uma Nota Fiscal de Devolução da " + nomeEmpresa + " para o CNPJ:" +
+            "Foi emitido uma Nota Fiscal de Devolução de " + nomeEmpresa + " para o CNPJ:" +
                cnpj +
                 "\n\nem anexo, você encontrará os arquivos referentes à "
                                 "Nota Fiscal de " +
@@ -298,6 +298,7 @@ void Entradas::addProdSemCodBarras(QString idProd, QString codBarras){
     novoProd.ncm             = prod.ncm;
     novoProd.csosn           = configDTO.csosnPadraoProduto;
     novoProd.pis             = configDTO.pisPadraoProduto;
+
 
     InserirProduto *addProd = new InserirProduto();
     addProd->preencherCamposProduto(novoProd);

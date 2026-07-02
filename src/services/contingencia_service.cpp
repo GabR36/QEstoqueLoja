@@ -4,13 +4,11 @@
 #include <QMutexLocker>
 #include <QDebug>
 #include <QSqlError>
+#include "../infra/databaseconnection_service.h"
 
 static const int     INTERVALO_MS  = 5 * 60 * 1000;   // 5 minutos
 static const QString DB_CONN_NAME  = QStringLiteral("contingencia_worker");
 
-// ================================================================
-// ContingenciaWorker
-// ================================================================
 
 ContingenciaWorker::ContingenciaWorker(QMutex *acbrMutex, QObject *parent)
     : QObject{parent}
@@ -24,8 +22,7 @@ ContingenciaWorker::ContingenciaWorker(QMutex *acbrMutex, QObject *parent)
 void ContingenciaWorker::setup()
 {
     // Cria conexão SQLite exclusiva para este thread
-    m_db = QSqlDatabase::addDatabase("QSQLITE", DB_CONN_NAME);
-    m_db.setDatabaseName(AppPath_service::databasePath());
+    m_db = DatabaseConnection_service::createThreadConnection(DB_CONN_NAME);
     if (!m_db.open()) {
         qDebug() << "ContingenciaWorker: falha ao abrir banco:" << m_db.lastError().text();
         return;
@@ -146,10 +143,6 @@ void ContingenciaWorker::tentarReenviar()
         }
     }
 }
-
-// ================================================================
-// ContingenciaService
-// ================================================================
 
 QMutex ContingenciaService::s_acbrMutex;
 

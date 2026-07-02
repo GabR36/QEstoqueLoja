@@ -3,17 +3,31 @@
 
 #include <QObject>
 #include <QSqlDatabase>
+#include "../dto/Config_dto.h".h"
 
-class DatabaseConnection_service : public QObject
+struct DatabaseConfig
 {
-    Q_OBJECT
+    QString driver;
+    QString host;
+    int port;
+    QString database;
+    QString user;
+    QString password;
+};
+
+
+class DatabaseConnection_service
+{
+
 public:
-    explicit DatabaseConnection_service(QObject *parent = nullptr);
     static bool init();
     static bool open();
     void close();
     static QSqlDatabase db();
     static void setDatabase(QSqlDatabase database);
+    static bool isPostgres();
+    static QSqlDatabase createThreadConnection(const QString &name);
+    static void changeDatabase(ConfigDTO configDto);
 private:
      static bool initialized;
 

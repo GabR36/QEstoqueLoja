@@ -25,24 +25,16 @@ DanfeUtil::DanfeUtil(QObject *parent)
                               "/imagens/" + QFileInfo(configDTO.logoPathEmpresa).fileName();
     caminhoLogo = caminhoCompletoLogo;
 }
-bool DanfeUtil::abrirDanfe(int idVenda){
-    if(!db.open()){
-        qDebug() << "nao abriu banco danfeUtil";
+bool DanfeUtil::abrirDanfe(qlonglong idVenda){
+    QString xmlPathRelativo = notaServ.getXmlPathFromIdVenda(idVenda);
+    if (xmlPathRelativo.isEmpty()) {
         return false;
     }
-
-    QSqlQuery query;
-    query.prepare("SELECT xml_path FROM notas_fiscais WHERE id_venda = :idvenda");
-    query.bindValue(":idvenda", idVenda);
-
-    if (!query.exec() || !query.next()) {
-        return false;
-    }
-
-    QString xmlPath = query.value(0).toString();
+    QString xmlPath = AppPath_service::pastaArmazenamentoArquivos() + "/" + xmlPathRelativo;
     if (xmlPath.isEmpty()) {
         return false;
     }
+    qDebug() << "abrindo danfe do xml em: " << xmlPath;
     auto nf = AcbrManager::instance()->nfe();
     nf->LimparLista();
     nf->CarregarXML(xmlPath.toStdString());

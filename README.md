@@ -6,7 +6,7 @@ O **QEstoqueLoja** é um ERP simples e eficiente para controle de estoque e vend
 
 Foi desenvolvido com foco em **facilidade de uso**, **instalação rápida** e **automatização de tarefas do dia a dia**, evitando a complexidade excessiva presente em sistemas ERP tradicionais.
 
-Atualmente, o sistema funciona de forma **local (offline)**, em um único computador, sem necessidade de servidores ou configurações complexas.
+O sistema funciona de forma **local (offline)**, em um único computador, sem necessidade de servidores ou configurações complexas, por padrão, **mas pode ser configurado com banco de dados PostgreSQL para compartilhar os dados pela rede**.
 
 ---
 
@@ -25,6 +25,7 @@ Atualmente, o sistema funciona de forma **local (offline)**, em um único comput
 - Orçamentos
 - Importação de produtos via notas fiscais
 - Envio de notas fiscais por e-mail
+- Suporte a banco de dados na rede
 - E mais
 
 ---
@@ -41,13 +42,6 @@ O **QEstoqueLoja** busca resolver esse problema com:
 
 ---
 
-## Tecnologias
-
-- **Qt Framework**
-- **SQLite** (banco de dados local)
-
----
-
 ## Instalação
 
 Instaladores para **Windows** e **Linux (Debian)** estão disponíveis na página de releases:
@@ -57,17 +51,25 @@ https://github.com/GabR36/QEstoqueLoja/releases
 Basta baixar e executar — não é necessário configurar servidor ou dependências adicionais.
 
 ---
+# PostgreSQL
+
+Pode ser configurado para usar o PostgreSQL e compartilhar os dados pela rede com múltiplos computadores ao mesmo tempo.
+
+---
 
 ## Compilação
 
 ### Dependências
 
+**dependências disponíveis no repositório**
 - cmake  
 - qt6-base-dev  
 - qt6-declarative-dev  
 - qt6-charts-dev  
 - qt6-tools-dev  
-- libzint-dev  
+- libzint-dev
+  
+**dependências externas**
 - libquazip1-qt6-dev  
 - QtRpt *(versão biblioteca, sem suporte a barcode)*  
   https://qtrpt.sourceforge.io/  
@@ -85,28 +87,6 @@ mkdir build
 cmake -S . -B build
 cmake --build build
 ```
-
-## Motivações e Futuro
-
-O projeto nasceu da necessidade real do dia a dia em uma pequena loja.
-
-A ideia é:
-
-- Substituir ferramentas já utilizadas
-- Evoluir com funcionalidades que realmente aumentem a eficiência
-- Evitar complexidade desnecessária
-
-Contribuições são bem-vindas, desde que estejam alinhadas com o foco do projeto.
-
-## Filosofia de Desenvolvimento
-
-O projeto segue uma abordagem prática:
-
-“Fazer funcionar primeiro, melhorar depois.”
-
-- Código funcional tem prioridade
-- Melhorias são feitas de forma incremental
-- Influência de práticas ágeis
 
 ## Capturas de Tela
 

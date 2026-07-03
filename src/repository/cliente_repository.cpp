@@ -161,7 +161,7 @@ void Cliente_repository::pesquisar(QSqlQueryModel *model, const QString &nome)
     QSqlQuery query(db);
     query.prepare(
         "SELECT * FROM clientes "
-        "WHERE nome LIKE :nome "
+        "WHERE LOWER(nome) LIKE LOWER(:nome) "
         "ORDER BY id DESC"
         );
 
@@ -345,7 +345,7 @@ ClienteDTO Cliente_repository::buscarClientePorNomeAproximado(const QString &nom
     query.prepare(
         "SELECT id, nome "
         "FROM clientes "
-        "WHERE nome LIKE :nome "
+        "WHERE LOWER(nome) LIKE LOWER(:nome) "
         "ORDER BY LENGTH(nome) ASC "
         "LIMIT 1"
         );

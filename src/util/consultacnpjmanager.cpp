@@ -2,6 +2,7 @@
 #include <QStandardPaths>
 #include <QDebug>
 #include "../infra/apppath_service.h"
+#include "../nota/acbrmanager.h"
 
 std::unique_ptr<ConsultaCnpjManager> ConsultaCnpjManager::m_instance = nullptr;
 
@@ -23,6 +24,7 @@ ConsultaCnpjManager* ConsultaCnpjManager::instance(){
 
 
 ACBrConsultaCNPJ* ConsultaCnpjManager::cnpj() {
+    if (AcbrManager::isTestMode()) return nullptr;
     if (!m_cnpj) {
         QString configLibPath = AppPath_service::consultaCnpjConfigPath();
         m_cnpj = std::make_unique<ACBrConsultaCNPJ>(configLibPath.toStdString(), "");

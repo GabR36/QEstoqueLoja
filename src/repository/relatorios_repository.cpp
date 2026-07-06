@@ -454,6 +454,92 @@ QMap<QString, float> Relatorios_repository::produtosMaisLucrativosPeriodo(
     return produtosLucro;
 }
 
+QMap<QString, double> Relatorios_repository::buscarLucroPeriodo(
+    const QDate &inicio,
+    const QDate &fim,
+    Agrupamento agrup)
+{
+    QMap<QString, double> resultado;
+
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco. buscarLucroPeriodo";
+        return resultado;
+    }
+
+    bool postgres = db.driverName().contains("QPSQL");
+
+    QString fmtV  = dateFormatSql(agrup, "v.data_hora");
+    QString fmtEV = dateFormatSql(agrup, "ev.data_hora");
+    QString filtroV  = postgres ? "v.data_hora::date"   : "date(v.data_hora)";
+    QString filtroEV = postgres ? "ev.data_hora::date"  : "date(ev.data_hora)";
+
+    // custo_unitario = p.preco * (1 - porcent_lucro/100)
+    // lucro_item     = (pv.preco_vendido - custo_unitario) * quantidade
+    // margem_venda   = SUM(lucro_item) / SUM(pv.preco_vendido * quantidade)
+    // lucro_caixa    = valor_pago * margem_venda
+    QSqlQuery query(db);
+    query.prepare(QString(R"(
+        WITH sale_stats AS (
+            SELECT
+                pv.id_venda,
+                SUM(pv.quantidade * pv.preco_vendido) AS valor_total,
+                SUM(
+                    pv.quantidade * (
+                        pv.preco_vendido
+                        - p.preco * (1.0 - COALESCE(p.porcent_lucro, 0) / 100.0)
+                    )
+                ) AS lucro_total
+            FROM produtos_vendidos pv
+            JOIN produtos p ON pv.id_produto = p.id
+            GROUP BY pv.id_venda
+        ),
+        cash AS (
+            SELECT %1 AS periodo,
+                   SUM(v.valor_final
+                       * ss.lucro_total / NULLIF(ss.valor_total, 0)
+                   ) AS lucro_caixa
+            FROM vendas2 v
+            JOIN sale_stats ss ON ss.id_venda = v.id
+            WHERE %3 BETWEEN :inicio1 AND :fim1
+              AND v.forma_pagamento <> 'Prazo'
+            GROUP BY %1
+        ),
+        credit AS (
+            SELECT %2 AS periodo,
+                   SUM(ev.valor_final
+                       * ss.lucro_total / NULLIF(ss.valor_total, 0)
+                   ) AS lucro_caixa
+            FROM entradas_vendas ev
+            JOIN sale_stats ss ON ss.id_venda = ev.id_venda
+            WHERE %4 BETWEEN :inicio2 AND :fim2
+            GROUP BY %2
+        )
+        SELECT periodo, SUM(lucro_caixa) AS total_lucro
+        FROM (
+            SELECT periodo, lucro_caixa FROM cash
+            UNION ALL
+            SELECT periodo, lucro_caixa FROM credit
+        ) combined
+        GROUP BY periodo
+        ORDER BY periodo
+    )").arg(fmtV, fmtEV, filtroV, filtroEV));
+
+    query.bindValue(":inicio1", inicio.toString(Qt::ISODate));
+    query.bindValue(":fim1",    fim.toString(Qt::ISODate));
+    query.bindValue(":inicio2", inicio.toString(Qt::ISODate));
+    query.bindValue(":fim2",    fim.toString(Qt::ISODate));
+
+    if (query.exec()) {
+        while (query.next()) {
+            resultado[query.value(0).toString()] = query.value(1).toDouble();
+        }
+    } else {
+        qDebug() << "Erro buscarLucroPeriodo:" << query.lastError().text();
+    }
+
+    return resultado;
+}
+
 bool Relatorios_repository::existeProdutoVendido()
 {
     if (!DatabaseConnection_service::open()) {

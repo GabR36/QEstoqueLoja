@@ -4,6 +4,7 @@
 #include <QSqlError>
 #include <QDebug>
 #include <QSqlRecord>
+#include <QDateTime>
 
 Relatorios_repository::Relatorios_repository(QObject *parent)
     : QObject{parent}
@@ -716,6 +717,96 @@ QList<QStringList> Relatorios_repository::buscarInventario(
                     'f',
                     2
                     )
+        };
+    }
+
+    return resultado;
+}
+
+QList<QStringList> Relatorios_repository::buscarClientesInadimplentes()
+{
+    QList<QStringList> resultado;
+
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco. buscarClientesInadimplentes";
+        return resultado;
+    }
+
+    QSqlQuery query(db);
+
+    // data_referencia = data do ultimo pagamento (entradas_vendas), ou,
+    // se o cliente nunca pagou nada, a data da compra a prazo mais antiga.
+    // Ordenar por essa data ASC coloca quem esta ha mais tempo sem pagar primeiro.
+    query.prepare(R"(
+        WITH devido AS (
+            SELECT id_cliente, SUM(valor_final) AS total_devido
+            FROM vendas2
+            WHERE forma_pagamento = 'Prazo'
+            GROUP BY id_cliente
+        ),
+        pago AS (
+            SELECT v.id_cliente, SUM(ev.valor_final) AS total_pago
+            FROM entradas_vendas ev
+            JOIN vendas2 v ON v.id = ev.id_venda
+            GROUP BY v.id_cliente
+        ),
+        ultimo_pagamento AS (
+            SELECT v.id_cliente, MAX(ev.data_hora) AS data_pagamento
+            FROM entradas_vendas ev
+            JOIN vendas2 v ON v.id = ev.id_venda
+            GROUP BY v.id_cliente
+        ),
+        primeira_compra AS (
+            SELECT id_cliente, MIN(data_hora) AS data_compra
+            FROM vendas2
+            WHERE forma_pagamento = 'Prazo'
+            GROUP BY id_cliente
+        )
+        SELECT c.nome,
+               c.telefone,
+               (d.total_devido - COALESCE(p.total_pago, 0)) AS valor_devido,
+               COALESCE(up.data_pagamento, pc.data_compra) AS data_referencia
+        FROM clientes c
+        JOIN devido d ON d.id_cliente = c.id
+        LEFT JOIN pago p ON p.id_cliente = c.id
+        LEFT JOIN ultimo_pagamento up ON up.id_cliente = c.id
+        JOIN primeira_compra pc ON pc.id_cliente = c.id
+        WHERE (d.total_devido - COALESCE(p.total_pago, 0)) > 0.005
+        ORDER BY data_referencia ASC
+    )");
+
+    if (!query.exec()) {
+        qDebug()
+        << "Erro buscarClientesInadimplentes:"
+        << query.lastError().text();
+        return resultado;
+    }
+
+    QDate hoje = QDate::currentDate();
+
+    while (query.next()) {
+        QString nome = query.value(0).toString();
+        QString telefone = query.value(1).toString();
+        double valorDevido = query.value(2).toDouble();
+
+        QString dataRefStr = query.value(3).toString();
+        QDateTime dataRef = QDateTime::fromString(dataRefStr, "yyyy-MM-dd HH:mm:ss");
+        if (!dataRef.isValid())
+            dataRef = QDateTime::fromString(dataRefStr, Qt::ISODate);
+
+        QString dataRefFormatada = dataRef.isValid()
+                                        ? dataRef.date().toString("dd/MM/yyyy")
+                                        : dataRefStr;
+        QString diasSemPagar = dataRef.isValid()
+                                    ? QString::number(dataRef.date().daysTo(hoje))
+                                    : "";
+
+        resultado << QStringList{
+            nome,
+            telefone,
+            QString::number(valorDevido, 'f', 2),
+            dataRefFormatada,
+            diasSemPagar
         };
     }
 

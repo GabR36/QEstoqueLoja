@@ -53,3 +53,8 @@ QList<QStringList> Relatorios_service::buscarInventario(const QDate &inicio, con
 {
     return relatoriosRepo.buscarInventario(inicio, fim, somenteNf);
 }
+
+QList<QStringList> Relatorios_service::buscarClientesInadimplentes()
+{
+    return relatoriosRepo.buscarClientesInadimplentes();
+}

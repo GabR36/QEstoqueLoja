@@ -9,7 +9,9 @@
 #include <QLocale>
 #include <QUrl>
 #include <QFont>
+#include <QFontMetrics>
 #include <QDate>
+#include <algorithm>
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QMessageBox>
@@ -216,15 +218,30 @@ void PDFexporter::exportarTabelaRelatorio(QWidget *parent,
     const QStringList &cabecalho = linhas.first();
     const int nCols = cabecalho.size();
 
-    // Distribuição proporcional das colunas: ID pequeno, Qtd pequeno, Descrição grande, Un médio, Preço médio
-    QVector<int> pesos(nCols, 10);
-    if (nCols == 5) { pesos = {5, 6, 35, 10, 14}; }
-    int pesoTotal = 0;
-    for (int p : pesos) pesoTotal += p;
+    // Largura de cada coluna proporcional ao conteúdo real (cabeçalho + todas as
+    // linhas), para preencher toda a largura da página independente de quantas
+    // colunas o relatório tiver.
+    QFontMetrics fmCabecalho(QFont("Arial", 9, QFont::Bold));
+    QFontMetrics fmCorpo(QFont("Arial", 8));
 
     QVector<int> larguras(nCols);
-    for (int i = 0; i < nCols; i++)
-        larguras[i] = conteudoW * pesos[i] / pesoTotal;
+    int somaConteudo = 0;
+    for (int i = 0; i < nCols; i++) {
+        int w = fmCabecalho.horizontalAdvance(cabecalho[i]);
+        for (int row = 1; row < linhas.size(); row++) {
+            if (i < linhas[row].size())
+                w = std::max(w, fmCorpo.horizontalAdvance(linhas[row][i]));
+        }
+        larguras[i] = w + 20; // padding
+        somaConteudo += larguras[i];
+    }
+
+    int somaFinal = 0;
+    for (int i = 0; i < nCols; i++) {
+        larguras[i] = conteudoW * larguras[i] / somaConteudo;
+        somaFinal += larguras[i];
+    }
+    larguras[nCols - 1] += conteudoW - somaFinal; // acerta arredondamento
 
     int y = margemTop;
 

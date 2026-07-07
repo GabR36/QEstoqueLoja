@@ -27,6 +27,7 @@ public:
     bool                             existeProdutoVendido();
     QList<QStringList>               buscarTodosProdutosParaCsv();
     QList<QStringList>               buscarInventario(const QDate &inicio, const QDate &fim, bool somenteNf);
+    QList<QStringList>               buscarClientesInadimplentes();
 
 private:
     QSqlDatabase db;

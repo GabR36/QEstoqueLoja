@@ -41,6 +41,7 @@ private:
     QLocale portugues;
     ConfigDTO configDTO;
     Relatorios_service relatoriosServ;
+    QStandardItemModel *modelInadimplentes = nullptr;
 
     bool existeProdutoVendido();
     void configurarJanelaQuantVendas();
@@ -51,6 +52,7 @@ private:
     void configurarJanelaProdutoLucroValor();
     void configurarJanelaInventario();
     void configurarJanelaLucroGeral();
+    void configurarJanelaInadimplentes();
 
     static Agrupamento agrupFromCombo(QComboBox *cb, bool semDia = false);
 

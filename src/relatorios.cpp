@@ -40,6 +40,7 @@ relatorios::relatorios(QWidget *parent)
         configurarJanelaLucroGeral();
     }
     configurarJanelaInventario();
+    configurarJanelaInadimplentes();
 
     connect(ui->Btn_ExportCSV, &QPushButton::clicked, this, &relatorios::exportarCsvAtual);
     connect(ui->Btn_ExportPDF, &QPushButton::clicked, this, &relatorios::exportarPdfAtual);
@@ -441,6 +442,39 @@ void relatorios::configurarJanelaLucroGeral()
     emit ui->Btn_AplicarLucroGeral->clicked();
 }
 
+void relatorios::configurarJanelaInadimplentes()
+{
+    modelInadimplentes = new QStandardItemModel(this);
+    modelInadimplentes->setHorizontalHeaderLabels(
+        {"Nome", "Telefone", "Valor Devido (R$)", "Sem Pagar Desde", "Dias sem Pagar"});
+    ui->Tview_Inadimplentes->setModel(modelInadimplentes);
+    ui->Tview_Inadimplentes->horizontalHeader()->setStretchLastSection(true);
+
+    auto atualizar = [=]() {
+        auto dados = relatoriosServ.buscarClientesInadimplentes();
+
+        modelInadimplentes->removeRows(0, modelInadimplentes->rowCount());
+        for (const QStringList &linha : dados) {
+            QList<QStandardItem*> row;
+            for (const QString &campo : linha)
+                row << new QStandardItem(campo);
+            modelInadimplentes->appendRow(row);
+        }
+        ui->Tview_Inadimplentes->resizeColumnsToContents();
+
+        if (dados.isEmpty()) {
+            ui->Lbl_InadimplentesStatus->setText("Nenhum cliente com pagamento em aberto.");
+        } else {
+            ui->Lbl_InadimplentesStatus->setText(
+                QString("%1 cliente(s) com pagamento em aberto.").arg(dados.size()));
+        }
+    };
+
+    connect(ui->Btn_AplicarInadimplentes, &QPushButton::clicked, this, atualizar);
+
+    atualizar();
+}
+
 // ── Helpers de exportação ──────────────────────────────────────────────────
 
 QChartView *relatorios::chartViewAtual()
@@ -471,6 +505,17 @@ void relatorios::exportarPdfAtual()
                          .arg(de.toString("dd/MM/yyyy"))
                          .arg(ate.toString("dd/MM/yyyy"));
         PDFexporter::exportarTabelaRelatorio(this, titulo, linhas);
+    } else if (idx == 8) {
+        auto dados = relatoriosServ.buscarClientesInadimplentes();
+        if (dados.isEmpty()) {
+            QMessageBox::information(this, "Sem dados",
+                "Nenhum cliente com pagamento em aberto.");
+            return;
+        }
+        QList<QStringList> linhas;
+        linhas << QStringList{"Nome", "Telefone", "Valor Devido (R$)", "Sem Pagar Desde", "Dias sem Pagar"};
+        linhas << dados;
+        PDFexporter::exportarTabelaRelatorio(this, "Clientes com Compras em Aberto", linhas);
     } else {
         PDFexporter::exportarGraficoRelatorio(this, chartViewAtual());
     }
@@ -583,6 +628,18 @@ void relatorios::exportarCsvAtual()
         linhas << QStringList{"ID", "Quantidade", "Descrição", "Un. Comercial", "Preço Fornecedor (R$)"};
         linhas << dados;
         nomeArquivo = "relatorio_inventario.csv";
+        break;
+    }
+    case 8: { // Clientes com compras em aberto
+        auto dados = relatoriosServ.buscarClientesInadimplentes();
+        if (dados.isEmpty()) {
+            QMessageBox::information(this, "Sem dados",
+                "Nenhum cliente com pagamento em aberto.");
+            return;
+        }
+        linhas << QStringList{"Nome", "Telefone", "Valor Devido (R$)", "Sem Pagar Desde", "Dias sem Pagar"};
+        linhas << dados;
+        nomeArquivo = "relatorio_clientes_inadimplentes.csv";
         break;
     }
     default:

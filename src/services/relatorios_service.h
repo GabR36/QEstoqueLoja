@@ -7,6 +7,7 @@
 #include <QStringList>
 #include <QDate>
 #include "../repository/relatorios_repository.h"
+#include "financeiro_service.h"
 
 class Relatorios_service : public QObject
 {
@@ -27,6 +28,7 @@ public:
 
 private:
     Relatorios_repository relatoriosRepo;
+    Financeiro_service financeiroServ;
 
 signals:
 };

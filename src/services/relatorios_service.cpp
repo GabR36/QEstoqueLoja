@@ -36,7 +36,7 @@ QMap<QString, float> Relatorios_service::produtosMaisLucrativosPeriodo(const QDa
 
 QMap<QString, double> Relatorios_service::buscarLucroPeriodo(const QDate &inicio, const QDate &fim, Agrupamento agrup)
 {
-    return relatoriosRepo.buscarLucroPeriodo(inicio, fim, agrup);
+    return financeiroServ.getLucroEstimadoPeriodo(inicio, fim, agrup);
 }
 
 bool Relatorios_service::existeProdutoVendido()

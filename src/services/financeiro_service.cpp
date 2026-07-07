@@ -11,3 +11,14 @@ double Financeiro_service::getValorTotalDevidoFromCliente(qlonglong idcliente){
     double valorDevido = valorTotalVendas - valorTotalEntradas;
     return valorDevido;
 }
+
+double Financeiro_service::getLucroEstimadoVenda(qlonglong idVenda)
+{
+    return relatoriosRepo.buscarLucroVenda(idVenda);
+}
+
+QMap<QString, double> Financeiro_service::getLucroEstimadoPeriodo(
+    const QDate &inicio, const QDate &fim, Agrupamento agrup)
+{
+    return relatoriosRepo.buscarLucroPeriodo(inicio, fim, agrup);
+}

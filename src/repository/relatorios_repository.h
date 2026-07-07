@@ -23,6 +23,7 @@ public:
     QMap<QString, float>             buscarValoresNfPeriodo(const QDate &inicio, const QDate &fim, Agrupamento agrup, int tpAmb);
     QMap<QString, float>             produtosMaisLucrativosPeriodo(const QDate &inicio, const QDate &fim);
     QMap<QString, double>            buscarLucroPeriodo(const QDate &inicio, const QDate &fim, Agrupamento agrup);
+    double                           buscarLucroVenda(qlonglong idVenda);
     bool                             existeProdutoVendido();
     QList<QStringList>               buscarTodosProdutosParaCsv();
     QList<QStringList>               buscarInventario(const QDate &inicio, const QDate &fim, bool somenteNf);

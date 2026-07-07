@@ -564,6 +564,79 @@ QMap<QString, double> Relatorios_repository::buscarLucroPeriodo(
     return resultado;
 }
 
+double Relatorios_repository::buscarLucroVenda(qlonglong idVenda)
+{
+    if (!DatabaseConnection_service::open()) {
+        qDebug() << "Erro ao abrir banco. buscarLucroVenda";
+        return 0.0;
+    }
+
+    // mesma logica de buscarLucroPeriodo, mas para uma unica venda: uma so
+    // query, sem agrupar por periodo, para nao gerar N+1 quando chamada em lote.
+    QSqlQuery query(db);
+    query.prepare(R"(
+        WITH sale_stats AS (
+            SELECT
+                pv.id_venda,
+                SUM(
+                    pv.quantidade * (
+                        pv.preco_vendido
+                        - p.preco * (1.0 - COALESCE(p.porcent_lucro, 0) / 100.0)
+                    )
+                ) AS lucro_total
+            FROM produtos_vendidos pv
+            JOIN produtos p ON pv.id_produto = p.id
+            WHERE pv.id_venda = :idVenda1
+            GROUP BY pv.id_venda
+        ),
+        cash AS (
+            SELECT
+                ss.lucro_total
+                - COALESCE(v.desconto, 0)
+                - CASE
+                      WHEN v.forma_pagamento IN ('Crédito', 'Débito')
+                      THEN (v.total - COALESCE(v.desconto, 0)) * COALESCE(v.taxa, 0) / 100.0
+                      ELSE 0
+                  END AS lucro_caixa
+            FROM vendas2 v
+            JOIN sale_stats ss ON ss.id_venda = v.id
+            WHERE v.id = :idVenda2
+              AND v.forma_pagamento <> 'Prazo'
+        ),
+        credit AS (
+            SELECT
+                (ss.lucro_total - COALESCE(v.desconto, 0))
+                * ev.valor_final / NULLIF(v.valor_final, 0)
+                - CASE
+                      WHEN ev.forma_pagamento IN ('Crédito', 'Débito')
+                      THEN (ev.total - COALESCE(ev.desconto, 0)) * COALESCE(ev.taxa, 0) / 100.0
+                      ELSE 0
+                  END AS lucro_caixa
+            FROM entradas_vendas ev
+            JOIN sale_stats ss ON ss.id_venda = ev.id_venda
+            JOIN vendas2 v ON v.id = ev.id_venda
+            WHERE ev.id_venda = :idVenda3
+        )
+        SELECT COALESCE(SUM(lucro_caixa), 0)
+        FROM (
+            SELECT lucro_caixa FROM cash
+            UNION ALL
+            SELECT lucro_caixa FROM credit
+        ) combined
+    )");
+
+    query.bindValue(":idVenda1", idVenda);
+    query.bindValue(":idVenda2", idVenda);
+    query.bindValue(":idVenda3", idVenda);
+
+    if (query.exec() && query.next()) {
+        return query.value(0).toDouble();
+    }
+
+    qDebug() << "Erro buscarLucroVenda:" << query.lastError().text();
+    return 0.0;
+}
+
 bool Relatorios_repository::existeProdutoVendido()
 {
     if (!DatabaseConnection_service::open()) {

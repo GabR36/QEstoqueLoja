@@ -169,7 +169,7 @@ void Vendas_repository::listarVendasDeAteFormaPagamento(
         "SELECT id, valor_final, forma_pagamento, data_hora, cliente, "
         "esta_pago, total, desconto, taxa, valor_recebido, troco "
         "FROM vendas2 "
-        "WHERE data_hora BETWEEN :de AND :ate LIMIT 240";
+        "WHERE data_hora BETWEEN :de AND :ate ";
 
     // filtro por cliente
     if (idCliente > 0) {
@@ -181,9 +181,12 @@ void Vendas_repository::listarVendasDeAteFormaPagamento(
         sql += "AND forma_pagamento = :formaPag ";
     }
 
-    sql += "ORDER BY id DESC";
+    sql += "ORDER BY id DESC LIMIT 240";
 
-    query.prepare(sql);
+    if (!query.prepare(sql)) {
+        qDebug() << "Erro ao preparar query:" << query.lastError().text();
+        return;
+    }
 
     query.bindValue(":de", de);
     query.bindValue(":ate", ate);
@@ -372,7 +375,7 @@ bool Vendas_repository::atualizarEstaPago(qlonglong idVenda, int estaPago){
 
     QSqlQuery query(db);
     query.prepare("UPDATE vendas2 SET esta_pago = :val WHERE id = :id");
-    query.bindValue(":val", estaPago);
+    query.bindValue(":val", estaPago ? true : false);
     query.bindValue(":id", idVenda);
 
     if (!query.exec()) {

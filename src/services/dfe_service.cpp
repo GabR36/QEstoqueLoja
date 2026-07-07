@@ -39,10 +39,12 @@ bool Dfe_service::possoConsultar(){
     //-1 = erro
     if(maxData != "-1"){
         QDateTime dataMod = QDateTime::fromString(maxData, "yyyy-MM-dd HH:mm:ss");
+        dataMod.setTimeSpec(Qt::UTC);
 
         // formato PostgreSQL ISO
         if (!dataMod.isValid()) {
             dataMod = QDateTime::fromString(maxData,Qt::ISODate);
+            dataMod.setTimeSpec(Qt::UTC);
             qDebug() << "Data inválida para sqlite, consultando formato postgre:";
         }
         if (!dataMod.isValid()) {
@@ -52,7 +54,7 @@ bool Dfe_service::possoConsultar(){
             return true;
         }
 
-        QDateTime agora = QDateTime::currentDateTime();
+        QDateTime agora = QDateTime::currentDateTimeUtc();
 
         qint64 diff = dataMod.secsTo(agora);
 

@@ -34,11 +34,10 @@ O sistema funciona de forma **local (offline)**, em um único computador, sem ne
 
 Muitos sistemas ERP tentam atender todos os tipos de negócios e cenários fiscais, tornando-se complexos e difíceis de usar.
 
-O **QEstoqueLoja** busca resolver esse problema com:
-- Simplicidade
-- Foco em pequenas lojas
-- Automação de tarefas essenciais
-- Interface direta e prática
+Nosso foco é o nosso caso de uso: Loja pequena de varejo de produtos variados, que vão desde materiais de construção, a eletrônicos e roupas, 
+com muitos produtos para se lembrar, produtos com nota fiscal, outros sem, produtos com código de barras outros sem, sem muitos atendimentos simultâneos, 
+com situação fiscal com pouca mudança entre as vendas, sem representantes e sem filiais, onde o dinheiro em espécie ainda é bastante usado assim como vendas
+"fiado" informais ainda são prevalentes.
 
 ---
 
@@ -51,7 +50,7 @@ https://github.com/GabR36/QEstoqueLoja/releases
 Basta baixar e executar — não é necessário configurar servidor ou dependências adicionais.
 
 ---
-# PostgreSQL
+## PostgreSQL
 
 Pode ser configurado para usar o PostgreSQL e compartilhar os dados pela rede com múltiplos computadores ao mesmo tempo.
 Instale o pacote libqt6sql6-psql (linux) e configure o banco nas configurações.
@@ -62,17 +61,17 @@ Instale o pacote libqt6sql6-psql (linux) e configure o banco nas configurações
 
 ### Dependências
 
-**dependências disponíveis no repositório**
+**Dependências disponíveis no repositório**
 - cmake  
 - qt6-base-dev  
 - qt6-declarative-dev  
 - qt6-charts-dev  
-- qt6-tools-dev  
-- libzint-dev
+- qt6-tools-dev
 - libqt6sql6-psql **opcional para postgresql**
-  
-**dependências externas**
 - libquazip1-qt6-dev  
+- libzint-dev
+  
+**Dependências externas**
 - QtRpt *(versão biblioteca, sem suporte a barcode)*  
   https://qtrpt.sourceforge.io/  
 - ACBrNFe *(compilada com Qt)*  

@@ -27,7 +27,6 @@ void ProdutoVenda_repository::listarProdutosVenda(QSqlQueryModel *model){
         qDebug() << "Erro SQL:" << model->lastError().text();
     }
 
-    db.close();
 
 }
 
@@ -53,7 +52,6 @@ QList<ProdutoVendidoDTO> ProdutoVenda_repository::getProdutosVendidos(qlonglong 
 
     if (!query.exec()) {
         qDebug() << "Erro ao executar query:" << query.lastError().text();
-        db.close();
         return lista;
     }
 
@@ -71,7 +69,6 @@ QList<ProdutoVendidoDTO> ProdutoVenda_repository::getProdutosVendidos(qlonglong 
         lista.append(dto);
     }
 
-    db.close();
     return lista;
 }
 
@@ -101,7 +98,6 @@ void ProdutoVenda_repository::listarProdutosVendidosFromVenda(
 
     if (!query.exec()) {
         qDebug() << "Erro ao executar query:" << query.lastError().text();
-        db.close();
         return;
     }
 
@@ -111,7 +107,6 @@ void ProdutoVenda_repository::listarProdutosVendidosFromVenda(
         qDebug() << "Erro ao setar model:" << model->lastError().text();
     }
 
-    db.close();
 }
 
 bool ProdutoVenda_repository::deletarProdutoVendido(qlonglong id){
@@ -149,10 +144,8 @@ bool ProdutoVenda_repository::deletarPorIdVenda(qlonglong idvenda){
 
     if(!query.exec()){
         qDebug() << "Query não rodou deletarPorIdVenda";
-        db.close();
         return false;
     }else{
-        db.close();
         return true;
     }
 }
@@ -172,7 +165,6 @@ int ProdutoVenda_repository::contarProdutosVendidosFromVenda(qlonglong idvenda){
 
     if(!query.exec()){
         qDebug() << "Erro SQL:" << query.lastError();
-        db.close();
         return -1;
     }
 
@@ -180,7 +172,6 @@ int ProdutoVenda_repository::contarProdutosVendidosFromVenda(qlonglong idvenda){
         quantidade = query.value(0).toInt();
     }
 
-    db.close();
     return quantidade;
 }
 
@@ -199,7 +190,6 @@ ProdutoVendidoDTO ProdutoVenda_repository::getProdutoVendido(qlonglong id){
     query.bindValue(":id", id);
     if(!query.exec()){
         qDebug() << "Query getProdutoVendido nao rodou";
-        db.close();
         return prod;
     }
 
@@ -243,11 +233,9 @@ bool ProdutoVenda_repository::marcarComoEmitidoNf(qlonglong idVenda, bool emitir
 
     if (!query.exec()) {
         qDebug() << "Erro marcarComoEmitidoNf:" << query.lastError().text();
-        db.close();
         return false;
     }
 
-    db.close();
     return true;
 }
 
@@ -286,10 +274,7 @@ bool ProdutoVenda_repository::inserir(ProdutoVendidoDTO prod){
             << "SQL:"
             << query.lastQuery();
 
-        db.close();
-
         return false;
     }
-    db.close();
     return true;
 }

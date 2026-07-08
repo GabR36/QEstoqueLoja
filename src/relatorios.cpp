@@ -37,8 +37,10 @@ relatorios::relatorios(QWidget *parent)
         configurarJanelaFormasPagamentoAno();
         configurarJanelaNFValor();
         configurarJanelaProdutoLucroValor();
+        configurarJanelaLucroGeral();
     }
     configurarJanelaInventario();
+    configurarJanelaInadimplentes();
 
     connect(ui->Btn_ExportCSV, &QPushButton::clicked, this, &relatorios::exportarCsvAtual);
     connect(ui->Btn_ExportPDF, &QPushButton::clicked, this, &relatorios::exportarPdfAtual);
@@ -390,6 +392,89 @@ void relatorios::configurarJanelaInventario()
     });
 }
 
+void relatorios::configurarJanelaLucroGeral()
+{
+    QDate inicio = QDate(QDate::currentDate().year(), 1, 1);
+    QDate fim    = QDate::currentDate();
+    ui->DE_InicioLucroGeral->setDate(inicio);
+    ui->DE_FimLucroGeral->setDate(fim);
+    ui->CBox_AgrupLucroGeral->setCurrentIndex(1); // Mês por padrão
+
+    connect(ui->Btn_AplicarLucroGeral, &QPushButton::clicked, this, [=]() {
+        QDate de  = ui->DE_InicioLucroGeral->date();
+        QDate ate = ui->DE_FimLucroGeral->date();
+        if (de > ate) {
+            QMessageBox::warning(this, "Período inválido", "A data inicial não pode ser posterior à data final.");
+            return;
+        }
+
+        Agrupamento agrup = agrupFromCombo(ui->CBox_AgrupLucroGeral);
+        auto dados = relatoriosServ.buscarLucroPeriodo(de, ate, agrup);
+        if (dados.isEmpty()) {
+            QMessageBox::information(this, "Sem dados", "Não há vendas registradas para esse período.");
+            return;
+        }
+
+        QStringList categorias = dados.keys();
+        QBarSet *set = new QBarSet("Lucro de Caixa");
+        double maxValor = 0;
+
+        for (const QString &k : categorias) {
+            double v = dados[k];
+            *set << v;
+            maxValor = std::max(maxValor, v);
+        }
+
+        connect(set, &QBarSet::hovered, this, [=](bool status, int index) {
+            if (status)
+                QToolTip::showText(QCursor::pos(),
+                    QString("Lucro: R$ %1").arg((*set)[index], 0, 'f', 2));
+        });
+
+        QString titulo = QString("Lucro de Caixa por %1 (%2 – %3)")
+                         .arg(ui->CBox_AgrupLucroGeral->currentText())
+                         .arg(de.toString("dd/MM/yyyy"))
+                         .arg(ate.toString("dd/MM/yyyy"));
+        QChartView *cv = GraficoHelper::criarBarChart(titulo, categorias, {set}, maxValor * 1.1);
+        GraficoHelper::inserirChartNaPagina(ui->Stacked_Vendas->widget(7), cv, 1);
+    });
+
+    emit ui->Btn_AplicarLucroGeral->clicked();
+}
+
+void relatorios::configurarJanelaInadimplentes()
+{
+    modelInadimplentes = new QStandardItemModel(this);
+    modelInadimplentes->setHorizontalHeaderLabels(
+        {"Nome", "Telefone", "Valor Devido (R$)", "Sem Pagar Desde", "Dias sem Pagar"});
+    ui->Tview_Inadimplentes->setModel(modelInadimplentes);
+    ui->Tview_Inadimplentes->horizontalHeader()->setStretchLastSection(true);
+
+    auto atualizar = [=]() {
+        auto dados = relatoriosServ.buscarClientesInadimplentes();
+
+        modelInadimplentes->removeRows(0, modelInadimplentes->rowCount());
+        for (const QStringList &linha : dados) {
+            QList<QStandardItem*> row;
+            for (const QString &campo : linha)
+                row << new QStandardItem(campo);
+            modelInadimplentes->appendRow(row);
+        }
+        ui->Tview_Inadimplentes->resizeColumnsToContents();
+
+        if (dados.isEmpty()) {
+            ui->Lbl_InadimplentesStatus->setText("Nenhum cliente com pagamento em aberto.");
+        } else {
+            ui->Lbl_InadimplentesStatus->setText(
+                QString("%1 cliente(s) com pagamento em aberto.").arg(dados.size()));
+        }
+    };
+
+    connect(ui->Btn_AplicarInadimplentes, &QPushButton::clicked, this, atualizar);
+
+    atualizar();
+}
+
 // ── Helpers de exportação ──────────────────────────────────────────────────
 
 QChartView *relatorios::chartViewAtual()
@@ -420,6 +505,17 @@ void relatorios::exportarPdfAtual()
                          .arg(de.toString("dd/MM/yyyy"))
                          .arg(ate.toString("dd/MM/yyyy"));
         PDFexporter::exportarTabelaRelatorio(this, titulo, linhas);
+    } else if (idx == 8) {
+        auto dados = relatoriosServ.buscarClientesInadimplentes();
+        if (dados.isEmpty()) {
+            QMessageBox::information(this, "Sem dados",
+                "Nenhum cliente com pagamento em aberto.");
+            return;
+        }
+        QList<QStringList> linhas;
+        linhas << QStringList{"Nome", "Telefone", "Valor Devido (R$)", "Sem Pagar Desde", "Dias sem Pagar"};
+        linhas << dados;
+        PDFexporter::exportarTabelaRelatorio(this, "Clientes com Compras em Aberto", linhas);
     } else {
         PDFexporter::exportarGraficoRelatorio(this, chartViewAtual());
     }
@@ -509,6 +605,16 @@ void relatorios::exportarCsvAtual()
         nomeArquivo = "relatorio_lucro_produtos.csv";
         break;
     }
+    case 7: { // Lucro geral por período
+        auto dados = relatoriosServ.buscarLucroPeriodo(
+            ui->DE_InicioLucroGeral->date(), ui->DE_FimLucroGeral->date(),
+            agrupFromCombo(ui->CBox_AgrupLucroGeral));
+        linhas << QStringList{"Período", "Lucro de Caixa (R$)"};
+        for (auto it = dados.cbegin(); it != dados.cend(); ++it)
+            linhas << QStringList{it.key(), QString::number(it.value(), 'f', 2)};
+        nomeArquivo = "relatorio_lucro_geral.csv";
+        break;
+    }
     case 6: { // Inventário por período
         QDate de  = ui->DE_InicioInv->date();
         QDate ate = ui->DE_FimInv->date();
@@ -522,6 +628,18 @@ void relatorios::exportarCsvAtual()
         linhas << QStringList{"ID", "Quantidade", "Descrição", "Un. Comercial", "Preço Fornecedor (R$)"};
         linhas << dados;
         nomeArquivo = "relatorio_inventario.csv";
+        break;
+    }
+    case 8: { // Clientes com compras em aberto
+        auto dados = relatoriosServ.buscarClientesInadimplentes();
+        if (dados.isEmpty()) {
+            QMessageBox::information(this, "Sem dados",
+                "Nenhum cliente com pagamento em aberto.");
+            return;
+        }
+        linhas << QStringList{"Nome", "Telefone", "Valor Devido (R$)", "Sem Pagar Desde", "Dias sem Pagar"};
+        linhas << dados;
+        nomeArquivo = "relatorio_clientes_inadimplentes.csv";
         break;
     }
     default:

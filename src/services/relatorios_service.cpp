@@ -34,6 +34,11 @@ QMap<QString, float> Relatorios_service::produtosMaisLucrativosPeriodo(const QDa
     return relatoriosRepo.produtosMaisLucrativosPeriodo(inicio, fim);
 }
 
+QMap<QString, double> Relatorios_service::buscarLucroPeriodo(const QDate &inicio, const QDate &fim, Agrupamento agrup)
+{
+    return financeiroServ.getLucroEstimadoPeriodo(inicio, fim, agrup);
+}
+
 bool Relatorios_service::existeProdutoVendido()
 {
     return relatoriosRepo.existeProdutoVendido();
@@ -47,4 +52,9 @@ QList<QStringList> Relatorios_service::buscarTodosProdutosParaCsv()
 QList<QStringList> Relatorios_service::buscarInventario(const QDate &inicio, const QDate &fim, bool somenteNf)
 {
     return relatoriosRepo.buscarInventario(inicio, fim, somenteNf);
+}
+
+QList<QStringList> Relatorios_service::buscarClientesInadimplentes()
+{
+    return relatoriosRepo.buscarClientesInadimplentes();
 }

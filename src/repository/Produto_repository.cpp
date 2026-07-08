@@ -27,12 +27,10 @@ bool Produto_Repository::codigoBarrasExiste(const QString &codigo)
 
     if (!query.exec()) {
         qDebug() << "SQL ERROR:" << query.lastError().text();
-        db.close();
         return false;
     }
 
     query.next();
-    db.close();
     return query.value(0).toInt() > 0;
 }
 
@@ -76,10 +74,8 @@ bool Produto_Repository::inserir(const ProdutoDTO &p, QString &erroSQL)
         erroSQL = query.lastError().text();
         qDebug() << "[SQL ERROR]" << erroSQL;
         qDebug() << "[SQL QUERY]" << query.lastQuery();
-        db.close();
         return false;
     }
-    db.close();
     return true;
 }
 
@@ -95,7 +91,6 @@ void Produto_Repository::listarProdutos(QSqlQueryModel* model)
     }
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC LIMIT 240", db);
 
-    db.close();
 }
 
 QSqlQueryModel* Produto_Repository::getProdutoPeloCodigo(const QString &codigoBarras){
@@ -113,7 +108,6 @@ QSqlQueryModel* Produto_Repository::getProdutoPeloCodigo(const QString &codigoBa
     if (model->lastError().isValid()) {
         qDebug() << "Erro SQL:" << model->lastError().text();
     }
-    db.close();
     return model;
 }
 
@@ -131,16 +125,13 @@ bool Produto_Repository::deletar(const QString &id, QString &erroSQL)
 
     if (!query.exec()) {
         erroSQL = query.lastError().text();
-        db.close();
         return false;
     }
 
     if (query.numRowsAffected() == 0) {
         erroSQL = "Produto não encontrado para exclusão.";
-        db.close();
         return false;
     }
-    db.close();
     return true;
 }
 
@@ -184,12 +175,10 @@ void Produto_Repository::pesquisar(const QStringList &palavras,
 
     if (!query.exec()) {
         qDebug() << "[SQL ERROR]" << query.lastError().text();
-        db.close();
         return;
     }
 
     model->setQuery(query);
-    db.close();
 }
 
 bool Produto_Repository::alterar(
@@ -242,10 +231,8 @@ bool Produto_Repository::alterar(
 
     if (!query.exec()) {
         erro = query.lastError().text();
-        db.close();
         return false;
     }
-    db.close();
     return true;
 }
 
@@ -266,7 +253,6 @@ QStringList Produto_Repository::listarLocais()
     } else {
         qDebug() << "Erro SQL listarLocais:" << query.lastError().text();
     }
-    db.close();
     return sugestoes;
 }
 
@@ -286,10 +272,8 @@ bool Produto_Repository::atualizarLocal(int id, const QString &local, QString &e
 
     if (!query.exec()) {
         erroSQL = query.lastError().text();
-        db.close();
         return false;
     }
-    db.close();
     return true;
 }
 
@@ -308,10 +292,8 @@ bool Produto_Repository::updateAumentarQuantidadeProduto(qlonglong idprod, doubl
 
     if(!query.exec()){
         qDebug() << "Query updateAumentarQuantidadeProduto nao rodou.";
-        db.close();
         return false;
     }else{
-        db.close();
         return true;
     }
 }
@@ -331,7 +313,6 @@ ProdutoDTO Produto_Repository::getProduto(qlonglong id){
     query.bindValue(":id", id);
     if(!query.exec()){
         qDebug() << "Query nao rodou getProduto()";
-        db.close();
         return prod;
     }
 
@@ -354,8 +335,6 @@ ProdutoDTO Produto_Repository::getProduto(qlonglong id){
         prod.atualizadoEm = query.value("atualizado_em").toString();
 
     }
-
-    db.close();
     return prod;
 }
 
@@ -371,7 +350,6 @@ ProdutoDTO Produto_Repository::getProdutoPeloCodBarras(const QString &codigo){
 
     if(!query.exec()){
         qDebug() << " Query não executou getProdutoPeloCodBarras";
-        db.close();
         return prod;
     }
 
@@ -396,7 +374,6 @@ ProdutoDTO Produto_Repository::getProdutoPeloCodBarras(const QString &codigo){
 
     }
 
-    db.close();
     return prod;
 }
 
@@ -415,10 +392,8 @@ bool Produto_Repository::updateDiminuirQuantidadeProduto(qlonglong idprod, doubl
 
     if(!query.exec()){
         qDebug() << "Query updateAumentarQuantidadeProduto nao rodou.";
-        db.close();
         return false;
     }else{
-        db.close();
         return true;
     }
 }
@@ -441,7 +416,6 @@ bool Produto_Repository::atualizarCamposMap(qlonglong id, const QVariantMap &cam
         sets << "nf = 1";
 
     if(sets.isEmpty()){
-        db.close();
         return true;
     }
 
@@ -463,10 +437,8 @@ bool Produto_Repository::atualizarCamposMap(qlonglong id, const QVariantMap &cam
     if(!query.exec()){
         qDebug() << "SQL:" << query.lastQuery();
         qDebug() << "ERRO:" << query.lastError().text();
-        db.close();
         return false;
     }
-    db.close();
     return true;
 }
 
@@ -482,11 +454,9 @@ QVariantMap Produto_Repository::getProdutoPorCodBarrasMap(const QString &codigo)
 
     if(!query.exec()){
         qDebug() << "getProdutoPorCodBarrasMap: query falhou" << query.lastError().text();
-        db.close();
         return {};
     }
 
     QVector<QVariantMap> registros = DBUtil::extrairResultados(query);
-    db.close();
     return registros.isEmpty() ? QVariantMap{} : registros.first();
 }

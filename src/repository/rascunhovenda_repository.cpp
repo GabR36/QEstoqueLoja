@@ -76,7 +76,6 @@ bool RascunhoVenda_repository::salvar(const RascunhoVendaDTO &rascunho)
         << "Erro prepare salvar rascunho:"
         << query.lastError().text();
 
-        db.close();
 
         return false;
     }
@@ -121,13 +120,10 @@ bool RascunhoVenda_repository::salvar(const RascunhoVendaDTO &rascunho)
         << "Erro ao salvar rascunho:"
         << query.lastError().text();
 
-        db.close();
 
         return false;
     }
 
-
-    db.close();
 
     return true;
 }
@@ -144,11 +140,9 @@ bool RascunhoVenda_repository::descartar()
 
     if (!query.exec()) {
         qDebug() << "Erro ao descartar rascunho:" << query.lastError().text();
-        db.close();
         return false;
     }
 
-    db.close();
     return true;
 }
 
@@ -171,7 +165,6 @@ RascunhoVendaDTO RascunhoVenda_repository::carregar()
 
     if (!query.exec()) {
         qDebug() << "Erro ao carregar rascunho:" << query.lastError().text();
-        db.close();
         return rascunho;
     }
 
@@ -190,7 +183,6 @@ RascunhoVendaDTO RascunhoVenda_repository::carregar()
         rascunho.atualizadoEm        = query.value("atualizado_em").toString();
     }
 
-    db.close();
     return rascunho;
 }
 
@@ -205,11 +197,9 @@ bool RascunhoVenda_repository::existe()
     query.prepare("SELECT COUNT(*) FROM rascunho_venda WHERE id = 1");
 
     if (!query.exec() || !query.next()) {
-        db.close();
         return false;
     }
 
     bool result = query.value(0).toInt() > 0;
-    db.close();
     return result;
 }

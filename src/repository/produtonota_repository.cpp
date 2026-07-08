@@ -44,7 +44,6 @@ void ProdutoNota_repository::listarPorNota(QSqlQueryModel *model, qlonglong idNf
     if (model->lastError().isValid())
         qDebug() << "Erro SQL listarPorNota:" << model->lastError().text();
 
-    db.close();
 }
 
 bool ProdutoNota_repository::inserir(ProdutoNotaDTO produtoNota){
@@ -93,7 +92,6 @@ bool ProdutoNota_repository::inserir(ProdutoNotaDTO produtoNota){
         qDebug() << "Erro ao inserir produto:" << q.lastError().text();
         return false;
     }
-    db.close();
 
     return true;
 
@@ -115,7 +113,6 @@ ProdutoNotaDTO ProdutoNota_repository::getProdutoNota(qlonglong id){
 
     if(!query.exec()){
         qDebug() << "Query nao rodou getProdutoNota";
-        db.close();
         return prod;
     }
 
@@ -142,8 +139,6 @@ ProdutoNotaDTO ProdutoNota_repository::getProdutoNota(qlonglong id){
         prod.atualizadoEm = query.value("atualizado_em").toString();
 
     }
-
-    db.close();
     return prod;
 
 }
@@ -167,7 +162,6 @@ QString ProdutoNota_repository::getXmlPathPorId(qlonglong id){
         qDebug() << "getXmlPathPorId: query falhou" << query.lastError().text();
     }
 
-    db.close();
     return xmlPath;
 }
 
@@ -185,11 +179,9 @@ bool ProdutoNota_repository::marcarComoAdicionado(qlonglong id){
 
     if(!query.exec()){
         qDebug() << "marcarComoAdicionado: query falhou" << query.lastError().text();
-        db.close();
         return false;
     }
 
-    db.close();
     return true;
 }
 
@@ -208,11 +200,9 @@ bool ProdutoNota_repository::marcarComoDevolvido(qlonglong id, qlonglong idNfDev
 
     if(!query.exec()){
         qDebug() << "marcarComoDevolvido: query falhou" << query.lastError().text();
-        db.close();
         return false;
     }
 
-    db.close();
     return true;
 }
 
@@ -232,11 +222,9 @@ QVariantMap ProdutoNota_repository::getProdutoNotaComXmlPath(qlonglong id){
 
     if(!query.exec()){
         qDebug() << "getProdutoNotaComXmlPath: query falhou" << query.lastError().text();
-        db.close();
         return {};
     }
 
     QVector<QVariantMap> registros = DBUtil::extrairResultados(query);
-    db.close();
     return registros.isEmpty() ? QVariantMap{} : registros.first();
 }

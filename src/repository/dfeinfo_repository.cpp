@@ -25,7 +25,6 @@ QString DfeInfo_repository::getUltimaIdentificaçãoUsada(){
     if (q.next()) {
         ultimaAcao = q.value(0).toString();
     }
-    m_db.close();
 
     return ultimaAcao;
 }
@@ -61,7 +60,7 @@ QString DfeInfo_repository::getUltNsuXml(){
 
 QString DfeInfo_repository::getDataAgora(){
 
-    QDateTime dataIngles = QDateTime::currentDateTime();
+    QDateTime dataIngles = QDateTime::currentDateTimeUtc();
     QString dataFormatada = dataIngles.toString("yyyy-MM-dd HH:mm:ss");
 
     return dataFormatada;
@@ -132,7 +131,7 @@ bool DfeInfo_repository::atualizarDataNsu(TipoDfeInfo tipo){
         identificacao = "consulta_xml";
     }
 
-    QDateTime dataIngles = QDateTime::currentDateTime();
+    QDateTime dataIngles = QDateTime::currentDateTimeUtc();
     QString dataFormatada = dataIngles.toString("yyyy-MM-dd HH:mm:ss");
     QSqlQuery query(m_db);
     query.prepare("UPDATE dfe_info SET data_modificado = :datamod "

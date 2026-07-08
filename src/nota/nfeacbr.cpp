@@ -31,11 +31,7 @@ static IBSTaxasNfe getIBSTaxasNfe(const std::string &cuf) {
 NfeACBR::NfeACBR(QObject *parent, bool saida, bool devolucao)
     : QObject{parent}
 {
-#ifndef TEST_ENV
     nfe = AcbrManager::instance()->nfe();
-#else
-    nfe = nullptr;
-#endif
     db = QSqlDatabase::database();
 
     Config_service *confServ = new Config_service();
@@ -75,9 +71,7 @@ NfeACBR::NfeACBR(QObject *parent, bool saida, bool devolucao)
     tpAmb = (configDTO.tpAmbFiscal == 0 ? "1" : "0");
 
     caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/xmlNf";
-#ifndef TEST_ENV
-    nfe->LimparLista();//evita acumular notas
-#endif
+    if (nfe) nfe->LimparLista();
 
     usarIBS = configDTO.usarIbsFiscal;
 

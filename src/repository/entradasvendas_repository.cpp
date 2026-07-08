@@ -58,17 +58,14 @@ double EntradasVendas_repository::getValorUltimoPagamentoFromCliente(qlonglong i
 
     if(!query.exec()) {
         qDebug() << "Erro na query:" << query.lastError().text();
-        db.close();
         return 0;
     }
     double valor;
     if(query.next()) {
         valor = query.value(0).toDouble();
     } else {
-        db.close();
         return 0;
     }
-    db.close();
 
     return valor;
 }
@@ -92,11 +89,9 @@ double EntradasVendas_repository::getValorTotalEntradasFromClientes(qlonglong id
         totalEntradas = queryEntradas.value(0).toDouble();
     } else {
         qDebug() << "Erro ao calcular total de entradas:" << queryEntradas.lastError().text();
-        db.close();
         return 0.0;
     }
 
-    db.close();
     return totalEntradas;
 }
 
@@ -116,7 +111,6 @@ QList<EntradaVendaDTO> EntradasVendas_repository::getEntradasFromVenda(qlonglong
 
     if(!query.exec()){
         qDebug() << "Query não executou getEntradaFromVenda()";
-        db.close();
         return lista;
     }
 
@@ -135,7 +129,6 @@ QList<EntradaVendaDTO> EntradasVendas_repository::getEntradasFromVenda(qlonglong
         dto.atualizadoEm = query.value("atualizado_em").toString();
         lista.append(dto);
     }
-    db.close();
     return lista;
 
 }
@@ -152,7 +145,6 @@ void EntradasVendas_repository::listarEntradasVenda(QSqlQueryModel *model, qlong
     query.bindValue(":idvenda", idvenda);
     query.exec();
     model->setQuery(std::move(query));
-    db.close();
 }
 
 bool EntradasVendas_repository::deletarEntradaPorId(qlonglong id){
@@ -167,10 +159,8 @@ bool EntradasVendas_repository::deletarEntradaPorId(qlonglong id){
 
     if(!query.exec()){
         qDebug() << "query nao rodou deletarEntradaPorId:" << query.lastError().text();
-        db.close();
         return false;
     }
-    db.close();
     return true;
 }
 
@@ -186,10 +176,8 @@ bool EntradasVendas_repository::deletarPorIdVenda(qlonglong idvenda){
 
     if(!query.exec()){
         qDebug() << "query nao rodou deletarPorIdVenda";
-        db.close();
         return false;
     }else{
-        db.close();
         return true;
     }
 }

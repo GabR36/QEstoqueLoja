@@ -71,8 +71,6 @@ QMap<QString, int> EventoFiscal_repository::contarPorTipo(QDateTime dtIni, QDate
     } else {
         qDebug() << "Erro contarPorTipo (eventos):" << q.lastError().text();
     }
-
-    db.close();
     return resultado;
 }
 
@@ -100,7 +98,6 @@ QList<QPair<QString, QString>> EventoFiscal_repository::buscarXmlsPorPeriodo(QDa
         qDebug() << "Erro buscarXmlsPorPeriodo (eventos):" << q.lastError().text();
     }
 
-    db.close();
     return resultado;
 }
 
@@ -129,5 +126,4 @@ void EventoFiscal_repository::listarTodos(QSqlQueryModel *model)
     if(model->lastError().isValid())
         qDebug() << "Erro SQL listarTodosEventos:" << model->lastError().text();
 
-    db.close();
 }

@@ -15,9 +15,11 @@
 #include "services/test_eventofiscal_service.h"
 #include <QSqlDatabase>
 #include <QDebug>
+#include "nota/acbrmanager.h"
 
 int main(int argc, char *argv[])
 {
+    AcbrManager::setTestMode(true);
     QApplication app(argc, argv);
 
     int status = 0;

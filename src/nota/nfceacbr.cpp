@@ -36,11 +36,7 @@ static IBSTaxas getIBSTaxas(const std::string &cuf) {
 NfceACBR::NfceACBR(QObject *parent)
     : QObject{parent}
 {
-#ifndef TEST_ENV
     nfce = AcbrManager::instance()->nfe();
-#else
-    nfce = nullptr;
-#endif
     db = QSqlDatabase::database();
 
     Config_service *confServ = new Config_service(this);
@@ -53,9 +49,7 @@ NfceACBR::NfceACBR(QObject *parent)
     tpAmb = (configDTO.tpAmbFiscal == 0 ? "1" : "0");
 
     caminhoXml = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/xmlNf";
-#ifndef TEST_ENV
-    nfce->LimparLista();//evita acumular notas
-#endif
+    if (nfce) nfce->LimparLista();
     //carregarConfig();
     usarIBS = configDTO.usarIbsFiscal;
 

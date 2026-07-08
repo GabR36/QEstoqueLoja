@@ -47,11 +47,9 @@ bool notafiscal_repository::salvarResNFe(NotaFiscalDTO resumoNota){
 
     if(!query.exec()){
         qDebug() << "ERRO INSERT notas_fiscais:" << query.lastError().text();
-        db.close();
         return false;
     } else {
         qDebug() << "Resumo nota salvo com sucesso!";
-        db.close();
         return true;
     }
 }
@@ -73,10 +71,8 @@ qlonglong notafiscal_repository::getIdFromChave(QString chnfe){
         }
     }else{
         qDebug() << "nao rodou query select idnf";
-        db.close();
         return -1;
     }
-    db.close();
     return id_nf.toLongLong();
 }
 
@@ -131,13 +127,11 @@ bool notafiscal_repository::updateWhereChave(NotaFiscalDTO dto, QString chave){
 
     if (!q.exec()){
         qDebug() << "Erro ao atualizar NF:" << q.lastError();
-        db.close();
         return false;
     }else{
         qDebug() << "Nota fiscal atualizada com sucesso!";
     }
     qDebug() << "Linhas afetadas:" << q.numRowsAffected();
-    db.close();
     return true;
 }
 
@@ -153,7 +147,6 @@ qlonglong notafiscal_repository::getIdFromIdVenda(qlonglong idvenda){
 
     if(!query.exec()){
         qDebug() << "Query getIdFromIdVenda não rodou";
-        db.close();
         return -1;
     }
 
@@ -193,22 +186,18 @@ qlonglong notafiscal_repository::getProximoNNF55(QString serie, bool tpAmb, qlon
 
     if(!query.exec()){
         qWarning() << "Erro na consulta NNF:" << query.lastError().text();
-        db.close();
         return -1;
     }
 
     if(query.next()){
         int ultimoNNF = query.value(0).toInt();
-        db.close();
         return ultimoNNF + 1;
     }
 
     // Se não encontrou nenhuma nota
     if(nnfConfigurado > 0){
-        db.close();
         return nnfConfigurado + 1;
     }
-    db.close();
     return 1; // fallback final
 }
 
@@ -236,22 +225,18 @@ qlonglong notafiscal_repository::getProximoNNF65(QString serie, bool tpAmb, qlon
 
     if(!query.exec()){
         qWarning() << "Erro na consulta NNF:" << query.lastError().text();
-        db.close();
         return -1;
     }
 
     if(query.next()){
         int ultimoNNF = query.value(0).toInt();
-        db.close();
         return ultimoNNF + 1;
     }
 
     // Se não encontrou nenhuma nota
     if(nnfConfigurado > 0){
-        db.close();
         return nnfConfigurado + 1;
     }
-    db.close();
     return 1; // fallback final
 }
 
@@ -271,7 +256,6 @@ NotaFiscalDTO notafiscal_repository::getNotaNormalFromIdVenda(qlonglong idvenda)
 
     if(!query.exec()){
         qDebug() << "Query nao rodou getNotaNormalFromIdVenda";
-        db.close();
         return nota;
     }
 
@@ -296,7 +280,6 @@ NotaFiscalDTO notafiscal_repository::getNotaNormalFromIdVenda(qlonglong idvenda)
         nota.xmlPath = query.value("xml_path").toString();
         nota.adicionadoEm = query.value("adicionado_em").toString();
     }
-    db.close();
     return nota;
 }
 
@@ -365,15 +348,12 @@ bool notafiscal_repository::inserir(NotaFiscalDTO nota){
             qDebug() << "ERRO INSERT notas_fiscais:"
                      << query.lastError().text();
 
-            db.close();
             return false;
         }
 
-        db.close();
         return false;
     } else {
         qDebug() << "Nota salvo com sucesso!";
-        db.close();
         return true;
     }
 }
@@ -414,7 +394,6 @@ void notafiscal_repository::listarEntradas(QSqlQueryModel *model, const QString 
     if (model->lastError().isValid())
         qDebug() << "Erro SQL listarEntradas:" << model->lastError().text();
 
-    db.close();
 }
 
 qlonglong notafiscal_repository::getIdNotaNormalFromIdVenda(qlonglong idvenda){
@@ -427,14 +406,12 @@ qlonglong notafiscal_repository::getIdNotaNormalFromIdVenda(qlonglong idvenda){
     query.bindValue(":idvenda", idvenda);
     if(!query.exec()){
         qDebug() << "Query nao rodou getIdNotaNormalFromIdVenda";
-        db.close();
         return -1;
     }
     qlonglong id = -1;
     if(query.next()){
         id = query.value(0).toLongLong();
     }
-    db.close();
     return id;
 
 }
@@ -454,7 +431,6 @@ NotaFiscalDTO notafiscal_repository::getNotaById(qlonglong id){
 
     if(!query.exec()){
         qDebug() << "Query nao rodou getNotaById";
-        db.close();
         return nota;
     }
 
@@ -481,7 +457,6 @@ NotaFiscalDTO notafiscal_repository::getNotaById(qlonglong id){
 
     }
 
-    db.close();
     return nota;
 }
 
@@ -512,7 +487,6 @@ QMap<QString, int> notafiscal_repository::contarPorFinalidade(QDateTime dtIni, Q
         qDebug() << "Erro contarPorFinalidade:" << q.lastError().text();
     }
 
-    db.close();
     return resultado;
 }
 
@@ -542,7 +516,6 @@ QList<QPair<QString, QString>> notafiscal_repository::buscarXmlsPorPeriodo(QDate
         qDebug() << "Erro buscarXmlsPorPeriodo (notas):" << q.lastError().text();
     }
 
-    db.close();
     return resultado;
 }
 
@@ -582,7 +555,6 @@ QList<NotaFiscalDTO> notafiscal_repository::buscarPorPeriodo(QDateTime dtIni, QD
         qDebug() << "Erro buscarPorPeriodo:" << q.lastError().text();
     }
 
-    db.close();
     return resultado;
 }
 
@@ -616,7 +588,6 @@ QList<NotaFiscalDTO> notafiscal_repository::buscarContingencias()
         qDebug() << "Erro buscarContingencias:" << q.lastError().text();
     }
 
-    db.close();
     return lista;
 }
 
@@ -641,7 +612,6 @@ bool notafiscal_repository::atualizarRetornoContingencia(const QString &chNfe, c
     else
         qDebug() << "Contingência atualizada para chave:" << chNfe << "cStat:" << cstat;
 
-    db.close();
     return ok;
 }
 
@@ -680,7 +650,6 @@ void notafiscal_repository::listarMonitor(QSqlQueryModel *model, const QStringLi
     if(model->lastError().isValid())
         qDebug() << "Erro SQL listarMonitor:" << model->lastError().text();
 
-    db.close();
 }
 
 QString notafiscal_repository::getXmlPathFromIdVenda(qlonglong idvenda){

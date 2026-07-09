@@ -654,6 +654,39 @@ void notafiscal_repository::listarMonitor(QSqlQueryModel *model, const QStringLi
 
 }
 
+void notafiscal_repository::listarContingencias(QSqlQueryModel *model)
+{
+    if(!model) return;
+
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "Erro ao abrir banco listarContingencias()";
+        return;
+    }
+
+    QString sql = R"(
+        SELECT
+            id,
+            valor_total,
+            modelo,
+            nnf,
+            dhemi,
+            tp_amb,
+            chnfe,
+            cnpjemit,
+            finalidade,
+            xml_path,
+            cstat
+        FROM notas_fiscais
+        WHERE cstat IN ('CONTINGENCIA', 'CONTINGENCIA_FALHA')
+        ORDER BY (cstat = 'CONTINGENCIA_FALHA') DESC, dhemi DESC
+    )";
+
+    model->setQuery(sql, db);
+
+    if(model->lastError().isValid())
+        qDebug() << "Erro SQL listarContingencias:" << model->lastError().text();
+}
+
 QString notafiscal_repository::getXmlPathFromIdVenda(qlonglong idvenda){
     if(!DatabaseConnection_service::open()){
         qDebug() << "Erro ao abrir banco getXmlPathFromIdVEnda()";

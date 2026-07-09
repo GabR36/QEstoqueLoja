@@ -44,6 +44,7 @@ public:
     bool temNotaNormal(qlonglong idvenda);
     void listarEntradas(QSqlQueryModel *model, const QString &de = "", const QString &ate = "");
     void listarMonitor(QSqlQueryModel *model, const QStringList &finalidades);
+    void listarContingencias(QSqlQueryModel *model);
     QMap<QString, int>             contarPorFinalidade(QDateTime dtIni, QDateTime dtFim, int tpAmb);
     QList<QPair<QString, QString>> buscarXmlsPorPeriodo(QDateTime dtIni, QDateTime dtFim, int tpAmb);
     QList<NotaFiscalDTO>           buscarPorPeriodo(QDateTime dtIni, QDateTime dtFim, int tpAmb);

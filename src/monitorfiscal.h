@@ -6,6 +6,7 @@
 #include <QSqlQueryModel>
 #include "delegateambiente.h"
 #include "delegatehora.h"
+#include "delegatestatuscontingencia.h"
 #include "services/notafiscal_service.h"
 #include "services/eventofiscal_service.h"
 
@@ -39,6 +40,7 @@ private:
     TipoVisualizacao m_tipoAtual;
     DelegateAmbiente *delegateAmb;
     DelegateHora *delegateHora;
+    DelegateStatusContingencia *delegateStatusCont;
     NotaFiscal_service notaServ;
     EventoFiscal_service eventoServ;
 
@@ -49,6 +51,8 @@ private:
     void abrirEntrada();
     void AtualizarTabelaEventos();
     void abrirEventos();
+    void abrirContingencia();
+    void AtualizarTabelaContingencia();
 };
 
 #endif // MONITORFISCAL_H

@@ -26,13 +26,15 @@ MonitorFiscal::MonitorFiscal(QWidget *parent)
     auto item2 = new MenuItem("Devolução");
     auto item3 = new MenuItem("Eventos");
     auto item4 = new MenuItem("Entrada");
+    auto item5 = new MenuItem("Contingência");
 
     ui->verticalLayout->addWidget(item1);
     ui->verticalLayout->addWidget(item2);
     ui->verticalLayout->addWidget(item3);
     ui->verticalLayout->addWidget(item4);
+    ui->verticalLayout->addWidget(item5);
 
-    m_items = { item1, item2, item3, item4 };
+    m_items = { item1, item2, item3, item4, item5 };
 
     for (auto item : m_items) {
         connect(item->button(), &QPushButton::clicked, this, [=]() {
@@ -41,6 +43,7 @@ MonitorFiscal::MonitorFiscal(QWidget *parent)
     }
     delegateHora = new DelegateHora(ui->TView_Fiscal);
     delegateAmb = new DelegateAmbiente(ui->TView_Fiscal);
+    delegateStatusCont = new DelegateStatusContingencia(ui->TView_Fiscal);
     selectItem(item1);
 
 }
@@ -76,6 +79,11 @@ void MonitorFiscal::selectItem(MenuItem* item)
         ui->labelTitulo->setText("Notas Fiscais — Entrada");
         abrirEntrada();
     }
+    else if (item->button()->text() == "Contingência"){
+        m_tipoAtual = TipoVisualizacao::NotaFiscal;
+        ui->labelTitulo->setText("Notas em Contingência");
+        abrirContingencia();
+    }
 }
 
 void MonitorFiscal::abrirDevolucao(){
@@ -92,6 +100,10 @@ void MonitorFiscal::abrirSaida(){
 
 void MonitorFiscal::abrirEventos(){
     AtualizarTabelaEventos();
+}
+
+void MonitorFiscal::abrirContingencia(){
+    AtualizarTabelaContingencia();
 }
 
 
@@ -121,6 +133,36 @@ void MonitorFiscal::AtualizarTabelaNotas(const QStringList &finalidades){
     modelSaida->setHeaderData(7, Qt::Horizontal, "CNPJ Emitente");
     modelSaida->setHeaderData(8, Qt::Horizontal, "Finalidade");
     modelSaida->setHeaderData(9, Qt::Horizontal, "Caminho XML");
+
+    ui->TView_Fiscal->setColumnHidden(0, true);
+    ui->TView_Fiscal->setColumnHidden(9, true);
+
+    ui->TView_Fiscal->selectRow(0);
+}
+
+void MonitorFiscal::AtualizarTabelaContingencia(){
+    ui->TView_Fiscal->setModel(modelSaida);
+
+    notaServ.listarContingencias(modelSaida);
+
+    for (int i = 0; i < modelSaida->columnCount(); ++i)
+        ui->TView_Fiscal->setColumnHidden(i, false);
+
+    ui->TView_Fiscal->setItemDelegateForColumn(4, delegateHora);
+    ui->TView_Fiscal->setItemDelegateForColumn(5, delegateAmb);
+    ui->TView_Fiscal->setItemDelegateForColumn(10, delegateStatusCont);
+
+    modelSaida->setHeaderData(0, Qt::Horizontal, "ID");
+    modelSaida->setHeaderData(1, Qt::Horizontal, "Valor");
+    modelSaida->setHeaderData(2, Qt::Horizontal, "Modelo");
+    modelSaida->setHeaderData(3, Qt::Horizontal, "Número");
+    modelSaida->setHeaderData(4, Qt::Horizontal, "Data Emissão");
+    modelSaida->setHeaderData(5, Qt::Horizontal, "Ambiente");
+    modelSaida->setHeaderData(6, Qt::Horizontal, "Chave");
+    modelSaida->setHeaderData(7, Qt::Horizontal, "CNPJ Emitente");
+    modelSaida->setHeaderData(8, Qt::Horizontal, "Finalidade");
+    modelSaida->setHeaderData(9, Qt::Horizontal, "Caminho XML");
+    modelSaida->setHeaderData(10, Qt::Horizontal, "Status");
 
     ui->TView_Fiscal->setColumnHidden(0, true);
     ui->TView_Fiscal->setColumnHidden(9, true);

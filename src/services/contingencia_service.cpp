@@ -103,7 +103,7 @@ void ContingenciaWorker::tentarReenviar()
     }
 
     for (const NotaFiscalDTO &nota : pendentes) {
-        if (nota.xmlPath.isEmpty() || !QFile::exists(nota.xmlPath)) {
+        if (nota.xmlPath.isEmpty() || !QFile::exists(AppPath_service::pastaArmazenamentoArquivos() + "/" + nota.xmlPath)) {
             qDebug() << "ContingenciaWorker: XML não encontrado para chave" << nota.chNfe << "- ignorando";
             continue;
         }
@@ -111,11 +111,13 @@ void ContingenciaWorker::tentarReenviar()
         try {
             QString ret;
             {
+                std::string xmlPath = AppPath_service::pastaArmazenamentoArquivos().toStdString() + "/" +
+                                      nota.xmlPath.toStdString();
                 QMutexLocker lock(m_mutex);
                 m_nfe->LimparLista();
                 m_nfe->ConfigGravarValor("NFe", "ModeloDF", nota.modelo == "55" ? "0" : "1");
                 m_nfe->ConfigGravarValor("NFe", "FormaEmissao", "0");
-                m_nfe->CarregarXML(nota.xmlPath.toStdString());
+                m_nfe->CarregarXML(xmlPath);
                 ret = QString::fromUtf8(m_nfe->Enviar(1, false, true, false).c_str());
             }
 

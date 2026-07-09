@@ -114,6 +114,11 @@ void NotaFiscal_service::listarMonitor(QSqlQueryModel *model, const QStringList 
     notaRepo.listarMonitor(model, finalidades);
 }
 
+void NotaFiscal_service::listarContingencias(QSqlQueryModel *model)
+{
+    notaRepo.listarContingencias(model);
+}
+
 QMap<QString, int> NotaFiscal_service::contarPorFinalidade(QDateTime dtIni, QDateTime dtFim, int tpAmb)
 {
     return notaRepo.contarPorFinalidade(dtIni, dtFim, tpAmb);

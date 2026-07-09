@@ -92,7 +92,7 @@ QString AppPath_service::pastaArmazenamentoArquivos()
     ConfigDbDTO dto = serv.getConfigsDB();
     if(dto.driverDB == 0){//sqlite
         QString path = dto.pathPastaSqliteDB;
-        qDebug() << "pasta sqlite:" << path;
+        // qDebug() << "pasta sqlite:" << path;
         QDir dir(path);
         if (!dir.exists()) {
             dir.mkpath(".");
@@ -100,7 +100,7 @@ QString AppPath_service::pastaArmazenamentoArquivos()
         return path;
     }else if(dto.driverDB == 1){//postgre
         QString path = dto.pathPastaPostgreDB;
-        qDebug() << "pasta postgre:" << path;
+        // qDebug() << "pasta postgre:" << path;
 
         QDir dir(path);
         if (!dir.exists()) {

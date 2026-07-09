@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include <QLocale>
 #include <QDebug>
+#include "../infra/apppath_service.h"
 
 Email_service::Email_service(QObject *parent)
     : QObject{parent}
@@ -86,14 +87,15 @@ Email_service::Resultado Email_service::exportarEEnviarEmailContador(QDateTime d
     for (const auto &par : notaServ.buscarXmlsPorPeriodo(dtIni, dtFim, confDTO.tpAmbFiscal)) {
         QString destinoDir = baseDir + "/notas_fiscais/" + par.first;
         QDir().mkpath(destinoDir);
-        if (!QFile::copy(par.second, destinoDir + "/" + QFileInfo(par.second).fileName()))
+        if (!QFile::copy(AppPath_service::pastaArmazenamentoArquivos() + "/" + par.second, destinoDir + "/" + QFileInfo(par.second).fileName()))
             qDebug() << "Erro ao copiar NF XML:" << par.second;
     }
 
     for (const auto &par : eventoServ.buscarXmlsPorPeriodo(dtIni, dtFim)) {
         QString destinoDir = baseDir + "/eventos_fiscais/" + par.first;
         QDir().mkpath(destinoDir);
-        if (!QFile::copy(par.second, destinoDir + "/" + QFileInfo(par.second).fileName()))
+        // qDebug()  << "copiando:" << AppPath_service::pastaArmazenamentoArquivos() + "/" + par.second;
+        if (!QFile::copy(AppPath_service::pastaArmazenamentoArquivos() + "/" + par.second, destinoDir + "/" + QFileInfo(par.second).fileName()))
             qDebug() << "Erro ao copiar Evento XML:" << par.second;
     }
 

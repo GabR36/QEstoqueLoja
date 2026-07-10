@@ -504,6 +504,7 @@ QList<QPair<QString, QString>> notafiscal_repository::buscarXmlsPorPeriodo(QDate
         FROM notas_fiscais
         WHERE dhemi BETWEEN :ini AND :fim
         AND tp_amb = :tpamb
+        AND (cstat != 'CONTINGENCIA_FALHA')
     )");
     q.bindValue(":ini", dtIni.toString("yyyy-MM-dd HH:mm:ss"));
     q.bindValue(":fim", dtFim.toString("yyyy-MM-dd HH:mm:ss"));
@@ -534,6 +535,7 @@ QList<NotaFiscalDTO> notafiscal_repository::buscarPorPeriodo(QDateTime dtIni, QD
         WHERE dhemi BETWEEN :ini AND :fim
         AND tp_amb = :tpamb
         AND finalidade != 'ENTRADA EXTERNA'
+        AND (cstat != 'CONTINGENCIA_FALHA')
         ORDER BY dhemi
     )");
     q.bindValue(":ini", dtIni.toString("yyyy-MM-dd HH:mm:ss"));
@@ -650,6 +652,39 @@ void notafiscal_repository::listarMonitor(QSqlQueryModel *model, const QStringLi
     if(model->lastError().isValid())
         qDebug() << "Erro SQL listarMonitor:" << model->lastError().text();
 
+}
+
+void notafiscal_repository::listarContingencias(QSqlQueryModel *model)
+{
+    if(!model) return;
+
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "Erro ao abrir banco listarContingencias()";
+        return;
+    }
+
+    QString sql = R"(
+        SELECT
+            id,
+            valor_total,
+            modelo,
+            nnf,
+            dhemi,
+            tp_amb,
+            chnfe,
+            cnpjemit,
+            finalidade,
+            xml_path,
+            cstat
+        FROM notas_fiscais
+        WHERE cstat IN ('CONTINGENCIA', 'CONTINGENCIA_FALHA')
+        ORDER BY (cstat = 'CONTINGENCIA_FALHA') DESC, dhemi DESC
+    )";
+
+    model->setQuery(sql, db);
+
+    if(model->lastError().isValid())
+        qDebug() << "Erro SQL listarContingencias:" << model->lastError().text();
 }
 
 QString notafiscal_repository::getXmlPathFromIdVenda(qlonglong idvenda){

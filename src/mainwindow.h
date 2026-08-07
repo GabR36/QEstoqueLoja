@@ -25,7 +25,7 @@
 #include "services/contingencia_service.h"
 
 
-#define VERSAO_QE "2.9.2"
+#define VERSAO_QE "2.10.0"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -128,6 +128,7 @@ private:
 
     void mostrarProdutoPorCodigoBarras(const QString &codigo);
     void iniciarMigration();
+    void atualizarConfigDTO();
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
     QString getIdProdSelected();

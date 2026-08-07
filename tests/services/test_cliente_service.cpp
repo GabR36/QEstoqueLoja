@@ -202,6 +202,21 @@ void test_cliente_service::alterar_cliente_invalido()
     QCOMPARE(r.erro, ClienteErro::CampoVazio);
 }
 
+void test_cliente_service::alterar_cliente_dataVazia()
+{
+    Cliente_service service;
+
+    ClienteDTO c;
+    c.nome = "Neymar Jr";
+    c.dataNasc = "//";
+    c.cpf = "66666666666";
+    c.ehPf = true;
+
+    auto r = service.updateCliente(1, c);
+
+    QVERIFY(r.ok);
+}
+
 void test_cliente_service::cleanup()
 {
     QSqlQuery q(db);

@@ -61,7 +61,7 @@ void Clientes::on_Btn_Alterar_clicked()
         QString clienteId = idVariant.toString();
         if(clienteId.toInt() > 1){
             AlterarCliente *alterarJanela = new AlterarCliente(nullptr, clienteId);
-            alterarJanela->setWindowModality(Qt::ApplicationModal);
+            // alterarJanela->setWindowModality(Qt::ApplicationModal);
             connect(alterarJanela, &AlterarCliente::clienteAtualizado, this, &Clientes::atualizarTableview);
             alterarJanela->show();
         }else{
@@ -118,7 +118,7 @@ void Clientes::on_Btn_Deletar_clicked()
 void Clientes::on_Btn_Novo_clicked()
 {
     InserirCliente *inserircliente = new InserirCliente();
-    inserircliente->setWindowModality(Qt::ApplicationModal);
+    // inserircliente->setWindowModality(Qt::ApplicationModal);
     connect(inserircliente, &InserirCliente::clienteInserido, this, &Clientes::atualizarTableview);
 
     inserircliente->show();

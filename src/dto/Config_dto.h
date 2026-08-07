@@ -84,6 +84,8 @@ struct ConfigDTO {
     QString senhaDB;
     QString pathPastaSqliteDB;
     QString pathPastaPostgreDB;
+
+    QString impressoraNomeDispositivo;
 };
 
 #endif // CONFIG_DTO_H

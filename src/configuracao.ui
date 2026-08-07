@@ -38,7 +38,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>6</number>
+      <number>7</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -380,8 +380,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>557</width>
-            <height>909</height>
+            <width>562</width>
+            <height>930</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -1283,6 +1283,39 @@ border-radius: 0px;</string>
         </widget>
        </item>
       </layout>
+     </widget>
+     <widget class="QWidget" name="tab_8">
+      <attribute name="title">
+       <string>Dispositivo</string>
+      </attribute>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>60</y>
+         <width>501</width>
+         <height>25</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
+        <item>
+         <widget class="QLabel" name="label_43">
+          <property name="toolTip">
+           <string>Deve ter papel tamanho 80mm e compatibilidade com comandos ESC/POS</string>
+          </property>
+          <property name="toolTipDuration">
+           <number>-1</number>
+          </property>
+          <property name="text">
+           <string>Impressora Fiscal 80mm:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="CBox_Impressora"/>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </widget>
    </item>

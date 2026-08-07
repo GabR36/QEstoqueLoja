@@ -40,6 +40,8 @@ private slots:
 
     void on_CBox_DBDriver_currentIndexChanged(int index);
 
+    void on_CBox_Impressora_activated(int index);
+
 private:
     Ui::Config *ui;
     QSqlDatabase db = QSqlDatabase::database();
@@ -47,6 +49,7 @@ private:
     Config_service *configService;
     ConfigDTO configDTO_preMudancas;
     void atualizarPaginaDB(int indexDriver);
+    void carregarImpressorasCBox();
 signals:
     void alterouConfig();
 };

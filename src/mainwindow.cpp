@@ -50,6 +50,7 @@
 #include "inutilizacaodialog.h"
 #include "cartacorrecaojanela.h"
 #include "services/export_service.h"
+#include "services/escposprinter_service.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -349,8 +350,12 @@ void MainWindow::imprimirEtiqueta1(){
         return;
     }
 
-    if (!PrintUtil::imprimirEtiquetas(this, 1, barcode, descVariant.toString(), precoVariant.toDouble(), &erro)) {
-        QMessageBox::warning(this, "Erro", erro);
+
+    EscPosPrinter_service printer;
+    auto r1 = printer.imprimirEtiquetas(configDTO.impressoraNomeDispositivo, 1, barcode, descVariant.toString(),precoVariant.toDouble());
+    if(!r1.ok){
+        QMessageBox::warning(this, "Erro", r1.msg);
+        return;
     }
 }
 
@@ -369,11 +374,13 @@ void MainWindow::imprimirEtiqueta3(){
         return;
     }
 
-    if (!PrintUtil::imprimirEtiquetas(this, 3, barcode, descVariant.toString(), precoVariant.toDouble(), &erro)) {
-        QMessageBox::warning(this, "Erro", erro);
+
+    EscPosPrinter_service printer;
+    auto r1 = printer.imprimirEtiquetas(configDTO.impressoraNomeDispositivo, 3, barcode, descVariant.toString(),precoVariant.toDouble());
+    if(!r1.ok){
+        QMessageBox::warning(this, "Erro", r1.msg);
+        return;
     }
-
-
 }
 
 
@@ -440,6 +447,11 @@ void MainWindow::on_actionConfig_triggered()
     configuracao->show();
     connect(configuracao, &Configuracao::alterouConfig, this,
             &MainWindow::atualizarConfigAcbr);
+    connect(configuracao, &Configuracao::alterouConfig, this,
+            &MainWindow::atualizarConfigDTO);
+}
+void MainWindow::atualizarConfigDTO(){
+    configDTO = confServ->carregarTudo();
 }
 
 void MainWindow::on_Ledit_Pesquisa_textChanged(const QString &arg1)
@@ -453,7 +465,7 @@ void MainWindow::on_Btn_Clientes_clicked()
 
 
     Clientes *clientes = new Clientes;
-    clientes->setWindowModality(Qt::ApplicationModal);
+    // clientes->setWindowModality(Qt::ApplicationModal);
     clientes->show();
 }
 

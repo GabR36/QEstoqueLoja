@@ -107,6 +107,8 @@ set(QESTOQUE_SOURCES
     src/services/email_service.cpp
     src/services/acbr_service.cpp
     src/services/schemamigration_service.cpp
+    src/services/escposprinter_service.cpp
+
 
     src/repository/Produto_repository.cpp
     src/repository/config_repository.cpp
@@ -131,6 +133,7 @@ set(QESTOQUE_SOURCES
     src/util/ACBrConsultaCNPJ.cpp
     src/util/ACBrMail.cpp
     src/util/vendasutil.cpp
+    src/util/escposcomandos.cpp
 
     src/nota/ACBrNFe.cpp
     src/nota/cancelnf.cpp
@@ -142,6 +145,8 @@ set(QESTOQUE_SOURCES
 
     src/infra/databaseconnection_service.cpp
     src/infra/apppath_service.cpp
+
+
 )
 
 add_library(QEstoqueLib STATIC
@@ -169,6 +174,7 @@ elseif(WIN32)
         quazip1-qt6
         QtRPT
         zlib_dll
+        Winspool
     )
 endif()
 
@@ -325,7 +331,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         recusos-geral.qrc
         src/dto/ConfigDB_dto.h
         src/services/export_service.h src/services/export_service.cpp
-
+        src/services/escposprinter_service.h src/services/escposprinter_service.cpp
+        src/util/escposcomandos.h src/util/escposcomandos.cpp
 
 
 

@@ -10,6 +10,7 @@ class test_cliente_service : public QObject
     Q_OBJECT
 public:
     explicit test_cliente_service(QObject *parent = nullptr);
+public slots:
 private:
     QSqlDatabase db;
 
@@ -26,6 +27,8 @@ private slots:
     void alterar_cliente_ok();
     void alterar_cliente_invalido();
     void inserir_cliente_data_nascimento_vazia();
+    void alterar_cliente_dataVazia();
+
 };
 
 #endif // TEST_CLIENTE_SERVICE_H

@@ -242,7 +242,11 @@ bool Cliente_repository::updateCliente(qlonglong id, ClienteDTO cliente){
     query.bindValue(":valor3", cliente.telefone);
     query.bindValue(":valor4", cliente.endereco);
     query.bindValue(":valor5", cliente.cpf);
-    query.bindValue(":valor6", cliente.dataNasc);
+    if(cliente.dataNasc.isEmpty() || cliente.dataNasc == "//"){
+        query.bindValue(":valor6", QVariant()); // Salva como null
+    }else{
+        query.bindValue(":valor6", cliente.dataNasc);
+    }
     query.bindValue(":valor7", cliente.ehPf);
     query.bindValue(":valor8", id);
     query.bindValue(":numero", cliente.numeroEnd);
@@ -256,7 +260,7 @@ bool Cliente_repository::updateCliente(qlonglong id, ClienteDTO cliente){
     query.bindValue(":atualizadoem", dataFormatada);
 
     if(!query.exec()){
-        qDebug() << "erro query, update clientes";
+        qDebug() << "erro query, update clientes: " << query.lastError();
         return false;
     }else{
         return true;

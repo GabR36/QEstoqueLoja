@@ -82,6 +82,8 @@ ConfigDTO Config_repository::loadAll()
     dto.pathPastaSqliteDB = s.value("database/path_pasta_sqlite").toString();
     dto.pathPastaPostgreDB = s.value("database/path_pasta_postgre").toString();
 
+    dto.impressoraNomeDispositivo = s.value("dispositivo/nome_impressora").toString();
+
     return dto;
 }
 
@@ -155,6 +157,8 @@ bool Config_repository::saveAll(const ConfigDTO &dto)
     s.setValue("database/senha", dto.senhaDB);
     s.setValue("database/path_pasta_sqlite", dto.pathPastaSqliteDB);
     s.setValue("database/path_pasta_postgre", dto.pathPastaPostgreDB);
+
+    s.setValue("dispositivo/nome_impressora", dto.impressoraNomeDispositivo);
 
 
 

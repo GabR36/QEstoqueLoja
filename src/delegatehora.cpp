@@ -3,12 +3,11 @@
 DelegateHora::DelegateHora(QObject *parent) : QStyledItemDelegate(parent) {}
 
 QString DelegateHora::displayText(const QVariant &value, const QLocale &locale) const {
-    if (value.canConvert<QDate>()) {
-        QDate date = value.toDate();
-        // Verifica se a data está no formato errado e corrige se necessário
-        if (date.isValid()) {
-            // Formata a data no formato "dd/MM/yyyy"
-            return date.toString("dd/MM/yyyy");
+    if (value.canConvert<QDateTime>()) {
+        QDateTime dateTime = value.toDateTime();
+        if (dateTime.isValid()) {
+            // Formata a data e hora no formato "dd/MM/yyyy HH:mm:ss"
+            return dateTime.toString("dd/MM/yyyy HH:mm:ss");
         }
     }
     // Caso contrário, chama o método base para a exibição padrão

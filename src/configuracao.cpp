@@ -12,6 +12,7 @@
 #include "util/helppage.h"
 #include "dto/Config_dto.h"
 #include "services/imagestorage_service.h"
+#include <QPrinterInfo>
 
 Configuracao::Configuracao(QWidget *parent)
     : QWidget(parent)
@@ -24,7 +25,7 @@ Configuracao::Configuracao(QWidget *parent)
     ui->Lbl_CertificadoAcPath->setVisible(false);
     ui->LEdit_CESTProd->setVisible(false);
     ui->Lbl_CestProd->setVisible(false);
-
+    ui->lbl_certac_txt->setVisible(false);
 
 
     ConfigDTO configDTO;
@@ -103,7 +104,9 @@ Configuracao::Configuracao(QWidget *parent)
     ui->Lbl_DBPathPastaSqlite->setText(configDTO.pathPastaSqliteDB);
     ui->Lbl_DBPathPastaPostgre->setText(configDTO.pathPastaPostgreDB);
 
-
+    //dispositivo
+    carregarImpressorasCBox();
+    ui->CBox_Impressora->setCurrentText(configDTO.impressoraNomeDispositivo);
 
     // validador
     QDoubleValidator *validador = new QDoubleValidator();
@@ -216,6 +219,7 @@ void Configuracao::on_Btn_Aplicar_clicked()
     dtoInserir.pathPastaSqliteDB = ui->Lbl_DBPathPastaSqlite->text().trimmed();
     dtoInserir.pathPastaPostgreDB = ui->Lbl_DBPathPastaPostgre->text().trimmed();
 
+    dtoInserir.impressoraNomeDispositivo = ui->CBox_Impressora->currentText();
 
 
     QString erro = "";
@@ -398,5 +402,22 @@ void Configuracao::atualizarPaginaDB(int indexDriver){
 void Configuracao::on_CBox_DBDriver_currentIndexChanged(int index)
 {
     atualizarPaginaDB(index);
+}
+
+
+void Configuracao::on_CBox_Impressora_activated(int index)
+{
+
+}
+void Configuracao::carregarImpressorasCBox(){
+    QList<QPrinterInfo> printers = QPrinterInfo::availablePrinters();
+
+    for (const QPrinterInfo &printer : printers)
+    {
+        ui->CBox_Impressora->addItem(printer.printerName());
+
+    }
+    ui->CBox_Impressora->addItem("");
+    ui->CBox_DBDriver->setCurrentText("");
 }
 

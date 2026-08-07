@@ -54,6 +54,7 @@ InserirProduto::InserirProduto(QWidget *parent)
 
     //desativa campo CEST
     ui->Ledit_CEST->setEnabled(false);
+    ui->Lbl_CEST->setVisible(false);
 
     on_Ledit_NCM_editingFinished();
 

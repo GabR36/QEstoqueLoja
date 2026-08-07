@@ -172,7 +172,7 @@ bool ProdutoNota_repository::marcarComoAdicionado(qlonglong id){
     }
 
     QSqlQuery query(db);
-    query.prepare("UPDATE produtos_nota SET adicionado = 1, atualizado_em = :atualizadoem "
+    query.prepare("UPDATE produtos_nota SET adicionado = true, atualizado_em = :atualizadoem "
                   "WHERE id = :id");
     query.bindValue(":atualizadoem", DataUtil::getDataAgoraUS());
     query.bindValue(":id", id);

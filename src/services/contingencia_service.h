@@ -26,7 +26,7 @@ public slots:
     void tentarReenviar();
 
 private:
-    bool consultarEAtualizar(const QString &chNfe);
+    bool consultarEAtualizar(const QString &chNfe, const QString &tokenReserva);
 
     QTimer                *m_timer;
     QSqlDatabase           m_db;

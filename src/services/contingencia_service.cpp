@@ -132,12 +132,12 @@ void ContingenciaWorker::tentarReenviar()
                 qDebug() << "ContingenciaWorker: nota retransmitida com sucesso —" << nota.chNfe;
             } else {
                 // Pode já ter sido autorizada (timeout, duplicidade, etc.)
-                if (!consultarEAtualizar(nota.chNfe, nota.tokenReserva)) {
+                // if (!consultarEAtualizar(nota.chNfe, nota.tokenReserva)) {
                     // Rejeitada na SEFAZ — não tenta mais
                     m_repo->atualizar(nota.chNfe, nota.tokenReserva,
                                       "CONTINGENCIA_FALHA", "");
                     qDebug() << "ContingenciaWorker: nota marcada como falha definitiva —" << nota.chNfe;
-                }
+                // }
             }
 
         } catch (std::exception &e) {

@@ -200,11 +200,29 @@ bool SchemaMigration_service::executarArquivoSql(const QString &caminho)
 
     return true;
 }
+SchemaMigration_service::Resultado SchemaMigration_service::bancoComVersaoSuperior(){
+    int versaoBanco = getSchemaVersion();
+    if(dbSchemaLastVersion < versaoBanco){
+        return {false, SchemaErro::ProgramaDesatualizado,
+                "Versão do banco de dados superior. Você provavelmente "
+                "vai precisar atualizar seu QEstoqueLoja ou usar outro "
+                "banco de dados.", versaoBanco};
+    }else {
+        return {true, SchemaErro::Nenhum, "Banco de dados com versão inferior, "
+                                          "ok.", versaoBanco};
+    }
+}
 
 SchemaMigration_service::Resultado SchemaMigration_service::update() {
     if(!DatabaseConnection_service::open()){
         qDebug() << "erro ao abrir banco de dados.";
         return {false, SchemaErro::FalhaConexao, "erro ao iniciar banco de dados", 0 };
+    }
+    //verifica se o banco de dados esta com versao superior indicando programa
+    // desatualizado
+    auto resultadoVersao = bancoComVersaoSuperior();
+    if (!resultadoVersao.ok){
+        return {false, resultadoVersao.status, resultadoVersao.message, 0};
     }
 
     QSqlQuery query(db);

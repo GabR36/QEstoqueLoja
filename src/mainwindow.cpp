@@ -68,7 +68,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     DatabaseConnection_service::changeDatabase(configDTO);
 
-    iniciarMigration();
+    if(!iniciarMigration()){
+        inicializacaoOk = false;
+        return;
+    }
 
 
     db = DatabaseConnection_service::db();
@@ -157,7 +160,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::iniciarMigration(){
+bool MainWindow::inicializacaoValida() const {
+    return inicializacaoOk;
+}
+
+bool MainWindow::iniciarMigration(){
 
     SchemaMigration_service *schema = new SchemaMigration_service(this, ultimaVersaoSchema);
     //conexões de ações para update de versao schema
@@ -173,8 +180,18 @@ void MainWindow::iniciarMigration(){
     // schema->update();
     auto result = schema->update();
     if(!result.ok){
-        QMessageBox::warning(this, "Erro migração", "Erro ao migrar banco de dados");
+        QMessageBox::warning(this, "Erro migração", result.message);
+        if(result.status == SchemaErro::ProgramaDesatualizado){
+            Config_service confServ;
+            confServ.trocarParaSQlite();
+            QMessageBox::warning(this, "Banco desincronizado",
+                                 "Trocando para banco SQlite Local. inicialize "
+                                 "o QEstoqueLoja novamente.");
+
+        }
+        return false;
     }
+    return true;
 
 }
 

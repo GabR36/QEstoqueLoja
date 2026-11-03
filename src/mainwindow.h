@@ -46,6 +46,7 @@ public:
     QLocale portugues;
     QIcon iconAlterarProduto, iconAddProduto, iconBtnVenda, iconDelete, iconPesquisa, iconBtnRelatorios,
         iconImpressora, iconClientes;
+    bool inicializacaoValida() const;
 
 public slots:
    void atualizarTableviewComQuery(QString &query);
@@ -118,6 +119,7 @@ private:
     Config_service *confServ = new Config_service(this);
     ConfigDTO configDTO;
     ContingenciaService *contingenciaService = nullptr;
+    bool inicializacaoOk = true;
 
 
     void setarIconesJanela();
@@ -127,8 +129,9 @@ private:
 
 
     void mostrarProdutoPorCodigoBarras(const QString &codigo);
-    void iniciarMigration();
+    bool iniciarMigration();
     void atualizarConfigDTO();
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
     QString getIdProdSelected();

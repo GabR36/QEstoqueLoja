@@ -212,8 +212,16 @@ bool Config_repository::saveMigration13Changes()
 {
     QSettings s(AppPath_service::configPath(), QSettings::IniFormat);
 
-    s.setValue("database/river",0);
+    s.setValue("database/driver",0);
     s.setValue("database/path_pasta_sqlite", AppPath_service::appDataPath());
     s.sync();
     return s.status() == QSettings::NoError;
+}
+
+bool Config_repository::SwitchToSqlite(){
+    QSettings s(AppPath_service::configPath(), QSettings::IniFormat);
+    s.setValue("database/driver", 0);
+    s.sync();
+    return s.status() == QSettings::NoError;
+
 }

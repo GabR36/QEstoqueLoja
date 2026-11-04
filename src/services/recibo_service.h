@@ -8,6 +8,7 @@
 #include "vendas_service.h"
 #include "config_service.h"
 #include "entradasvendas_service.h"
+#include "cliente_service.h"
 
 class Recibo_service : public QObject
 {
@@ -21,6 +22,7 @@ private:
     ProdutoVenda_service prodVendaServ;
     Vendas_service vendaServ;
     Config_service confServ;
+    Cliente_service clieServ;
     EntradasVendas_service entradaServ;
 signals:
 };

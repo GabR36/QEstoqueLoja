@@ -438,6 +438,7 @@ void venda::terminarPagamento()
     QString valor_final    = ui->Lbl_TotalTaxa->text();
     QString descontoInicial = ui->Ledit_Desconto->text();
     QString desconto;
+    QString obs = ui->Ledit_OBS->text().trimmed();
 
     if (ui->CheckPorcentagem->isChecked())
         desconto = portugues.toString(
@@ -462,6 +463,7 @@ void venda::terminarPagamento()
     newVenda.troco          = portugues.toDouble(troco);
     newVenda.valorFinal     = portugues.toDouble(valor_final);
     newVenda.valorRecebido  = portugues.toDouble(recebido);
+    newVenda.observacao = obs;
 
     if(idClienteAtual > 0)
         CLIENTE = cliServ.getClienteByID(idClienteAtual);

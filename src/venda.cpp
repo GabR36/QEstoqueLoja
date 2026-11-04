@@ -119,6 +119,8 @@ venda::venda(QWidget *parent) :
     configDTO = confServ->carregarTudo();
     bool tipoAmb = configDTO.tpAmbFiscal;
     bool emitirNf = configDTO.emitNfFiscal;
+    int modeloEmissao = configDTO.modeloEmissao;
+    int comportamentoEmissao = configDTO.comportamentoEmissao;
 
     if (tipoAmb == 1 && emitirNf == 1) {
         ui->Lbl_TpAmb->setText("Ambiente: Produção");
@@ -126,6 +128,16 @@ venda::venda(QWidget *parent) :
     } else if (emitirNf == 1) {
         ui->Lbl_TpAmb->setText("Ambiente: Homologação");
         ui->Lbl_TpAmb->setStyleSheet("color: white; background-color: orange; font-weight: bold; padding: 4px; border-radius: 5px;");
+    }
+
+    if(modeloEmissao){
+        ui->CBox_ModeloEmit->setCurrentIndex(modeloEmissao);
+    }
+    if(comportamentoEmissao == 0){
+        ui->RadioBtn_EmitNfApenas->setChecked(true);
+
+    }else if(comportamentoEmissao == 1){
+        ui->RadioBtn_EmitNfTodos->setChecked(true);
     }
 
     connect(ui->Tview_Produtos, &QTableView::doubleClicked, this, &venda::verProd);

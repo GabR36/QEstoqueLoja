@@ -108,6 +108,10 @@ Configuracao::Configuracao(QWidget *parent)
     carregarImpressorasCBox();
     ui->CBox_Impressora->setCurrentText(configDTO.impressoraNomeDispositivo);
 
+    //geral
+    ui->CBox_ModeloEmissao->setCurrentIndex(configDTO.modeloEmissao);
+    ui->CBox_ComportamentoEmissao->setCurrentIndex(configDTO.comportamentoEmissao);
+
     // validador
     QDoubleValidator *validador = new QDoubleValidator();
     ui->Ledt_LucroEmpresa->setValidator(validador);
@@ -220,6 +224,10 @@ void Configuracao::on_Btn_Aplicar_clicked()
     dtoInserir.pathPastaPostgreDB = ui->Lbl_DBPathPastaPostgre->text().trimmed();
 
     dtoInserir.impressoraNomeDispositivo = ui->CBox_Impressora->currentText();
+
+
+    dtoInserir.modeloEmissao = ui->CBox_ModeloEmissao->currentIndex();
+    dtoInserir.comportamentoEmissao = ui->CBox_ComportamentoEmissao->currentIndex();
 
 
     QString erro = "";

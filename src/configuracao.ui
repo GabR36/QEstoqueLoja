@@ -38,7 +38,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>7</number>
+      <number>8</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -1288,7 +1288,7 @@ border-radius: 0px;</string>
       <attribute name="title">
        <string>Dispositivo</string>
       </attribute>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>30</x>
@@ -1313,6 +1313,81 @@ border-radius: 0px;</string>
         </item>
         <item>
          <widget class="QComboBox" name="CBox_Impressora"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+     <widget class="QWidget" name="tab_9">
+      <attribute name="title">
+       <string>Geral</string>
+      </attribute>
+      <widget class="QGroupBox" name="groupBox_4">
+       <property name="geometry">
+        <rect>
+         <x>20</x>
+         <y>20</y>
+         <width>521</width>
+         <height>141</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Comportamento Fiscal</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_12">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_11">
+          <item>
+           <widget class="QLabel" name="label_44">
+            <property name="text">
+             <string>Emissão Padrão:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="CBox_ModeloEmissao">
+            <item>
+             <property name="text">
+              <string>NFC-E</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>NF-E</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Não emitir NF</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_12">
+          <item>
+           <widget class="QLabel" name="label_45">
+            <property name="text">
+             <string>Comportamento padrão:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="CBox_ComportamentoEmissao">
+            <item>
+             <property name="text">
+              <string>Emitir NF apenas para itens NF</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Emitir NF para todos itens</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>

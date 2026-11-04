@@ -79,7 +79,7 @@ void Recibo_service::imprimirReciboVenda(qlonglong idvenda){
     yPos += 20;
     painter.drawText(xPos, yPos, "Cliente: " + venda.clienteNome);
     yPos += 20;
-    QString observacao = "Observação: " + cliente.observacao;
+    QString observacao = "Observação: " + venda.observacao;
 
     // Largura disponível para impressão
     int largura = printer.pageRect(QPrinter::DevicePixel).width() - margemEsquerda - 20;

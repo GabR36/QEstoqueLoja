@@ -177,6 +177,7 @@ bool MainWindow::iniciarMigration(){
     connect(schema, &SchemaMigration_service::dbVersao13, this,
             &MainWindow::atualizarConfigAcbr);
 
+
     // schema->update();
     auto result = schema->update();
     if(!result.ok){

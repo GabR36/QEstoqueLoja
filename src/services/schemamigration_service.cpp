@@ -1550,6 +1550,98 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             emit dbVersao13();
             break;
         }
+        case 13:
+        {
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+                break;
+            }
+            qDebug() << "Atualizando para versao 14: adicionando campos em nota_fiscal, "
+                        "clientes e vendas.";
+            QSqlQuery query(db);
+            qDebug() << "É Postgre?: " << DatabaseConnection_service::isPostgres();
+
+            if(DatabaseConnection_service::isPostgres()){
+
+                //notas fiscais
+                if(!query.exec("ALTER TABLE notas_fiscais ADD token_reserva TEXT")){
+                    qDebug() << "Não executou query postgre migração 14";
+                }else{
+                    qDebug() << "executou query notas_fiscais migração 14";
+                }
+                if(!query.exec("ALTER TABLE notas_fiscais ADD processando_por TEXT")){
+                    qDebug() << "Não executou query postgre migração 14";
+                }else{
+                    qDebug() << "executou query eventos_fiscais migração 14";
+                }
+                if(!query.exec("ALTER TABLE notas_fiscais ADD processando_ate TIMESTAMP")){
+                    qDebug() << "Não executou query postgre migração 14";
+                }else{
+                    qDebug() << "executou query eventos_fiscais migração 14";
+                }
+                // clientes
+
+                if(!query.exec("ALTER TABLE clientes ADD observacao TEXT")){
+                    qDebug() << "Não executou query postgre migração 14";
+                }else{
+                    qDebug() << "executou query notas_fiscais migração 14";
+                }
+                //vendas2
+                if(!query.exec("ALTER TABLE vendas2 ADD observacao TEXT")){
+                    qDebug() << "Não executou query postgre migração 14";
+                }else{
+                    qDebug() << "executou query notas_fiscais migração 14";
+                }
+
+            }else{
+                //notas fiscais
+                if(!query.exec("ALTER TABLE notas_fiscais ADD token_reserva TEXT")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query notas_fiscais migração 14";
+                }
+                if(!query.exec("ALTER TABLE notas_fiscais ADD processando_por TEXT")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query eventos_fiscais migração 14";
+                }
+                if(!query.exec("ALTER TABLE notas_fiscais ADD processando_ate TEXT")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query eventos_fiscais migração 14";
+                }
+                // clientes
+
+                if(!query.exec("ALTER TABLE clientes ADD observacao TEXT")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query notas_fiscais migração 14";
+                }
+                //vendas2
+                if(!query.exec("ALTER TABLE vendas2 ADD observacao TEXT")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query vendas2 migração 14";
+                }
+
+            }
+
+
+            if (!setSchemaVersion(14)) {
+                qDebug() << "Erro ao atualizar user_version para 14:" << query.lastError().text();
+                db.rollback();
+                break;
+            }
+            if (!db.commit()) {
+                qDebug() << "Erro ao dar commit:" << db.lastError().text();
+                db.rollback();
+                break;
+            }
+            dbSchemaVersion = 14;
+            qDebug() << "Migracao para versao 14 concluida.";
+            emit dbVersao14();
+            break;
+        }
 
         }
     }

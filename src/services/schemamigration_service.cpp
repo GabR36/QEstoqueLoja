@@ -200,11 +200,29 @@ bool SchemaMigration_service::executarArquivoSql(const QString &caminho)
 
     return true;
 }
+SchemaMigration_service::Resultado SchemaMigration_service::bancoComVersaoSuperior(){
+    int versaoBanco = getSchemaVersion();
+    if(dbSchemaLastVersion < versaoBanco){
+        return {false, SchemaErro::ProgramaDesatualizado,
+                "Versão do banco de dados superior. Você provavelmente "
+                "vai precisar atualizar seu QEstoqueLoja ou usar outro "
+                "banco de dados.", versaoBanco};
+    }else {
+        return {true, SchemaErro::Nenhum, "Banco de dados com versão inferior, "
+                                          "ok.", versaoBanco};
+    }
+}
 
 SchemaMigration_service::Resultado SchemaMigration_service::update() {
     if(!DatabaseConnection_service::open()){
         qDebug() << "erro ao abrir banco de dados.";
         return {false, SchemaErro::FalhaConexao, "erro ao iniciar banco de dados", 0 };
+    }
+    //verifica se o banco de dados esta com versao superior indicando programa
+    // desatualizado
+    auto resultadoVersao = bancoComVersaoSuperior();
+    if (!resultadoVersao.ok){
+        return {false, resultadoVersao.status, resultadoVersao.message, 0};
     }
 
     QSqlQuery query(db);
@@ -1530,6 +1548,98 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
             dbSchemaVersion = 13;
             qDebug() << "Migracao para versao 13 concluida.";
             emit dbVersao13();
+            break;
+        }
+        case 13:
+        {
+            if (!db.transaction()) {
+                qDebug() << "Error: unable to start transaction";
+                break;
+            }
+            qDebug() << "Atualizando para versao 14: adicionando campos em nota_fiscal, "
+                        "clientes e vendas.";
+            QSqlQuery query(db);
+            qDebug() << "É Postgre?: " << DatabaseConnection_service::isPostgres();
+
+            if(DatabaseConnection_service::isPostgres()){
+
+                //notas fiscais
+                if(!query.exec("ALTER TABLE notas_fiscais ADD token_reserva TEXT")){
+                    qDebug() << "Não executou query postgre migração 14";
+                }else{
+                    qDebug() << "executou query notas_fiscais migração 14";
+                }
+                if(!query.exec("ALTER TABLE notas_fiscais ADD processando_por TEXT")){
+                    qDebug() << "Não executou query postgre migração 14";
+                }else{
+                    qDebug() << "executou query eventos_fiscais migração 14";
+                }
+                if(!query.exec("ALTER TABLE notas_fiscais ADD processando_ate TIMESTAMP")){
+                    qDebug() << "Não executou query postgre migração 14";
+                }else{
+                    qDebug() << "executou query eventos_fiscais migração 14";
+                }
+                // clientes
+
+                if(!query.exec("ALTER TABLE clientes ADD observacao TEXT")){
+                    qDebug() << "Não executou query postgre migração 14";
+                }else{
+                    qDebug() << "executou query notas_fiscais migração 14";
+                }
+                //vendas2
+                if(!query.exec("ALTER TABLE vendas2 ADD observacao TEXT")){
+                    qDebug() << "Não executou query postgre migração 14";
+                }else{
+                    qDebug() << "executou query notas_fiscais migração 14";
+                }
+
+            }else{
+                //notas fiscais
+                if(!query.exec("ALTER TABLE notas_fiscais ADD token_reserva TEXT")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query notas_fiscais migração 14";
+                }
+                if(!query.exec("ALTER TABLE notas_fiscais ADD processando_por TEXT")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query eventos_fiscais migração 14";
+                }
+                if(!query.exec("ALTER TABLE notas_fiscais ADD processando_ate TEXT")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query eventos_fiscais migração 14";
+                }
+                // clientes
+
+                if(!query.exec("ALTER TABLE clientes ADD observacao TEXT")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query notas_fiscais migração 14";
+                }
+                //vendas2
+                if(!query.exec("ALTER TABLE vendas2 ADD observacao TEXT")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query vendas2 migração 14";
+                }
+
+            }
+
+
+            if (!setSchemaVersion(14)) {
+                qDebug() << "Erro ao atualizar user_version para 14:" << query.lastError().text();
+                db.rollback();
+                break;
+            }
+            if (!db.commit()) {
+                qDebug() << "Erro ao dar commit:" << db.lastError().text();
+                db.rollback();
+                break;
+            }
+            dbSchemaVersion = 14;
+            qDebug() << "Migracao para versao 14 concluida.";
+            emit dbVersao14();
             break;
         }
 

@@ -10,7 +10,8 @@ enum class SchemaErro {
     CampoVazio,
     FalhaConexao,
     ErroSQL,
-    ErroMigracao
+    ErroMigracao,
+    ProgramaDesatualizado
 };
 
 class SchemaMigration_service : public QObject
@@ -38,6 +39,7 @@ public:
 
     SchemaMigration_service::Resultado update();
 
+    SchemaMigration_service::Resultado bancoComVersaoSuperior();
 signals:
     void dbVersao6();
     void dbVersao7();
@@ -45,6 +47,7 @@ signals:
     void dbVersao10();
     void dbVersao11();
     void dbVersao13();
+    void dbVersao14();
 private slots:
     bool executarArquivoSql(const QString &caminho);
 private:

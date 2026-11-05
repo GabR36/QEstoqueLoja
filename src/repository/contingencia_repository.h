@@ -17,8 +17,9 @@ public:
     explicit ContingenciaRepository(const QSqlDatabase &db, QObject *parent = nullptr);
 
     QList<NotaFiscalDTO> buscarPendentes();
-    bool atualizar(const QString &chNfe, const QString &cstat, const QString &nProt);
-
+    QList<NotaFiscalDTO> reservarPendentes(int limite, const QString &computador);
+    bool atualizar(const QString &chNfe, const QString &tokenReserva, const QString &cstat,
+                   const QString &nProt);
 private:
     QSqlDatabase m_db;
 };

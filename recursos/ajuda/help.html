@@ -64,8 +64,8 @@
 	<b>Simples Nacional</b>. Se precisar veja a baixo como preencher cada um dos campos da aba Fiscal
 	ou consulte seu contador.</p>
       <ul>
-	<li><b>Usar IBS</b></li>
-	<p>Marcar "Usar IBS" fará com que as notas sejam emitidas usando os novos campos IBS da reforma tributária, ainda estão em fase de testes e devem ser usados apenas se necessário.</p>
+	<li><b>Usar IBS/CBS</b></li>
+	<p>Marcar "Usar IBS/CBS" fará com que as notas sejam emitidas usando os novos campos IBS e CBS da reforma tributária, ainda estão em fase de testes e devem ser usados apenas se necessário. <i>obs: os valores de aliquota para esses campos atualmente são preenchidos com alíquotas de teste simbólicas (0,9% para CBS e 0,1% para IBS).</i></p>
 	<li><b>Número da última NF</b></li>
 	<p>Preencha com os valores da última Nota Fiscal Eletrônica ou Nota Fiscal ao Consumidor Eletrônica
 	  emitida por outro sistema, se nunca foi utilizado outro sistema para emitir notas deve-se deixar os
@@ -85,7 +85,7 @@
 	<p>O CSC deve parecer algo como GW6YWZMZKFOCFHXLH5YQEDUYLWD9KOKKVR6 e o ID CSC: 000001, <i>lembre de usar o CSC e ID CSC de produção se estiver
 	    usando o ambiente produção e o CSC e ID CSC de homologação se estiver usando o ambiente homologação.</i></p>
 	<li><b>Pasta Schemas</b></li>
-	<p>Selecione a pasta de schemas para validar xml das notas que é baixada automaticamente com o QEstoqueLoja, no <i>Windows</i> está em <i>%appdata%\Roaming\QEstoqueLoja\recursos\NFeSchemas</i>, no <i>Linux</i> fica em <i>/usr/local/share/QEstoqueLoja/recursos/NFeSchemas.</i>
+	<p>Selecione a pasta de schemas (Se já não estiver selecionada automaticamente) para validar xml das notas que é baixada automaticamente com o QEstoqueLoja, no <i>Windows</i> está em <i> C:\Usuários\SeuNomeDeUsuario\AppData\Roaming\QEstoqueLoja\recursos\NFeSchemas</i>, no <i>Linux</i> fica em <i>/usr/local/share/QEstoqueLoja/recursos/NFeSchemas.</i>
 	</p>
 	<!-- <p>Baixe a pasta contendo os schemas da NF oficiais do governo, geralmente é recomendado baixar a versão mais atual dos schemas, porém o -->
 	  <!--   QEstoqueLoja nem sempre atualiza imediatamente para comportar as novas mudanças, nessa versão do QEstoqueLoja, a versão <i>Esquema XML NF-e/NFC-e - Pacote de Liberação nº 9o (Novo leiaute da NF-e, NT 2024.001 v.1.00) (ZIP). Publicado em 04/06/2024</i> foi testada e está funcionando corretamente. Para baixar o arquivo compactado contendo a pasta de schemas acesse o <a href="https://www.nfe.fazenda.gov.br/portal/listaConteudo.aspx?tipoConteudo=BMPFMBoln3w=&AspxAutoDetectCookieSupport=1">Portal da Nota Fiscal Eletrônica</a>, escolha a versão recomendada, descompacte o arquivo e selecione a pasta que contem os arquivos .xsd.</p> -->
@@ -100,7 +100,7 @@
 	<li><b>Inscrição Estadual</b></li>
 	<p>Número referente a Inscrição Estadual da sua empresa.</p>
 	<li><b>Responsável Técnico</b></li>
-	<p>Você pode preencher os dados do responsável técnico com os dados da sua empresa como CNPJ, nome, telefone etc. mas para emitir NF-e é necessário que o CNPJ do responsável técnico esteja cadastrado como emissor na Receita, você pode cadastrar o seu CNPJ como <i>emissor próprio</i> no site da receita do seu estado, no Paraná o link é <a href="https://receita.pr.gov.br">receita</a> indo em <i>UPD > Cadastro de Fornecedor</i> no menu lateral, solicite o cadastro como <b> Fornecedor Próprio</b>, deve ser simples e você precisará levar alguns documentos listados no estabelecimento referenciado.<i> Você não precisa preencher os dados referentes a Hash e ID CSRT por enquanto</i>. Após isso você deve cadastastrar o sistema em UPD>Sistema, pode colocar qualquer nome e versão mas lembre-se de cadastrar o sistema com as funções "Emissao NF-e" e Emissao NFC-e", o útimo passo é cadastrar a autorização de uso sua no sistema agora cadastrado, em UPD>autorização de uso>Cadastro de autorização de uso. Se tudo foi feito corretamente você deve conseguir emitir notas-fiscais com seu cnpj como responsável técnico(no Paraná no ambiente de homologação é necessário tambem criar o CSRT no site da receita também).
+	<p>Você pode preencher os dados do responsável técnico com os dados da sua empresa como CNPJ, nome, telefone etc. mas para emitir NF-e é necessário que o CNPJ do responsável técnico esteja cadastrado como emissor na Receita. Você pode cadastrar o seu CNPJ como <i>emissor próprio</i> no site da receita do seu estado, no Paraná o link é <a href="https://receita.pr.gov.br">receita</a> indo em <i>UPD > Cadastro de Fornecedor</i> no menu lateral, solicite o cadastro como <b> Fornecedor Próprio</b>, deve ser simples e você precisará levar alguns documentos listados no estabelecimento referenciado.<i> Você não precisa preencher os dados referentes a Hash e ID CSRT por enquanto</i>. Após isso você deve cadastastrar o sistema em UPD>Sistema, pode colocar qualquer nome e versão mas lembre-se de cadastrar o sistema com as funções "Emissao NF-e" e Emissao NFC-e", o útimo passo é cadastrar a autorização de uso sua no sistema agora cadastrado, em UPD>autorização de uso>Cadastro de autorização de uso. Se tudo foi feito corretamente você deve conseguir emitir notas-fiscais com seu cnpj como responsável técnico(no Paraná no ambiente de homologação é necessário tambem criar o CSRT no site da receita também).
       </ul>
       <h3 id="conf-produto">Produto</h3>
       <p>Use esta aba para setar valores padrão da aba "imposto" do cadastro de produtos, essa aba é mais util se você emite nota fiscal. Confira com seu contador quais valores preencher principalmente para CSOSN e PIS/COFINS, visto que terão impacto no quanto de imposto você vai pagar.

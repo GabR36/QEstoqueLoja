@@ -25,7 +25,7 @@
 #include "services/contingencia_service.h"
 
 
-#define VERSAO_QE "2.10.0"
+#define VERSAO_QE "2.11.0"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -46,6 +46,7 @@ public:
     QLocale portugues;
     QIcon iconAlterarProduto, iconAddProduto, iconBtnVenda, iconDelete, iconPesquisa, iconBtnRelatorios,
         iconImpressora, iconClientes;
+    bool inicializacaoValida() const;
 
 public slots:
    void atualizarTableviewComQuery(QString &query);
@@ -118,17 +119,19 @@ private:
     Config_service *confServ = new Config_service(this);
     ConfigDTO configDTO;
     ContingenciaService *contingenciaService = nullptr;
+    bool inicializacaoOk = true;
 
 
     void setarIconesJanela();
     //QModelIndex selected_index;
 
-    const int ultimaVersaoSchema = 13;
+    const int ultimaVersaoSchema = 14;
 
 
     void mostrarProdutoPorCodigoBarras(const QString &codigo);
-    void iniciarMigration();
+    bool iniciarMigration();
     void atualizarConfigDTO();
+
 protected:
     bool eventFilter(QObject *obj, QEvent *event) override;
     QString getIdProdSelected();

@@ -84,6 +84,9 @@ ConfigDTO Config_repository::loadAll()
 
     dto.impressoraNomeDispositivo = s.value("dispositivo/nome_impressora").toString();
 
+    dto.modeloEmissao = s.value("geral/modelo_emissao").toInt();
+    dto.comportamentoEmissao = s.value("geral/comportamento_emissao").toInt();
+
     return dto;
 }
 
@@ -159,6 +162,9 @@ bool Config_repository::saveAll(const ConfigDTO &dto)
     s.setValue("database/path_pasta_postgre", dto.pathPastaPostgreDB);
 
     s.setValue("dispositivo/nome_impressora", dto.impressoraNomeDispositivo);
+    s.setValue("geral/modelo_emissao", dto.modeloEmissao);
+    s.setValue("geral/comportamento_emissao", dto.comportamentoEmissao);
+
 
 
 
@@ -212,8 +218,16 @@ bool Config_repository::saveMigration13Changes()
 {
     QSettings s(AppPath_service::configPath(), QSettings::IniFormat);
 
-    s.setValue("database/river",0);
+    s.setValue("database/driver",0);
     s.setValue("database/path_pasta_sqlite", AppPath_service::appDataPath());
     s.sync();
     return s.status() == QSettings::NoError;
+}
+
+bool Config_repository::SwitchToSqlite(){
+    QSettings s(AppPath_service::configPath(), QSettings::IniFormat);
+    s.setValue("database/driver", 0);
+    s.sync();
+    return s.status() == QSettings::NoError;
+
 }

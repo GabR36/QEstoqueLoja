@@ -17,6 +17,7 @@ struct VendasDTO {
     qlonglong idCliente;
     QString adicionadoEm;
     QString atualizadoEm;
+    QString observacao;
 };
 
 #endif // VENDAS_DTO_H

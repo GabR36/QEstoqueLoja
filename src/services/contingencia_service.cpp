@@ -21,7 +21,7 @@ ContingenciaWorker::ContingenciaWorker(QMutex *acbrMutex, QObject *parent)
 
 void ContingenciaWorker::setup()
 {
-    // Cria conexão SQLite exclusiva para este thread
+    // Cria conexão exclusiva para esta thread
     m_db = DatabaseConnection_service::createThreadConnection(DB_CONN_NAME);
     if (!m_db.open()) {
         qDebug() << "ContingenciaWorker: falha ao abrir banco:" << m_db.lastError().text();
@@ -50,7 +50,7 @@ static void parsearRetornoAcbr(const QString &retorno,
     }
 }
 
-bool ContingenciaWorker::consultarEAtualizar(const QString &chNfe)
+bool ContingenciaWorker::consultarEAtualizar(const QString &chNfe, const QString &tokenReserva)
 {
     try {
         QString retConsulta;
@@ -63,10 +63,10 @@ bool ContingenciaWorker::consultarEAtualizar(const QString &chNfe)
         parsearRetornoAcbr(retConsulta, cstat, nProt, xMotivo);
 
         qDebug() << "ContingenciaWorker: Consultar() para" << chNfe
-                 << "→ cStat:" << cstat << xMotivo;
+                 << ">> cStat:" << cstat << xMotivo;
 
         if (cstat == "100" || cstat == "150") {
-            m_repo->atualizar(chNfe, cstat, nProt);
+            m_repo->atualizar(chNfe, tokenReserva, cstat, nProt);
             qDebug() << "ContingenciaWorker: nota já estava autorizada na SEFAZ —" << chNfe;
             return true;
         }
@@ -79,7 +79,7 @@ bool ContingenciaWorker::consultarEAtualizar(const QString &chNfe)
 void ContingenciaWorker::tentarReenviar()
 {
     if (!m_repo) return;
-    QList<NotaFiscalDTO> pendentes = m_repo->buscarPendentes();
+    QList<NotaFiscalDTO> pendentes = m_repo->reservarPendentes(5, QSysInfo::machineHostName());
     if (pendentes.isEmpty())
         return;
 
@@ -128,15 +128,16 @@ void ContingenciaWorker::tentarReenviar()
                      << "cStat:" << cstat << "|" << xMotivo;
 
             if (cstat == "100" || cstat == "150") {
-                m_repo->atualizar(nota.chNfe, cstat, nProt);
+                m_repo->atualizar(nota.chNfe, nota.tokenReserva, cstat, nProt);
                 qDebug() << "ContingenciaWorker: nota retransmitida com sucesso —" << nota.chNfe;
             } else {
                 // Pode já ter sido autorizada (timeout, duplicidade, etc.)
-                if (!consultarEAtualizar(nota.chNfe)) {
+                // if (!consultarEAtualizar(nota.chNfe, nota.tokenReserva)) {
                     // Rejeitada na SEFAZ — não tenta mais
-                    m_repo->atualizar(nota.chNfe, "CONTINGENCIA_FALHA", "");
+                    m_repo->atualizar(nota.chNfe, nota.tokenReserva,
+                                      "CONTINGENCIA_FALHA", "");
                     qDebug() << "ContingenciaWorker: nota marcada como falha definitiva —" << nota.chNfe;
-                }
+                // }
             }
 
         } catch (std::exception &e) {

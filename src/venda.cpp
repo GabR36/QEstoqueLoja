@@ -19,6 +19,7 @@
 #include "infojanelaprod.h"
 #include "../services/Produto_service.h"
 #include "services/config_service.h"
+#include "../services/financeiro_service.h"
 
 venda::venda(QWidget *parent) :
     QWidget(parent),

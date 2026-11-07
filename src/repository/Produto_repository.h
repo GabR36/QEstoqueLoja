@@ -27,6 +27,7 @@ public:
     bool updateDiminuirQuantidadeProduto(qlonglong idprod, double quantia);
     QVariantMap getProdutoPorCodBarrasMap(const QString &codigo);
     bool atualizarCamposMap(qlonglong id, const QVariantMap &campos, bool marcarNf);
+    QList<ProdutoDTO> getProdutosViaIdList(QList<int> ids);
 private:
     QSqlDatabase db;
     QString dataAgoraUs;

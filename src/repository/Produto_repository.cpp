@@ -460,3 +460,51 @@ QVariantMap Produto_Repository::getProdutoPorCodBarrasMap(const QString &codigo)
     QVector<QVariantMap> registros = DBUtil::extrairResultados(query);
     return registros.isEmpty() ? QVariantMap{} : registros.first();
 }
+
+QList<ProdutoDTO> Produto_Repository::getProdutosViaIdList(QList<int> ids){
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "erro ao abrir banco getProdutosViaIdList";
+        return {};
+    }
+
+    QStringList idsString;
+
+    for (int id : ids) {
+        idsString.append(QString::number(id));
+    }
+
+    QString idsSql = idsString.join(",");
+
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM produtos WHERE id IN (:ids)");
+    query.bindValue(":ids", idsSql);
+
+    QList<ProdutoDTO> produtos;
+    if(!query.exec()){
+        while(query.next()){
+            ProdutoDTO prod;
+
+            prod.id = query.value("id").toLongLong();
+            prod.quantidade = query.value("quantidade").toDouble();
+            prod.descricao = query.value("descricao").toString();
+            prod.preco =query.value("preco").toDouble();
+            prod.codigoBarras = query.value("codigo_barras").toString();
+            prod.nf = query.value("nf").toBool();
+            prod.uCom = query.value("un_comercial").toString();
+            prod.precoFornecedor = query.value("preco_fornecedor").toDouble();
+            prod.percentLucro = query.value("porcent_lucro").toDouble();
+            prod.ncm = query.value("ncm").toString();
+            prod.cest = query.value("cest").toString();
+            prod.aliquotaIcms = query.value("aliquota_imposto").toDouble();
+            prod.csosn = query.value("csosn").toString();
+            prod.pis = query.value("pis").toString();
+            prod.local = query.value("local").toString();
+            prod.adicionadoEm = query.value("adicionado_em").toString();
+            prod.atualizadoEm = query.value("atualizado_em").toString();
+
+            produtos.append(prod);
+        }
+    }
+
+    return produtos;
+}

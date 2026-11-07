@@ -143,13 +143,7 @@ QLabel {
      <property name="frameShape">
       <enum>QFrame::Shape::NoFrame</enum>
      </property>
-     <layout class="QHBoxLayout" name="headerLayout">
-      <property name="leftMargin">
-       <number>12</number>
-      </property>
-      <property name="rightMargin">
-       <number>12</number>
-      </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
        <widget class="QLabel" name="label_8">
         <property name="styleSheet">
@@ -279,7 +273,7 @@ QLabel {
    <item>
     <widget class="QStackedWidget" name="stack_Pages">
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="page_Produtos">
       <layout class="QVBoxLayout" name="vl_p0">
@@ -1061,6 +1055,24 @@ QLineEdit { background-color: white; border: 1px solid rgb(155,165,185); border-
                <widget class="QLabel" name="Lbl_ResumoData">
                 <property name="text">
                  <string/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_2">
+              <item>
+               <widget class="QLabel" name="label_9">
+                <property name="text">
+                 <string>Lucro:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="Lbl_Lucro">
+                <property name="text">
+                 <string>0</string>
                 </property>
                </widget>
               </item>

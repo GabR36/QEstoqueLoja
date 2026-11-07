@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QDate>
 #include "entradasvendas_service.h"
+#include "Produto_service.h"
 #include "vendas_service.h"
 #include "../repository/relatorios_repository.h"
 
@@ -36,8 +37,10 @@ public:
     // caixa (relevante para vendas a prazo pagas em varias entradas).
     double getLucroEstimadoVenda(qlonglong idVenda);
     QMap<QString, double> getLucroEstimadoPeriodo(const QDate &inicio, const QDate &fim, Agrupamento agrup);
+    double getLucroEstimadoVendaDto(VendasDTO venda, QList<ProdutoVendidoDTO> produtos);
 private:
     Vendas_service vendaServ;
+    Produto_Service prodServ;
     EntradasVendas_service entradasServ;
     Relatorios_repository relatoriosRepo;
 

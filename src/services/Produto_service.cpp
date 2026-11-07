@@ -1,6 +1,9 @@
 #include "Produto_service.h"
 #include <QSqlQuery>
 #include <cmath>
+#include "../dto/ProdutoVendido_dto.h"
+#include "../dto/Produto_dto.h"
+
 Produto_Service::Produto_Service(QObject *parent)
     : QObject{parent},
     portugues(QLocale(QLocale::Portuguese, QLocale::Brazil))
@@ -284,3 +287,16 @@ Produto_Service::Resultado Produto_Service::updateDiminuirQuantidadeProduto(qlon
     }
 }
 
+QList<ProdutoDTO> Produto_Service::getListaProdutosViaListaVendidos(
+    QList<ProdutoVendidoDTO> produtosVendidos)
+{
+    QList<int> ids;
+    for (ProdutoVendidoDTO produtoVend : produtosVendidos) {
+        ids.append(produtoVend.id);
+    }
+
+    QList<ProdutoDTO> produtos;
+    produtos = repo.getProdutosViaIdList(ids);
+
+    return produtos;
+}

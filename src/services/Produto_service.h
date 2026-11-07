@@ -5,6 +5,7 @@
 #include <QLocale>
 #include <QVariantMap>
 #include "../dto/Produto_dto.h"
+#include "../dto/ProdutoVendido_dto.h"
 #include "../util/ibptutil.h"
 #include <QSqlQueryModel>
 #include "../repository/Produto_repository.h"
@@ -63,6 +64,7 @@ public:
   QVariantMap getProdutoPorCodBarrasMap(const QString &codigo);
   Resultado atualizarCamposMap(qlonglong id, const QVariantMap &campos, bool marcarNf);
   Produto_Service::Resultado updateDiminuirQuantidadeProduto(qlonglong idprod, double quantia);
+  QList<ProdutoDTO> getListaProdutosViaListaVendidos(QList<ProdutoVendidoDTO> produtosVendidos);
   private slots:
 };
 

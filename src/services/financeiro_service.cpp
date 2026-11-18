@@ -26,30 +26,40 @@ QMap<QString, double> Financeiro_service::getLucroEstimadoPeriodo(
     return relatoriosRepo.buscarLucroPeriodo(inicio, fim, agrup);
 }
 
-double Financeiro_service::getLucroEstimadoVendaDto(VendasDTO venda, QList<ProdutoVendidoDTO> produtos)
+double Financeiro_service::getLucroEstimadoVendaDto(
+    VendasDTO venda,
+    QList<ProdutoVendidoDTO> produtos)
 {
     double lucroTotal = 0.0;
-    ProdutoDTO prod;
 
-    QList<ProdutoDTO> prods;
-    prods = prodServ.getListaProdutosViaListaVendidos(produtos);
+    QList<ProdutoDTO> prods =
+        prodServ.getListaProdutosViaListaVendidos(produtos);
+
+    qDebug() << "debug produtos getlucroestimadovendadto";
+    for (const ProdutoDTO &produto : prods) {
+        qDebug() << "ID produto:" << produto.id;
+        qDebug() << "Quantidade:" << produto.quantidade;
+        qDebug() << "preco:" << produto.preco;
+        qDebug() << "descricao:" << produto.descricao;
+        qDebug() << "porcent lucro:" << produto.percentLucro;
+        qDebug() << "preco fornecedor:" << produto.precoFornecedor;
+        qDebug() << "----------------------";
+    }
 
     // Calcula o lucro individual de cada produto
     for (const ProdutoVendidoDTO &produto : produtos) {
+
         for (const ProdutoDTO &prod1 : prods) {
-            if (prod1.id == produto.id) {
-                prod = prod1;
+            if (prod1.id == produto.idProduto) {
+
+                double lucroProduto =
+                    produto.quantidade *
+                    (produto.precoVendido - prod1.precoFornecedor);
+
+                lucroTotal += lucroProduto;
                 break;
             }
         }
-
-        double custoReal = produto.precoVendido *
-                           (1.0 - prod.percentLucro / 100.0);
-
-        double lucroProduto = produto.quantidade *
-                              (produto.precoVendido - custoReal);
-
-        lucroTotal += lucroProduto;
     }
 
     // Desconta o desconto concedido na venda

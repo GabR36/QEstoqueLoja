@@ -462,25 +462,39 @@ QVariantMap Produto_Repository::getProdutoPorCodBarrasMap(const QString &codigo)
 }
 
 QList<ProdutoDTO> Produto_Repository::getProdutosViaIdList(QList<int> ids){
+    if (ids.isEmpty())
+        return {};
+
     if(!DatabaseConnection_service::open()){
         qDebug() << "erro ao abrir banco getProdutosViaIdList";
         return {};
     }
 
-    QStringList idsString;
+    QStringList placeholders;
 
-    for (int id : ids) {
-        idsString.append(QString::number(id));
+    for (int i = 0; i < ids.size(); ++i) {
+        placeholders.append(QString(":id%1").arg(i));
     }
 
-    QString idsSql = idsString.join(",");
+    QString sql = QString(
+                      "SELECT * FROM produtos WHERE id IN (%1)"
+                      ).arg(placeholders.join(","));
 
     QSqlQuery query(db);
-    query.prepare("SELECT * FROM produtos WHERE id IN (:ids)");
-    query.bindValue(":ids", idsSql);
+    query.prepare(sql);
+
+    for (int i = 0; i < ids.size(); ++i) {
+        query.bindValue(placeholders[i], ids[i]);
+    }
 
     QList<ProdutoDTO> produtos;
-    if(!query.exec()){
+
+    if (!query.exec()) {
+        qDebug() << "Erro na query:" << query.lastError().text();
+        return {};
+    }
+
+    if(query.exec()){
         while(query.next()){
             ProdutoDTO prod;
 
@@ -503,6 +517,11 @@ QList<ProdutoDTO> Produto_Repository::getProdutosViaIdList(QList<int> ids){
             prod.atualizadoEm = query.value("atualizado_em").toString();
 
             produtos.append(prod);
+
+            qDebug() << "id (getProdutosViaIdList): " << prod.id;
+            qDebug() << "preco: " << prod.preco;
+            qDebug() << "preco fornec: " << prod.precoFornecedor;
+            qDebug() << "quant: " << prod.quantidade;
         }
     }
 

@@ -581,8 +581,7 @@ double Relatorios_repository::buscarLucroVenda(qlonglong idVenda)
                 pv.id_venda,
                 SUM(
                     pv.quantidade * (
-                        pv.preco_vendido
-                        - p.preco * (1.0 - COALESCE(p.porcent_lucro, 0) / 100.0)
+                        pv.preco_vendido - COALESCE(p.preco_custo, 0)
                     )
                 ) AS lucro_total
             FROM produtos_vendidos pv

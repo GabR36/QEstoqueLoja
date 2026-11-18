@@ -20,6 +20,7 @@
 #include "../services/Produto_service.h"
 #include "services/config_service.h"
 #include "../services/financeiro_service.h"
+#include "../dto/ProdutoVendido_dto.h"
 
 venda::venda(QWidget *parent) :
     QWidget(parent),
@@ -305,6 +306,31 @@ void venda::configurarPaginaPagamento()
         ui->Ledit_Recebido->show();
         ui->Lbl_Troco->show();
     }
+
+    VendasDTO newVenda = construirVendasDTO();
+    QList<ProdutoVendidoDTO> prodVendidos = obterProdutosSelecionados();
+
+    qDebug() << "===== DEBUG VENDA =====";
+    qDebug() << "ID venda:" << newVenda.id;
+    qDebug() << "total venda:" << newVenda.total;
+    qDebug() << "valorfinal venda:" << newVenda.valorFinal;
+    qDebug() << "desconto venda:" << newVenda.desconto;
+    qDebug() << "taxa venda:" << newVenda.taxa;
+
+    qDebug() << "===== PRODUTOS VENDIDOS =====";
+
+    for (const ProdutoVendidoDTO &produto : prodVendidos) {
+        qDebug() << "ID produto:" << produto.idProduto;
+        qDebug() << "Quantidade:" << produto.quantidade;
+        qDebug() << "preco vendido:" << produto.precoVendido;
+        qDebug() << "descricao:" << produto.descricao;
+        qDebug() << "----------------------";
+    }
+
+    double lucro = finanServ.getLucroEstimadoVendaDto(newVenda, prodVendidos);
+
+    ui->Lbl_Lucro->setText(QString::number(lucro));
+    qDebug() << "Lucro venda: " <<  lucro;
 }
 
 void venda::configurarPaginaNF()
@@ -360,6 +386,13 @@ void venda::descontoTaxa()
     ui->Lbl_Total->setText(valorFinal);
     ui->Ledit_Recebido->setText(valorFinal);
     ui->Lbl_Troco->setText("0");
+
+    VendasDTO newVenda = construirVendasDTO();
+    QList<ProdutoVendidoDTO> prodVendidos = obterProdutosSelecionados();
+    double lucro = finanServ.getLucroEstimadoVendaDto(newVenda, prodVendidos);
+
+    ui->Lbl_Lucro->setText(portugues.toString(lucro));
+    qDebug() << "Lucro venda: " <<  lucro;
 }
 
 void venda::on_CBox_FormaPagamento_activated(int index)
@@ -444,39 +477,9 @@ void venda::on_CBox_ModeloEmit_currentIndexChanged(int index)
 
 void venda::terminarPagamento()
 {
-    QString troco          = ui->Lbl_Troco->text();
-    QString recebido       = ui->Ledit_Recebido->text();
-    QString forma          = ui->CBox_FormaPagamento->currentText();
-    QString taxa           = ui->Ledit_Taxa->text();
-    QString valor_final    = ui->Lbl_TotalTaxa->text();
-    QString descontoInicial = ui->Ledit_Desconto->text();
-    QString desconto;
-    QString obs = ui->Ledit_OBS->text().trimmed();
-
-    if (ui->CheckPorcentagem->isChecked())
-        desconto = portugues.toString(
-            (portugues.toFloat(descontoInicial) / 100) * portugues.toFloat(Total()));
-    else
-        desconto = descontoInicial;
-
     emitTodosNf = ui->RadioBtn_EmitNfTodos->isChecked();
 
-    QString data = portugues.toString(ui->DateEdt_Venda->dateTime(), "dd-MM-yyyy hh:mm:ss");
-    QDateTime dataIngles = portugues.toDateTime(data, "dd-MM-yyyy hh:mm:ss");
-
-    VendasDTO newVenda;
-    newVenda.clienteNome    = CLIENTE.nome;
-    newVenda.dataHora       = dataIngles.toString("yyyy-MM-dd hh:mm:ss");
-    newVenda.desconto       = portugues.toDouble(desconto);
-    newVenda.formaPagamento = forma;
-    newVenda.estaPago       = (forma != "Prazo");
-    newVenda.idCliente      = idClienteAtual;
-    newVenda.taxa           = portugues.toDouble(taxa);
-    newVenda.total          = portugues.toDouble(Total());
-    newVenda.troco          = portugues.toDouble(troco);
-    newVenda.valorFinal     = portugues.toDouble(valor_final);
-    newVenda.valorRecebido  = portugues.toDouble(recebido);
-    newVenda.observacao = obs;
+    VendasDTO newVenda = construirVendasDTO();
 
     if(idClienteAtual > 0)
         CLIENTE = cliServ.getClienteByID(idClienteAtual);
@@ -916,4 +919,40 @@ void venda::verProd()
     QString id = getIdProdSelected();
     InfoJanelaProd *janelaProd = new InfoJanelaProd(this, id);
     janelaProd->show();
+}
+
+VendasDTO venda::construirVendasDTO(){
+    QString troco          = ui->Lbl_Troco->text();
+    QString recebido       = ui->Ledit_Recebido->text();
+    QString forma          = ui->CBox_FormaPagamento->currentText();
+    QString taxa           = ui->Ledit_Taxa->text();
+    QString valor_final    = ui->Lbl_TotalTaxa->text();
+    QString descontoInicial = ui->Ledit_Desconto->text();
+    QString desconto;
+    QString obs = ui->Ledit_OBS->text().trimmed();
+
+    if (ui->CheckPorcentagem->isChecked())
+        desconto = portugues.toString(
+            (portugues.toFloat(descontoInicial) / 100) * portugues.toFloat(Total()));
+    else
+        desconto = descontoInicial;
+
+    QString data = portugues.toString(ui->DateEdt_Venda->dateTime(), "dd-MM-yyyy hh:mm:ss");
+    QDateTime dataIngles = portugues.toDateTime(data, "dd-MM-yyyy hh:mm:ss");
+
+    VendasDTO newVenda;
+    newVenda.clienteNome    = CLIENTE.nome;
+    newVenda.dataHora       = dataIngles.toString("yyyy-MM-dd hh:mm:ss");
+    newVenda.desconto       = portugues.toDouble(desconto);
+    newVenda.formaPagamento = forma;
+    newVenda.estaPago       = (forma != "Prazo");
+    newVenda.idCliente      = idClienteAtual;
+    newVenda.taxa           = portugues.toDouble(taxa);
+    newVenda.total          = portugues.toDouble(Total());
+    newVenda.troco          = portugues.toDouble(troco);
+    newVenda.valorFinal     = portugues.toDouble(valor_final);
+    newVenda.valorRecebido  = portugues.toDouble(recebido);
+    newVenda.observacao     = obs;
+
+    return newVenda;
 }

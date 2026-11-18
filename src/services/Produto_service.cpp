@@ -292,7 +292,12 @@ QList<ProdutoDTO> Produto_Service::getListaProdutosViaListaVendidos(
 {
     QList<int> ids;
     for (ProdutoVendidoDTO produtoVend : produtosVendidos) {
-        ids.append(produtoVend.id);
+        ids.append(produtoVend.idProduto);
+    }
+
+    qDebug() << "ids getlistaprodutosvialistavendidos: " << ids;
+    for (const int id : ids) {
+        qDebug() << "ID: " << id;
     }
 
     QList<ProdutoDTO> produtos;

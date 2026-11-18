@@ -16,6 +16,7 @@
 #include "services/cliente_service.h"
 #include "services/vendas_service.h"
 #include "services/notafiscal_service.h"
+#include "services/financeiro_service.h"
 #include "subclass/waitdialog.h"
 
 
@@ -75,6 +76,7 @@ private:
     Vendas_service vendaServ;
     NotaFiscal_service notaServ;
     FiscalEmitter_service fiscalServ;
+    Financeiro_service finanServ;
     WaitDialog *waitDialog = nullptr;
     ClienteDTO CLIENTE;
     qlonglong idClienteAtual = -1;
@@ -99,6 +101,7 @@ private:
     RascunhoVendaDTO rascunhoPendente;
     bool temRascunhoPendente = false;
 
+    VendasDTO construirVendasDTO();
 signals:
     void vendaConcluida();
 };

@@ -279,12 +279,24 @@ void venda::configurarPaginaPagamento()
     ui->Lbl_ResumoData->setText(data);
 
     // defaults
-    ui->Ledit_Recebido->setText(Total());
-    ui->Lbl_Troco->setText("0");
-    ui->Ledit_Desconto->setText("0");
-    ui->Ledit_Taxa->setText("0");
-    ui->Lbl_TotalTaxa->setText(Total());
-    ui->Lbl_Total->setText(Total());
+    if (ui->Ledit_Recebido->text() == ""){
+        ui->Ledit_Recebido->setText(Total());
+    }
+    if (ui->Lbl_Troco->text() == ""){
+        ui->Lbl_Troco->setText("0");
+    }
+    if (ui->Ledit_Desconto->text() == ""){
+        ui->Ledit_Desconto->setText("0");
+    }
+    if (ui->Ledit_Taxa->text() == ""){
+        ui->Ledit_Taxa->setText("0");
+    }
+    if (ui->Lbl_TotalTaxa->text() == ""){
+        ui->Lbl_TotalTaxa->setText(Total());
+    }
+    if (ui->Lbl_Total->text() == ""){
+        ui->Lbl_Total->setText(Total());
+    }
 
     if (temRascunhoPendente) {
         // aplica forma de pagamento salva e reconfigura visibilidade dos campos
@@ -307,30 +319,7 @@ void venda::configurarPaginaPagamento()
         ui->Lbl_Troco->show();
     }
 
-    VendasDTO newVenda = construirVendasDTO();
-    QList<ProdutoVendidoDTO> prodVendidos = obterProdutosSelecionados();
-
-    qDebug() << "===== DEBUG VENDA =====";
-    qDebug() << "ID venda:" << newVenda.id;
-    qDebug() << "total venda:" << newVenda.total;
-    qDebug() << "valorfinal venda:" << newVenda.valorFinal;
-    qDebug() << "desconto venda:" << newVenda.desconto;
-    qDebug() << "taxa venda:" << newVenda.taxa;
-
-    qDebug() << "===== PRODUTOS VENDIDOS =====";
-
-    for (const ProdutoVendidoDTO &produto : prodVendidos) {
-        qDebug() << "ID produto:" << produto.idProduto;
-        qDebug() << "Quantidade:" << produto.quantidade;
-        qDebug() << "preco vendido:" << produto.precoVendido;
-        qDebug() << "descricao:" << produto.descricao;
-        qDebug() << "----------------------";
-    }
-
-    double lucro = finanServ.getLucroEstimadoVendaDto(newVenda, prodVendidos);
-
-    ui->Lbl_Lucro->setText(QString::number(lucro));
-    qDebug() << "Lucro venda: " <<  lucro;
+    descontoTaxa();
 }
 
 void venda::configurarPaginaNF()
@@ -391,7 +380,7 @@ void venda::descontoTaxa()
     QList<ProdutoVendidoDTO> prodVendidos = obterProdutosSelecionados();
     double lucro = finanServ.getLucroEstimadoVendaDto(newVenda, prodVendidos);
 
-    ui->Lbl_Lucro->setText(portugues.toString(lucro));
+    ui->Lbl_Lucro->setText(portugues.toString(lucro, 'f', 2));
     qDebug() << "Lucro venda: " <<  lucro;
 }
 
@@ -869,6 +858,7 @@ void venda::on_Ledit_Pesquisa_returnPressed()
     atualizarTotalProduto();
     ui->Ledit_Pesquisa->clear();
     ui->Lbl_Total->setText(Total());
+    descontoTaxa();
 }
 
 void venda::on_Btn_CancelarVenda_clicked()

@@ -1065,7 +1065,7 @@ QLineEdit { background-color: white; border: 1px solid rgb(155,165,185); border-
               <item>
                <widget class="QLabel" name="label_9">
                 <property name="text">
-                 <string>Lucro:</string>
+                 <string> Lucro (R$):</string>
                 </property>
                </widget>
               </item>

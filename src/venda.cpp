@@ -298,6 +298,9 @@ void venda::configurarPaginaPagamento()
         ui->Lbl_Total->setText(Total());
     }
 
+    descontoTaxa();
+
+    qDebug() << "temrascunhopend: " << temRascunhoPendente;
     if (temRascunhoPendente) {
         // aplica forma de pagamento salva e reconfigura visibilidade dos campos
         int idxForma = ui->CBox_FormaPagamento->findText(rascunhoPendente.formaPagamento);
@@ -311,15 +314,15 @@ void venda::configurarPaginaPagamento()
         ui->Ledit_Recebido->setText(rascunhoPendente.recebido);
     } else {
         // defaults para nova venda: dinheiro — hide taxa, show troco
-        ui->lbl_taxa->hide();
-        ui->Ledit_Taxa->hide();
-        ui->label_2->show();
-        ui->label_3->show();
-        ui->Ledit_Recebido->show();
-        ui->Lbl_Troco->show();
+        if (ui->CBox_FormaPagamento->currentText() == "Dinheiro"){
+            ui->lbl_taxa->hide();
+            ui->Ledit_Taxa->hide();
+            ui->label_2->show();
+            ui->label_3->show();
+            ui->Ledit_Recebido->show();
+            ui->Lbl_Troco->show();
+        }
     }
-
-    descontoTaxa();
 }
 
 void venda::configurarPaginaNF()
@@ -626,6 +629,7 @@ void venda::salvarRascunho()
     dto.desconto            = ui->Ledit_Desconto->text();
     dto.taxa                = ui->Ledit_Taxa->text();
     dto.recebido            = ui->Ledit_Recebido->text();
+    qDebug() << "recebido salvar rascunho: " << ui->Ledit_Recebido->text();
     dto.descontoPorcentagem = ui->CheckPorcentagem->isChecked();
     dto.modeloNf            = ui->CBox_ModeloEmit->currentIndex();
     dto.emitirTodos         = ui->RadioBtn_EmitNfTodos->isChecked();

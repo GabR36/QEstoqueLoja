@@ -90,17 +90,17 @@ bool RascunhoVenda_repository::salvar(const RascunhoVendaDTO &rascunho)
     query.bindValue(":desconto",
                     rascunho.desconto.isEmpty()
                         ? 0
-                        : rascunho.desconto.toDouble());
+                        : rascunho.desconto);
 
     query.bindValue(":taxa",
                     rascunho.taxa.isEmpty()
                         ? 0
-                        : rascunho.taxa.toDouble());
+                        : rascunho.taxa);
 
     query.bindValue(":recebido",
                     rascunho.recebido.isEmpty()
                         ? 0
-                        : rascunho.recebido.toDouble());
+                        : rascunho.recebido);
 
     query.bindValue(":descontoPorcentagem",
                     rascunho.descontoPorcentagem ? 1 : 0);

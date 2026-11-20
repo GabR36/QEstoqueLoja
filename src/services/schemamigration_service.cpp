@@ -1592,6 +1592,18 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
                 }else{
                     qDebug() << "executou query notas_fiscais migração 14";
                 }
+                if(!query.exec("ALTER TABLE vendas2 ADD lucro numeric(10,2)")){
+                    qDebug() << "Não executou query postgre migração 14";
+                }else{
+                    qDebug() << "executou query vendas2-2 migração 14";
+                }
+
+                // rascunho
+                if(!query.exec("ALTER TABLE rascunho_venda ADD observacao TEXT")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query rascunho migração 14";
+                }
 
             }else{
                 //notas fiscais
@@ -1623,6 +1635,19 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
                 }else{
                     qDebug() << "executou query vendas2 migração 14";
                 }
+                if(!query.exec("ALTER TABLE vendas2 ADD lucro DECIMAL(10,2)")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query vendas2-2 migração 14";
+                }
+
+                // rascunho
+                if(!query.exec("ALTER TABLE rascunho_venda ADD observacao TEXT")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query rascunho migração 14";
+                }
+
 
             }
 

@@ -18,6 +18,7 @@ struct VendasDTO {
     QString adicionadoEm;
     QString atualizadoEm;
     QString observacao;
+    double lucro;
 };
 
 #endif // VENDAS_DTO_H

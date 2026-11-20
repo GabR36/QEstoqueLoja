@@ -633,6 +633,7 @@ void venda::salvarRascunho()
     dto.descontoPorcentagem = ui->CheckPorcentagem->isChecked();
     dto.modeloNf            = ui->CBox_ModeloEmit->currentIndex();
     dto.emitirTodos         = ui->RadioBtn_EmitNfTodos->isChecked();
+    dto.observacao          = ui->Ledit_OBS->text();
 
     rascunhoServ.salvar(dto);
 }
@@ -689,6 +690,10 @@ void venda::verificarRascunho()
 
     if (!rascunho.dataHora.isEmpty())
         ui->DateEdt_Venda->setDateTime(QDateTime::fromString(rascunho.dataHora, "yyyy-MM-dd HH:mm:ss"));
+
+    if (rascunho.observacao != "") {
+        ui->Ledit_OBS->setText(rascunho.observacao);
+    }
 
     // pagamento e NF serão aplicados em configurarPaginaPagamento/configurarPaginaNF
     // para não serem sobrescritos pelos defaults dessas funções

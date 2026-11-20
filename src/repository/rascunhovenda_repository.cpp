@@ -30,13 +30,13 @@ bool RascunhoVenda_repository::salvar(const RascunhoVendaDTO &rascunho)
             "INSERT INTO rascunho_venda "
             "(id, id_cliente, cpf_manual, data_hora, produtos_json, "
             "forma_pagamento, desconto, taxa, recebido, desconto_porcentagem, "
-            "modelo_nf, emitir_todos, atualizado_em) "
+            "modelo_nf, emitir_todos, atualizado_em, observacao) "
 
             "VALUES "
             "(1, :idCliente, :cpf, :dataHora, :json, "
             ":formaPag, :desconto, :taxa, :recebido, "
             ":descontoPorcentagem, :modeloNf, :emitirTodos, "
-            ":atualizadoEm) "
+            ":atualizadoEm, :observacao) "
 
             "ON CONFLICT (id) DO UPDATE SET "
 
@@ -51,7 +51,8 @@ bool RascunhoVenda_repository::salvar(const RascunhoVendaDTO &rascunho)
             "desconto_porcentagem = EXCLUDED.desconto_porcentagem, "
             "modelo_nf = EXCLUDED.modelo_nf, "
             "emitir_todos = EXCLUDED.emitir_todos, "
-            "atualizado_em = EXCLUDED.atualizado_em";
+            "atualizado_em = EXCLUDED.atualizado_em, "
+              "observacao = EXCLUDED.observacao";
 
 
     } else {
@@ -60,13 +61,13 @@ bool RascunhoVenda_repository::salvar(const RascunhoVendaDTO &rascunho)
             "INSERT OR REPLACE INTO rascunho_venda "
             "(id, id_cliente, cpf_manual, data_hora, produtos_json, "
             "forma_pagamento, desconto, taxa, recebido, desconto_porcentagem, "
-            "modelo_nf, emitir_todos, atualizado_em) "
+            "modelo_nf, emitir_todos, atualizado_em, observacao) "
 
             "VALUES "
             "(1, :idCliente, :cpf, :dataHora, :json, "
             ":formaPag, :desconto, :taxa, :recebido, "
             ":descontoPorcentagem, :modeloNf, :emitirTodos, "
-            ":atualizadoEm)";
+            ":atualizadoEm, :observacao)";
     }
 
 
@@ -112,6 +113,9 @@ bool RascunhoVenda_repository::salvar(const RascunhoVendaDTO &rascunho)
 
     query.bindValue(":atualizadoEm",
                     rascunho.atualizadoEm);
+
+    query.bindValue(":observacao",
+                    rascunho.observacao);
 
 
     if (!query.exec()) {
@@ -159,7 +163,7 @@ RascunhoVendaDTO RascunhoVenda_repository::carregar()
     query.prepare(
         "SELECT id_cliente, cpf_manual, data_hora, produtos_json, "
         "       forma_pagamento, desconto, taxa, recebido, desconto_porcentagem, "
-        "       modelo_nf, emitir_todos, atualizado_em "
+        "       modelo_nf, emitir_todos, atualizado_em, observacao "
         "FROM rascunho_venda WHERE id = 1"
     );
 
@@ -181,6 +185,7 @@ RascunhoVendaDTO RascunhoVenda_repository::carregar()
         rascunho.modeloNf            = query.value("modelo_nf").toInt();
         rascunho.emitirTodos         = query.value("emitir_todos").toInt() == 1;
         rascunho.atualizadoEm        = query.value("atualizado_em").toString();
+        rascunho.observacao          = query.value("observacao").toString();
     }
 
     return rascunho;

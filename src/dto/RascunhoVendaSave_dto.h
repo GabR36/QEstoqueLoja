@@ -19,6 +19,8 @@ struct RascunhoVendaSaveDTO {
     // nota fiscal
     int       modeloNf            = 0;
     bool      emitirTodos         = false;
+
+    QString observacao;
 };
 
 #endif // RASCUNHOVENDASAVE_DTO_H

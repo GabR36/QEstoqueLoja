@@ -1655,8 +1655,17 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
                 UPDATE vendas2
                 SET lucro =
                     COALESCE((
-                        SELECT SUM(pv.quantidade *
-                                   (pv.preco_vendido - COALESCE(p.preco_fornecedor, 0)))
+                        -- sem preco de fornecedor, o custo e estimado tirando a
+                        -- porcentagem de lucro do preco de venda cadastrado
+                        SELECT SUM(pv.quantidade * (
+                                   pv.preco_vendido
+                                   - CASE
+                                         WHEN p.preco_fornecedor IS NOT NULL
+                                              AND p.preco_fornecedor > 0
+                                         THEN p.preco_fornecedor
+                                         ELSE COALESCE(p.preco, 0)
+                                              / (1.0 + COALESCE(p.porcent_lucro, 0) / 100.0)
+                                     END))
                         FROM produtos_vendidos pv
                         JOIN produtos p ON p.id = pv.id_produto
                         WHERE pv.id_venda = vendas2.id

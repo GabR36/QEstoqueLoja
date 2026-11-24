@@ -52,9 +52,17 @@ double Financeiro_service::getLucroEstimadoVendaDto(
         for (const ProdutoDTO &prod1 : prods) {
             if (prod1.id == produto.idProduto) {
 
+                // sem preco de fornecedor, o custo e estimado tirando a
+                // porcentagem de lucro do preco de venda cadastrado
+                // (inverso de preco = fornecedor * (1 + porcent/100)).
+                double custo = prod1.precoFornecedor;
+                if (custo <= 0) {
+                    custo = prod1.preco / (1.0 + prod1.percentLucro / 100.0);
+                }
+
                 double lucroProduto =
                     produto.quantidade *
-                    (produto.precoVendido - prod1.precoFornecedor);
+                    (produto.precoVendido - custo);
 
                 lucroTotal += lucroProduto;
                 break;

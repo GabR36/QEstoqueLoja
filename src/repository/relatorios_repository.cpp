@@ -400,38 +400,47 @@ QMap<QString, float> Relatorios_repository::produtosMaisLucrativosPeriodo(
                              ? "v.data_hora::date"
                              : "date(v.data_hora)";
 
+    // O lucro de cada venda ja vem pronto em vendas2.lucro (lucro dos itens
+    // menos desconto e taxa do cartao). Para chegar no lucro por produto, o
+    // lucro da venda e rateado entre os itens proporcionalmente ao valor de
+    // cada item no total vendido (quantidade * preco_vendido).
     QSqlQuery query(db);
     query.prepare(QString(R"(
-        SELECT p.descricao,
-               SUM(
-                   pv.quantidade *
+        WITH sale_stats AS (
+            SELECT pv.id_venda,
+                   SUM(pv.quantidade * pv.preco_vendido) AS valor_total
+            FROM produtos_vendidos pv
+            GROUP BY pv.id_venda
+        ),
+        itens AS (
+            SELECT p.descricao,
                    CASE
+                       WHEN v.lucro IS NOT NULL THEN
+                           COALESCE(
+                               v.lucro * (pv.quantidade * pv.preco_vendido * 1.0)
+                               / NULLIF(ss.valor_total, 0),
+                               0)
                        WHEN p.preco_fornecedor IS NOT NULL
                             AND p.preco_fornecedor > 0
                        THEN
-                           (pv.preco_vendido - p.preco_fornecedor)
+                           pv.quantidade * (pv.preco_vendido - p.preco_fornecedor)
                        ELSE
-                           (pv.preco_vendido * (p.porcent_lucro / 100.0))
-                   END
-               ) AS lucro_total
-        FROM produtos_vendidos pv
-        JOIN produtos p
-             ON pv.id_produto = p.id
-        JOIN vendas2 v
-             ON pv.id_venda = v.id
-        WHERE %1 BETWEEN :inicio AND :fim
-        GROUP BY p.descricao
-        HAVING SUM(
-                   pv.quantidade *
-                   CASE
-                       WHEN p.preco_fornecedor IS NOT NULL
-                            AND p.preco_fornecedor > 0
-                       THEN
-                           (pv.preco_vendido - p.preco_fornecedor)
-                       ELSE
-                           (pv.preco_vendido * (p.porcent_lucro / 100.0))
-                   END
-               ) > 0
+                           pv.quantidade * (pv.preco_vendido * (COALESCE(p.porcent_lucro, 0) / 100.0))
+                   END AS lucro_item
+            FROM produtos_vendidos pv
+            JOIN produtos p
+                 ON pv.id_produto = p.id
+            JOIN vendas2 v
+                 ON pv.id_venda = v.id
+            JOIN sale_stats ss
+                 ON ss.id_venda = v.id
+            WHERE %1 BETWEEN :inicio AND :fim
+        )
+        SELECT descricao,
+               SUM(lucro_item) AS lucro_total
+        FROM itens
+        GROUP BY descricao
+        HAVING SUM(lucro_item) > 0
         ORDER BY lucro_total DESC
         LIMIT 10
     )").arg(filtroData));
@@ -474,27 +483,25 @@ QMap<QString, double> Relatorios_repository::buscarLucroPeriodo(
     QString filtroV  = postgres ? "v.data_hora::date"   : "date(v.data_hora)";
     QString filtroEV = postgres ? "ev.data_hora::date"  : "date(ev.data_hora)";
 
-    // custo_unitario   = p.preco * (1 - porcent_lucro/100)
-    // lucro_item       = (pv.preco_vendido - custo_unitario) * quantidade
-    // lucro_total_venda = SUM(lucro_item) -> lucro bruto da venda, sem desconto/taxa
-    // taxa_valor       = (total_pago - desconto_pago) * taxa/100 (repassada ao cartão,
-    //                    só quando a forma de pagamento daquele pagamento é credito/debito)
+    // O lucro de cada venda ja vem pronto em vendas2.lucro, calculado no
+    // momento da venda (e recalculado na devolucao de produtos):
+    //   lucro = SUM(quantidade * (preco_vendido - preco_fornecedor))
+    //           - desconto
+    //           - taxa do cartao (so quando a forma de pagamento da venda e credito/debito)
     //
-    // vendas a vista (cash): a venda inteira é paga em uma unica tacada, entao o
-    // desconto dado na venda e a taxa daquele pagamento sao abatidos direto do lucro bruto.
+    // vendas a vista (cash): a venda inteira e paga de uma vez, entao entra o
+    // vendas2.lucro inteiro na data da venda.
     //
-    // vendas a prazo (credit/entradas_vendas): o desconto foi concedido uma unica vez, no
-    // momento da venda original (vendas2.desconto), mas o dinheiro chega em varias entradas
-    // ao longo do tempo. Por isso o desconto e rateado proporcionalmente ao quanto cada
-    // entrada representa do valor final total devido (ev.valor_final / v.valor_final),
-    // enquanto a taxa de cada entrada é abatida integralmente, pois é especifica daquele
-    // pagamento (cada entrada pode ter sua propria forma de pagamento/taxa).
+    // vendas a prazo (credit/entradas_vendas): o dinheiro chega em varias entradas.
+    // O lucro da venda (que para 'Prazo' ja tem o desconto abatido e nenhuma taxa)
+    // e rateado proporcionalmente ao quanto cada entrada representa do valor final
+    // total devido (ev.valor_final / v.valor_final), e a taxa de cada entrada e
+    // abatida integralmente, pois e especifica daquele pagamento.
     QSqlQuery query(db);
     query.prepare(QString(R"(
         WITH sale_stats AS (
             SELECT
                 pv.id_venda,
-                SUM(pv.quantidade * pv.preco_vendido) AS valor_total,
                 SUM(
                     pv.quantidade * (
                         pv.preco_vendido
@@ -505,19 +512,27 @@ QMap<QString, double> Relatorios_repository::buscarLucroPeriodo(
             JOIN produtos p ON pv.id_produto = p.id
             GROUP BY pv.id_venda
         ),
-        cash AS (
-            SELECT %1 AS periodo,
-                   SUM(
+        lucro_vendas AS (
+            SELECT v.id,
+                   COALESCE(
+                       v.lucro,
                        ss.lucro_total
                        - COALESCE(v.desconto, 0)
                        - CASE
                              WHEN v.forma_pagamento IN ('Crédito', 'Débito')
                              THEN (v.total - COALESCE(v.desconto, 0)) * COALESCE(v.taxa, 0) / 100.0
                              ELSE 0
-                         END
-                   ) AS lucro_caixa
+                         END,
+                       0
+                   ) AS lucro
             FROM vendas2 v
-            JOIN sale_stats ss ON ss.id_venda = v.id
+            LEFT JOIN sale_stats ss ON ss.id_venda = v.id
+        ),
+        cash AS (
+            SELECT %1 AS periodo,
+                   SUM(lv.lucro) AS lucro_caixa
+            FROM vendas2 v
+            JOIN lucro_vendas lv ON lv.id = v.id
             WHERE %3 BETWEEN :inicio1 AND :fim1
               AND v.forma_pagamento <> 'Prazo'
             GROUP BY %1
@@ -525,8 +540,7 @@ QMap<QString, double> Relatorios_repository::buscarLucroPeriodo(
         credit AS (
             SELECT %2 AS periodo,
                    SUM(
-                       (ss.lucro_total - COALESCE(v.desconto, 0))
-                       * ev.valor_final / NULLIF(v.valor_final, 0)
+                       COALESCE(lv.lucro * ev.valor_final / NULLIF(v.valor_final, 0), 0)
                        - CASE
                              WHEN ev.forma_pagamento IN ('Crédito', 'Débito')
                              THEN (ev.total - COALESCE(ev.desconto, 0)) * COALESCE(ev.taxa, 0) / 100.0
@@ -534,8 +548,8 @@ QMap<QString, double> Relatorios_repository::buscarLucroPeriodo(
                          END
                    ) AS lucro_caixa
             FROM entradas_vendas ev
-            JOIN sale_stats ss ON ss.id_venda = ev.id_venda
             JOIN vendas2 v ON v.id = ev.id_venda
+            JOIN lucro_vendas lv ON lv.id = v.id
             WHERE %4 BETWEEN :inicio2 AND :fim2
             GROUP BY %2
         )

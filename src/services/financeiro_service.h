@@ -6,7 +6,7 @@
 #include <QDate>
 #include "entradasvendas_service.h"
 #include "Produto_service.h"
-#include "vendas_service.h"
+#include "../services/vendas_service.h"
 #include "../repository/relatorios_repository.h"
 
 

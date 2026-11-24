@@ -929,6 +929,7 @@ VendasDTO venda::construirVendasDTO(){
     QString descontoInicial = ui->Ledit_Desconto->text();
     QString desconto;
     QString obs = ui->Ledit_OBS->text().trimmed();
+    QString lucro = ui->Lbl_Lucro->text();
 
     if (ui->CheckPorcentagem->isChecked())
         desconto = portugues.toString(
@@ -952,6 +953,7 @@ VendasDTO venda::construirVendasDTO(){
     newVenda.valorFinal     = portugues.toDouble(valor_final);
     newVenda.valorRecebido  = portugues.toDouble(recebido);
     newVenda.observacao     = obs;
+    newVenda.lucro          = portugues.toDouble(lucro);
 
     return newVenda;
 }

@@ -1651,6 +1651,33 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
 
             }
 
+            if(!query.exec(R"(
+                UPDATE vendas2
+                SET lucro =
+                    COALESCE((
+                        SELECT SUM(pv.quantidade *
+                                   (pv.preco_vendido - COALESCE(p.preco_fornecedor, 0)))
+                        FROM produtos_vendidos pv
+                        JOIN produtos p ON p.id = pv.id_produto
+                        WHERE pv.id_venda = vendas2.id
+                    ), 0)
+                    - COALESCE(desconto, 0)
+                    - CASE
+                          WHEN forma_pagamento IN ('Crédito', 'Débito')
+                          THEN (COALESCE(total, 0) - COALESCE(desconto, 0))
+                               * COALESCE(taxa, 0) / 100.0
+                          ELSE 0
+                      END
+                WHERE lucro IS NULL
+            )")){
+                qDebug() << "Erro ao calcular lucro das vendas antigas migração 14:"
+                         << query.lastError().text();
+                db.rollback();
+                break;
+            }
+            qDebug() << "lucro calculado para" << query.numRowsAffected()
+                     << "vendas antigas migração 14";
+
 
             if (!setSchemaVersion(14)) {
                 qDebug() << "Erro ao atualizar user_version para 14:" << query.lastError().text();

@@ -1,5 +1,7 @@
 #include "venda.h"
 #include "ui_venda.h"
+#include <QTextCursor>
+#include <QSignalBlocker>
 #include "customdelegate.h"
 #include <QSqlQueryModel>
 #include <QSqlQuery>
@@ -148,6 +150,21 @@ venda::venda(QWidget *parent) :
     QDoubleValidator *validador = new QDoubleValidator(0.0, 9999.99, 2, this);
     ui->Ledit_Taxa->setValidator(validador);
     ui->Ledit_Recebido->setValidator(new QDoubleValidator(0.0, 99999.99, 2, this));
+
+    // observacao: QPlainTextEdit quebra a linha sozinho, mas nao tem maxLength
+    connect(ui->Ledit_OBS, &QPlainTextEdit::textChanged, this, [this]() {
+        constexpr int LIMITE_OBS = 255;
+        QString texto = ui->Ledit_OBS->toPlainText();
+        if (texto.length() <= LIMITE_OBS)
+            return;
+        QTextCursor cursor = ui->Ledit_OBS->textCursor();
+        int pos = qMin(cursor.position(), LIMITE_OBS);
+        QSignalBlocker bloqueio(ui->Ledit_OBS);
+        ui->Ledit_OBS->setPlainText(texto.left(LIMITE_OBS));
+        cursor = ui->Ledit_OBS->textCursor();
+        cursor.setPosition(pos);
+        ui->Ledit_OBS->setTextCursor(cursor);
+    });
     ui->Ledit_Desconto->setValidator(new QDoubleValidator(0.0, 99999.99, 2, this));
     QIntValidator *validadorInt = new QIntValidator(this);
     ui->Ledit_NNF->setValidator(validadorInt);
@@ -635,7 +652,7 @@ void venda::salvarRascunho()
     dto.descontoPorcentagem = ui->CheckPorcentagem->isChecked();
     dto.modeloNf            = ui->CBox_ModeloEmit->currentIndex();
     dto.emitirTodos         = ui->RadioBtn_EmitNfTodos->isChecked();
-    dto.observacao          = ui->Ledit_OBS->text();
+    dto.observacao          = ui->Ledit_OBS->toPlainText();
 
     rascunhoServ.salvar(dto);
 }
@@ -694,7 +711,7 @@ void venda::verificarRascunho()
         ui->DateEdt_Venda->setDateTime(QDateTime::fromString(rascunho.dataHora, "yyyy-MM-dd HH:mm:ss"));
 
     if (rascunho.observacao != "") {
-        ui->Ledit_OBS->setText(rascunho.observacao);
+        ui->Ledit_OBS->setPlainText(rascunho.observacao);
     }
 
     // pagamento e NF serão aplicados em configurarPaginaPagamento/configurarPaginaNF
@@ -937,7 +954,7 @@ VendasDTO venda::construirVendasDTO(){
     QString valor_final    = ui->Lbl_TotalTaxa->text();
     QString descontoInicial = ui->Ledit_Desconto->text();
     QString desconto;
-    QString obs = ui->Ledit_OBS->text().trimmed();
+    QString obs = ui->Ledit_OBS->toPlainText().trimmed();
     QString lucro = ui->Lbl_Lucro->text();
 
     if (ui->CheckPorcentagem->isChecked())

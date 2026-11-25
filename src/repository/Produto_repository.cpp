@@ -79,18 +79,24 @@ bool Produto_Repository::inserir(const ProdutoDTO &p, QString &erroSQL)
     return true;
 }
 
-void Produto_Repository::listarProdutos(QSqlQueryModel* model)
+int Produto_Repository::listarProdutos(QSqlQueryModel* model)
 {
     if (!model) {
         qDebug() << "Model inválido em listarProdutos";
-        return;
+        return -1;
     }
     if(!DatabaseConnection_service::open()){
         qDebug() << "db nao aberto ao salvar resumo nota";
-        return;
+        return -1;
     }
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC LIMIT 240", db);
 
+    QSqlQuery count(db);
+    if (!count.exec("SELECT COUNT(*) FROM produtos") || !count.next()) {
+        qDebug() << "[SQL ERROR] contar produtos:" << count.lastError().text();
+        return -1;
+    }
+    return count.value(0).toInt();
 }
 
 QSqlQueryModel* Produto_Repository::getProdutoPeloCodigo(const QString &codigoBarras){
@@ -135,50 +141,62 @@ bool Produto_Repository::deletar(const QString &id, QString &erroSQL)
     return true;
 }
 
-void Produto_Repository::pesquisar(const QStringList &palavras,
+int Produto_Repository::pesquisar(const QStringList &palavras,
                                               const QString &textoNormalizado, QSqlQueryModel* model)
 {
     if (!model) {
         qDebug() << "Model inválido em pesquisar";
-        return;
+        return -1;
     }
 
     if(!DatabaseConnection_service::open()){
         qDebug() << "db nao aberto ao salvar resumo nota";
-        return;
+        return -1;
     }
 
-    QString sql = "SELECT * FROM produtos WHERE ";
+    QString where;
     QStringList conditions;
 
     if (palavras.size() > 1) {
         for (int i = 0; i < palavras.size(); ++i) {
             conditions << QString("descricao LIKE :p%1").arg(i);
         }
-        sql += conditions.join(" AND ");
+        where = conditions.join(" AND ");
     } else {
-        sql += "descricao LIKE :busca OR codigo_barras LIKE :busca";
+        where = "descricao LIKE :busca OR codigo_barras LIKE :busca";
     }
 
-    sql += " ORDER BY id DESC";
+    auto bindFiltro = [&](QSqlQuery &q) {
+        if (palavras.size() > 1) {
+            for (int i = 0; i < palavras.size(); ++i) {
+                q.bindValue(QString(":p%1").arg(i), "%" + palavras[i] + "%");
+            }
+        } else {
+            q.bindValue(":busca", "%" + textoNormalizado + "%");
+        }
+    };
 
     QSqlQuery query(db);
-    query.prepare(sql);
-
-    if (palavras.size() > 1) {
-        for (int i = 0; i < palavras.size(); ++i) {
-            query.bindValue(QString(":p%1").arg(i), "%" + palavras[i] + "%");
-        }
-    } else {
-        query.bindValue(":busca", "%" + textoNormalizado + "%");
-    }
+    query.prepare("SELECT * FROM produtos WHERE " + where + " ORDER BY id DESC");
+    bindFiltro(query);
 
     if (!query.exec()) {
         qDebug() << "[SQL ERROR]" << query.lastError().text();
-        return;
+        return -1;
     }
 
-    model->setQuery(query);
+    model->setQuery(std::move(query));
+
+    // o model busca as linhas aos poucos (fetchMore), entao rowCount() nao
+    // da o total real; conta com o mesmo filtro.
+    QSqlQuery count(db);
+    count.prepare("SELECT COUNT(*) FROM produtos WHERE " + where);
+    bindFiltro(count);
+    if (!count.exec() || !count.next()) {
+        qDebug() << "[SQL ERROR] contar pesquisa:" << count.lastError().text();
+        return -1;
+    }
+    return count.value(0).toInt();
 }
 
 bool Produto_Repository::alterar(

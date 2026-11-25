@@ -89,6 +89,7 @@ private:
     void configurarPaginaNF();
     float obterValorFinal(QString taxa, QString desconto);
     void descontoTaxa();
+    void mostrarQtdeCatalogo(int total);
     void terminarPagamento();
     void salvarRascunho();
     void descartarRascunho();

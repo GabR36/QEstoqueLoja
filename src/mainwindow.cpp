@@ -200,6 +200,11 @@ void MainWindow::mostrarProdutoPorCodigoBarras(const QString &codigo)
 {
     model = produtoService->getProdutoPeloCodigo(codigo);
     ui->Tview_Produtos->setModel(model);
+    if (model) {
+        while (model->canFetchMore())
+            model->fetchMore();
+        mostrarQtdeCatalogo(model->rowCount());
+    }
 
 }
 
@@ -230,7 +235,14 @@ void MainWindow::setarIconesJanela(){
 
 void MainWindow::atualizarTableview()
 {
-    produtoService->listarProdutos(model);
+    mostrarQtdeCatalogo(produtoService->listarProdutos(model));
+}
+
+// total de produtos encontrados pela listagem/pesquisa, mesmo que a tabela
+// mostre so parte deles (LIMIT da listagem e carregamento aos poucos do model)
+void MainWindow::mostrarQtdeCatalogo(int total)
+{
+    ui->Lbl_catalog_qtde->setText(total >= 0 ? QString::number(total) : "-");
 }
 
 
@@ -277,7 +289,7 @@ void MainWindow::on_Btn_Pesquisa_clicked()
 {
     QString inputText = ui->Ledit_Pesquisa->text();
 
-    produtoService->pesquisar(inputText, model);
+    mostrarQtdeCatalogo(produtoService->pesquisar(inputText, model));
 
     if (!model) {
         QMessageBox::warning(this, "Erro", "Erro ao realizar a pesquisa.");

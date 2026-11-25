@@ -50,6 +50,7 @@ public:
 
 public slots:
    void atualizarTableviewComQuery(QString &query);
+   void mostrarQtdeCatalogo(int total);
 
 private slots:
 

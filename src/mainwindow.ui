@@ -109,7 +109,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0" colspan="2">
+    <item row="0" column="0">
      <widget class="QFrame" name="frameHeaderBar">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -512,29 +512,27 @@ Produto</string>
       </widget>
      </widget>
     </item>
-    <item row="2" column="1">
-     <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item row="1" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_6">
-        <property name="spacing">
-         <number>0</number>
+       <widget class="CustomLineEdit" name="Ledit_Pesquisa">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>32</height>
+         </size>
         </property>
-        <item>
-         <widget class="CustomLineEdit" name="Ledit_Pesquisa">
-          <property name="minimumSize">
-           <size>
-            <width>200</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
 QLineEdit {
   background-color: white;
   border: 1px solid rgb(175, 185, 205);
@@ -552,34 +550,34 @@ QLineEdit:focus {
   border-right: none;
 }
            </string>
-          </property>
-          <property name="placeholderText">
-           <string>  Pesquisar por descrição ou código de barras</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="Btn_Pesquisa">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>38</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>38</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">
+        </property>
+        <property name="placeholderText">
+         <string>  Pesquisar por descrição ou código de barras</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="Btn_Pesquisa">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>38</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>38</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">
 QPushButton {
   background-color: rgb(43, 132, 191);
   border: 1px solid rgb(43, 132, 191);
@@ -596,94 +594,127 @@ QPushButton:pressed {
   background-color: rgb(153, 193, 241);
 }
            </string>
-          </property>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>18</width>
+          <height>18</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="searchSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label">
+      <property name="styleSheet">
+       <string notr="true">font: 700 9pt &quot;Segoe UI&quot;; font-size: 15px;</string>
+      </property>
+      <property name="text">
+       <string>Produtos:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QTableView" name="Tview_Produtos">
+      <property name="minimumSize">
+       <size>
+        <width>750</width>
+        <height>350</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="baseSize">
+       <size>
+        <width>100</width>
+        <height>200</height>
+       </size>
+      </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="alternatingRowColors">
+       <bool>true</bool>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+      </property>
+      <property name="showGrid">
+       <bool>false</bool>
+      </property>
+      <attribute name="horizontalHeaderCascadingSectionResizes">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>50</number>
+      </attribute>
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label_2">
           <property name="text">
-           <string/>
-          </property>
-          <property name="iconSize">
-           <size>
-            <width>18</width>
-            <height>18</height>
-           </size>
+           <string>Qtde:</string>
           </property>
          </widget>
         </item>
         <item>
-         <spacer name="searchSpacer">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
+         <widget class="QLabel" name="Lbl_catalog_qtde">
+          <property name="text">
+           <string>0</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
+         </widget>
         </item>
        </layout>
       </item>
       <item>
-       <widget class="QLabel" name="label">
-        <property name="styleSheet">
-         <string notr="true">font: 700 9pt &quot;Segoe UI&quot;; font-size: 15px;</string>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
-        <property name="text">
-         <string>Produtos:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QTableView" name="Tview_Produtos">
-        <property name="minimumSize">
+        <property name="sizeHint" stdset="0">
          <size>
-          <width>750</width>
-          <height>350</height>
+          <width>40</width>
+          <height>20</height>
          </size>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>100</width>
-          <height>200</height>
-         </size>
-        </property>
-        <property name="contextMenuPolicy">
-         <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
-        </property>
-        <property name="autoFillBackground">
-         <bool>false</bool>
-        </property>
-        <property name="alternatingRowColors">
-         <bool>true</bool>
-        </property>
-        <property name="selectionMode">
-         <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
-        </property>
-        <property name="selectionBehavior">
-         <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
-        </property>
-        <property name="showGrid">
-         <bool>false</bool>
-        </property>
-        <attribute name="horizontalHeaderCascadingSectionResizes">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="horizontalHeaderDefaultSectionSize">
-         <number>50</number>
-        </attribute>
-        <attribute name="horizontalHeaderStretchLastSection">
-         <bool>true</bool>
-        </attribute>
-        <attribute name="verticalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-       </widget>
+       </spacer>
       </item>
      </layout>
     </item>

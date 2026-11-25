@@ -28,7 +28,7 @@ venda::venda(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    prodServ.listarProdutos(modeloProdutos);
+    mostrarQtdeCatalogo(prodServ.listarProdutos(modeloProdutos));
     ui->Tview_Produtos->setModel(modeloProdutos);
     modeloProdutos->setHeaderData(0, Qt::Horizontal, tr("ID"));
     modeloProdutos->setHeaderData(1, Qt::Horizontal, tr("Quantidade"));
@@ -800,9 +800,16 @@ void venda::focusInEvent(QFocusEvent *event)
 
 void venda::on_Btn_Pesquisa_clicked()
 {
-    prodServ.pesquisar(ui->Ledit_Pesquisa->text(), modeloProdutos);
+    mostrarQtdeCatalogo(prodServ.pesquisar(ui->Ledit_Pesquisa->text(), modeloProdutos));
     if (!modeloProdutos)
         QMessageBox::warning(this, "Erro", "Erro ao realizar a pesquisa.");
+}
+
+// total de produtos encontrados pela listagem/pesquisa, mesmo que a tabela
+// mostre so parte deles (LIMIT da listagem e carregamento aos poucos do model)
+void venda::mostrarQtdeCatalogo(int total)
+{
+    ui->Lbl_catalog_qtde->setText(total >= 0 ? QString::number(total) : "-");
 }
 
 QList<ProdutoVendidoDTO> venda::obterProdutosSelecionados()

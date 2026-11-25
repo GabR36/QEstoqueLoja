@@ -21,8 +21,10 @@ public:
     bool atualizarLocal(int id, const QString &local, QString &erroSQL);
     bool updateAumentarQuantidadeProduto(qlonglong idprod, double quantia);
     ProdutoDTO getProduto(qlonglong id);
-    void listarProdutos(QSqlQueryModel *model);
-    void pesquisar(const QStringList &palavras, const QString &textoNormalizado, QSqlQueryModel *model);
+    // retornam o total de produtos que a consulta encontra (sem o LIMIT),
+    // ou -1 em caso de erro
+    int listarProdutos(QSqlQueryModel *model);
+    int pesquisar(const QStringList &palavras, const QString &textoNormalizado, QSqlQueryModel *model);
     ProdutoDTO getProdutoPeloCodBarras(const QString &codigo);
     bool updateDiminuirQuantidadeProduto(qlonglong idprod, double quantia);
     QVariantMap getProdutoPorCodBarrasMap(const QString &codigo);

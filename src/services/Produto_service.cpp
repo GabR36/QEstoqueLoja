@@ -125,7 +125,7 @@ Produto_Service::Resultado Produto_Service::deletar(const QString &id){
 
 }
 
-void Produto_Service::listarProdutos(QSqlQueryModel *model)
+int Produto_Service::listarProdutos(QSqlQueryModel *model)
 {
     return repo.listarProdutos(model);
 }
@@ -166,7 +166,7 @@ QString Produto_Service::normalizeText(const QString &text) {
 
 }
 
-void Produto_Service::pesquisar(const QString &texto, QSqlQueryModel* model)
+int Produto_Service::pesquisar(const QString &texto, QSqlQueryModel* model)
 {
     QString normalizado = normalizeText(texto);
 

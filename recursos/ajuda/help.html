@@ -46,6 +46,8 @@
 	<li><a href="#configuracao">1.Configuração</a></li>
 	<li><a href="#vendas">2.Vendas</a></li>
 	<li><a href="#relatorios">3.Relatórios</a></li>
+	<li><a href="#Compras">4.Compras</a></li>
+	<li><a href="#desenvolvimento">5.Desenvolvimento</a></li>
       </ul>
     </nav>
 
@@ -184,8 +186,69 @@
       menu de contexto "Devolver Produtos", depois se tudo estiver
       correto a nota de devolução será gerada e enviada para o email
       do destinatário.</p>
-      
-	
+    </section>
+
+    <section id="desenvolvimento">
+      <h2>5.Desenvolvimento</h2>
+      <p>Esta seção é para quem quer contribuir com o código do
+	QEstoqueLoja. O processo é simples e sem burocracia. Esse é o
+	modo que fazemos, não significa que tem que ser assim para
+	você mas serve para dar um norte para quem está começando.</p>
+
+      <h3 id="dev-ambiente">Ambiente de desenvolvimento</h3>
+      <p>Usamos o <b>Qt Creator</b> como IDE: basta abrir o arquivo
+	<code>CMakeLists.txt</code> da raiz do projeto, escolher um kit Qt 6
+	e compilar. O Qt pode vir de duas formas, ambas funcionam:</p>
+      <ul>
+	<li><b>Qt Maintenance Tool</b> (instalador oficial do Qt): instala
+	  uma versão específica do Qt (ex.: 6.8) junto com o Qt Creator, em
+	  uma pasta do usuário. Lembre de marcar os módulos Charts e
+	  Qt 5 Compatibility Module.</li>
+	<li><b>Pacotes do repositório da distribuição</b>: por exemplo no
+	  Debian/Ubuntu <code>qtcreator</code>, <code>qt6-base-dev</code>,
+	  <code>qt6-declarative-dev</code>, <code>qt6-charts-dev</code>,
+	  <code>qt6-tools-dev</code>, <code>qt6-5compat-dev</code>,
+	  <code>libquazip1-qt6-dev</code> e <code>libzint-dev</code>
+	  (e <code>libqt6sql6-psql</code> se for usar PostgreSQL).</li>
+      </ul>
+      <p>As dependências externas (QtRpt e as bibliotecas ACBr) estão
+	listadas no README do projeto.<br>
+	<i>Se usar o Qt da Maintenance Tool e for rodar o executável pelo
+	  terminal, aponte <code>LD_LIBRARY_PATH</code> para a pasta
+	  <code>lib</code> desse Qt, senão o programa pode carregar as
+	  bibliotecas Qt do sistema e não abrir.</i></p>
+
+      <h3 id="dev-fluxo">Fluxo de trabalho (git)</h3>
+      <ol>
+	<li>Crie uma branch para a funcionalidade ou correção a partir
+	  da <code>master</code> (ex.: <code>lucro-na-venda</code>).</li>
+	<li>Desenvolva e faça os commits nessa branch.</li>
+	<li>Quando estiver pronta e testada, faça o merge da branch na
+	  <code>master</code>.</li>
+      </ol>
+
+      <h3 id="dev-regras">Código e commits</h3>
+      <p>Não temos muitas regras de estilo de código ou de commits.
+	Procure seguir o jeito do código ao redor (services, repositories e
+	DTOs em <code>src/</code>). Na mensagem do commit basta dizer
+	<b>qual problema (issue) foi resolvido</b> ou o que foi feito, de
+	forma curta, por exemplo: <i>"arruma lucro quando não há preço de
+	  fornecedor"</i>.</p>
+
+      <h3 id="dev-testes">Testes</h3>
+      <p>Os testes automatizados ficam na pasta <code>tests/</code>
+	(Qt Test) e geram o executável <code>QEstoqueLojaTests</code>, que
+	pode ser rodado direto pelo Qt Creator. Por padrão eles usam um banco
+	SQLite temporário. Para rodar com PostgreSQL configure o CMake com
+	<code>-DTEST_WITH_POSTGRES=ON</code> e defina as variáveis de ambiente
+	<code>TEST_DB_HOST</code>, <code>TEST_DB_PORT</code>,
+	<code>TEST_DB_NAME</code>, <code>TEST_DB_USER</code> e
+	<code>TEST_DB_PASSWORD</code>. Ao criar uma classe de teste nova,
+	adicione os arquivos em <code>tests/CMakeLists.txt</code> e registre
+	a classe em <code>tests/test_main.cpp</code>.</p>
+      <p>Faça um teste se achar que precisa, mas ao menos rode os
+      testes existentes antes de mandar a pull request.</p>
+    </section>
 
   </body>
 </html>

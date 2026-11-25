@@ -373,11 +373,26 @@ void venda::descontoTaxa()
     else
         desconto = descontoInicial;
 
+    // valor final anterior, para saber se o recebido ainda acompanhava o total
+    double valorFinalAnterior = portugues.toDouble(ui->Lbl_TotalTaxa->text());
+    double recebidoAtual = portugues.toDouble(ui->Ledit_Recebido->text());
+
     QString valorFinal = portugues.toString(obterValorFinal(novaTaxa, desconto), 'f', 2);
     ui->Lbl_TotalTaxa->setText(valorFinal);
     ui->Lbl_Total->setText(valorFinal);
-    ui->Ledit_Recebido->setText(valorFinal);
-    ui->Lbl_Troco->setText("0");
+
+    // so atualiza o recebido quando o usuario nao digitou um valor proprio:
+    // campo escondido (pagamento sem troco), vazio, ou igual ao valor final anterior.
+    bool recebidoAcompanhaTotal =
+        ui->Ledit_Recebido->isHidden()
+        || ui->Ledit_Recebido->text().trimmed().isEmpty()
+        || qAbs(recebidoAtual - valorFinalAnterior) < 0.005;
+
+    if (recebidoAcompanhaTotal && ui->Ledit_Recebido->text() != valorFinal) {
+        ui->Ledit_Recebido->setText(valorFinal); // dispara o recalculo do troco
+    } else {
+        on_Ledit_Recebido_textChanged(ui->Ledit_Recebido->text());
+    }
 
     VendasDTO newVenda = construirVendasDTO();
     QList<ProdutoVendidoDTO> prodVendidos = obterProdutosSelecionados();
@@ -392,42 +407,29 @@ void venda::on_CBox_FormaPagamento_activated(int index)
     QString taxaDebito  = QString::number(configDTO.taxaDebitoFinanceiro);
     QString taxaCredito = QString::number(configDTO.taxaCreditoFinanceiro);
 
-    switch (index) {
-    case 0: // dinheiro
-        ui->label_2->show(); ui->label_3->show(); ui->Ledit_Recebido->show(); ui->Lbl_Troco->show();
-        ui->lbl_taxa->hide(); ui->Ledit_Taxa->hide();
-        ui->Ledit_Recebido->setText(Total());
-        ui->Lbl_Troco->setText("0");
-        ui->Ledit_Desconto->setText("0");
-        ui->Ledit_Taxa->setText("0");
-        ui->Lbl_TotalTaxa->setText(Total());
-        ui->Lbl_Total->setText(Total());
-        break;
-    case 2: // crédito
-        ui->label_2->hide(); ui->label_3->hide(); ui->Ledit_Recebido->hide(); ui->Lbl_Troco->hide();
-        ui->lbl_taxa->show(); ui->Ledit_Taxa->show();
-        ui->Ledit_Desconto->setText("0");
-        ui->Ledit_Taxa->setText(taxaCredito);
-        ui->Lbl_TotalTaxa->setText(portugues.toString(obterValorFinal(taxaCredito, "0"), 'f', 2));
-        ui->Lbl_Total->setText(ui->Lbl_TotalTaxa->text());
-        break;
-    case 3: // débito
-        ui->label_2->hide(); ui->label_3->hide(); ui->Ledit_Recebido->hide(); ui->Lbl_Troco->hide();
-        ui->lbl_taxa->show(); ui->Ledit_Taxa->show();
-        ui->Ledit_Desconto->setText("0");
-        ui->Ledit_Taxa->setText(taxaDebito);
-        ui->Lbl_TotalTaxa->setText(portugues.toString(obterValorFinal(taxaDebito, "0"), 'f', 2));
-        ui->Lbl_Total->setText(ui->Lbl_TotalTaxa->text());
-        break;
-    default:
-        ui->label_2->hide(); ui->label_3->hide(); ui->Ledit_Recebido->hide(); ui->Lbl_Troco->hide();
-        ui->lbl_taxa->hide(); ui->Ledit_Taxa->hide();
-        ui->Ledit_Desconto->setText("0");
-        ui->Ledit_Taxa->setText("0");
-        ui->Lbl_TotalTaxa->setText(Total());
-        ui->Lbl_Total->setText(Total());
-        break;
-    }
+    // o desconto digitado e mantido ao trocar a forma de pagamento; so a taxa
+    // muda conforme a forma. descontoTaxa() recalcula total, recebido e troco.
+    bool mostraTroco = (index == 0);
+    bool mostraTaxa  = (index == 2 || index == 3);
+
+    ui->label_2->setVisible(mostraTroco);
+    ui->label_3->setVisible(mostraTroco);
+    ui->Ledit_Recebido->setVisible(mostraTroco);
+    ui->Lbl_Troco->setVisible(mostraTroco);
+    ui->lbl_taxa->setVisible(mostraTaxa);
+    ui->Ledit_Taxa->setVisible(mostraTaxa);
+
+    QString taxa = "0";
+    if (index == 2) taxa = taxaCredito;
+    else if (index == 3) taxa = taxaDebito;
+
+    // ao trocar a forma, o recebido volta a acompanhar o valor final
+    ui->Ledit_Recebido->clear();
+
+    if (ui->Ledit_Taxa->text() != taxa)
+        ui->Ledit_Taxa->setText(taxa); // textChanged -> descontoTaxa()
+    else
+        descontoTaxa();
 }
 
 void venda::on_Ledit_Recebido_textChanged(const QString &)

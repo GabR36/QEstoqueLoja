@@ -992,6 +992,21 @@ void NfeACBR::pag()
     ini << "vTroco=" << QString::number(trocoNf, 'f', 2).replace('.', ',').toStdString() << "\n\n";
 }
 
+void NfeACBR::setObservacao(const QString &obs)
+{
+    // no INI cada valor ocupa uma linha so; infCpl aceita ate 5000 caracteres
+    observacaoNf = obs.simplified().left(5000);
+}
+
+void NfeACBR::infAdic()
+{
+    //Grupo Z. Informações Adicionais (infCpl = informacoes complementares)
+    if (observacaoNf.isEmpty())
+        return;
+    ini << "[DadosAdicionais]\n";
+    ini << "infCpl=" << observacaoNf.toStdString() << "\n\n";
+}
+
 void NfeACBR::infRespTec()
 {
     std::string cnpjRT = configDTO.cnpjRTFiscal.toStdString();
@@ -1070,6 +1085,7 @@ QString NfeACBR::gerarEnviar(){
     total();
     transp();
     pag();
+    infAdic();
     infRespTec();
     if(usarIBS){
         ibscbsTotais();

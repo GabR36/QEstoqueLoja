@@ -1,4 +1,5 @@
 #include "vendas_service.h"
+#include "financeiro_service.h"
 #include <QDebug>
 
 Vendas_service::Vendas_service(QObject *parent)
@@ -100,8 +101,9 @@ bool Vendas_service::vendaPossuiNota(qlonglong idVenda)
     return notaServ.getIdFromIdVenda(idVenda) != -1;
 }
 
-Vendas_service::Resultado Vendas_service::updateNewTotalTrocoValorFinal(double total, double troco, double valorFinal, qlonglong id){
-    if(!vendasRepo.updateNewTotalTrocoValorFinal(total, troco, valorFinal, id)){
+Vendas_service::Resultado Vendas_service::updateNewTotalTrocoValorFinal(double total, double troco, double valorFinal, qlonglong id,
+                                                                        double lucro){
+    if(!vendasRepo.updateNewTotalTrocoValorFinal(total, troco, valorFinal, id, lucro)){
         return {false, VendasErro::UpdateFalhou,  "Erro ao atualizar valores"};
     }else{
         return {true, VendasErro::Nenhum, "Update OK"};
@@ -142,7 +144,18 @@ Vendas_service::Resultado Vendas_service::devolverProdutoRegraNegocio(qlonglong 
     double valorFinalNovo = (totalNovo - venda.desconto)*taxa;
     double trocoNovo = venda.valorRecebido - valorFinalNovo;
 
-    auto result2 = updateNewTotalTrocoValorFinal(totalNovo, trocoNovo, valorFinalNovo, idVenda);
+    VendasDTO vendaNova = venda;
+    vendaNova.total = totalNovo;
+    vendaNova.valorFinal = valorFinalNovo;
+    vendaNova.troco = trocoNovo;
+
+    QList<ProdutoVendidoDTO> produtosvendidos =  prodVendaServ.getProdutosVendidos(idVenda);
+
+    Financeiro_service finanServ;
+    double lucro = finanServ.getLucroEstimadoVendaDto(vendaNova, produtosvendidos);
+    vendaNova.lucro = lucro;
+
+    auto result2 = updateNewTotalTrocoValorFinal(totalNovo, trocoNovo, valorFinalNovo, idVenda, lucro);
     if(!result2.ok){
         return {false, VendasErro::UpdateFalhou, result2.msg};
     }

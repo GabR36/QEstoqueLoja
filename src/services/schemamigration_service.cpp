@@ -1592,6 +1592,18 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
                 }else{
                     qDebug() << "executou query notas_fiscais migração 14";
                 }
+                if(!query.exec("ALTER TABLE vendas2 ADD lucro numeric(10,2)")){
+                    qDebug() << "Não executou query postgre migração 14";
+                }else{
+                    qDebug() << "executou query vendas2-2 migração 14";
+                }
+
+                // rascunho
+                if(!query.exec("ALTER TABLE rascunho_venda ADD observacao TEXT")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query rascunho migração 14";
+                }
 
             }else{
                 //notas fiscais
@@ -1623,8 +1635,57 @@ SchemaMigration_service::Resultado SchemaMigration_service::update() {
                 }else{
                     qDebug() << "executou query vendas2 migração 14";
                 }
+                if(!query.exec("ALTER TABLE vendas2 ADD lucro DECIMAL(10,2)")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query vendas2-2 migração 14";
+                }
+
+                // rascunho
+                if(!query.exec("ALTER TABLE rascunho_venda ADD observacao TEXT")){
+                    qDebug() << "Não executou query sqlite migração 14";
+                }else{
+                    qDebug() << "executou query rascunho migração 14";
+                }
+
 
             }
+
+            if(!query.exec(R"(
+                UPDATE vendas2
+                SET lucro =
+                    COALESCE((
+                        -- sem preco de fornecedor, o custo e estimado tirando a
+                        -- porcentagem de lucro do preco de venda cadastrado
+                        SELECT SUM(pv.quantidade * (
+                                   pv.preco_vendido
+                                   - CASE
+                                         WHEN p.preco_fornecedor IS NOT NULL
+                                              AND p.preco_fornecedor > 0
+                                         THEN p.preco_fornecedor
+                                         ELSE COALESCE(p.preco, 0)
+                                              / (1.0 + COALESCE(p.porcent_lucro, 0) / 100.0)
+                                     END))
+                        FROM produtos_vendidos pv
+                        JOIN produtos p ON p.id = pv.id_produto
+                        WHERE pv.id_venda = vendas2.id
+                    ), 0)
+                    - COALESCE(desconto, 0)
+                    - CASE
+                          WHEN forma_pagamento IN ('Crédito', 'Débito')
+                          THEN (COALESCE(total, 0) - COALESCE(desconto, 0))
+                               * COALESCE(taxa, 0) / 100.0
+                          ELSE 0
+                      END
+                WHERE lucro IS NULL
+            )")){
+                qDebug() << "Erro ao calcular lucro das vendas antigas migração 14:"
+                         << query.lastError().text();
+                db.rollback();
+                break;
+            }
+            qDebug() << "lucro calculado para" << query.numRowsAffected()
+                     << "vendas antigas migração 14";
 
 
             if (!setSchemaVersion(14)) {

@@ -50,6 +50,7 @@ add_executable(QEstoqueLojaTests
     services/test_produtovenda_service.h services/test_produtovenda_service.cpp
     services/test_fiscalemitter_service.h services/test_fiscalemitter_service.cpp
     services/test_eventofiscal_service.h services/test_eventofiscal_service.cpp
+    services/test_financeiro_service.h services/test_financeiro_service.cpp
 
 
 )

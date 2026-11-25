@@ -1,6 +1,9 @@
 #include "Produto_service.h"
 #include <QSqlQuery>
 #include <cmath>
+#include "../dto/ProdutoVendido_dto.h"
+#include "../dto/Produto_dto.h"
+
 Produto_Service::Produto_Service(QObject *parent)
     : QObject{parent},
     portugues(QLocale(QLocale::Portuguese, QLocale::Brazil))
@@ -122,7 +125,7 @@ Produto_Service::Resultado Produto_Service::deletar(const QString &id){
 
 }
 
-void Produto_Service::listarProdutos(QSqlQueryModel *model)
+int Produto_Service::listarProdutos(QSqlQueryModel *model)
 {
     return repo.listarProdutos(model);
 }
@@ -163,7 +166,7 @@ QString Produto_Service::normalizeText(const QString &text) {
 
 }
 
-void Produto_Service::pesquisar(const QString &texto, QSqlQueryModel* model)
+int Produto_Service::pesquisar(const QString &texto, QSqlQueryModel* model)
 {
     QString normalizado = normalizeText(texto);
 
@@ -284,3 +287,21 @@ Produto_Service::Resultado Produto_Service::updateDiminuirQuantidadeProduto(qlon
     }
 }
 
+QList<ProdutoDTO> Produto_Service::getListaProdutosViaListaVendidos(
+    QList<ProdutoVendidoDTO> produtosVendidos)
+{
+    QList<int> ids;
+    for (ProdutoVendidoDTO produtoVend : produtosVendidos) {
+        ids.append(produtoVend.idProduto);
+    }
+
+    qDebug() << "ids getlistaprodutosvialistavendidos: " << ids;
+    for (const int id : ids) {
+        qDebug() << "ID: " << id;
+    }
+
+    QList<ProdutoDTO> produtos;
+    produtos = repo.getProdutosViaIdList(ids);
+
+    return produtos;
+}

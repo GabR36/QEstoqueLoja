@@ -25,6 +25,8 @@ public:
     int getProximoNNF();
     void setNNF(int nNF);
     void setCliente(QString cpf, bool ehPf);
+    // texto livre da venda, vai em infAdic/infCpl (informacoes complementares)
+    void setObservacao(const QString &obs);
     void setPagamentoValores(QString formaPag, double desconto, double recebido, double troco,
                              double taxa);
     qlonglong getNNF();
@@ -79,6 +81,8 @@ private:
     void transp();
     void pag();
     void infRespTec();
+    void infAdic();
+    QString observacaoNf;
     void ibscbsTotais();
 
 

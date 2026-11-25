@@ -33,7 +33,7 @@ QSqlDatabase TestDbFactory::create()
     DatabaseConnection_service::setDatabase(db);
 
     // roda migration
-    SchemaMigration_service schema(nullptr, 12);
+    SchemaMigration_service schema(nullptr, 14);
     auto result = schema.update();
 
     if (!result.ok) {

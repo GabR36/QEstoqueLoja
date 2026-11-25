@@ -27,6 +27,8 @@ public:
     qlonglong getProximoNNF();
     void setNNF(int nNF);
     void setProdutosVendidos(QList<QList<QVariant> > produtosVendidos, bool emitirTodos);
+    // texto livre da venda, vai em infAdic/infCpl (informacoes complementares)
+    void setObservacao(const QString &obs);
     void setPagamentoValores(QString formaPag, float desconto, float recebido, float troco,
                              float taxa);
     qlonglong getNNF();
@@ -105,6 +107,8 @@ private:
     void transp();
     void pag();
     void infRespTec();
+    void infAdic();
+    QString observacaoNf;
     void ibscbsTotais();
 
 

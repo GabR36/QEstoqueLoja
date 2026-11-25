@@ -87,6 +87,7 @@ AlterarCliente::AlterarCliente(QWidget *parent, QString id)
     }else{
         ui->RadioB_Pjuridica->setChecked(true);
     }
+    ui->Ledit_OBS->setText(cli.observacao);
 
 
     db.close();
@@ -129,6 +130,7 @@ void AlterarCliente::on_Btn_Ok_clicked()
     cli.cep = ui->Ledit_CEP->text().trimmed();
     cli.ie = ui->Ledit_IE->text().trimmed();
     cli.indIeDest = ui->CBox_IndIEDest->currentIndex();
+    cli.observacao = ui->Ledit_OBS->text().trimmed();
 
     auto result = cliServ.updateCliente(id.toLongLong(), cli);
     if(!result.ok){

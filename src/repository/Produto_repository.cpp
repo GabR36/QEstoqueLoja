@@ -79,18 +79,24 @@ bool Produto_Repository::inserir(const ProdutoDTO &p, QString &erroSQL)
     return true;
 }
 
-void Produto_Repository::listarProdutos(QSqlQueryModel* model)
+int Produto_Repository::listarProdutos(QSqlQueryModel* model)
 {
     if (!model) {
         qDebug() << "Model inválido em listarProdutos";
-        return;
+        return -1;
     }
     if(!DatabaseConnection_service::open()){
         qDebug() << "db nao aberto ao salvar resumo nota";
-        return;
+        return -1;
     }
     model->setQuery("SELECT * FROM produtos ORDER BY id DESC LIMIT 240", db);
 
+    QSqlQuery count(db);
+    if (!count.exec("SELECT COUNT(*) FROM produtos") || !count.next()) {
+        qDebug() << "[SQL ERROR] contar produtos:" << count.lastError().text();
+        return -1;
+    }
+    return count.value(0).toInt();
 }
 
 QSqlQueryModel* Produto_Repository::getProdutoPeloCodigo(const QString &codigoBarras){
@@ -135,50 +141,62 @@ bool Produto_Repository::deletar(const QString &id, QString &erroSQL)
     return true;
 }
 
-void Produto_Repository::pesquisar(const QStringList &palavras,
+int Produto_Repository::pesquisar(const QStringList &palavras,
                                               const QString &textoNormalizado, QSqlQueryModel* model)
 {
     if (!model) {
         qDebug() << "Model inválido em pesquisar";
-        return;
+        return -1;
     }
 
     if(!DatabaseConnection_service::open()){
         qDebug() << "db nao aberto ao salvar resumo nota";
-        return;
+        return -1;
     }
 
-    QString sql = "SELECT * FROM produtos WHERE ";
+    QString where;
     QStringList conditions;
 
     if (palavras.size() > 1) {
         for (int i = 0; i < palavras.size(); ++i) {
             conditions << QString("descricao LIKE :p%1").arg(i);
         }
-        sql += conditions.join(" AND ");
+        where = conditions.join(" AND ");
     } else {
-        sql += "descricao LIKE :busca OR codigo_barras LIKE :busca";
+        where = "descricao LIKE :busca OR codigo_barras LIKE :busca";
     }
 
-    sql += " ORDER BY id DESC";
+    auto bindFiltro = [&](QSqlQuery &q) {
+        if (palavras.size() > 1) {
+            for (int i = 0; i < palavras.size(); ++i) {
+                q.bindValue(QString(":p%1").arg(i), "%" + palavras[i] + "%");
+            }
+        } else {
+            q.bindValue(":busca", "%" + textoNormalizado + "%");
+        }
+    };
 
     QSqlQuery query(db);
-    query.prepare(sql);
-
-    if (palavras.size() > 1) {
-        for (int i = 0; i < palavras.size(); ++i) {
-            query.bindValue(QString(":p%1").arg(i), "%" + palavras[i] + "%");
-        }
-    } else {
-        query.bindValue(":busca", "%" + textoNormalizado + "%");
-    }
+    query.prepare("SELECT * FROM produtos WHERE " + where + " ORDER BY id DESC");
+    bindFiltro(query);
 
     if (!query.exec()) {
         qDebug() << "[SQL ERROR]" << query.lastError().text();
-        return;
+        return -1;
     }
 
-    model->setQuery(query);
+    model->setQuery(std::move(query));
+
+    // o model busca as linhas aos poucos (fetchMore), entao rowCount() nao
+    // da o total real; conta com o mesmo filtro.
+    QSqlQuery count(db);
+    count.prepare("SELECT COUNT(*) FROM produtos WHERE " + where);
+    bindFiltro(count);
+    if (!count.exec() || !count.next()) {
+        qDebug() << "[SQL ERROR] contar pesquisa:" << count.lastError().text();
+        return -1;
+    }
+    return count.value(0).toInt();
 }
 
 bool Produto_Repository::alterar(
@@ -459,4 +477,71 @@ QVariantMap Produto_Repository::getProdutoPorCodBarrasMap(const QString &codigo)
 
     QVector<QVariantMap> registros = DBUtil::extrairResultados(query);
     return registros.isEmpty() ? QVariantMap{} : registros.first();
+}
+
+QList<ProdutoDTO> Produto_Repository::getProdutosViaIdList(QList<int> ids){
+    if (ids.isEmpty())
+        return {};
+
+    if(!DatabaseConnection_service::open()){
+        qDebug() << "erro ao abrir banco getProdutosViaIdList";
+        return {};
+    }
+
+    QStringList placeholders;
+
+    for (int i = 0; i < ids.size(); ++i) {
+        placeholders.append(QString(":id%1").arg(i));
+    }
+
+    QString sql = QString(
+                      "SELECT * FROM produtos WHERE id IN (%1)"
+                      ).arg(placeholders.join(","));
+
+    QSqlQuery query(db);
+    query.prepare(sql);
+
+    for (int i = 0; i < ids.size(); ++i) {
+        query.bindValue(placeholders[i], ids[i]);
+    }
+
+    QList<ProdutoDTO> produtos;
+
+    if (!query.exec()) {
+        qDebug() << "Erro na query:" << query.lastError().text();
+        return {};
+    }
+
+    if(query.exec()){
+        while(query.next()){
+            ProdutoDTO prod;
+
+            prod.id = query.value("id").toLongLong();
+            prod.quantidade = query.value("quantidade").toDouble();
+            prod.descricao = query.value("descricao").toString();
+            prod.preco =query.value("preco").toDouble();
+            prod.codigoBarras = query.value("codigo_barras").toString();
+            prod.nf = query.value("nf").toBool();
+            prod.uCom = query.value("un_comercial").toString();
+            prod.precoFornecedor = query.value("preco_fornecedor").toDouble();
+            prod.percentLucro = query.value("porcent_lucro").toDouble();
+            prod.ncm = query.value("ncm").toString();
+            prod.cest = query.value("cest").toString();
+            prod.aliquotaIcms = query.value("aliquota_imposto").toDouble();
+            prod.csosn = query.value("csosn").toString();
+            prod.pis = query.value("pis").toString();
+            prod.local = query.value("local").toString();
+            prod.adicionadoEm = query.value("adicionado_em").toString();
+            prod.atualizadoEm = query.value("atualizado_em").toString();
+
+            produtos.append(prod);
+
+            qDebug() << "id (getProdutosViaIdList): " << prod.id;
+            qDebug() << "preco: " << prod.preco;
+            qDebug() << "preco fornec: " << prod.precoFornecedor;
+            qDebug() << "quant: " << prod.quantidade;
+        }
+    }
+
+    return produtos;
 }

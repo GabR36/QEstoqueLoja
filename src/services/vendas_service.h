@@ -57,7 +57,7 @@ public:
     Vendas_service::Resultado deletarVenda(qlonglong id);
     Vendas_service::Resultado deletarVendaRegraNegocio(qlonglong idVenda, bool cancelarNf);
     bool vendaPossuiNota(qlonglong idVenda);
-    Vendas_service::Resultado updateNewTotalTrocoValorFinal(double total, double troco, double valorFinal, qlonglong id);
+    Vendas_service::Resultado updateNewTotalTrocoValorFinal(double total, double troco, double valorFinal, qlonglong id, double lucro);
     Vendas_service::Resultado devolverProdutoRegraNegocio(qlonglong idProdVend, qlonglong idVenda);
     void listarVendasCliente(QSqlQueryModel *model, qlonglong idcliente);
     void listarVendasDeAteFormaPag(QSqlQueryModel *model, QString de, QString ate, VendasUtil::VendasFormaPagamento formaPag, qlonglong idcliente);

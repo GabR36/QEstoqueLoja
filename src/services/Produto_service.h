@@ -5,6 +5,7 @@
 #include <QLocale>
 #include <QVariantMap>
 #include "../dto/Produto_dto.h"
+#include "../dto/ProdutoVendido_dto.h"
 #include "../util/ibptutil.h"
 #include <QSqlQueryModel>
 #include "../repository/Produto_repository.h"
@@ -42,11 +43,12 @@ public:
   double calcularPercentualLucro(double precoFornecedor, double precoFinal);
   static double round2(double v);
   static float round2f(float v);
-  void listarProdutos(QSqlQueryModel *model);
+  // retornam o total de produtos encontrados (sem o LIMIT da tabela), -1 em erro
+  int listarProdutos(QSqlQueryModel *model);
   QSqlQueryModel *getProdutoPeloCodigo(const QString &codigoBarras);
   Resultado deletar(const QString &id);
   static QString normalizeText(const QString &text);
-  void pesquisar(const QString &texto, QSqlQueryModel *);
+  int pesquisar(const QString &texto, QSqlQueryModel *model);
   QSqlDatabase db;
   QLocale portugues;
   IbptUtil ibpt;
@@ -63,6 +65,7 @@ public:
   QVariantMap getProdutoPorCodBarrasMap(const QString &codigo);
   Resultado atualizarCamposMap(qlonglong id, const QVariantMap &campos, bool marcarNf);
   Produto_Service::Resultado updateDiminuirQuantidadeProduto(qlonglong idprod, double quantia);
+  QList<ProdutoDTO> getListaProdutosViaListaVendidos(QList<ProdutoVendidoDTO> produtosVendidos);
   private slots:
 };
 

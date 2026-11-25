@@ -86,6 +86,10 @@ struct ConfigDTO {
     QString pathPastaPostgreDB;
 
     QString impressoraNomeDispositivo;
+
+    //geral
+    int modeloEmissao = 0;
+    int comportamentoEmissao = 0;
 };
 
 #endif // CONFIG_DTO_H

@@ -121,7 +121,7 @@ VendasDTO Vendas_repository::getVenda(qlonglong id){
 
     QSqlQuery query(db);
     query.prepare("SELECT cliente, data_hora, total, forma_pagamento, valor_recebido, troco, "
-                  "taxa, valor_final, desconto, esta_pago, id_cliente FROM vendas2 "
+                  "taxa, valor_final, desconto, esta_pago, id_cliente, observacao, lucro FROM vendas2 "
                   "WHERE id = :id_venda");
     query.bindValue(":id_venda", id);
     if(query.exec()){
@@ -137,6 +137,8 @@ VendasDTO Vendas_repository::getVenda(qlonglong id){
             result.desconto = query.value("desconto").toDouble();
             result.estaPago = query.value("esta_pago").toBool();
             result.idCliente = query.value("id_cliente").toLongLong();
+            result.observacao = query.value("observacao").toString();
+            result.lucro = query.value("lucro").toDouble();
 
         }
     }else{
@@ -285,7 +287,7 @@ bool Vendas_repository::deletarVenda(qlonglong id){
 }
 
 bool Vendas_repository::updateNewTotalTrocoValorFinal(double total, double troco, double valorFinal,
-                                                      qlonglong id){
+                                                      qlonglong id, double lucro){
     if (!DatabaseConnection_service::open()) {
         qDebug() << "Erro ao abrir banco (updateNewTotalTrocoValorFinal)";
         return false;
@@ -293,12 +295,14 @@ bool Vendas_repository::updateNewTotalTrocoValorFinal(double total, double troco
 
     QSqlQuery query(db);
 
-    query.prepare("UPDATE vendas2 SET total = :total, troco = :troco, valor_final = :final "
+    query.prepare("UPDATE vendas2 SET total = :total, troco = :troco, valor_final = :final, "
+                  "lucro = :lucro "
                   "WHERE id = :id");
     query.bindValue(":total", total);
     query.bindValue(":troco", troco);
     query.bindValue(":final", valorFinal);
     query.bindValue(":id", id);
+    query.bindValue(":lucro", lucro);
     if(!query.exec()){
         qDebug() << "Query não rodou updateNewTotalTrocoValorFinal";
         return false;
@@ -341,9 +345,10 @@ qlonglong Vendas_repository::inserir(VendasDTO venda){
 
     QSqlQuery query(db);
     query.prepare("INSERT INTO vendas2 (cliente, total, data_hora, forma_pagamento, "
-                  "valor_recebido, troco, taxa, valor_final, desconto, id_cliente, esta_pago) "
+                  "valor_recebido, troco, taxa, valor_final, desconto, id_cliente, "
+                  "esta_pago, observacao, lucro) "
                   "VALUES (:cliente, :total, :datahora, :formapag, :recebido, :troco, :taxa, "
-                  ":valorfinal, :desconto, :idcliente, :estapago)");
+                  ":valorfinal, :desconto, :idcliente, :estapago, :obs, :lucro)");
 
     query.bindValue(":cliente", venda.clienteNome);
     query.bindValue(":total", venda.total);
@@ -356,6 +361,8 @@ qlonglong Vendas_repository::inserir(VendasDTO venda){
     query.bindValue(":desconto", venda.desconto);
     query.bindValue(":idcliente", venda.idCliente);
     query.bindValue(":estapago", venda.estaPago);
+    query.bindValue(":obs", venda.observacao);
+    query.bindValue(":lucro", venda.lucro);
 
     if(!query.exec()){
         qDebug() << "Query não executou inserir venda()";

@@ -48,6 +48,9 @@
             }
         }
         MainWindow w;
+        if (!w.inicializacaoValida()) {
+            return 1;
+        }
         w.show();
         return a.exec();
     }

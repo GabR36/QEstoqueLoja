@@ -97,3 +97,7 @@ ConfigDbDTO Config_service::getConfigsDB(){
 bool Config_service::salvarMudancasMigration13(){
     return m_repo->saveMigration13Changes();
 }
+
+bool Config_service::trocarParaSQlite(){
+    return m_repo->saveMigration13Changes();
+}

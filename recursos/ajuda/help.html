@@ -46,6 +46,8 @@
 	<li><a href="#configuracao">1.Configuração</a></li>
 	<li><a href="#vendas">2.Vendas</a></li>
 	<li><a href="#relatorios">3.Relatórios</a></li>
+	<li><a href="#Compras">4.Compras</a></li>
+	<li><a href="#desenvolvimento">5.Desenvolvimento</a></li>
       </ul>
     </nav>
 
@@ -64,8 +66,8 @@
 	<b>Simples Nacional</b>. Se precisar veja a baixo como preencher cada um dos campos da aba Fiscal
 	ou consulte seu contador.</p>
       <ul>
-	<li><b>Usar IBS</b></li>
-	<p>Marcar "Usar IBS" fará com que as notas sejam emitidas usando os novos campos IBS da reforma tributária, ainda estão em fase de testes e devem ser usados apenas se necessário.</p>
+	<li><b>Usar IBS/CBS</b></li>
+	<p>Marcar "Usar IBS/CBS" fará com que as notas sejam emitidas usando os novos campos IBS e CBS da reforma tributária, ainda estão em fase de testes e devem ser usados apenas se necessário. <i>obs: os valores de aliquota para esses campos atualmente são preenchidos com alíquotas de teste simbólicas (0,9% para CBS e 0,1% para IBS).</i></p>
 	<li><b>Número da última NF</b></li>
 	<p>Preencha com os valores da última Nota Fiscal Eletrônica ou Nota Fiscal ao Consumidor Eletrônica
 	  emitida por outro sistema, se nunca foi utilizado outro sistema para emitir notas deve-se deixar os
@@ -85,7 +87,7 @@
 	<p>O CSC deve parecer algo como GW6YWZMZKFOCFHXLH5YQEDUYLWD9KOKKVR6 e o ID CSC: 000001, <i>lembre de usar o CSC e ID CSC de produção se estiver
 	    usando o ambiente produção e o CSC e ID CSC de homologação se estiver usando o ambiente homologação.</i></p>
 	<li><b>Pasta Schemas</b></li>
-	<p>Selecione a pasta de schemas para validar xml das notas que é baixada automaticamente com o QEstoqueLoja, no <i>Windows</i> está em <i>%appdata%\Roaming\QEstoqueLoja\recursos\NFeSchemas</i>, no <i>Linux</i> fica em <i>/usr/local/share/QEstoqueLoja/recursos/NFeSchemas.</i>
+	<p>Selecione a pasta de schemas (Se já não estiver selecionada automaticamente) para validar xml das notas que é baixada automaticamente com o QEstoqueLoja, no <i>Windows</i> está em <i> C:\Usuários\SeuNomeDeUsuario\AppData\Roaming\QEstoqueLoja\recursos\NFeSchemas</i>, no <i>Linux</i> fica em <i>/usr/local/share/QEstoqueLoja/recursos/NFeSchemas.</i>
 	</p>
 	<!-- <p>Baixe a pasta contendo os schemas da NF oficiais do governo, geralmente é recomendado baixar a versão mais atual dos schemas, porém o -->
 	  <!--   QEstoqueLoja nem sempre atualiza imediatamente para comportar as novas mudanças, nessa versão do QEstoqueLoja, a versão <i>Esquema XML NF-e/NFC-e - Pacote de Liberação nº 9o (Novo leiaute da NF-e, NT 2024.001 v.1.00) (ZIP). Publicado em 04/06/2024</i> foi testada e está funcionando corretamente. Para baixar o arquivo compactado contendo a pasta de schemas acesse o <a href="https://www.nfe.fazenda.gov.br/portal/listaConteudo.aspx?tipoConteudo=BMPFMBoln3w=&AspxAutoDetectCookieSupport=1">Portal da Nota Fiscal Eletrônica</a>, escolha a versão recomendada, descompacte o arquivo e selecione a pasta que contem os arquivos .xsd.</p> -->
@@ -100,7 +102,7 @@
 	<li><b>Inscrição Estadual</b></li>
 	<p>Número referente a Inscrição Estadual da sua empresa.</p>
 	<li><b>Responsável Técnico</b></li>
-	<p>Você pode preencher os dados do responsável técnico com os dados da sua empresa como CNPJ, nome, telefone etc. mas para emitir NF-e é necessário que o CNPJ do responsável técnico esteja cadastrado como emissor na Receita, você pode cadastrar o seu CNPJ como <i>emissor próprio</i> no site da receita do seu estado, no Paraná o link é <a href="https://receita.pr.gov.br">receita</a> indo em <i>UPD > Cadastro de Fornecedor</i> no menu lateral, solicite o cadastro como <b> Fornecedor Próprio</b>, deve ser simples e você precisará levar alguns documentos listados no estabelecimento referenciado.<i> Você não precisa preencher os dados referentes a Hash e ID CSRT por enquanto</i>. Após isso você deve cadastastrar o sistema em UPD>Sistema, pode colocar qualquer nome e versão mas lembre-se de cadastrar o sistema com as funções "Emissao NF-e" e Emissao NFC-e", o útimo passo é cadastrar a autorização de uso sua no sistema agora cadastrado, em UPD>autorização de uso>Cadastro de autorização de uso. Se tudo foi feito corretamente você deve conseguir emitir notas-fiscais com seu cnpj como responsável técnico(no Paraná no ambiente de homologação é necessário tambem criar o CSRT no site da receita também).
+	<p>Você pode preencher os dados do responsável técnico com os dados da sua empresa como CNPJ, nome, telefone etc. mas para emitir NF-e é necessário que o CNPJ do responsável técnico esteja cadastrado como emissor na Receita. Você pode cadastrar o seu CNPJ como <i>emissor próprio</i> no site da receita do seu estado, no Paraná o link é <a href="https://receita.pr.gov.br">receita</a> indo em <i>UPD > Cadastro de Fornecedor</i> no menu lateral, solicite o cadastro como <b> Fornecedor Próprio</b>, deve ser simples e você precisará levar alguns documentos listados no estabelecimento referenciado.<i> Você não precisa preencher os dados referentes a Hash e ID CSRT por enquanto</i>. Após isso você deve cadastastrar o sistema em UPD>Sistema, pode colocar qualquer nome e versão mas lembre-se de cadastrar o sistema com as funções "Emissao NF-e" e Emissao NFC-e", o útimo passo é cadastrar a autorização de uso sua no sistema agora cadastrado, em UPD>autorização de uso>Cadastro de autorização de uso. Se tudo foi feito corretamente você deve conseguir emitir notas-fiscais com seu cnpj como responsável técnico(no Paraná no ambiente de homologação é necessário tambem criar o CSRT no site da receita também).
       </ul>
       <h3 id="conf-produto">Produto</h3>
       <p>Use esta aba para setar valores padrão da aba "imposto" do cadastro de produtos, essa aba é mais util se você emite nota fiscal. Confira com seu contador quais valores preencher principalmente para CSOSN e PIS/COFINS, visto que terão impacto no quanto de imposto você vai pagar.
@@ -184,8 +186,69 @@
       menu de contexto "Devolver Produtos", depois se tudo estiver
       correto a nota de devolução será gerada e enviada para o email
       do destinatário.</p>
-      
-	
+    </section>
+
+    <section id="desenvolvimento">
+      <h2>5.Desenvolvimento</h2>
+      <p>Esta seção é para quem quer contribuir com o código do
+	QEstoqueLoja. O processo é simples e sem burocracia. Esse é o
+	modo que fazemos, não significa que tem que ser assim para
+	você mas serve para dar um norte para quem está começando.</p>
+
+      <h3 id="dev-ambiente">Ambiente de desenvolvimento</h3>
+      <p>Usamos o <b>Qt Creator</b> como IDE: basta abrir o arquivo
+	<code>CMakeLists.txt</code> da raiz do projeto, escolher um kit Qt 6
+	e compilar. O Qt pode vir de duas formas, ambas funcionam:</p>
+      <ul>
+	<li><b>Qt Maintenance Tool</b> (instalador oficial do Qt): instala
+	  uma versão específica do Qt (ex.: 6.8) junto com o Qt Creator, em
+	  uma pasta do usuário. Lembre de marcar os módulos Charts e
+	  Qt 5 Compatibility Module.</li>
+	<li><b>Pacotes do repositório da distribuição</b>: por exemplo no
+	  Debian/Ubuntu <code>qtcreator</code>, <code>qt6-base-dev</code>,
+	  <code>qt6-declarative-dev</code>, <code>qt6-charts-dev</code>,
+	  <code>qt6-tools-dev</code>, <code>qt6-5compat-dev</code>,
+	  <code>libquazip1-qt6-dev</code> e <code>libzint-dev</code>
+	  (e <code>libqt6sql6-psql</code> se for usar PostgreSQL).</li>
+      </ul>
+      <p>As dependências externas (QtRpt e as bibliotecas ACBr) estão
+	listadas no README do projeto.<br>
+	<i>Se usar o Qt da Maintenance Tool e for rodar o executável pelo
+	  terminal, aponte <code>LD_LIBRARY_PATH</code> para a pasta
+	  <code>lib</code> desse Qt, senão o programa pode carregar as
+	  bibliotecas Qt do sistema e não abrir.</i></p>
+
+      <h3 id="dev-fluxo">Fluxo de trabalho (git)</h3>
+      <ol>
+	<li>Crie uma branch para a funcionalidade ou correção a partir
+	  da <code>master</code> (ex.: <code>lucro-na-venda</code>).</li>
+	<li>Desenvolva e faça os commits nessa branch.</li>
+	<li>Quando estiver pronta e testada, faça o merge da branch na
+	  <code>master</code>.</li>
+      </ol>
+
+      <h3 id="dev-regras">Código e commits</h3>
+      <p>Não temos muitas regras de estilo de código ou de commits.
+	Procure seguir o jeito do código ao redor (services, repositories e
+	DTOs em <code>src/</code>). Na mensagem do commit basta dizer
+	<b>qual problema (issue) foi resolvido</b> ou o que foi feito, de
+	forma curta, por exemplo: <i>"arruma lucro quando não há preço de
+	  fornecedor"</i>.</p>
+
+      <h3 id="dev-testes">Testes</h3>
+      <p>Os testes automatizados ficam na pasta <code>tests/</code>
+	(Qt Test) e geram o executável <code>QEstoqueLojaTests</code>, que
+	pode ser rodado direto pelo Qt Creator. Por padrão eles usam um banco
+	SQLite temporário. Para rodar com PostgreSQL configure o CMake com
+	<code>-DTEST_WITH_POSTGRES=ON</code> e defina as variáveis de ambiente
+	<code>TEST_DB_HOST</code>, <code>TEST_DB_PORT</code>,
+	<code>TEST_DB_NAME</code>, <code>TEST_DB_USER</code> e
+	<code>TEST_DB_PASSWORD</code>. Ao criar uma classe de teste nova,
+	adicione os arquivos em <code>tests/CMakeLists.txt</code> e registre
+	a classe em <code>tests/test_main.cpp</code>.</p>
+      <p>Faça um teste se achar que precisa, mas ao menos rode os
+      testes existentes antes de mandar a pull request.</p>
+    </section>
 
   </body>
 </html>

@@ -106,6 +106,8 @@ void InserirCliente::on_Btn_Inserir_clicked()
     newCli.cep = ui->Ledit_CEP->text().trimmed();
     newCli.ie = ui->Ledit_IE->text().trimmed();
     newCli.indIeDest = ui->CBox_IndIEDest->currentIndex();
+    newCli.observacao = ui->Ledit_OBS->text().trimmed();
+
 
     if(ui->RadioB_Pfisica->isChecked()){
         newCli.ehPf = true;

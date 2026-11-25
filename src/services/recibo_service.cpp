@@ -5,6 +5,7 @@
 #include "../infra/databaseconnection_service.h"
 #include "config_service.h"
 #include <QFontMetrics>
+#include <QRect>
 
 Recibo_service::Recibo_service(QObject *parent)
     : QObject{parent}
@@ -39,7 +40,7 @@ void Recibo_service::imprimirReciboVenda(qlonglong idvenda){
 
 
     VendasDTO venda = vendaServ.getVenda(idvenda);
-
+    ClienteDTO cliente = clieServ.getClienteByID(venda.idCliente);
 
 
     QDateTime dataVenda;
@@ -77,7 +78,33 @@ void Recibo_service::imprimirReciboVenda(qlonglong idvenda){
     painter.drawText(xPos, yPos, "Data/Hora: " + dataFormatada);
     yPos += 20;
     painter.drawText(xPos, yPos, "Cliente: " + venda.clienteNome);
-    yPos += 30;
+    yPos += 20;
+    QString observacao = "Observação: " + venda.observacao;
+
+    // Largura disponível para impressão
+    int largura = printer.pageRect(QPrinter::DevicePixel).width() - margemEsquerda - 20;
+
+    // Calcula o espaço necessário para o texto
+    QFontMetrics fm(painter.font());
+
+    QRect textoRect = fm.boundingRect(
+        0,
+        0,
+        largura,
+        10000,
+        Qt::TextWordWrap,
+        observacao
+        );
+
+    // Desenha o texto com quebra automática de linhas
+    painter.drawText(
+        QRect(xPos, yPos, largura, textoRect.height()),
+        Qt::TextWordWrap,
+        observacao
+        );
+
+    // Avança a posição vertical conforme a altura utilizada
+    yPos += textoRect.height() + 30;
     painter.drawText(xPos, yPos, "Quant:");
     int xPosProds = 65;
     xPos = xPosProds;
@@ -97,8 +124,6 @@ void Recibo_service::imprimirReciboVenda(qlonglong idvenda){
     auto produtos = prodVendaServ.getProdutosVendidos(idvenda);
     //QStringList descricoes = getDescricoesProdutos(produtos);
     //int index = 0;  // Índice para acessar as descrições
-
-    QFontMetrics fm(painter.font());
 
     const int larguraDescricao = xPosValor - xPosProds - 30;
     const int alturaDuasLinhas = fm.lineSpacing() * 3;

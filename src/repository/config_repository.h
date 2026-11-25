@@ -15,6 +15,7 @@ public:
     bool testarConexaoBanco(const ConfigDTO &dto, QString &erro);
     ConfigDbDTO getConfigsDb();
     bool saveMigration13Changes();
+    bool SwitchToSqlite();
 signals:
 };
 

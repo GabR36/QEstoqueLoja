@@ -22,6 +22,7 @@ struct ClienteDTO {
     QString ie;
     QString adicionadoEm;
     QString atualizadoEm;
+    QString observacao;
 
 };
 

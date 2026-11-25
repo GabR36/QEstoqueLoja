@@ -108,6 +108,7 @@ set(QESTOQUE_SOURCES
     src/services/acbr_service.cpp
     src/services/schemamigration_service.cpp
     src/services/escposprinter_service.cpp
+    src/services/financeiro_service.cpp
 
 
     src/repository/Produto_repository.cpp
@@ -120,6 +121,7 @@ set(QESTOQUE_SOURCES
     src/repository/vendas_repository.cpp
     src/repository/produtovenda_repository.cpp
     src/repository/entradasvendas_repository.cpp
+    src/repository/relatorios_repository.cpp
 
     src/util/datautil.cpp
     src/util/ibptutil.cpp

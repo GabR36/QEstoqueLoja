@@ -17,6 +17,8 @@ struct RascunhoVendaDTO {
     int       modeloNf         = 0;
     bool      emitirTodos      = false;
     QString   atualizadoEm;
+
+    QString   observacao;
 };
 
 #endif // RASCUNHOVENDA_DTO_H

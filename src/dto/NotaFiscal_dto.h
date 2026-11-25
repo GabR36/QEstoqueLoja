@@ -22,6 +22,9 @@ struct NotaFiscalDTO {
     QString dhEmi;
     qlonglong idEmissorCliente = 0;
     QString adicionadoEm;
+    QString tokenReserva;
+    QString processandoPor;
+    QString processandoAte;
 };
 
 #endif // NOTAFISCAL_DTO_H

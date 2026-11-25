@@ -89,6 +89,10 @@ cmake -S . -B build
 cmake --build build
 ```
 
+# Contato
+
+- Gabriel <gabrielchuede.publico@gmail.com>
+
 ## Capturas de Tela
 
 ![Tela Principal](/Imagens/capturas_de_tela/capturaPrincipal.png)

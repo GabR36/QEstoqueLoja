@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSqlDatabase>
 #include "../dto/RascunhoVenda_dto.h"
+#include <QLocale>
 
 class RascunhoVenda_repository : public QObject
 {
@@ -18,6 +19,7 @@ public:
 
 private:
     QSqlDatabase db;
+    QLocale portugues;
 
 signals:
 };

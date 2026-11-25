@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>467</width>
-    <height>356</height>
+    <width>490</width>
+    <height>440</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Inserir Cliente</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
-   <item>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
     <widget class="QLabel" name="label_7">
      <property name="font">
       <font>
@@ -26,7 +26,7 @@
      </property>
     </widget>
    </item>
-   <item>
+   <item row="1" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_8">
      <item>
       <widget class="QRadioButton" name="RadioB_Pfisica">
@@ -47,7 +47,7 @@
      </item>
     </layout>
    </item>
-   <item>
+   <item row="2" column="1">
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Orientation::Vertical</enum>
@@ -60,7 +60,7 @@
      </property>
     </spacer>
    </item>
-   <item>
+   <item row="3" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
       <widget class="QLabel" name="label_5">
@@ -89,7 +89,7 @@
      </item>
     </layout>
    </item>
-   <item>
+   <item row="4" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_17">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -322,7 +322,37 @@
      </item>
     </layout>
    </item>
-   <item>
+   <item row="5" column="0" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout_18">
+     <item>
+      <widget class="QLabel" name="label_16">
+       <property name="text">
+        <string>Observação:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="Ledit_OBS">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>60</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="maxLength">
+        <number>255</number>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="6" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout_7">
      <item>
       <widget class="QPushButton" name="Btn_Cancelar">

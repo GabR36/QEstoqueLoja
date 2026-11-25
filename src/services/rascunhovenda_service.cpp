@@ -35,6 +35,7 @@ bool RascunhoVenda_service::salvar(const RascunhoVendaSaveDTO &saveDto)
     rascunho.modeloNf            = saveDto.modeloNf;
     rascunho.emitirTodos         = saveDto.emitirTodos;
     rascunho.atualizadoEm        = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+    rascunho.observacao          = saveDto.observacao;
 
     return rascunhoRepo.salvar(rascunho);
 }

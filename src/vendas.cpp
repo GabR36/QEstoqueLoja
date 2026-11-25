@@ -174,7 +174,6 @@ void Vendas::LabelLucro(QString de, QString ate){
         );
 
     ui->Lbl_Total->setText(portugues.toString(resumo.total, 'f', 2));
-    ui->Lbl_Lucro->setText(portugues.toString(resumo.lucro, 'f', 2));
     ui->Lbl_Quantidade->setText(QString::number(resumo.quantidade));
 }
 

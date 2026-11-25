@@ -68,7 +68,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     DatabaseConnection_service::changeDatabase(configDTO);
 
-    iniciarMigration();
+    if(!iniciarMigration()){
+        inicializacaoOk = false;
+        return;
+    }
 
 
     db = DatabaseConnection_service::db();
@@ -157,7 +160,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::iniciarMigration(){
+bool MainWindow::inicializacaoValida() const {
+    return inicializacaoOk;
+}
+
+bool MainWindow::iniciarMigration(){
 
     SchemaMigration_service *schema = new SchemaMigration_service(this, ultimaVersaoSchema);
     //conexões de ações para update de versao schema
@@ -170,11 +177,22 @@ void MainWindow::iniciarMigration(){
     connect(schema, &SchemaMigration_service::dbVersao13, this,
             &MainWindow::atualizarConfigAcbr);
 
+
     // schema->update();
     auto result = schema->update();
     if(!result.ok){
-        QMessageBox::warning(this, "Erro migração", "Erro ao migrar banco de dados");
+        QMessageBox::warning(this, "Erro migração", result.message);
+        if(result.status == SchemaErro::ProgramaDesatualizado){
+            Config_service confServ;
+            confServ.trocarParaSQlite();
+            QMessageBox::warning(this, "Banco desincronizado",
+                                 "Trocando para banco SQlite Local. inicialize "
+                                 "o QEstoqueLoja novamente.");
+
+        }
+        return false;
     }
+    return true;
 
 }
 
@@ -182,6 +200,11 @@ void MainWindow::mostrarProdutoPorCodigoBarras(const QString &codigo)
 {
     model = produtoService->getProdutoPeloCodigo(codigo);
     ui->Tview_Produtos->setModel(model);
+    if (model) {
+        while (model->canFetchMore())
+            model->fetchMore();
+        mostrarQtdeCatalogo(model->rowCount());
+    }
 
 }
 
@@ -212,7 +235,14 @@ void MainWindow::setarIconesJanela(){
 
 void MainWindow::atualizarTableview()
 {
-    produtoService->listarProdutos(model);
+    mostrarQtdeCatalogo(produtoService->listarProdutos(model));
+}
+
+// total de produtos encontrados pela listagem/pesquisa, mesmo que a tabela
+// mostre so parte deles (LIMIT da listagem e carregamento aos poucos do model)
+void MainWindow::mostrarQtdeCatalogo(int total)
+{
+    ui->Lbl_catalog_qtde->setText(total >= 0 ? QString::number(total) : "-");
 }
 
 
@@ -259,7 +289,7 @@ void MainWindow::on_Btn_Pesquisa_clicked()
 {
     QString inputText = ui->Ledit_Pesquisa->text();
 
-    produtoService->pesquisar(inputText, model);
+    mostrarQtdeCatalogo(produtoService->pesquisar(inputText, model));
 
     if (!model) {
         QMessageBox::warning(this, "Erro", "Erro ao realizar a pesquisa.");

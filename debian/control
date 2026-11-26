@@ -25,6 +25,7 @@ Architecture: any
 Depends:
  ${shlibs:Depends},
  ${misc:Depends},
+ libxml2-dev,
 Description: Sistema de controle de estoque, ERP, PDV simples.
  Software simples ERP para controlar o estoque de lojas pequenas com
  funções de emissão de nota fiscal eletrônica (NF-e) e NFC-e para
